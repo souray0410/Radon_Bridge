@@ -39,3 +39,7 @@ same 128 participants. Do not select medical endpoints by the apparent R&B gain.
 ## 007 — bounded combination sweep
 
 [Protocol and acceptance](007-combination-sweep/README.md). 8 baseline recipes +20 communication configurations +10 seed-replication runs, each8epochs. Fixed within-trial optimization; five-minute monitor. Results pending execution.
+
+## 008 — expanded cohort and rigorous development validation
+
+[Execution plan](008-expanded-validation/PLAN.zh-CN.md). Verified1264train/296development-validation, sealed290test not evaluated. CPU cache preparation first; larger backbone/5-seed controls pending implementation after007. Thirty-minute monitoring.

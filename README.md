@@ -1,5 +1,7 @@
 # R&B / RadonBridge
 
+后续已授权：[008扩大队列与多种子验证计划](experiments/008-expanded-validation/PLAN.zh-CN.md)。监控间隔30分钟；007原批次不变。
+
 最新：[007组合筛查方案](experiments/007-combination-sweep/README.md)，38次短跑，含修复后的独立基线、桥接组合和两个新种子复核。
 
 Current implementation preserves two complete native task paths and uses intermediate
