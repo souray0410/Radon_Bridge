@@ -21,3 +21,12 @@ def validate_formal_protocol(protocol):
         raise ValueError('Verified qualification summary hash required')
     if not protocol.get('qualification_summary_path'):
         raise ValueError('Qualification evidence path required')
+
+    if protocol.get('training_regime') == 'full_finetune':
+        recipe = protocol['recipes'][0]
+        if recipe.get('adapt_stages') != [1, 2, 3, 4] or recipe.get('training_regime') != 'full_finetune':
+            raise ValueError('Full fine-tuning cannot freeze any backbone stage')
+        if protocol.get('batchnorm_policy') != 'train':
+            raise ValueError('This full fine-tuning protocol updates BatchNorm statistics')
+        if protocol.get('recipe_policy') != 'user_full_finetune_override' or not protocol.get('recipe_override_reason'):
+            raise ValueError('Record why the partial-finetuning recipe is superseded')

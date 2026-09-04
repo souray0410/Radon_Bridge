@@ -14,6 +14,12 @@ def configure_optimizer(g, protocol, warm=False):
             p.requires_grad_(enabled)
         if enabled and params:
             groups.append({'params': params, 'lr': protocol['backbone_lr'] if backbone else protocol['head_bridge_lr']})
+    if protocol.get('training_regime') == 'full_finetune':
+        if sorted(stages) != [1, 2, 3, 4] or any(not p.requires_grad for p in g.graph.parameters()):
+            raise ValueError('Full fine-tuning requires every backbone and bridge parameter trainable')
+        assigned = [id(p) for group in groups for p in group['params']]
+        if len(assigned) != len(set(assigned)) or set(assigned) != {id(p) for p in g.graph.parameters()}:
+            raise ValueError('Optimizer must contain every learnable parameter exactly once')
     return torch.optim.AdamW(groups, weight_decay=protocol.get('weight_decay', .01))
 
 def clip_task_gradients(g, max_norm=5.):

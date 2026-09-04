@@ -63,6 +63,8 @@ def main(args):
             raise ValueError('Qualification evidence changed')
         qualification = json.loads(evidence)
         selected = qualification['trials'][qualification['selections']['baseline']]['configuration']['recipe']
+        if protocol.get('recipe_policy') == 'user_full_finetune_override':
+            selected = dict(selected, id=selected['id'] + '_full', adapt_stages=[1, 2, 3, 4], training_regime='full_finetune')
         if selected != protocol['recipes'][0] or protocol['prior_gpu_minutes'] < qualification['elapsed_minutes']:
             raise ValueError('Recipe or prior budget does not match qualification')
     assert protocol['loss_reduction'] == 'sum' and protocol['clip_policy'] == 'per_task'
@@ -148,15 +150,22 @@ def main(args):
         opt = configure_optimizer(g, recipe)
         info = {'recipe': recipe, 'arm': arm, 'seed': seed, 'groups': g.communication_groups,
                 'parameters': sum(p.numel() for p in g.graph.parameters()),
-                'trainable_parameters': sum(p.numel() for p in g.graph.parameters() if p.requires_grad)}
+                'trainable_parameters': sum(p.numel() for p in g.graph.parameters() if p.requires_grad),
+                'trainability_by_module': {name: {'total': sum(p.numel() for p in module.parameters()),
+                    'trainable': sum(p.numel() for p in module.parameters() if p.requires_grad)}
+                    for name, module in g.modules_by_name().items() if list(module.parameters())},
+                'batchnorm_policy': protocol.get('batchnorm_policy', 'frozen_statistics')}
         write_json(directory / 'model.json', info)
         initial = evaluate(g, val, seed); best = initial; best_epoch = 0
         torch.cuda.reset_peak_memory_stats(); trial_start = time.monotonic()
         for epoch in range(protocol['epochs']):
             g.graph.train()
-            for m in g.graph.modules():
-                if isinstance(m, (torch.nn.BatchNorm2d, torch.nn.BatchNorm3d)):
-                    m.eval()
+            if protocol.get('batchnorm_policy', 'frozen_statistics') == 'frozen_statistics':
+                for m in g.graph.modules():
+                    if isinstance(m, (torch.nn.BatchNorm2d, torch.nn.BatchNorm3d)):
+                        m.eval()
+            elif protocol['batchnorm_policy'] != 'train':
+                raise ValueError('Unknown BatchNorm policy')
             losses = {k: 0. for k in g.branches}; gradients = {}; clipped = {}; count = 0; steps = 0
             for batch, (c, o, y, _) in enumerate(loader(train, seed, epoch)):
                 opt.zero_grad(set_to_none=True)
