@@ -1,0 +1,137 @@
+{
+  "source_commit": "0cdc1ad6e3f66a22e578879c04977079fc4d49b4",
+  "source_branch": "main",
+  "parent_source_commits": {
+    "cfp96_s3407": "51a19ee2eb0659e5bb6798aeaa47c784b29487fd",
+    "cfp224_s3407": "51a19ee2eb0659e5bb6798aeaa47c784b29487fd",
+    "oct_s3407": "51a19ee2eb0659e5bb6798aeaa47c784b29487fd",
+    "both96_s3407": "51a19ee2eb0659e5bb6798aeaa47c784b29487fd",
+    "both224_s3407": "51a19ee2eb0659e5bb6798aeaa47c784b29487fd"
+  },
+  "seed": 3407,
+  "validation_participants": 128,
+  "test_used": false,
+  "gpu_training_minutes": 0,
+  "metrics": {
+    "cfp96": {
+      "auroc": 0.595458984375,
+      "auprc": 0.5969320362210346,
+      "log_loss": 0.7129904668793561,
+      "brier": 0.24965517383611566,
+      "accuracy_at_0.5": 0.5390625
+    },
+    "cfp224": {
+      "auroc": 0.65673828125,
+      "auprc": 0.6301115878378679,
+      "log_loss": 0.8464063076954287,
+      "brier": 0.2466494397836646,
+      "accuracy_at_0.5": 0.59375
+    },
+    "oct": {
+      "auroc": 0.650146484375,
+      "auprc": 0.6238078957009183,
+      "log_loss": 0.655045508341258,
+      "brier": 0.22999292778742553,
+      "accuracy_at_0.5": 0.5703125
+    },
+    "joint96": {
+      "auroc": 0.621337890625,
+      "auprc": 0.6084362890675837,
+      "log_loss": 1.3718411315742776,
+      "brier": 0.328227055368001,
+      "accuracy_at_0.5": 0.578125
+    },
+    "joint224": {
+      "auroc": 0.650390625,
+      "auprc": 0.6825027209165172,
+      "log_loss": 0.8094478235514779,
+      "brier": 0.2580254696564326,
+      "accuracy_at_0.5": 0.6328125
+    },
+    "radon224": {
+      "auroc": 0.638671875,
+      "auprc": 0.6585322524650484,
+      "log_loss": 1.0209559315814651,
+      "brier": 0.29147630482912446,
+      "accuracy_at_0.5": 0.6171875
+    },
+    "mean96": {
+      "auroc": 0.654052734375,
+      "auprc": 0.6508197374076815,
+      "log_loss": 0.6516225455642652,
+      "brier": 0.2301024815688622,
+      "accuracy_at_0.5": 0.6015625
+    },
+    "mean224": {
+      "auroc": 0.689208984375,
+      "auprc": 0.7006438968546783,
+      "log_loss": 0.6326954732737412,
+      "brier": 0.22169661539697136,
+      "accuracy_at_0.5": 0.625
+    },
+    "logit224": {
+      "auroc": 0.68310546875,
+      "auprc": 0.6586214268033247,
+      "log_loss": 0.6918413253118172,
+      "brier": 0.22744913621708518,
+      "accuracy_at_0.5": 0.625
+    }
+  },
+  "comparisons": [
+    {
+      "a": "mean224",
+      "b": "cfp224",
+      "delta_auroc": 0.032470703125,
+      "paired_bootstrap_95pct": [
+        -0.027621871610492996,
+        0.09555414948403196
+      ]
+    },
+    {
+      "a": "mean224",
+      "b": "oct",
+      "delta_auroc": 0.0390625,
+      "paired_bootstrap_95pct": [
+        -0.03333699902248288,
+        0.1127499094401989
+      ]
+    },
+    {
+      "a": "mean224",
+      "b": "joint224",
+      "delta_auroc": 0.038818359375,
+      "paired_bootstrap_95pct": [
+        -0.037926755146638985,
+        0.113037109375
+      ]
+    },
+    {
+      "a": "mean224",
+      "b": "radon224",
+      "delta_auroc": 0.050537109375,
+      "paired_bootstrap_95pct": [
+        -0.013921465417412526,
+        0.11602502132674536
+      ]
+    },
+    {
+      "a": "mean96",
+      "b": "oct",
+      "delta_auroc": 0.00390625,
+      "paired_bootstrap_95pct": [
+        -0.057867625110554245,
+        0.06445509736761082
+      ]
+    },
+    {
+      "a": "logit224",
+      "b": "mean224",
+      "delta_auroc": -0.006103515625,
+      "paired_bootstrap_95pct": [
+        -0.017129160243937788,
+        0.003459352606869254
+      ]
+    }
+  ],
+  "limitation": "Exploratory follow-up using shared validation and one training seed; no multiplicity adjustment."
+}

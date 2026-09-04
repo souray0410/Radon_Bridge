@@ -96,3 +96,10 @@ report fixed-last-epoch metrics alongside validation-selected metrics.
 unimodal predictions for equal-weight late fusion, without additional training.
 `main` always holds the latest code and records; timestamp branches archive the
 previous main before each executable update. ws follows main after running jobs finish.
+
+See the [experiment ledger](experiments/INDEX.md) for all source tags and reports.
+Latest completed feedback: 7 training runs / 19 continuations took 11.07 minutes
+on one GPU with a 2064 MiB peak. R&B showed no reliable added benefit. A subsequent
+zero-training equal-probability fusion reached exploratory validation AUROC
+0.6892; paired uncertainty intervals still cross zero. This practical baseline
+will be retained in subsequent studies.
