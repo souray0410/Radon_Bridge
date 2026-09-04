@@ -60,6 +60,20 @@ class Loss(nn.Module):
         return nn.functional.cross_entropy(logits, target.long())
 
 
+class SliceMaxPool3d(nn.Module):
+    """Depth-one 3D max pooling via deterministic per-slice 2D kernels."""
+    def __init__(self, pool):
+        super().__init__()
+        if pool.return_indices:
+            raise ValueError('Index-returning pooling requires explicit 3D index conversion')
+        self.pool = copy.deepcopy(pool)
+
+    def forward(self, x):
+        b, c, d, h, w = x.shape
+        y = self.pool(x.permute(0, 2, 1, 3, 4).reshape(b*d, c, h, w))
+        return y.reshape(b, d, c, *y.shape[-2:]).permute(0, 2, 1, 3, 4).contiguous()
+
+
 def inflate(module):
     """Inflate ImageNet 2D filters along depth; this is not OCT pretraining."""
     if isinstance(module, nn.Conv2d):
@@ -76,8 +90,7 @@ def inflate(module):
         result = nn.BatchNorm3d(module.num_features, eps=module.eps, momentum=module.momentum)
         result.load_state_dict(module.state_dict()); return result
     if isinstance(module, nn.MaxPool2d):
-        return nn.MaxPool3d((1, module.kernel_size, module.kernel_size),
-                           (1, module.stride, module.stride), (0, module.padding, module.padding))
+        return SliceMaxPool3d(module)
     result = copy.deepcopy(module)
     for name, child in module.named_children(): setattr(result, name, inflate(child))
     return result
