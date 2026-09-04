@@ -68,6 +68,19 @@ def main():
     torch.optim.SGD(parameters,lr=lr).step()
     assert all(torch.allclose(p,e,atol=2e-6) for p,e in zip(parameters,expected))
     report["mhd"]={"nodes":len(g.nodes),"edges":len(g.edges),"max_gradient_error":max(errors),"update_matches":True,"zero_bridge_exact":True}
+    # New graph paths: high-resolution projection and truly independent modalities.
+    high=torch.randn(1,2,3,224,224)
+    high_base=PilotGraph(cfp_size=224);high_radon=PilotGraph("radon",cfp_size=224)
+    hb,_=high_base.forward(high,o,y);hr,_=high_radon.forward(high,o,y)
+    assert torch.equal(hb,hr)
+    for modality in ("cfp","oct"):
+        mono=PilotGraph(cfp_size=224,modalities=modality)
+        logits,loss=mono.forward(high,o,y);mono.backward()
+        assert mono.modules_by_name()["classifier"].weight.grad.abs().sum()>0
+        unused="oct" if modality=="cfp" else "cfp"
+        assert not any(name.startswith(unused+"_") for name in mono.modules_by_name())
+        assert torch.allclose(logits,mono.native_forward(high,o,y)[0])
+    report["new_paths"]={"cfp224_zero_bridge_exact":True,"independent_modalities_backward":True}
     report["seconds"]=time.time()-start
     print(json.dumps(report,indent=2))
 

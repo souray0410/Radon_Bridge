@@ -18,14 +18,15 @@ from .data import PairedDataset
 def main(args):
     torch.set_num_threads(3)
     torch.cuda.set_per_process_memory_fraction(8*1024**3/torch.cuda.get_device_properties(0).total_memory)
-    def loader(split):return DataLoader(PairedDataset(args.data,split),batch_size=4,num_workers=2)
+    def loader(split):return DataLoader(PairedDataset(args.data,split,config.get("cfp_size",96)),batch_size=4,num_workers=2)
     report={}
     with torch.no_grad():
         for run_name in args.runs:
             run=Path(run_name);config=json.loads((run/"config.json").read_text())
+            if config.get("modalities","both") != "both": raise ValueError("Diagnostics require a joint run")
             ratio=config.get("handoff_ratio",.25)
             for ck in ("best","last"):
-                g=PilotGraph("radon",device="cuda",backbone="resnet18",handoff_ratio=ratio)
+                g=PilotGraph("radon",device="cuda",backbone="resnet18",handoff_ratio=ratio,cfp_size=config.get("cfp_size",96))
                 state=torch.load(run/f"radon_{ck}.pt",map_location="cpu",weights_only=False)
                 g.load_state(state["model"]);g.graph.eval()
                 mixer=g.modules_by_name()["projection_mixer"];n=mixer.h1
@@ -50,7 +51,7 @@ def main(args):
                 del g,state;torch.cuda.empty_cache()
         # These are probes of jointly trained features, NOT independently
         # trained unimodal clinical baselines. C=0.01 is fixed before fitting.
-        run=Path(args.runs[-1]);g=PilotGraph(device="cuda",backbone="resnet18")
+        run=Path(args.runs[-1]);g=PilotGraph(device="cuda",backbone="resnet18",cfp_size=config.get("cfp_size",96))
         g.load_state(torch.load(run/"warmup_best.pt",map_location="cpu",weights_only=False)["model"]);g.graph.eval()
         features={}
         for split in ("train","validation"):

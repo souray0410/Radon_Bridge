@@ -1,0 +1,14 @@
+{
+  "experiment": "003-cfp-resolution",
+  "max_minutes": 25,
+  "common": {"batch": 4, "warmup_epochs": 10, "arm_epochs": 10, "handoff_ratio": 0.03125, "lr": 0.0001},
+  "runs": [
+    {"id": "both96_s3407", "cfp_size": 96, "modalities": "both", "seed": 3407},
+    {"id": "both224_s3407", "cfp_size": 224, "modalities": "both", "seed": 3407},
+    {"id": "cfp96_s3407", "cfp_size": 96, "modalities": "cfp", "seed": 3407},
+    {"id": "cfp224_s3407", "cfp_size": 224, "modalities": "cfp", "seed": 3407},
+    {"id": "oct_s3407", "cfp_size": 96, "modalities": "oct", "seed": 3407},
+    {"id": "both96_s3408", "cfp_size": 96, "modalities": "both", "seed": 3408},
+    {"id": "both224_s3408", "cfp_size": 224, "modalities": "both", "seed": 3408}
+  ]
+}

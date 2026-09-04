@@ -81,3 +81,13 @@ The first feedback run used Handoff 0.25 and showed immediate overfitting. The
 current default is 0.03125. After warmup, backbone stage 4 is fixed and matched
 arms train only the classifier, plus bridge parameters where present. This is
 an evidence-driven pilot change; it is not a selected final hyperparameter.
+
+## Experiment history and deployment
+
+See [project management](PROJECT_MANAGEMENT.zh-CN.md) for permanent experiment
+branches and the single ws checkout. The first two pilots are documented in
+[PILOT_REPORT.zh-CN.md](PILOT_REPORT.zh-CN.md). The next fixed protocol is
+[experiment 003](experiments/003-cfp-resolution/PROTOCOL.md): original CFP at
+96 versus 224, independent unimodal baselines, and two seeds of matched bridges.
+New runs enable deterministic algorithms, include epoch-zero checkpoints, and
+report fixed-last-epoch metrics alongside validation-selected metrics.

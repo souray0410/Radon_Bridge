@@ -18,6 +18,17 @@ from torch.utils.data import Dataset
 CACHE_SCHEMA = "fullspan32_cfp96_oct96_v1"
 
 
+def read_cfp(path, size):
+    with Image.open(path) as im:
+        im = im.convert("RGB")
+        arr = np.asarray(im); ys, xs = np.where(arr.max(-1) > 8)
+        if not len(xs): raise ValueError("Empty fundus")
+        im = im.crop((xs.min(), ys.min(), xs.max()+1, ys.max()+1))
+        side = max(im.size); padded = Image.new("RGB", (side, side))
+        padded.paste(im, ((side-im.width)//2, (side-im.height)//2))
+        return np.asarray(padded.resize((size, size), Image.Resampling.BILINEAR)).transpose(2,0,1)
+
+
 def prepare(args):
     root = Path(args.output); root.mkdir(parents=True, exist_ok=True)
     frame = pd.read_csv(args.labels, dtype={"participant_id": str})
@@ -45,14 +56,7 @@ def prepare(args):
             cfp_path = Path(args.image_root) / row[eye + "_fundus_path"]
             # Existing exporter uses <archive-parent>/<archive-stem>/<slice>.
             archive = Path(args.source_root) / Path(row[eye + "_oct_path"]).parent.with_suffix(".zip")
-            with Image.open(cfp_path) as im:
-                im = im.convert("RGB")
-                arr = np.asarray(im); ys, xs = np.where(arr.max(-1) > 8)
-                if not len(xs): raise ValueError("Empty fundus")
-                im = im.crop((xs.min(), ys.min(), xs.max()+1, ys.max()+1))
-                side = max(im.size); padded = Image.new("RGB", (side,side))
-                padded.paste(im, ((side-im.width)//2, (side-im.height)//2))
-                cfps.append(np.asarray(padded.resize((96,96), Image.Resampling.BILINEAR)).transpose(2,0,1))
+            cfps.append(read_cfp(cfp_path, 96))
             with zipfile.ZipFile(archive) as z:
                 members = [i for i in z.infolist() if Path(i.filename).suffix.lower() == ".png"]
                 numbers = [int(re.search(r"_(\d+)\.[^.]+$", i.filename).group(1)) for i in members]
@@ -95,7 +99,9 @@ def prepare(args):
 
 
 class PairedDataset(Dataset):
-    def __init__(self, root, split):
+    def __init__(self, root, split, cfp_size=96):
+        self.cfp_size=cfp_size
+        if cfp_size not in (96,224): raise ValueError(cfp_size)
         self.root=Path(root)
         f=pd.read_csv(self.root/"selected.csv",dtype={"participant_id":str})
         self.rows=f[f.split==split].to_dict("records")
@@ -105,6 +111,10 @@ class PairedDataset(Dataset):
         with np.load(self.root/(row["order"]+".npz"),allow_pickle=False) as z:
             c=torch.from_numpy(z["cfp"].copy()).float()/255
             o=torch.from_numpy(z["oct"].copy()).float()/255
+        if self.cfp_size != 96:
+            high=np.load(self.root/f"cfp{self.cfp_size}"/(row["order"]+".npy"),allow_pickle=False)
+            if high.shape != (2,3,self.cfp_size,self.cfp_size): raise ValueError("CFP cache shape mismatch")
+            c=torch.from_numpy(high.copy()).float()/255
         c=(c-torch.tensor([.485,.456,.406]).view(1,3,1,1))/torch.tensor([.229,.224,.225]).view(1,3,1,1)
         o=(o-.5)/.25
         return c,o,int(row["label_id"]),row["order"]

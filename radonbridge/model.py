@@ -97,7 +97,11 @@ def pretrained_backbones():
 
 
 class PilotGraph:
-    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25):
+    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both"):
+        if modalities not in ("both", "cfp", "oct"): raise ValueError(modalities)
+        if cfp_size not in (96, 224): raise ValueError(cfp_size)
+        if modalities != "both" and mode != "baseline": raise ValueError("Bridge requires both modalities")
+        branches = ("cfp", "oct") if modalities == "both" else (modalities,)
         torch.manual_seed(seed)
         self.nodes, self.edges, self.steps = [], [], []
         self.by_name = {}
@@ -122,8 +126,9 @@ class PilotGraph:
             backbones[name] = blocks
         if backbone == "resnet18": backbones = pretrained_backbones()
         bridge_channels = 256 if backbone == "resnet18" else 32
-        head = nn.Linear(1024 if backbone == "resnet18" else 128, 2)
+        head = nn.Linear((512 if backbone == "resnet18" else 64) * len(branches), 2)
         for name, inp in [("cfp", cfp), ("oct", oct_)]:
+            if name not in branches: continue
             out = node(name + "_eye_input"); edge(name + "_flatten_eyes", FlattenEyes(), [inp], [out])
             for stage in range(3):
                 nxt = node(f"{name}_stage{stage+1}")
@@ -131,7 +136,7 @@ class PilotGraph:
             features[name] = out
         if mode in ("radon", "scrambled", "self"):
             handoffs, projectors, widths = {}, {}, {}
-            shapes = ((6, 6), (8, 6, 6)) if backbone == "resnet18" else ((12, 12), (4, 12, 12))
+            shapes = ((cfp_size//16,)*2, (8, 6, 6)) if backbone == "resnet18" else ((cfp_size//8,)*2, (4, 12, 12))
             for name, shape, mesh in [("cfp", shapes[0], (8,)), ("oct", shapes[1], (4, 4))]:
                 p = Projector(shape, mesh, span=16, scramble=mode == "scrambled")
                 projectors[name] = p
@@ -150,11 +155,11 @@ class PilotGraph:
                 updated = node(name + "_updated"); edge(name + "_residual", Add(), [features[name], delta], [updated])
                 features[name] = updated
         pooled = []
-        for name in ("cfp", "oct"):
+        for name in branches:
             out = node(name + "_stage4")
             edge(name + "_stage4", backbones[name][3], [features[name]], [out])
             pool = node(name + "_participant"); edge(name + "_pool", EyePool(), [out], [pool]); pooled.append(pool)
-        joined = node("joined"); edge("join", Join(), pooled, [joined])
+        joined = node("joined"); edge("join", Join() if len(branches) == 2 else nn.Identity(), pooled, [joined])
         logits = node("logits"); edge("classifier", head, [joined], [logits])
         loss = node("loss"); edge("criterion", Loss(), [logits, target], [loss])
         roles, sorts = [], []

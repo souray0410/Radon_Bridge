@@ -27,16 +27,19 @@ def metrics(y,p):
 
 
 def main(args):
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG",":4096:8")
     start=time.time(); out=Path(args.output)
     out.mkdir(parents=True,exist_ok=True)
-    if (out/"summary.json").exists():raise RuntimeError("Completed result exists; use another output directory")
+    if any(out.iterdir()):raise RuntimeError("Run output must be empty; never append to an interrupted or completed run")
     torch.set_num_threads(3);torch.manual_seed(args.seed);np.random.seed(args.seed)
     device=torch.device("cuda:0")
     total=torch.cuda.get_device_properties(device).total_memory
     # Allocator cap leaves room for CUDA context, libraries and transient use.
     torch.cuda.set_per_process_memory_fraction((8*1024**3)/total,device)
     torch.backends.cudnn.benchmark=False
-    train=PairedDataset(args.data,"train");val=PairedDataset(args.data,"validation")
+    torch.backends.cudnn.deterministic=True
+    torch.use_deterministic_algorithms(True)
+    train=PairedDataset(args.data,"train",args.cfp_size);val=PairedDataset(args.data,"validation",args.cfp_size)
     if set(r["participant_id"] for r in train.rows)&set(r["participant_id"] for r in val.rows):raise RuntimeError("Leakage")
     config=vars(args)|{"torch":torch.__version__,"gpu":torch.cuda.get_device_name(),
                       "train_participants":len(train),"validation_participants":len(val),
@@ -45,6 +48,10 @@ def main(args):
                       "allocator_cap_gib":8,"process_stop_mib":9728,
                       "source_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
                       "mhd_commit":subprocess.check_output(["git","-C","third_party/MHD_Project","rev-parse","HEAD"],text=True).strip()}
+    config["source_branch"]=subprocess.check_output(["git","branch","--show-current"],text=True).strip()
+    if subprocess.check_output(["git","status","--porcelain"],text=True).strip(): raise RuntimeError("Commit source before training")
+    if args.cfp_size != 96:
+        config["cfp_audit"]=json.loads((Path(args.data)/f"cfp{args.cfp_size}"/"audit.json").read_text())
     config["data_audit"]=json.loads((Path(args.data)/"audit.json").read_text())
     weight_file=Path(os.environ.get("TORCH_HOME",str(Path.home()/".cache/torch")))/"hub/checkpoints/resnet18-f37072fd.pth"
     if weight_file.exists():config["pretrained_sha256"]=hashlib.sha256(weight_file.read_bytes()).hexdigest()
@@ -86,7 +93,10 @@ def main(args):
         nonlocal peak_process
         if initial:g.load_state(initial)
         opt=configure(g,phase)
-        best=None;best_state=None;best_epoch=-1
+        # Include the common epoch-zero checkpoint in every continuation.
+        # Also preserve fixed-last-epoch metrics, independent of validation selection.
+        best=evaluate(g,val);best_state=g.save_state();best_epoch=0
+        torch.save({"model":best_state,"epoch":0,"arm":name,"config":config,"validation":best},out/(name+"_best.pt"))
         for epoch in range(epochs):
             check_budget(); t=time.time();configure_training(g)
             loss_sum=0.;count=0
@@ -111,15 +121,16 @@ def main(args):
                             "arm":name,"config":config,"validation":vm},out/(name+"_best.pt"))
             torch.save({"model":g.save_state(),"optimizer":opt.state_dict(),"epoch":epoch+1,
                         "arm":name,"config":config,"validation":vm},out/(name+"_last.pt"))
+        last=evaluate(g,val,out/(name+"_last_predictions.npz"))
         g.load_state(best_state)
         actual=evaluate(g,val,out/(name+"_predictions.npz"))
-        return best_state,actual|{"best_epoch":best_epoch,"train":evaluate(g,train)}
+        return best_state,actual|{"best_epoch":best_epoch,"fixed_last":last,"train":evaluate(g,train)}
     def configure_training(g):
         g.graph.train()
         for module in g.modules_by_name().values():
             for m in module.modules():
                 if isinstance(m,(torch.nn.BatchNorm2d,torch.nn.BatchNorm3d)):m.eval()
-    baseline=PilotGraph("baseline",args.seed,device,backbone="resnet18")
+    baseline=PilotGraph("baseline",args.seed,device,backbone="resnet18",cfp_size=args.cfp_size,modalities=args.modalities)
     # Verify real pretrained graph shapes and peak memory on one full batch.
     c,o,y,_=next(iter(loader(train)))
     opt=configure(baseline,"warmup");t=time.time()
@@ -151,18 +162,19 @@ def main(args):
     baseline.load_state(initial);del initial,opt
     state,warm=run(baseline,"warmup",args.warmup_epochs,phase="warmup")
     # Occlusion is an input-use diagnostic, not a separately trained unimodal baseline.
-    ablation={"zero_cfp":evaluate(baseline,val,ablate="cfp"),"zero_oct":evaluate(baseline,val,ablate="oct")}
+    ablation={m:evaluate(baseline,val,ablate=m) for m in ("cfp","oct")} if args.modalities == "both" else {}
     atomic_json(out/"warmup_report.json",warm|{"input_occlusion":ablation})
     del baseline;torch.cuda.empty_cache()
     results={}
-    for mode in ("baseline","radon","scrambled","self"):
-        g=PilotGraph(mode,args.seed,device,backbone="resnet18",handoff_ratio=args.handoff_ratio)
+    modes=("baseline","radon","scrambled","self") if args.modalities == "both" else ("baseline",)
+    for mode in modes:
+        g=PilotGraph(mode,args.seed,device,backbone="resnet18",handoff_ratio=args.handoff_ratio,cfp_size=args.cfp_size,modalities=args.modalities)
         _,results[mode]=run(g,mode,args.arm_epochs,state)
         del g;torch.cuda.empty_cache()
     # Paired bootstrap uses identical validation participants across all arms.
     baseline_p=np.load(out/"baseline_predictions.npz")
     comparisons={}
-    for mode in ("radon","scrambled","self"):
+    for mode in modes[1:]:
         arm=np.load(out/(mode+"_predictions.npz"))
         assert np.array_equal(arm["ids"],baseline_p["ids"])
         rng=np.random.default_rng(710);delta=[]
@@ -189,4 +201,6 @@ if __name__=="__main__":
     p.add_argument("--arm-epochs",type=int,default=5);p.add_argument("--seed",type=int,default=3407)
     p.add_argument("--lr",type=float,default=1e-4);p.add_argument("--max-minutes",type=float,default=60)
     p.add_argument("--handoff-ratio",type=float,default=.03125)
+    p.add_argument("--cfp-size",type=int,choices=(96,224),default=96)
+    p.add_argument("--modalities",choices=("both","cfp","oct"),default="both")
     main(p.parse_args())
