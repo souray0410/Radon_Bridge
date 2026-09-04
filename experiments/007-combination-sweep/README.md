@@ -36,3 +36,5 @@
 启动：scripts/run_combination_sweep.sh
 运行目录：/data/mengh/RadonBridge/runs/exp007_sweep
 阶段产物：status.json、history.jsonl、partial_summary.json；完整结束才生成summary.json。
+
+资源与优化验收已通过（源码9e3a2c1）：真实batch4较大配置峰值allocated约1559/1415MiB；两步独立CFP参数更新误差均为0。验收JSON随本协议保存。

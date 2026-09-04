@@ -35,3 +35,7 @@ same 128 participants. Do not select medical endpoints by the apparent R&B gain.
 ## 006 — implementation and optimization audit
 
 [Report](006-implementation-audit/REPORT.zh-CN.md). Real checkpoint diagnostics found large train/validation gaps and coupled gradient clipping; new optimizer independence gate added. No new performance training.
+
+## 007 — bounded combination sweep
+
+[Protocol and acceptance](007-combination-sweep/README.md). 8 baseline recipes +20 communication configurations +10 seed-replication runs, each8epochs. Fixed within-trial optimization; five-minute monitor. Results pending execution.

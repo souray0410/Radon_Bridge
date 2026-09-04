@@ -1,5 +1,7 @@
 # R&B / RadonBridge
 
+最新：[007组合筛查方案](experiments/007-combination-sweep/README.md)，38次短跑，含修复后的独立基线、桥接组合和两个新种子复核。
+
 Current implementation preserves two complete native task paths and uses intermediate
 feature communication through explicit MHD V4 forward/backward. Read [requirements](REQUIREMENTS.md),
 [full source specifications](specification/README.md), [legacy audit](experiments/specification_audit/AUDIT.zh-CN.md)

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -u
 cd /home/mengh/RadonBridge || exit 90
+exec 9>/data/mengh/RadonBridge/.exp007.launch.lock
+flock -n 9 || exit 92
 run_root=/data/mengh/RadonBridge/runs/exp007_sweep
 if test -e "$run_root/status.json"; then
   echo 'Existing sweep detected; refusing duplicate launch.'
