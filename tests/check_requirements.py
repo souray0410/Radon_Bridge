@@ -19,8 +19,9 @@ def exercise(specs,repeats=1,upsilon=(1.,1.,.25),mode="radon",device="cpu"):
     x={s.key:torch.randn((2,s.channels)+s.shape,device=device,requires_grad=True) for s in specs}
     b.set_inputs(x);g.forward(levels=b.forward_levels)
     for k,n in outputs.items():assert torch.equal(b.nodes[n].feature_message.current_state,x[k])
-    for e in b.edges:
-        m=e.edge_operations[0].function
+    assert outputs == inputs
+    assert len(b.nodes) == len(specs)+repeats+1
+    for m in g.modules():
         if isinstance(m,LinearMixer):nn.init.normal_(m.conv.weight,std=.02)
     g.zero_grad(set_to_none=True);b.set_inputs(x);g.forward(levels=b.forward_levels)
     first=b.nodes[outputs[specs[0].key]].feature_message.current_state

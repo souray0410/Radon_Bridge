@@ -60,3 +60,7 @@ ResNet34已取得官方ImageNet权重，batch4验收通过（源码fe3ea74）：
 2026-09-04连接恢复，资格预测重算通过，按原规则选resnet18_s34。随机投影GPU/数值和独立优化验收均通过，结果与冻结正式协议见QUALIFICATION_REPORT.zh-CN.md及formal_protocol.json。旧待验收文字为历史进展记录。
 
 用户纠正后，部分解冻正式批次已停止；主实验改为全网络联合训练，详见FULL_FINETUNE_CORRECTION.zh-CN.md。此条覆盖此前沿用stage3+4的执行计划。
+
+全解冻及带宽修订均已验收；最终预定5种子×7臂×16epoch，主H1/8，H1/16和1/32对照，见FULL_FINETUNE_LAUNCH.zh-CN.md及formal_full_protocol.json。此条覆盖旧六臂20epoch计划。
+
+用户要求修正版使用新时间戳目录及同名分支，当前完整协议已移至experiments/2026_09_04_15_23_46/protocol.json；本008目录是历史来源，禁止从旧formal入口续跑。

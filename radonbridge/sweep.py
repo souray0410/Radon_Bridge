@@ -129,8 +129,10 @@ def main(args):
             for group in g.communication_groups:
                 stage = group['stage']
                 for task in g.branches:
-                    x = g.by_name[f'{task}_stage{stage}'].feature_message.current_state
-                    dx = g.by_name[f'bridge_s{stage}_{task}_delta'].feature_message.current_state
+                    exchange = g.modules_by_name()[group['exchange_edge_name']]
+                    index = exchange.keys.index(group['task_keys'][task])
+                    x = exchange.latest_inputs[index]
+                    dx = exchange.latest_deltas[index]
                     row = ratios.setdefault(f's{stage}_{task}', [0., 0.])
                     row[0] += float(dx.square().sum()); row[1] += float(x.square().sum())
         arrays = {k: np.concatenate(v) for k, v in values.items()}

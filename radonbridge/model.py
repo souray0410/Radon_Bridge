@@ -6,7 +6,7 @@ import copy
 from torch import nn
 from V4.MHD_Framework_V4 import MHD_Node, MHD_Edge, MHD_Topo, MHD_Graph
 from .projector import Projector, Return
-from .bridge import FeatureSpec, attach_group
+from .bridge import FeatureSpec, attach_group, attach_to_nodes
 from .graph import MHDBuilder
 
 
@@ -161,6 +161,7 @@ class PilotGraph:
             if name not in branches:continue
             out=node(name+"_eye_input");edge(name+"_flatten_eyes",FlattenEyes(),[inp],[out]);features[name]=out
         self.communication_groups=[]
+        stage_features={};stage_anchors={}
         def bridge(stage):
             prefix="" if head_mode == "shared_legacy" else f"bridge_s{stage}_"
             channels=([64,128,256][stage-1] if backbone in ("resnet18", "resnet34") else [8,16,32][stage-1])
@@ -168,12 +169,6 @@ class PilotGraph:
                 stride=2**(stage+1);depth=32//(2**(stage-1))
             else:stride=2**stage;depth=32//stride
             shapes=((cfp_size//stride,)*2,(depth,96//stride,96//stride))
-            if head_mode == "separate":
-                references=mesh_references or {"cfp":(8,),"oct":(4,4)}
-                specs=[FeatureSpec(name,channels,shape,tuple(references[name])) for name,shape in zip(("cfp","oct"),shapes)]
-                outputs,metadata=attach_group(node,edge,specs,features,prefix,upsilon or (1.,1.,handoff_ratio),mode,kernel_size=mixer_kernel_size)
-                features.update(outputs);self.communication_groups.append(metadata|{"stage":stage})
-                return
             handoffs,projectors,widths={},{},{}
             for name,shape,mesh in [("cfp",shapes[0],(8,)),("oct",shapes[1],(4,4))]:
                 projector=Projector(shape,mesh,span=16,scramble=mode=="scrambled")
@@ -191,7 +186,8 @@ class PilotGraph:
         for stage in range(1,5):
             for name in branches:
                 out=node(f"{name}_stage{stage}");edge(f"{name}_stage{stage}",backbones[name][stage-1],[features[name]],[out]);features[name]=out
-            if stage in bridge_stages and mode in ("radon","scrambled","self","random"):bridge(stage)
+            stage_features[stage]=dict(features);stage_anchors[stage]=builder.steps[-1][0]
+            if head_mode == 'shared_legacy' and stage in bridge_stages and mode in ("radon","scrambled","self","random"):bridge(stage)
         pooled=[];losses=[]
         for name in branches:
             pool=node(name+"_participant");edge(name+"_pool",EyePool(),[features[name]],[pool]);pooled.append(pool)
@@ -204,7 +200,27 @@ class PilotGraph:
         else:
             joined=node("joined");edge("join",Join() if len(branches)==2 else nn.Identity(),pooled,[joined])
             logits=node("logits");edge("classifier",head,[joined],[logits]);edge("criterion",Loss(),[logits,target],[loss])
+        if head_mode == 'separate' and mode in ('radon','scrambled','self','random'):
+            # One shape-only native probe. No labels are fitted and BatchNorm
+            # buffers are not updated; all original Nodes/Edges already exist.
+            original_modes={m:m.training for e in self.edges for m in e.edge_operations[0].function.modules()}
+            for m in original_modes: m.training=False
+            try:
+                with torch.no_grad():
+                    samples=builder.native_forward({'cfp':torch.zeros(1,2,3,cfp_size,cfp_size),
+                        'oct':torch.zeros(1,2,1,32,96,96),'target':torch.zeros(1,dtype=torch.long)})
+            finally:
+                for m,training in original_modes.items(): m.training=training
+            references=mesh_references or {'cfp':(8,),'oct':(4,4)}
+            for stage in bridge_stages:
+                names=[f'{task}_stage{stage}' for task in branches]
+                _,metadata=attach_to_nodes(builder,names,prefix=f'bridge_s{stage}_',samples=samples,
+                    mesh_reference={name:references[task] for name,task in zip(names,branches)},
+                    upsilon=upsilon or (1.,1.,handoff_ratio),mode=mode,kernel_size=mixer_kernel_size)
+                self.communication_groups.append(metadata|{'stage':stage,'task_keys':dict(zip(branches,names))})
+            del samples
         self.graph=builder.compile(device)
+        self.forward_edge_levels=builder.forward_edge_levels
         self.forward_levels=builder.forward_levels;self.backward_levels=builder.backward_levels
 
     def set_inputs(self, cfp, oct_, target):

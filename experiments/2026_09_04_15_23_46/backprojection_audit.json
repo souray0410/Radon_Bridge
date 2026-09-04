@@ -1,0 +1,35 @@
+{
+  "gaussian_2d": {
+    "relative_peak_error": 0.02325820372502684,
+    "tolerance": 0.1
+  },
+  "gaussian_3d": {
+    "relative_peak_error": 0.01821265950741182,
+    "tolerance": 0.1
+  },
+  "2d_actual_stage": {
+    "adjoint_abs_error": 4.440892098500626e-16,
+    "all_input_projection_slots": 184,
+    "output_spatial_points": 196,
+    "full_output_shape": [
+      1,
+      2,
+      14,
+      14
+    ]
+  },
+  "3d_actual_stage": {
+    "adjoint_abs_error": 8.881784197001252e-16,
+    "all_input_projection_slots": 368,
+    "output_spatial_points": 288,
+    "full_output_shape": [
+      1,
+      2,
+      8,
+      6,
+      6
+    ]
+  },
+  "source_commit": "dea446c8ba1c7abb5515026c779ddd5b6d684545",
+  "interpretation": "Matched discrete adjoint; Gaussian analytic test supports forward geometry, not exact inversion or clinical efficacy"
+}
