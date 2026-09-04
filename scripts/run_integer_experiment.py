@@ -26,8 +26,8 @@ class Controller:
     def __init__(self,args):
         self.args=args; self.root=Path(args.output); self.root.mkdir(parents=True,exist_ok=True)
         self.protocol=read_json(args.protocol)
-        if self.protocol['review_status']!='approved' or self.protocol['schema']!='integer_eem_direct_bp_v1':
-            raise ValueError('Only the explicitly approved integer protocol may launch')
+        if self.protocol['review_status']!='approved' or self.protocol['schema']!='two_stage_ratio_convergence_v3':
+            raise ValueError('Only the explicitly approved ratio and convergence protocol may launch')
         self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
         self.ledger=read_json(self.root/'ledger.json') if (self.root/'ledger.json').exists() else {'jobs':[]}
         self.active={}; self.peak={}; self.phase=args.phase; self.stop=False; self.stop_reason=None
@@ -74,7 +74,9 @@ class Controller:
         if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
         path.mkdir()
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),CUBLAS_WORKSPACE_CONFIG=':4096:8')
-        if job.get('geometry'):
+        if job.get('audit'):
+            cmd=[sys.executable,'tests/check_two_stage.py','--device','cuda','--output',str(path/'summary.json')]
+        elif job.get('geometry'):
             cmd=[sys.executable,'tests/check_integer_bridge.py','--device','cuda','--output',str(path/'summary.json')]
         else:
             write_json(path/'configuration.json',job['config']|{'source_commit':self.commit})
@@ -124,7 +126,7 @@ class Controller:
                 else:
                     error=read_json(directory/'failure.json') if (directory/'failure.json').exists() else {'state':'failed'}
                     if allow_oom and error['state']=='oom':results[key]=error
-                    elif self.stop_reason=='budget':pass
+                    elif self.stop_reason in ('budget','controller_signal'):pass
                     else:failed=True;queue.clear();self.stop=True
             self.status('running' if not self.stop else 'stopping',queued=[j['id'] for j in queue])
             if queue or self.active:time.sleep(1)
@@ -138,68 +140,91 @@ class Controller:
         return results
 
     def group_fits(self,jobs,seconds_per_epoch):
-        estimate=sum(20+j['config']['epochs']*seconds_per_epoch for j in jobs)*1.2/60
+        estimate=sum(20+j['config'].get('budget_estimate_epochs',j['config']['convergence']['max_epochs'])*seconds_per_epoch for j in jobs)*1.2/60
         if self.used()+estimate>self.limit:
             self.status('budget_complete',reason='Insufficient budget for the next complete comparison group',estimated_group_gpu_minutes=estimate)
             return False
         return True
 
 
-def config(seed,lr,stages=(),mode='radon',epochs=6,batch=16):
-    return {'seed':seed,'backbone_lr':lr,'bridges':bridge_configs(stages,mode),'epochs':epochs,'microbatch':batch,'effective_batch':16}
+DEFAULT_POLICY={'min_epochs':8,'max_epochs':60,'patience':6,'min_delta':.001,'lr_patience':3,'lr_factor':.3}
+
+def config(seed,lr,stages=(),mode='radon',epochs=60,batch=16,protocol=None):
+    p=protocol or {}
+    policy=dict(p.get('convergence',DEFAULT_POLICY))
+    if protocol is None:policy['max_epochs']=epochs;policy['min_epochs']=min(policy['min_epochs'],epochs)
+    return {'seed':seed,'backbone_lr':lr,
+            'bridges':bridge_configs(stages,mode,M=p.get('M',16),S=p.get('S',64),rho=p.get('rho',.125)),
+            'convergence':policy,'microbatch':batch,'effective_batch':16}
 
 
 def job(identifier,cfg):return {'id':identifier,'config':cfg}
 
 
+def source_hashes():
+    return {str(p):hashlib.sha256(p.read_bytes()).hexdigest() for directory in ['radonbridge','scripts','tests']
+            for p in sorted(Path(directory).glob('*.py'))}
+
+
 def main(args):
     c=Controller(args)
     if args.phase=='preflight':
-        c.phase='geometry_gpu';c.run_jobs([{'id':'gpu_geometry','geometry':True}])
-        c.phase='microbatch_profile'
+        c.phase='geometry_checkpoint_and_ratio_audit'
+        attempt=1+sum(1 for p in c.root.glob('two_stage_audit*') if p.is_dir())
+        c.run_jobs([{'id':f'two_stage_audit_{attempt}','audit':True},{'id':f'gpu_geometry_{attempt}','geometry':True}])
         for batch in [16,8,4,2]:
-            cfg=config(3410,3e-5,(2,3),batch=batch);cfg['profile']=True
-            result=c.run_jobs([job(f'profile_b{batch}',cfg)],allow_oom=True)[f'profile_b{batch}']
+            cfg=config(3415,3e-5,(2,3),batch=batch,protocol=c.protocol);cfg['profile']=True
+            identifier=f'memory_profile_{batch}_{attempt}'
+            result=c.run_jobs([job(identifier,cfg)],allow_oom=True)[identifier]
             if result.get('passed'):
-                result['preflight_gpu_minutes']=c.used()
-                write_json(c.root/'preflight.json',result);c.status('preflight_complete',microbatch=batch);return
-        raise RuntimeError('No microbatch fits; do not freeze or change M/S/H')
-    preflight=read_json(c.root/'preflight.json');assert preflight['passed']
-    batch=preflight['microbatch'];report={'trials':{},'selections':{},'test_used':False,'source_commit':c.commit}
-    per_epoch=max(preflight['step_seconds'][1:])*math_ceil(1264/batch)*1.6+5
-    def collect(jobs):
-        nonlocal per_epoch
-        if not c.group_fits(jobs,per_epoch):return False
-        completed=c.run_jobs(jobs);report['trials'].update(completed)
-        observed=max(r['seconds']/max(r['configuration']['epochs'],1) for r in completed.values())
-        per_epoch=observed if c.phase=='position_screen' else max(per_epoch,observed)
-        write_json(c.root/'partial_summary.json',report);return True
-    c.phase='learning_rate_calibration'
-    calibration=[job('calibration_lr_low',config(3410,3e-6,epochs=4,batch=batch)),job('calibration_lr_high',config(3410,3e-5,epochs=4,batch=batch))]
-    if not collect(calibration):return
-    selected=max(calibration,key=lambda j:(report['trials'][j['id']]['fixed_last']['mean_task_macro_f1'],-j['config']['backbone_lr']))
-    lr=selected['config']['backbone_lr'];report['selections']['backbone_lr']=lr
-    write_json(c.root/'partial_summary.json',report)
-    c.phase='position_screen'
-    positions={'independent':(), 'stage2':(2,), 'stage3':(3,), 'stage23':(2,3)}
-    screen=[job('screen_'+name,config(3411,lr,stages,batch=batch)) for name,stages in positions.items()]
-    if not collect(screen):return
-    selected=max(['stage2','stage3','stage23'],key=lambda name:(report['trials']['screen_'+name]['fixed_last']['mean_task_macro_f1'],-len(positions[name]),name=='stage3'))
-    stages=positions[selected];report['selections']['bridge_positions']=list(stages)
-    write_json(c.root/'partial_summary.json',report)
-    c.phase='mechanism_screen'
-    controls=[job('screen_'+mode,config(3411,lr,stages,mode,batch=batch)) for mode in ['self','pooled']]
-    if not collect(controls):return
-    write_json(c.root/'partial_summary.json',report)
-    for seed in [3412,3413,3414]:
-        c.phase=f'confirmation_{seed}'
-        arms={'independent':((),'radon'),'radon':(stages,'radon'),'self':(stages,'self'),'pooled':(stages,'pooled')}
-        group=[job(f'confirm_{seed}_{name}',config(seed,lr,pos,mode,epochs=8,batch=batch)) for name,(pos,mode) in arms.items()]
-        if not collect(group):return
-        hashes={report['trials'][j['id']]['initial_native_sha256'] for j in group}
-        assert len(hashes)==1,'Paired native initializations differ'
+                c.status('preflight_complete',microbatch=batch)
+                write_json(c.root/'preflight.json',{'passed':True,'microbatch':batch,'profile':result,
+                    'source_hashes':source_hashes(),'protocol_sha256':hashlib.sha256(Path(args.protocol).read_bytes()).hexdigest()})
+                return
+        raise RuntimeError('Even microbatch 2 did not fit; do not freeze or shrink bridge')
+    preflight=read_json(c.root/'preflight.json')
+    assert preflight['passed'] and preflight['source_hashes']==source_hashes(), 'Source changed since acceptance'
+    assert preflight['protocol_sha256']==hashlib.sha256(Path(args.protocol).read_bytes()).hexdigest()
+    batch=preflight['microbatch']
+    report={'trials':{},'training_protocol':'independent modality validation plateau then matched joint validation plateau',
+            'source_commit':c.commit,'test_used':False}
+    # Profile the heaviest configuration and include validation, checkpoint I/O and startup allowance.
+    seconds_per_epoch=max(preflight['profile']['step_seconds'][1:])*math_ceil(1264/batch)*1.4+5
+    for seed in c.protocol['seeds']:
+        c.phase=f'independent_pretraining_{seed}'
+        warm=config(seed,c.protocol['backbone_lr'],batch=batch,protocol=c.protocol)
+        warm['training_stage']='independent';warm['budget_estimate_epochs']=warm['convergence']['min_epochs'];warm_job=job(f'pretrain_{seed}',warm)
+        if not c.group_fits([warm_job],seconds_per_epoch):return
+        completed=c.run_jobs([warm_job]);result=completed[warm_job['id']]
+        report['trials'].update(completed);write_json(c.root/'partial_summary.json',report)
+        if not result['converged_by_policy']:
+            c.status('needs_attention',reason='Stage one hit epoch cap without validation plateau; no stage two launched');return
+        parents=result['modality_checkpoints'];assert set(parents)=={'cfp','oct'}
+        # Actual epoch duration can exceed a short profile under shared-machine load.
+        seconds_per_epoch=max(seconds_per_epoch,max(result['epoch_seconds']))
+        hashes=set()
+        for modes in c.protocol['arm_groups']:
+            c.phase=f"continuations_{seed}_{'_'.join(modes)}"
+            jobs=[]
+            for mode in modes:
+                cfg=config(seed,c.protocol['backbone_lr'],() if mode=='independent' else c.protocol['positions'],
+                           'radon' if mode=='independent' else mode,batch=batch,protocol=c.protocol)
+                cfg.update(training_stage='communication',parent_checkpoints=parents,
+                           budget_estimate_epochs=min(cfg['convergence']['max_epochs'],math_ceil(max(result['epochs_ran'],cfg['convergence']['min_epochs'])*1.5)))
+                jobs.append(job(f'confirm_{seed}_{mode}',cfg))
+            # Estimate from the observed stage-one plateau with 50% epoch headroom plus the group time margin.
+            # Convergence is not predictable: the hard budget guard can still interrupt an incomplete pair.
+            if not c.group_fits(jobs,seconds_per_epoch):return
+            completed=c.run_jobs(jobs);report['trials'].update(completed)
+            hashes.update(r['initial_native_sha256'] for r in completed.values())
+            assert len(hashes)==1,'Continuation native initializations differ'
+            assert all(r['parent_checkpoints']==parents for r in completed.values())
+            write_json(c.root/'partial_summary.json',report)
+            if not all(r['converged_by_policy'] for r in completed.values()):
+                c.status('needs_attention',reason='Comparison contains a non-converged epoch-cap run; not a completed comparison');return
+            seconds_per_epoch=max(seconds_per_epoch,max(t for r in completed.values() for t in r['epoch_seconds']))
     report['new_gpu_minutes']=c.used();report['cumulative_gpu_minutes']=c.protocol['prior_gpu_minutes']+c.used()
-    write_json(c.root/'summary.json',report);c.status('complete',selections=report['selections'])
+    write_json(c.root/'summary.json',report);c.status('complete')
 
 
 def math_ceil(x):return int(-(-x//1))

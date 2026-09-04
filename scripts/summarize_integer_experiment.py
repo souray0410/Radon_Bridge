@@ -14,25 +14,29 @@ def main(root):
     accounting={j['id']:j for j in ledger['jobs']}
     for path in sorted(root.glob('*/summary.json')):
         result=json.loads(path.read_text())
-        if 'fixed_last' not in result:continue
+        if 'selected' not in result or result.get('state')!='complete' or not result.get('converged_by_policy'):continue
         cfg=result['configuration'];identifier=path.parent.name
-        with np.load(path.parent/'last_predictions.npz',allow_pickle=False) as a:
+        with np.load(path.parent/'selected_predictions.npz',allow_pickle=False) as a:
             for task in ['cfp','oct']:
                 recalculated=classification_metrics(a['y'],a[task])
-                expected=result['fixed_last']['tasks'][task]
+                expected=result['selected']['tasks'][task]
                 for key in ['macro_f1','macro_precision','macro_recall']:
                     assert abs(recalculated[key]-expected[key])<1e-12
-                records.append({'trial':identifier,'seed':cfg['seed'],'task':task,'epochs':cfg['epochs'],
-                    'macro_f1':expected['macro_f1'],'macro_precision':expected['macro_precision'],
+                records.append({'trial':identifier,'seed':cfg['seed'],'task':task,'epochs':result['epochs_ran'],'selected_epochs':result['selection'],'stopping_macro_f1':result['stopping_metrics']['tasks'][task]['macro_f1'],
+                    'training_stage':cfg.get('training_stage','legacy'),'macro_f1':expected['macro_f1'],'macro_precision':expected['macro_precision'],
                     'macro_recall':expected['macro_recall'],'auroc':expected.get('auroc'),
                     'parameters':result['parameters'],'gpu_seconds':accounting.get(identifier,{}).get('gpu_seconds',result['seconds']),
                     'peak_process_mib':accounting.get(identifier,{}).get('sampled_peak_process_mib'),
                     'confusion_matrix':expected['confusion_matrix']})
     baseline={(r['seed'],r['task']):r['macro_f1'] for r in records if r['trial'].endswith('_independent')}
     for row in records:
-        base=baseline.get((row['seed'],row['task']));row['delta_macro_f1']=row['macro_f1']-base if base is not None else None
+        base=baseline.get((row['seed'],row['task'])) if row['training_stage']=='communication' else None;row['delta_macro_f1']=row['macro_f1']-base if base is not None else None
+    pretrained={(r['seed'],r['task']):r['macro_f1'] for r in records if r['training_stage']=='independent'}
+    for row in records:
+        start=pretrained.get((row['seed'],row['task']))
+        row['delta_vs_stage_one']=row['macro_f1']-start if start is not None else None
     aggregate=[]
-    for arm in ['independent','radon','self','pooled']:
+    for arm in ['independent','radon','self','pooled','random','scrambled']:
         for task in ['cfp','oct']:
             rows=[r for r in records if r['trial'].startswith('confirm_') and r['trial'].endswith('_'+arm) and r['task']==task]
             if rows:
@@ -44,7 +48,7 @@ def main(root):
     if records:
         with (root/'aggregate.csv').open('w',newline='') as f:
             writer=csv.DictWriter(f,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
-    lines=['# Rhythm Bridge exploratory results','','Fixed last epoch; macro-F1 per branch. Development set was used in prior task screening; test remains untouched.','',
+    lines=['# Rhythm Bridge exploratory results','','Validation-plateau completed trials only; best development checkpoints; macro-F1 per branch. Different stopping epochs and selected epochs are recorded in aggregate.json. These are equal-rule comparisons, not equal-training-time comparisons. Development set was used in prior task screening; test remains untouched.','',
            '| Trial | Branch | Macro-F1 (%) | Change (pp) | Peak process (MiB) |','|---|---|---:|---:|---:|']
     for r in records:
         delta='—' if r['delta_macro_f1'] is None else f"{100*r['delta_macro_f1']:+.2f}"

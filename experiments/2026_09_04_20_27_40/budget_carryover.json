@@ -1,0 +1,7 @@
+{
+  "original_prior_gpu_minutes": 13.341,
+  "invalid_training_and_preflight_gpu_minutes": 30.827544233283334,
+  "prior_total_gpu_minutes": 44.168544233283335,
+  "remaining_gpu_minutes": 29.17245576671666,
+  "previous_validation_seconds": 7.41780362100053
+}

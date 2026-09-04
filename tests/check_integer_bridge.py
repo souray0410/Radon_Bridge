@@ -78,10 +78,10 @@ def topology_check(dims, repeated=False):
     loss=b.node('loss'); b.edge('objective',Objective(),outputs,[loss])
     original_nodes={k:n.id for k,n in b.by_name.items()}; original_edges=list(b.steps)
     samples=b.native_forward(inputs); baseline=samples['loss'].detach()
-    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=4,S=11,H=5,samples=samples)
+    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=4,S=11,rho=.5,samples=samples)
     if repeated:
-        _, second=attach_to_nodes(b,later,prefix='bridge_1_',M=3,S=9,H=7,samples=samples)
-        assert (meta['M'],meta['S'],meta['H']) != (second['M'],second['S'],second['H'])
+        _, second=attach_to_nodes(b,later,prefix='bridge_1_',M=3,S=9,rho=.25,samples=samples)
+        assert (meta['M'],meta['S'],meta['rho']) != (second['M'],second['S'],second['rho'])
     g=b.compile('cpu').double(); b.set_inputs(inputs); g.forward(levels=b.forward_levels)
     assert torch.equal(b.by_name['loss'].feature_message.current_state, baseline)
     assert all(b.by_name[k].id==v for k,v in original_nodes.items())

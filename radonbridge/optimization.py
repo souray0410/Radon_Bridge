@@ -13,7 +13,7 @@ def configure_optimizer(g, protocol, warm=False):
         for p in params:
             p.requires_grad_(enabled)
         if enabled and params:
-            groups.append({'params': params, 'lr': protocol['backbone_lr'] if backbone else protocol['head_bridge_lr']})
+            groups.append({'params': params, 'name': name, 'lr': protocol['backbone_lr'] if backbone else protocol['head_bridge_lr']})
     if protocol.get('training_regime') == 'full_finetune':
         if sorted(stages) != [1, 2, 3, 4] or any(not p.requires_grad for p in g.graph.parameters()):
             raise ValueError('Full fine-tuning requires every backbone and bridge parameter trainable')

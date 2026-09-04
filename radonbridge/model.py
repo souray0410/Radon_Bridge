@@ -51,10 +51,10 @@ class PilotGraph:
             finally:
                 for m, value in training.items(): m.training = value
             for index, cfg in enumerate(configs):
-                if set(cfg) != {'nodes', 'M', 'S', 'H', 'mode'}:
-                    raise ValueError('Each bridge requires exactly nodes, M, S, H, mode')
+                if set(cfg) != {'nodes', 'M', 'S', 'rho', 'mode'}:
+                    raise ValueError('Each bridge requires exactly nodes, M, S, rho, mode')
                 _, metadata = attach_to_nodes(builder, cfg['nodes'], prefix=f'bridge_{index}_', samples=samples,
-                                               M=cfg['M'], S=cfg['S'], H=cfg['H'], mode=cfg['mode'])
+                                               M=cfg['M'], S=cfg['S'], rho=cfg['rho'], mode=cfg['mode'])
                 self.communication_groups.append(metadata)
             del samples
         self.graph = builder.compile(device).float()
@@ -77,6 +77,14 @@ class PilotGraph:
 
     def save_state(self):
         return {k:{n:v.detach().cpu().clone() for n,v in m.state_dict().items()} for k,m in self.modules_by_name().items()}
+
+    def load_native_state(self, state, branch=None):
+        modules={k:m for k,m in self.modules_by_name().items() if not k.startswith('bridge_')}
+        if branch is not None:
+            modules={k:m for k,m in modules.items() if k.startswith(branch+'_')}
+        if set(state) != set(modules):
+            raise ValueError(f'Checkpoint native module mismatch: missing={set(modules)-set(state)}, extra={set(state)-set(modules)}')
+        for key,module in modules.items():module.load_state_dict(state[key],strict=True)
 
     def native_forward(self, cfp, oct_, target):
         values = self.builder.native_forward(dict(zip(('cfp','oct','target'), (cfp,oct_,target))))

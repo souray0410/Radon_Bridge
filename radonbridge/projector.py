@@ -159,3 +159,50 @@ class Projector(nn.Module):
             curve = curves[:, :, m]
             delta = delta+curve[..., self.lower[m]]*self.lower_weight[m]+curve[..., self.upper[m]]*self.upper_weight[m]
         return (delta*self.angular_weight).reshape(b, cm//self.M, *self.shape)
+
+
+class ScrambledProjector(Projector):
+    """Destroy spatial arrangement with an invertible fixed voxel permutation."""
+    def __init__(self, shape, M, S, seed):
+        super().__init__(shape, M, S)
+        permutation=np.random.default_rng(seed).permutation(math.prod(shape))
+        self.register_buffer('permutation',torch.from_numpy(permutation))
+        self.register_buffer('inverse_permutation',torch.from_numpy(np.argsort(permutation)))
+        self.metadata.update(projection_kind='spatial_permutation_radon',random_seed=seed,
+                             return_kind='inverse_permutation_direct_bp')
+    def forward(self,x):
+        permuted=x.flatten(2)[...,self.permutation].reshape_as(x)
+        return super().forward(permuted)
+    def backproject(self,p):
+        x=super().backproject(p)
+        return x.flatten(2)[...,self.inverse_permutation].reshape_as(x)
+
+
+class GaussianProjector(Projector):
+    """Fixed Gaussian linear control; norm-matched forward and scaled adjoint return.
+
+    This is an explicitly defined experimental control, not a claim to reproduce
+    a separately published method named Random Bridge. It has no learned geometry.
+    """
+    def __init__(self,shape,M,S,seed):
+        super().__init__(shape,M,S)
+        rng=np.random.default_rng(seed)
+        q=rng.normal(size=tuple(self.matrix.shape))
+        q*=np.linalg.norm(self.matrix.numpy(),axis=1,keepdims=True)/np.maximum(np.linalg.norm(q,axis=1,keepdims=True),1e-300)
+        # Ordinary BP matrix, used only to match row energy of the random return.
+        N=math.prod(shape); reference=np.zeros((N,M*S))
+        rows=np.arange(N)
+        for m in range(M):
+            np.add.at(reference,(rows,m*S+self.lower[m].numpy()),self.lower_weight[m].numpy()*self.angular_weight)
+            np.add.at(reference,(rows,m*S+self.upper[m].numpy()),self.upper_weight[m].numpy()*self.angular_weight)
+        back=q.T.copy()
+        back*=np.linalg.norm(reference,axis=1,keepdims=True)/np.maximum(np.linalg.norm(back,axis=1,keepdims=True),1e-300)
+        self.matrix.copy_(torch.from_numpy(q))
+        self.register_buffer('return_matrix',torch.from_numpy(back))
+        self.metadata.update(projection_kind='row_norm_matched_fixed_gaussian',random_seed=seed,
+                             return_kind='row_norm_matched_scaled_adjoint',
+                             matching='forward row norms and return row norms; singular values are not matched')
+    def backproject(self,p):
+        b,cm,_=p.shape
+        x=p.reshape(b,cm//self.M,self.M*self.S)@self.return_matrix.T
+        return x.reshape(b,cm//self.M,*self.shape)

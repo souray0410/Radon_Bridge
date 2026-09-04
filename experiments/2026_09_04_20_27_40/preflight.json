@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "microbatch": 16,
+  "profile": {
+    "state": "complete",
+    "microbatch": 16,
+    "step_seconds": [
+      0.6741387880001639,
+      0.28719080399969243,
+      0.5315207430003284
+    ],
+    "modules_changed": {
+      "cfp_stage1": true,
+      "oct_stage1": true,
+      "cfp_stage2": true,
+      "oct_stage2": true,
+      "cfp_stage3": true,
+      "oct_stage3": true,
+      "cfp_stage4": true,
+      "oct_stage4": true,
+      "cfp_head": true,
+      "oct_head": true,
+      "bridge_0_exchange": true,
+      "bridge_1_exchange": true
+    },
+    "cross_branch_gradients": {
+      "cfp_to_oct": 1.125050663948059,
+      "oct_to_cfp": 0.1910831481218338
+    },
+    "gradient_norms": [
+      {
+        "cfp": 9.132359504699707,
+        "oct": 41.03968811035156,
+        "communication": 6.211663246154785
+      },
+      {
+        "cfp": 5.860539436340332,
+        "oct": 14.864239692687988,
+        "communication": 2.4583163261413574
+      },
+      {
+        "cfp": 3.9170520305633545,
+        "oct": 5.748017311096191,
+        "communication": 1.1148258447647095
+      }
+    ],
+    "seconds": 3.763072722000288,
+    "peak_allocated_mib": 6142.841796875,
+    "peak_reserved_mib": 8124.0,
+    "passed": true
+  },
+  "source_hashes": {
+    "radonbridge/__init__.py": "2266ecb6c6cc57593ed472e0699a987f2302c19fa0db890756e9aa56dad38980",
+    "radonbridge/bridge.py": "7e0eb2aef3177c3f49f22af4bd969b9ed4751110e503c0c4c5a4f06581d8e170",
+    "radonbridge/convergence.py": "a942330d54bbfd8a6f0767e70ef7493bea27dc6243982b03f8afb3898d1e36bc",
+    "radonbridge/data.py": "4e1369c03e1e93f6c70a5250ead39876773fc85f3e97f15d4a06c0d678b0ddf7",
+    "radonbridge/diagnose.py": "75949a3dab0413ca7daab1bdacaee1e1795404c4070f4b9db4bb9c6cdfe13d5f",
+    "radonbridge/experiment.py": "62a1cfc025935ea7d800cd30b6ef4507d2f6d2892c709797588d558d1239104b",
+    "radonbridge/graph.py": "c4347e6461cb82ae90790716d55da857f7c2de60700835610582f3645445413f",
+    "radonbridge/legacy_bridge.py": "0f12d2619bf8a842941f56334021b62a5074196668f67fc43aae8f56e520e339",
+    "radonbridge/legacy_model.py": "93fc6240239a76d624bb50d59a3b9d5e4e67bd320a5379c88af946135dd8c659",
+    "radonbridge/legacy_projector.py": "c2cddd1717a3562559a14fa0e0f1fba5ad02d9318b8c0a83137662f118e4886f",
+    "radonbridge/metrics.py": "08256881d532af0d55ff329074b06708fbfd82ecd29fccaa8f5baae9e1b8e891",
+    "radonbridge/model.py": "c59350fc0dcd0caf07b2e2899f044e2ecac34d9d6c3e7a87a79fea38c5cef1c8",
+    "radonbridge/optimization.py": "a9369f55ca62b6c02f4a5987674a1ad956741f87607708af8a92e1c1dec7c84e",
+    "radonbridge/pilot.py": "0034b52ad45edff8540628c123fb8d5c1ed3e33cb867d5db2ae7e497e600747e",
+    "radonbridge/projector.py": "a9656e88dfe67e4903fffd90d9da9a108b29ccec3c73ed6fbee92342935afe55",
+    "radonbridge/protocol.py": "f3ba995e8940a3db123eca5cb94909a223606ecefea9aa0768f08fd964c377b0",
+    "radonbridge/resolution.py": "646c7d6fbf780b1962b4a089ee9978d79c268601d7146d12c5ca451e078f1b79",
+    "radonbridge/separate_pilot.py": "f46b56384f12235e720ff4cede4390a85cbbdbc82b56e1c6c69bd908c9a5c339",
+    "radonbridge/sweep.py": "74204e96d580cb3622889ab9d25b1db014c84d35dd6ed5887226930eb11bdc8f",
+    "scripts/audit_separate_pilot.py": "d30c61c0bdfe38793a7762121feb460cb08e84b3c5f8bc1446b1afa75ba69183",
+    "scripts/fixed_late_fusion.py": "a15895cad0a3cff838f42170cd521c718f3ba2c7773e20483e4de481364bfb21",
+    "scripts/inventory_expanded_data.py": "36b4bdb355bb592ed5883bf4ccf106a99ab097b68575eeecb4fadafd4e259373",
+    "scripts/prepare_expanded_data.py": "02a48e442d48654d79f5c04d3ee3e950b31a918eaed46c274474daada888442e",
+    "scripts/run_integer_experiment.py": "356fd8c7ea558c56f10ffb0a6bec85b7bffb4a60fe18a424b013f94b571d4bbc",
+    "scripts/summarize_experiment.py": "ab338c9e830839223ca8c6fe859da0864f63c551c7b539703b393f824a61469d",
+    "scripts/summarize_integer_experiment.py": "43a3336ab2c404e0533f806679776f330b5ebef9bce377565c799ed503694554",
+    "scripts/verify_sweep_results.py": "b91d4872fd383bffc17c0a98d21c2f514e9ac05100e260a111162e40182741d0",
+    "tests/check_accumulation.py": "0ce72adbae8ba935db27016620be1353fe35f5a97c1651b3d49979d0cefd9701",
+    "tests/check_convergence.py": "15055b0bb66f12db381f64fd417adef950e82090c962714cd8ef983468cdd961",
+    "tests/check_core.py": "8e349d7ddf9ec4eb33da8013c82e208fb7b2baf3bc6777797459c40d85e15b37",
+    "tests/check_expanded_backbone.py": "b2338d9f383d96baa8993b52f1f9587d7fb6351a427a5020acf2c054ad89bb12",
+    "tests/check_formal_protocol.py": "f4c9867d9f370acc731f94c0d0569ecc371a050328e7a184218525bbf169d0f1",
+    "tests/check_full_finetune.py": "7396267d3c90ab1e823f70a512c3fde94635e6340f7d4df925672acb71c09ff0",
+    "tests/check_inplace_topology.py": "1c24c0c35c2cf9c3638af2ee0eed993786ed07ffb8506e2082d3676779e361a9",
+    "tests/check_integer_bridge.py": "ad3b612768242543b948f65bab43abdc88ee899f1b2a2e1ada4e4fbc94242ce2",
+    "tests/check_optimization.py": "c8e5a726cf80ccf26cbe46c32bbc0e84f6925267ac9283619ed58985c977c31d",
+    "tests/check_random_projection.py": "503c39de8eb7e26bb0fa687f4d7bd1fb55f803d41f152a55108177d5b8eecb7f",
+    "tests/check_requirements.py": "64126352d83eb7497795f1a80cc32f05ab536ffe125ad12408cd4054b64892ee",
+    "tests/check_scheduler.py": "f82751e890f13cf3bd7919931329513a878b3508c2560a333f8da8c081396d45",
+    "tests/check_sweep.py": "67e0e19aa2772f7866927f9160fb408a2686bb0490f762cc0db0e5f7f5aa6807",
+    "tests/check_two_stage.py": "c8f3eb4ec42e294607f70589a959396d358094fe5de09687d87420ede07feb9f"
+  },
+  "protocol_sha256": "c5e3261adee3c94c384ea3fd48af5c6454dfec7f31dbcc023c4420aa7c97b5ea"
+}

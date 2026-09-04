@@ -1,1 +1,0 @@
-{"vectorized_bootstrap_f1_matches_sklearn": true, "head_only_policy_verified": true, "planned_runs": 38, "gpu_full_batch_checks": [{"arm": "rb_mdouble_h16_s3", "finite_full_batch_step": true, "peak_allocated_mib": 1559.4658203125}, {"arm": "rb_mdouble_s23", "finite_full_batch_step": true, "peak_allocated_mib": 1415.24609375}]}

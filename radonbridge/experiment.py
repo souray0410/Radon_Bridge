@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from .data import PairedDataset
 from .metrics import classification_metrics
 from .model import PilotGraph
+from .convergence import Plateau
 from .optimization import configure_optimizer, clip_task_gradients
 
 
@@ -21,8 +22,8 @@ def write_json(path, value):
     tmp.write_text(json.dumps(value,indent=2,allow_nan=False)); tmp.replace(path)
 
 
-def bridge_configs(stages, mode='radon'):
-    return [{'nodes':[f'cfp_stage{s}',f'oct_stage{s}'],'M':16,'S':64,'H':512,'mode':mode} for s in stages]
+def bridge_configs(stages, mode='radon', *, M=16, S=64, rho=.125):
+    return [{'nodes':[f'cfp_stage{s}',f'oct_stage{s}'],'M':M,'S':S,'rho':rho,'mode':mode} for s in stages]
 
 
 def loader(data, batch, seed, epoch=None):
@@ -83,12 +84,27 @@ def main(args):
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
         g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda')
+        parents={}
+        if cfg.get('training_stage')=='communication':
+            if set(cfg.get('parent_checkpoints',{})) != {'cfp','oct'}:
+                raise ValueError('Communication training requires both independently trained modality checkpoints')
+            for branch, parent in cfg['parent_checkpoints'].items():
+                checkpoint=Path(parent['path'])
+                if hashlib.sha256(checkpoint.read_bytes()).hexdigest()!=parent['sha256']:
+                    raise ValueError('Parent checkpoint hash mismatch')
+                saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+                if saved.get('branch')!=branch or saved.get('training_stage')!='independent' or saved.get('seed')!=seed or saved.get('stop_reason')!='validation_plateau':
+                    raise ValueError('Not a matching independently trained modality checkpoint')
+                g.load_native_state(saved['model'],branch=branch)
+                parents[branch]=parent
+        elif cfg.get('training_stage')=='independent' and cfg['bridges']:
+            raise ValueError('Independent pretraining cannot contain a bridge')
         opt=configure_optimizer(g,recipe)
         initial_hash=parameter_hash(g)
         info={'configuration':cfg,'initial_native_sha256':initial_hash,'groups':g.communication_groups,
               'parameters':sum(p.numel() for p in g.graph.parameters()),
               'trainable_parameters':sum(p.numel() for p in g.graph.parameters() if p.requires_grad),
-              'batchnorm_policy':'train','initialization':'CFP ImageNet; OCT inflated ImageNet, not OCT-specific pretraining'}
+              'parent_checkpoints':parents,'batchnorm_policy':'train','initialization':'CFP ImageNet; OCT inflated ImageNet, not OCT-specific pretraining'}
         if any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
         write_json(out/'model.json',info)
         batch=cfg['microbatch']; torch.cuda.reset_peak_memory_stats()
@@ -121,8 +137,26 @@ def main(args):
                     'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
                     'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'passed':True}
             write_json(out/'summary.json',report); return
-        initial=evaluate(g,val,batch,seed,stop=lambda:stop_requested)
-        for epoch in range(1,cfg['epochs']+1):
+        initial=evaluate(g,val,batch,seed,out/'initial_predictions.npz',stop=lambda:stop_requested)
+        if parents:
+            for branch,parent in parents.items():
+                with np.load(Path(parent['path']).parent/'selected_predictions.npz',allow_pickle=False) as previous, np.load(out/'initial_predictions.npz',allow_pickle=False) as current:
+                    assert np.array_equal(previous['ids'],current['ids']) and np.array_equal(previous['y'],current['y'])
+                    if not np.allclose(previous[branch],current[branch],rtol=1e-5,atol=1e-6):
+                        raise AssertionError('Stage two initial prediction differs from stage one checkpoint')
+            write_json(out/'checkpoint_acceptance.json',{'strict_load':True,'parent_hashes_verified':True,'initial_predictions_match':True,'optimizer_reset_for_all_arms':True})
+        policy=cfg['convergence']
+        independent=cfg['training_stage']=='independent'
+        monitors={k:Plateau(**policy) for k in (g.branches if independent else ('joint',))}
+        # Stage two may retain the loaded checkpoint if every update degrades validation.
+        selected_states={}
+        for key,monitor in monitors.items():
+            if not independent:
+                monitor.update(initial['mean_task_macro_f1'],0)
+                selected_states[key]=g.save_state()
+        converged=False; epoch_times=[]
+        for epoch in range(1,policy['max_epochs']+1):
+            epoch_start=time.monotonic()
             g.graph.train(); opt.zero_grad(set_to_none=True); seen=0; window_count=0; window_total=min(16,len(train))
             train_ce=0.; steps=0
             for c,o,y,_ in loader(train,batch,seed,epoch-1):
@@ -138,15 +172,52 @@ def main(args):
                 if steps%8==0: progress(samples=seen,train_ce=train_ce/seen)
             assert seen==len(train) and window_count==0
             metrics=evaluate(g,val,batch,seed,stop=lambda:stop_requested)
-            row={'epoch':epoch,'train_ce_sum':train_ce/seen,'validation':metrics}
+            flags={}
+            for key,monitor in monitors.items():
+                score=metrics['tasks'][key]['macro_f1'] if independent else metrics['mean_task_macro_f1']
+                flags[key]=monitor.update(score,epoch)
+                if flags[key]['improved']:
+                    selected_states[key]={name:{k:v.detach().cpu().clone() for k,v in module.state_dict().items()}
+                                          for name,module in g.modules_by_name().items()
+                                          if not independent or name.startswith(key+'_')}
+                if flags[key]['reduce_lr']:
+                    for group in opt.param_groups:
+                        if not independent or group['name'].startswith(key+'_'):group['lr']*=monitor.factor
+            epoch_times.append(time.monotonic()-epoch_start)
+            row={'epoch':epoch,'train_ce_sum':train_ce/seen,'validation':metrics,
+                 'plateau':{k:m.state() for k,m in monitors.items()},
+                 'learning_rates':{group['name']:group['lr'] for group in opt.param_groups}}
             with (out/'history.jsonl').open('a') as f:f.write(json.dumps(row)+'\n')
-            progress(samples=seen,validation=metrics)
+            progress(samples=seen,validation=metrics,plateau=row['plateau'])
+            if all(f['plateau'] for f in flags.values()):
+                converged=True;break
         final=evaluate(g,val,batch,seed,out/'last_predictions.npz',stop=lambda:stop_requested)
         train_final=evaluate(g,train,batch,seed,stop=lambda:stop_requested)
         if stop_requested: raise InterruptedError('Trial stopped before checkpoint')
-        torch.save({'model':g.save_state(),'configuration':cfg,'epoch':epoch},out/'last.pt')
-        report={'state':'complete','configuration':cfg,'initial_native_sha256':initial_hash,
-                'initial':initial,'fixed_last':final,'train_last':train_final,'seconds':time.monotonic()-start,
+        # Preserve stopping-point state separately from selected development checkpoint.
+        torch.save({'model':g.save_state(),'optimizer':opt.state_dict(),'configuration':cfg,'epoch':epoch,
+                    'stop_reason':'validation_plateau' if converged else 'epoch_cap'},out/'last.pt')
+        if independent:
+            for branch in g.branches:g.load_native_state(selected_states[branch],branch)
+        else:
+            for name,module in g.modules_by_name().items():module.load_state_dict(selected_states['joint'][name],strict=True)
+        selected=evaluate(g,val,batch,seed,out/'selected_predictions.npz',stop=lambda:stop_requested)
+        state=g.save_state()
+        torch.save({'model':state,'configuration':cfg,'selection':{k:m.state() for k,m in monitors.items()}},out/'selected.pt')
+        modality_checkpoints={}
+        if independent and converged:
+            for branch in g.branches:
+                path=out/(branch+'.pt')
+                torch.save({'model':{k:v for k,v in state.items() if k.startswith(branch+'_')},
+                            'branch':branch,'training_stage':'independent','seed':seed,
+                            'epoch':monitors[branch].best_epoch,'stop_reason':'validation_plateau',
+                            'source_commit':cfg.get('source_commit')},path)
+                modality_checkpoints[branch]={'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+        report={'state':'complete' if converged else 'incomplete','stop_reason':'validation_plateau' if converged else 'epoch_cap',
+                'converged_by_policy':converged,'epochs_ran':epoch,'epoch_seconds':epoch_times,
+                'selection':{k:m.state() for k,m in monitors.items()},'configuration':cfg,'initial_native_sha256':initial_hash,
+                'parent_checkpoints':parents,'modality_checkpoints':modality_checkpoints,'initial':initial,
+                'stopping_metrics':final,'selected':selected,'train_stopping_metrics':train_final,'seconds':time.monotonic()-start,
                 'parameters':info['parameters'],'trainable_parameters':info['trainable_parameters'],
                 'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
                 'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False}

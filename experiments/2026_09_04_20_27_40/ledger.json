@@ -1,0 +1,46 @@
+{
+  "jobs": [
+    {
+      "id": "gpu_geometry",
+      "gpu": 1,
+      "gpu_seconds": 2.1606694049996804,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 380
+    },
+    {
+      "id": "two_stage_audit",
+      "gpu": 0,
+      "gpu_seconds": 10.604174996999973,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 1732
+    },
+    {
+      "id": "memory_profile_16",
+      "gpu": 0,
+      "gpu_seconds": 7.456588035000095,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 8556
+    },
+    {
+      "id": "gpu_geometry_2",
+      "gpu": 1,
+      "gpu_seconds": 2.1328316019998965,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 426
+    },
+    {
+      "id": "two_stage_audit_2",
+      "gpu": 0,
+      "gpu_seconds": 7.390260154000316,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 1732
+    },
+    {
+      "id": "memory_profile_16_2",
+      "gpu": 0,
+      "gpu_seconds": 6.391069976999461,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 8556
+    }
+  ]
+}
