@@ -91,3 +91,8 @@ branches and the single ws checkout. The first two pilots are documented in
 96 versus 224, independent unimodal baselines, and two seeds of matched bridges.
 New runs enable deterministic algorithms, include epoch-zero checkpoints, and
 report fixed-last-epoch metrics alongside validation-selected metrics.
+
+[Experiment 004](experiments/004-fixed-late-fusion/PROTOCOL.md) reuses fixed-epoch
+unimodal predictions for equal-weight late fusion, without additional training.
+`main` always holds the latest code and records; timestamp branches archive the
+previous main before each executable update. ws follows main after running jobs finish.
