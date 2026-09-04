@@ -3,7 +3,7 @@ import torch
 
 def configure_optimizer(g, protocol, warm=False):
     stages = protocol['warmup_adapt_stages' if warm else 'adapt_stages']
-    if not stages or any(s not in (1, 2, 3, 4) for s in stages):
+    if not isinstance(stages, list) or any(s not in (1, 2, 3, 4) for s in stages):
         raise ValueError('Explicit trainable backbone stages required')
     groups = []
     for name, module in g.modules_by_name().items():

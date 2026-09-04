@@ -108,7 +108,7 @@ class MeanLoss(nn.Module):
 
 
 class PilotGraph:
-    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None, loss_reduction="mean"):
+    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None, loss_reduction="mean", mixer_kernel_size=3):
         if modalities not in ("both", "cfp", "oct"): raise ValueError(modalities)
         if cfp_size not in (96, 224): raise ValueError(cfp_size)
         if modalities != "both" and mode != "baseline": raise ValueError("Bridge requires both modalities")
@@ -153,7 +153,7 @@ class PilotGraph:
             if head_mode == "separate":
                 references=mesh_references or {"cfp":(8,),"oct":(4,4)}
                 specs=[FeatureSpec(name,channels,shape,tuple(references[name])) for name,shape in zip(("cfp","oct"),shapes)]
-                outputs,metadata=attach_group(node,edge,specs,features,prefix,upsilon or (1.,1.,handoff_ratio),mode)
+                outputs,metadata=attach_group(node,edge,specs,features,prefix,upsilon or (1.,1.,handoff_ratio),mode,kernel_size=mixer_kernel_size)
                 features.update(outputs);self.communication_groups.append(metadata|{"stage":stage})
                 return
             handoffs,projectors,widths={},{},{}
