@@ -7,7 +7,7 @@ name = "radonbridge"
 version = "0.1.0"
 description = "Householder Radon communication through explicit MHD V4 graphs"
 requires-python = ">=3.10"
-dependencies = ["torch>=2.8", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
+dependencies = ["torch>=2.8", "torchvision>=0.23", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
 
 [tool.setuptools]
 packages = ["radonbridge", "V4"]
