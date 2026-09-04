@@ -13,7 +13,9 @@ import torch
 from sklearn.metrics import roc_auc_score, average_precision_score, accuracy_score, log_loss
 from torch.utils.data import DataLoader
 from .data import PairedDataset
-from .model import PilotGraph
+from .model import PilotGraph as _PilotGraph
+from functools import partial
+PilotGraph = partial(_PilotGraph, head_mode="shared_legacy")  # historical outputs only
 
 
 def atomic_json(path, value):
@@ -203,4 +205,5 @@ if __name__=="__main__":
     p.add_argument("--handoff-ratio",type=float,default=.03125)
     p.add_argument("--cfp-size",type=int,choices=(96,224),default=96)
     p.add_argument("--modalities",choices=("both","cfp","oct"),default="both")
-    main(p.parse_args())
+    p.parse_args()
+    raise SystemExit("Legacy shared-head training retired. Use python -m radonbridge.separate_pilot.")

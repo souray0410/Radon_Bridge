@@ -1,0 +1,11 @@
+{
+  "seed":3407,"warmup_epochs":10,"arm_epochs":10,"max_minutes":15,
+  "backbone_lr":0.00001,"head_bridge_lr":0.0001,"upsilon":[1.0,1.0,0.03125],
+  "arms":[
+    {"id":"independent","mode":"baseline","stages":[]},
+    {"id":"radon_s3","mode":"radon","stages":[3]},
+    {"id":"radon_s2_s3","mode":"radon","stages":[2,3]},
+    {"id":"scrambled_s2_s3","mode":"scrambled","stages":[2,3]},
+    {"id":"self_s2_s3","mode":"self","stages":[2,3]}
+  ]
+}

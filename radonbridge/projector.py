@@ -56,22 +56,24 @@ def householder(n):
 
 
 @lru_cache(maxsize=24)
-def operator(shape, mesh, span):
+def operator(shape, mesh, span, spacing=None):
     shape, mesh = tuple(shape), tuple(mesh)
     d = len(shape)
-    if len(mesh) != d - 1 or span < 2 or min(shape) < 2:
+    if len(mesh) != d - 1 or span < 1 or min(shape) < 2:
         raise ValueError("Incompatible dimension, mesh, span or native shape")
     ns, weights = orientations(mesh)
     voxel_count = math.prod(shape)
     if len(ns) * span * voxel_count > 8_000_000:
         raise ValueError("Dense reference backend budget exceeded; use smaller pilot features")
-    h = 2 / max(shape)
+    h = np.asarray(spacing if spacing is not None else (2/max(shape),)*d)
+    if len(h)!=d or np.any(h<=0): raise ValueError("Invalid coordinate spacing")
     # Includes the full support of the zero-extended multilinear basis.
     radius = np.linalg.norm((np.asarray(shape) + 1) * h / 2)
-    s = np.linspace(-radius, radius, span)
-    transverse_count = max(3, math.ceil(2 * radius / h) + 1)
+    s = np.linspace(-radius, radius, span) if span>1 else np.zeros(1)
+    transverse_count = max(3, math.ceil(2 * radius / h.min()) + 1)
     transverse = np.linspace(-radius, radius, transverse_count)
     axes = [s] + [transverse] * (d - 1)
+    if span*transverse_count**(d-1)>2_000_000: raise ValueError("Reference quadrature budget exceeded")
     canonical = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(-1, d)
     per_s = transverse_count ** (d - 1)
     row = np.repeat(np.arange(span), per_s)
@@ -100,9 +102,9 @@ def operator(shape, mesh, span):
 
 
 class Projector(nn.Module):
-    def __init__(self, shape, mesh, span=16, scramble=False):
+    def __init__(self, shape, mesh, span=16, scramble=False, spacing=None):
         super().__init__()
-        a, self.scale = operator(tuple(shape), tuple(mesh), span)
+        a, self.scale = operator(tuple(shape), tuple(mesh), span, None if spacing is None else tuple(spacing))
         a = a.clone().float()
         if scramble:
             # Same singular values, sparsity, parameter count and compute;

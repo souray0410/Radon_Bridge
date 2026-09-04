@@ -11,7 +11,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, log_loss
 
-from .model import PilotGraph
+from .model import PilotGraph as _PilotGraph
+from functools import partial
+PilotGraph = partial(_PilotGraph, head_mode="shared_legacy")  # historical outputs only
 from .data import PairedDataset
 
 

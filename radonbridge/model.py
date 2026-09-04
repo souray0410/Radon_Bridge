@@ -6,6 +6,8 @@ import copy
 from torch import nn
 from V4.MHD_Framework_V4 import MHD_Node, MHD_Edge, MHD_Topo, MHD_Graph
 from .projector import Projector, Return
+from .bridge import FeatureSpec, attach_group
+from .graph import MHDBuilder
 
 
 class Residual(nn.Module):
@@ -96,23 +98,25 @@ def pretrained_backbones():
     return {"cfp": stages(c), "oct": stages(o)}
 
 
+class MeanLoss(nn.Module):
+    def forward(self, *losses): return torch.stack(losses).mean()
+
+
 class PilotGraph:
-    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both"):
+    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None):
         if modalities not in ("both", "cfp", "oct"): raise ValueError(modalities)
         if cfp_size not in (96, 224): raise ValueError(cfp_size)
         if modalities != "both" and mode != "baseline": raise ValueError("Bridge requires both modalities")
-        branches = ("cfp", "oct") if modalities == "both" else (modalities,)
+        if head_mode not in ("separate", "shared_legacy"): raise ValueError(head_mode)
+        if tuple(sorted(set(bridge_stages))) != tuple(bridge_stages) or any(s not in (1,2,3) for s in bridge_stages):
+            raise ValueError("Bridge locations must be ordered unique intermediate stages 1..3")
+        if head_mode == "shared_legacy" and tuple(bridge_stages) != (3,): raise ValueError("Legacy layout only supports stage3")
+        self.head_mode=head_mode
+        self.branches=branches = ("cfp", "oct") if modalities == "both" else (modalities,)
         torch.manual_seed(seed)
-        self.nodes, self.edges, self.steps = [], [], []
-        self.by_name = {}
-        def node(name):
-            n = MHD_Node(len(self.nodes), name, MHD_Node.Message(torch.zeros(1)), aggregation="replace")
-            self.nodes.append(n); self.by_name[name] = n
-            return n.id
-        def edge(name, fn, heads, tails):
-            eid = len(self.edges)
-            self.edges.append(MHD_Edge(eid, name, [MHD_Edge.Operation(fn)]))
-            self.steps.append((eid, heads, tails))
+        builder=MHDBuilder()
+        self.nodes,self.edges,self.steps,self.by_name=builder.nodes,builder.edges,builder.steps,builder.by_name
+        node,edge=builder.node,builder.edge
         cfp, oct_, target = node("cfp"), node("oct"), node("target")
         features = {}
         # Instantiate both backbones and the common classifier before any
@@ -125,55 +129,60 @@ class PilotGraph:
                 cin = cout
             backbones[name] = blocks
         if backbone == "resnet18": backbones = pretrained_backbones()
-        bridge_channels = 256 if backbone == "resnet18" else 32
-        head = nn.Linear((512 if backbone == "resnet18" else 64) * len(branches), 2)
-        for name, inp in [("cfp", cfp), ("oct", oct_)]:
-            if name not in branches: continue
-            out = node(name + "_eye_input"); edge(name + "_flatten_eyes", FlattenEyes(), [inp], [out])
-            for stage in range(3):
-                nxt = node(f"{name}_stage{stage+1}")
-                edge(f"{name}_stage{stage+1}", backbones[name][stage], [out], [nxt]); out = nxt
-            features[name] = out
-        if mode in ("radon", "scrambled", "self"):
-            handoffs, projectors, widths = {}, {}, {}
-            shapes = ((cfp_size//16,)*2, (8, 6, 6)) if backbone == "resnet18" else ((cfp_size//8,)*2, (4, 12, 12))
-            for name, shape, mesh in [("cfp", shapes[0], (8,)), ("oct", shapes[1], (4, 4))]:
-                p = Projector(shape, mesh, span=16, scramble=mode == "scrambled")
-                projectors[name] = p
-                width = bridge_channels * p.directions; h = max(1, round(width * handoff_ratio)); widths[name] = (width, h)
-                z = node(name + "_projected"); edge(name + "_project", p, [features[name]], [z])
-                u = node(name + "_handoff"); edge(name + "_compress", nn.Conv1d(width, h, 1, bias=False), [z], [u])
-                handoffs[name] = u
-            c, o = node("cfp_mixed"), node("oct_mixed")
-            edge("projection_mixer", Mixer(widths["cfp"][1], widths["oct"][1], mode == "self"),
-                 [handoffs["cfp"], handoffs["oct"]], [c, o])
-            for name, mixed in [("cfp", c), ("oct", o)]:
-                width, h = widths[name]
-                expanded = node(name + "_expanded")
-                edge(name + "_expand", nn.Conv1d(h, width, 1, bias=False), [mixed], [expanded])
-                delta = node(name + "_delta"); edge(name + "_return", Return(projectors[name]), [expanded], [delta])
-                updated = node(name + "_updated"); edge(name + "_residual", Add(), [features[name], delta], [updated])
-                features[name] = updated
-        pooled = []
+        last_channels=512 if backbone == "resnet18" else 64
+        # Build all task heads before any communication parameters. Their initial
+        # states are identical whether branches are trained alone or together.
+        if head_mode == "separate": heads={name:nn.Linear(last_channels,2) for name in ("cfp","oct")}
+        else: head=nn.Linear(last_channels*len(branches),2)
+        for name,inp in [("cfp",cfp),("oct",oct_)]:
+            if name not in branches:continue
+            out=node(name+"_eye_input");edge(name+"_flatten_eyes",FlattenEyes(),[inp],[out]);features[name]=out
+        self.communication_groups=[]
+        def bridge(stage):
+            prefix="" if head_mode == "shared_legacy" else f"bridge_s{stage}_"
+            channels=([64,128,256][stage-1] if backbone=="resnet18" else [8,16,32][stage-1])
+            if backbone=="resnet18":
+                stride=2**(stage+1);depth=32//(2**(stage-1))
+            else:stride=2**stage;depth=32//stride
+            shapes=((cfp_size//stride,)*2,(depth,96//stride,96//stride))
+            if head_mode == "separate":
+                references=mesh_references or {"cfp":(8,),"oct":(4,4)}
+                specs=[FeatureSpec(name,channels,shape,tuple(references[name])) for name,shape in zip(("cfp","oct"),shapes)]
+                outputs,metadata=attach_group(node,edge,specs,features,prefix,upsilon or (1.,1.,handoff_ratio),mode)
+                features.update(outputs);self.communication_groups.append(metadata|{"stage":stage})
+                return
+            handoffs,projectors,widths={},{},{}
+            for name,shape,mesh in [("cfp",shapes[0],(8,)),("oct",shapes[1],(4,4))]:
+                projector=Projector(shape,mesh,span=16,scramble=mode=="scrambled")
+                projectors[name]=projector
+                width=channels*projector.directions;h=max(1,round(width*handoff_ratio));widths[name]=(width,h)
+                z=node(prefix+name+"_projected");edge(prefix+name+"_project",projector,[features[name]],[z])
+                u=node(prefix+name+"_handoff");edge(prefix+name+"_compress",nn.Conv1d(width,h,1,bias=False),[z],[u]);handoffs[name]=u
+            c,o=node(prefix+"cfp_mixed"),node(prefix+"oct_mixed")
+            edge(prefix+"projection_mixer",Mixer(widths["cfp"][1],widths["oct"][1],mode=="self"),[handoffs["cfp"],handoffs["oct"]],[c,o])
+            for name,mixed in [("cfp",c),("oct",o)]:
+                width,h=widths[name]
+                expanded=node(prefix+name+"_expanded");edge(prefix+name+"_expand",nn.Conv1d(h,width,1,bias=False),[mixed],[expanded])
+                delta=node(prefix+name+"_delta");edge(prefix+name+"_return",Return(projectors[name]),[expanded],[delta])
+                updated=node(prefix+name+"_updated");edge(prefix+name+"_residual",Add(),[features[name],delta],[updated]);features[name]=updated
+        for stage in range(1,5):
+            for name in branches:
+                out=node(f"{name}_stage{stage}");edge(f"{name}_stage{stage}",backbones[name][stage-1],[features[name]],[out]);features[name]=out
+            if stage in bridge_stages and mode in ("radon","scrambled","self"):bridge(stage)
+        pooled=[];losses=[]
         for name in branches:
-            out = node(name + "_stage4")
-            edge(name + "_stage4", backbones[name][3], [features[name]], [out])
-            pool = node(name + "_participant"); edge(name + "_pool", EyePool(), [out], [pool]); pooled.append(pool)
-        joined = node("joined"); edge("join", Join() if len(branches) == 2 else nn.Identity(), pooled, [joined])
-        logits = node("logits"); edge("classifier", head, [joined], [logits])
-        loss = node("loss"); edge("criterion", Loss(), [logits, target], [loss])
-        roles, sorts = [], []
-        for eid, heads, tails in self.steps:
-            r = torch.zeros((len(self.edges), len(self.nodes)), dtype=torch.long)
-            s = torch.zeros_like(r)
-            for order, nid in enumerate(heads): r[eid, nid] = -1; s[eid, nid] = order
-            for order, nid in enumerate(tails, len(heads)): r[eid, nid] = 1; s[eid, nid] = order
-            roles.append(r); sorts.append(s)
-        self.forward_levels = list(range(len(roles)))
-        self.backward_levels = list(range(len(roles), 2 * len(roles)))
-        self.graph = MHD_Graph(set(self.nodes), set(self.edges),
-                              {MHD_Topo(roles + [-r for r in reversed(roles)], sorts + list(reversed(sorts)))},
-                              device=torch.device(device))
+            pool=node(name+"_participant");edge(name+"_pool",EyePool(),[features[name]],[pool]);pooled.append(pool)
+            if head_mode == "separate":
+                logits=node(name+"_logits");edge(name+"_head",heads[name],[pool],[logits])
+                task_loss=node(name+"_loss");edge(name+"_criterion",Loss(),[logits,target],[task_loss]);losses.append(task_loss)
+        loss=node("loss")
+        if head_mode == "separate":
+            edge("task_loss_mean",MeanLoss(),losses,[loss])
+        else:
+            joined=node("joined");edge("join",Join() if len(branches)==2 else nn.Identity(),pooled,[joined])
+            logits=node("logits");edge("classifier",head,[joined],[logits]);edge("criterion",Loss(),[logits,target],[loss])
+        self.graph=builder.compile(device)
+        self.forward_levels=builder.forward_levels;self.backward_levels=builder.backward_levels
 
     def set_inputs(self, cfp, oct_, target):
         for name, x in zip(("cfp", "oct", "target"), (cfp, oct_, target)):
@@ -184,7 +193,9 @@ class PilotGraph:
     def forward(self, cfp, oct_, target):
         self.set_inputs(cfp, oct_, target)
         self.graph.forward(levels=self.forward_levels)
-        return self.by_name["logits"].feature_message.current_state, self.by_name["loss"].feature_message.current_state
+        logits=({k:self.by_name[k+"_logits"].feature_message.current_state for k in self.branches}
+                if self.head_mode=="separate" else self.by_name["logits"].feature_message.current_state)
+        return logits,self.by_name["loss"].feature_message.current_state
 
     def backward(self): self.graph.backward(levels=self.backward_levels)
 
@@ -205,4 +216,6 @@ class PilotGraph:
             fn = self.edges[eid].edge_operations[0].function
             out = fn(*[values[n] for n in heads])
             for n, x in zip(tails, out if isinstance(out, tuple) else (out,)): values[n] = x
-        return values[self.by_name["logits"].id], values[self.by_name["loss"].id]
+        logits=({k:values[self.by_name[k+"_logits"].id] for k in self.branches}
+                if self.head_mode=="separate" else values[self.by_name["logits"].id])
+        return logits,values[self.by_name["loss"].id]

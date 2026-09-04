@@ -1,63 +1,44 @@
 # R&B / RadonBridge
 
-Experimental Householder–Radon communication between native 2D and 3D neural
-features, represented explicitly with MHD V4 forward and backward levels.
-
-This is a **bounded feasibility pilot**, not a validated clinical model.
-The first question is whether the implementation is correct and whether a small
-paired experiment produces a useful direction for a subsequent study.
+Current implementation preserves two complete native task paths and uses intermediate
+feature communication through explicit MHD V4 forward/backward. Read [requirements](REQUIREMENTS.md),
+[full source specifications](specification/README.md), [legacy audit](experiments/specification_audit/AUDIT.zh-CN.md)
+and [corrected pilot 005](experiments/005-separate-tasks/README.md).
 
 ## Current pilot
 
-- UKB participant-level, record-derived glaucoma labels; existing train and
-  validation assignments; no test evaluation.
-- 256 training and 128 validation participants, balanced within each split;
-  both eyes; CFP 96x96 and 32 ordered OCT slices spanning the full scan range,
-  each resized to 96x96. This is a coarse 3D input, not central-slice OCT.
-- ImageNet ResNet18 for CFP; the same filters inflated into 3D for OCT.
-  Inflation averages a 2D kernel along the new depth axis and sums the first
-  layer's RGB kernels for a grayscale input. It is not OCT-specific pretraining.
-- During warmup, first three stages frozen, fourth stage and classifier adapted. BatchNorm
-  running statistics frozen. This deliberately measures a cheap adaptation
-  regime rather than full-network optimization.
-- Baseline warmup, then four matched continuations from the same baseline:
-  no bridge, Radon bridge, spatially scrambled Radon operator, and self-only
-  projection filtering. All use identical participant order and training budget.
-- Mixer is bias-free linear Conv1d, initialized to zero; direct residual return.
-  Handoff compression follows projection. No nonlinear or adaptive gate.
-- Dense reference operators operate on small stage features. nD mathematical
-  interface and 1D–4D tests; no claim of scalable arbitrary-dimensional kernels.
+- UKB participant record-derived glaucoma; 256 training / 128 validation, both eyes.
+  CFP224 and volumetric OCT32x96x96. No test evaluation.
+- ImageNet ResNet18 and a 3D inflated ResNet18, each with its own head, CE and metrics.
+- Independent warmup, then matched no-bridge / one-bridge / two-bridge / scrambled /
+  self-only continuations. Stage3/4 and heads adapt; earlier stages and BN stats frozen.
+- FeatureSpec / attach_group accept heterogeneous K inputs, retain identities, and
+  implement M/S/H reference controls. Linear mixer, Householder, adjoint, direct residual.
+- Per-task macro-F1 primary, macro precision/recall and auxiliary AUROC reported separately.
+- Dense reference operators support small nD features; scalable high-resolution kernels
+  and evidence of clinical effectiveness are not claimed.
 
-## Resource limits
+## Run and limits
 
-Use one available GPU for the initial run. The pilot limits PyTorch allocator
-memory to 8 GiB and stops if own-process `nvidia-smi` usage exceeds 9.5 GiB.
-This is a practical guard with headroom, not a hardware-isolated memory quota.
-Other GPU users must not be interrupted. Initial training budget: 60 minutes;
-24 GPU hours is only the previously agreed outer ceiling, not a target.
-
-## Run
-
-Initialize the pinned MHD submodule and use an environment containing the
-dependencies in `pyproject.toml`, including torchvision compatible with PyTorch.
-Install this package, or expose the two source roots through `PYTHONPATH`:
+Use the pinned submodule and compatible PyTorch/torchvision. Source data, predictions and
+checkpoints remain on ws. One GPU; allocator cap8GiB, own-process stop9.5GiB; 15minute budget.
+No automatic interrupted-run resume; existing output directories cannot be overwritten.
 
 ```bash
 git submodule update --init
 export PYTHONPATH="$PWD:$PWD/third_party/MHD_Project"
 python tests/check_core.py
-python -m radonbridge.data --labels LABELS_CSV --image-root EXPORTED_CFP_ROOT \
-  --source-root RAW_UKB_ROOT --output CACHE_ROOT
-CUDA_VISIBLE_DEVICES=0 python -m radonbridge.pilot --data CACHE_ROOT --output RUN_ROOT
+python tests/check_requirements.py
+CUDA_VISIBLE_DEVICES=1 python -m radonbridge.separate_pilot \
+  --data CACHE_ROOT --output RUN_ROOT \
+  --protocol experiments/005-separate-tasks/protocol.json --lock LOCK_PATH
 ```
 
-Source media are only read. Participant IDs, selected records, images,
-checkpoints and predictions stay on ws, outside Git. Local copies are temporary.
-The configuration captures commits, pretraining provenance, hardware and limits;
-the data audit records source-label and selected-manifest hashes. Each arm saves
-best and last model/optimizer state plus its epoch. Automatic interrupted-run
-resume is not implemented in this initial pilot; checkpoints permit explicit
-recovery, and existing completed results are never overwritten.
+## Legacy experiments
+
+001–004 used a shared output in the paired arms. They do not validate the corrected
+separate-task formulation and remain historical diagnostics only. The old training CLI
+is retired; its module remains available for reconstructing old checkpoint diagnostics.
 
 ## Interpretation and next gates
 

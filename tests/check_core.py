@@ -4,7 +4,9 @@ import time
 import torch
 import numpy as np
 from radonbridge.projector import Projector, orientations, householder
-from radonbridge.model import PilotGraph
+from radonbridge.model import PilotGraph as _PilotGraph
+from functools import partial
+PilotGraph = partial(_PilotGraph, head_mode="shared_legacy")  # historical outputs only
 from radonbridge.projector import operator
 
 

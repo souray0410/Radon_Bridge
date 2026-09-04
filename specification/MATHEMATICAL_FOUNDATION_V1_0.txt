@@ -1,0 +1,1784 @@
+R&B — RADON BRIDGE
+MATHEMATICAL FOUNDATION
+Generalized Radon Parameterization, Signed Hyperspherical Coordinates,
+Givens Construction, Fixed-Frame Projection, and Backprojection
+
+Version: V1.0
+Purpose: Mathematical reference for Codex and later manuscript development
+Status: Core derivations verified symbolically for low dimensions and written in dimension-general form
+
+================================================================================
+0. PURPOSE AND SCOPE
+================================================================================
+
+This document is separate from the R&B Project Master Plan.
+
+Its purpose is to establish the mathematical foundation of the R&B method before
+large-scale implementation or biomedical experiments.
+
+The central mathematical questions are:
+
+1. How should an arbitrary n-dimensional projection direction be parameterized?
+2. Can every angular coordinate be placed on the same half-open interval [0, pi)?
+3. Can the conventional nonnegative radial coordinate be replaced by a signed
+   coordinate on (-infinity, +infinity)?
+4. How does this relate to the antipodal symmetry of the n-dimensional Radon
+   transform?
+5. How do successive Givens rotations generate the required n-dimensional
+   direction vector?
+6. Why is it valid to transform the tensor/coordinate frame and then always
+   perform the Radon projection in one canonical frame?
+7. What is the correct Jacobian / exterior-form factor?
+8. What role do wedge-product signs play?
+9. What is the mathematically correct distinction between forward projection,
+   backprojection/adjoint, and exact inversion?
+10. What assumptions must NOT be overstated in the paper or implementation?
+
+This document distinguishes TWO related but different constructions:
+
+A. Signed hyperspherical coordinates for POINTS x in R^n.
+B. A nonredundant projective orientation parameterization for RADON HYPERPLANES.
+
+They use the same angular geometry, but the signed radial coordinate rho used for
+points is NOT the same variable as the signed Radon offset s.
+
+This distinction must be preserved in code and writing.
+
+================================================================================
+1. STANDARD n-DIMENSIONAL RADON TRANSFORM
+================================================================================
+
+Let:
+
+    f : R^n -> R
+
+be a sufficiently regular scalar field.
+
+For a unit normal:
+
+    omega in S^(n-1)
+
+and signed hyperplane offset:
+
+    s in R,
+
+the standard hyperplane Radon transform is:
+
+    Rf(omega, s)
+    =
+    integral_{x dot omega = s} f(x) d sigma(x)
+
+Equivalently, using the Dirac delta distribution:
+
+    Rf(omega, s)
+    =
+    integral_{R^n} f(x) delta(s - x dot omega) dx.
+
+The hyperplane represented by (omega, s) is:
+
+    H(omega, s)
+    =
+    { x in R^n : x dot omega = s }.
+
+But:
+
+    H(omega, s)
+    =
+    H(-omega, -s).
+
+Therefore:
+
+    Rf(omega, s)
+    =
+    Rf(-omega, -s).
+
+Proof using the delta representation:
+
+    Rf(-omega, -s)
+    =
+    integral f(x) delta(-s - x dot (-omega)) dx
+    =
+    integral f(x) delta(-(s - x dot omega)) dx.
+
+Because:
+
+    delta(-u) = delta(u),
+
+we obtain:
+
+    Rf(-omega, -s)
+    =
+    Rf(omega, s).
+
+This antipodal relation is fundamental.
+
+The true unoriented hyperplane parameter space is therefore not simply:
+
+    S^(n-1) x R,
+
+but the quotient:
+
+    (S^(n-1) x R) / ((omega,s) ~ (-omega,-s)).
+
+R&B exploits this redundancy to use one projective representative of each
+orientation together with a signed Span coordinate.
+
+================================================================================
+2. STANDARD HYPERSPHERICAL DIRECTION COORDINATES
+================================================================================
+
+For n >= 2, the conventional hyperspherical unit vector can be written:
+
+    nu_1 = cos(theta_1)
+
+    nu_2 = sin(theta_1) cos(theta_2)
+
+    nu_3 = sin(theta_1) sin(theta_2) cos(theta_3)
+
+    ...
+
+    nu_k
+    =
+    [product_{j=1}^{k-1} sin(theta_j)] cos(theta_k),
+    for 2 <= k <= n-1
+
+    nu_n
+    =
+    product_{j=1}^{n-1} sin(theta_j).
+
+Thus:
+
+    nu(theta)
+    =
+    (
+      cos(theta_1),
+      sin(theta_1) cos(theta_2),
+      sin(theta_1) sin(theta_2) cos(theta_3),
+      ...,
+      product_{j=1}^{n-2} sin(theta_j) cos(theta_{n-1}),
+      product_{j=1}^{n-1} sin(theta_j)
+    )^T.
+
+By repeated use of:
+
+    cos^2(theta) + sin^2(theta) = 1,
+
+one obtains:
+
+    ||nu(theta)||_2 = 1.
+
+Therefore:
+
+    nu(theta) in S^(n-1).
+
+================================================================================
+3. CONVENTIONAL ANGULAR DOMAIN
+================================================================================
+
+A conventional full-sphere hyperspherical parameterization uses:
+
+    theta_1, ..., theta_{n-2} in [0, pi]
+
+and:
+
+    theta_{n-1} in [0, 2pi).
+
+This is natural for parameterizing the FULL oriented sphere S^(n-1).
+
+However, R&B does not need both omega and -omega as independent projection
+orientations because Radon hyperplanes satisfy:
+
+    (omega,s) ~ (-omega,-s).
+
+Therefore it is mathematically natural to choose a fundamental domain of the
+antipodal identification.
+
+================================================================================
+4. R&B ANGULAR DOMAIN: ALL ANGLES IN [0, pi)
+================================================================================
+
+R&B uses:
+
+    theta_j in [0, pi),
+    j = 1, ..., n-1.
+
+Define:
+
+    D_n = [0, pi)^(n-1).
+
+For theta in D_n:
+
+    sin(theta_j) >= 0.
+
+Therefore the final component:
+
+    nu_n(theta)
+    =
+    product_{j=1}^{n-1} sin(theta_j)
+
+is nonnegative.
+
+For interior points, where every theta_j lies strictly in (0, pi):
+
+    nu_n(theta) > 0.
+
+Thus the interior of D_n parameterizes the open hemisphere:
+
+    omega_n > 0.
+
+At the boundary, the parameterization recursively chooses representatives on
+lower-dimensional equators.
+
+An intuitive representative rule is:
+
+    among {omega, -omega},
+    choose the one whose LAST NONZERO COORDINATE is positive.
+
+For example in R^3:
+
+- if omega_3 != 0, choose omega_3 > 0;
+- if omega_3 = 0 but omega_2 != 0, choose omega_2 > 0;
+- if omega_3 = omega_2 = 0, choose omega_1 > 0.
+
+This gives one representative from every antipodal pair, except that ordinary
+hyperspherical coordinate singularities can still give multiple ANGLE TUPLES at
+measure-zero boundary locations.
+
+Important:
+
+The claim is NOT:
+
+    every theta tuple gives a globally unique direction.
+
+The correct claim is:
+
+    D_n provides a fundamental projective orientation domain almost everywhere,
+    with only standard coordinate degeneracies on measure-zero boundaries.
+
+This is sufficient for integration and for the regular tensor-grid representation
+used by R&B.
+
+================================================================================
+5. SUCCESSIVE GIVENS ROTATIONS GENERATE THE SAME DIRECTION VECTOR
+================================================================================
+
+Let:
+
+    e_1 = (1,0,...,0)^T.
+
+Define the standard Givens rotation G_{k,k+1}(theta) as the identity matrix
+except for the 2 x 2 block on coordinates (k,k+1):
+
+        [ cos(theta)  -sin(theta) ]
+        [ sin(theta)   cos(theta) ]
+
+Each such matrix satisfies:
+
+    G^T G = I
+
+and:
+
+    det(G) = +1.
+
+Thus every standard Givens rotation lies in SO(n).
+
+IMPORTANT CORRECTION:
+
+A standard Givens rotation does NOT have determinant -1.
+
+A determinant -1 orthogonal map would be an improper orthogonal transformation
+such as a reflection.
+
+The signs that appear later in exterior-form coordinate substitutions come from
+orientation changes / antisymmetry of wedge products, NOT from a determinant -1
+Givens rotation.
+
+Now define:
+
+    Q(theta)
+    =
+    G_{n-1,n}(theta_{n-1})
+    ...
+    G_{2,3}(theta_2)
+    G_{1,2}(theta_1).
+
+Then:
+
+    nu(theta)
+    =
+    Q(theta) e_1.
+
+Expansion gives exactly:
+
+    nu_1 = cos(theta_1)
+
+    nu_2 = sin(theta_1) cos(theta_2)
+
+    nu_3 = sin(theta_1) sin(theta_2) cos(theta_3)
+
+    ...
+
+    nu_n = product_{j=1}^{n-1} sin(theta_j).
+
+Therefore:
+
+    successive adjacent-plane Givens rotations
+
+and:
+
+    the chosen hyperspherical parameterization
+
+are two equivalent descriptions of the same orientation construction.
+
+This is the dimension-general mechanism R&B should implement.
+
+================================================================================
+6. IMPORTANT IMPLEMENTATION DISTINCTION: nu(theta) VERSUS Q(theta)
+================================================================================
+
+The unit vector:
+
+    nu(theta)
+
+tells us the projection NORMAL.
+
+But the full orthogonal transform:
+
+    Q(theta)
+
+tells us how the COMPLETE coordinate frame is transformed.
+
+For the fixed-frame projection implementation, Q(theta) or an exactly equivalent
+coordinate transformation must be available.
+
+Do not store only nu(theta) if later interpolation/backprojection requires the
+full transformed basis.
+
+Because Q is orthogonal:
+
+    Q^{-1} = Q^T
+
+and:
+
+    |det(Q)| = 1.
+
+For the standard Givens construction above:
+
+    det(Q) = +1.
+
+================================================================================
+7. SIGNED HYPERSPHERICAL COORDINATES FOR POINTS IN R^n
+================================================================================
+
+This section concerns ordinary points:
+
+    x in R^n,
+
+not the Radon offset s.
+
+The conventional full-space hyperspherical coordinate map uses:
+
+    r >= 0,
+
+with:
+
+    theta_1,...,theta_{n-2} in [0,pi]
+
+and:
+
+    phi in [0,2pi).
+
+R&B's related signed-coordinate observation is that the same Euclidean space can
+be covered almost everywhere by:
+
+    rho in (-infinity,+infinity)
+
+and:
+
+    theta_1,...,theta_{n-1} in [0,pi).
+
+Define:
+
+    Phi(rho,theta)
+    =
+    rho nu(theta).
+
+The geometric reason is simple:
+
+    negative rho automatically produces the antipodal direction.
+
+That is:
+
+    rho nu
+    =
+    |rho| (-nu)
+    when rho < 0.
+
+Thus:
+
+    signed radius x projective hemisphere
+        =
+    full Euclidean space
+
+almost everywhere.
+
+================================================================================
+8. EXPLICIT CHANGE OF VARIABLES FROM STANDARD SPHERICAL COORDINATES
+================================================================================
+
+Let the conventional coordinates be:
+
+    r >= 0
+
+    phi_1,...,phi_{n-2} in [0,pi]
+
+    phi_{n-1} in [0,2pi).
+
+Split the final azimuthal interval into:
+
+    Region A:
+        phi_{n-1} in [0,pi)
+
+    Region B:
+        phi_{n-1} in [pi,2pi).
+
+For Region A, use:
+
+    rho = r
+
+    theta_j = phi_j
+    for all j.
+
+For Region B, define:
+
+    rho = -r
+
+    theta_j = pi - phi_j,
+    j = 1,...,n-2
+
+    theta_{n-1}
+    =
+    phi_{n-1} - pi.
+
+Then:
+
+    theta_j in [0,pi)
+
+up to ordinary endpoint conventions.
+
+Using:
+
+    cos(pi-a) = -cos(a)
+
+    sin(pi-a) = sin(a)
+
+    cos(phi-pi) = -cos(phi)
+
+    sin(phi-pi) = -sin(phi),
+
+one obtains:
+
+    nu(theta)
+    =
+    -nu(phi)
+
+for Region B.
+
+Therefore:
+
+    rho nu(theta)
+    =
+    (-r)(-nu(phi))
+    =
+    r nu(phi).
+
+Thus the two parameterizations represent the same Euclidean point.
+
+This proves the geometry of the replacement:
+
+    r >= 0, final angle in [0,2pi)
+
+by:
+
+    rho in R, all angles in [0,pi)
+
+almost everywhere.
+
+================================================================================
+9. JACOBIAN OF THE SIGNED PARAMETERIZATION
+================================================================================
+
+Let:
+
+    Phi(rho,theta)
+    =
+    rho nu(theta).
+
+Then:
+
+    partial Phi / partial rho
+    =
+    nu(theta)
+
+and:
+
+    partial Phi / partial theta_j
+    =
+    rho partial nu / partial theta_j.
+
+Hence the Jacobian determinant factors as:
+
+    det D Phi
+    =
+    rho^(n-1)
+    det[
+      nu,
+      partial_{theta_1} nu,
+      ...,
+      partial_{theta_{n-1}} nu
+    ].
+
+For the hyperspherical parameterization above:
+
+    det[
+      nu,
+      partial_{theta_1} nu,
+      ...,
+      partial_{theta_{n-1}} nu
+    ]
+
+equals:
+
+    A(theta)
+    =
+    sin^(n-2)(theta_1)
+    sin^(n-3)(theta_2)
+    ...
+    sin(theta_{n-2}).
+
+Therefore:
+
+    det D Phi
+    =
+    rho^(n-1)
+    A(theta).
+
+The scalar Euclidean volume measure uses the ABSOLUTE Jacobian:
+
+    dx
+    =
+    |rho|^(n-1)
+    A(theta)
+    d rho
+    d theta_1
+    ...
+    d theta_{n-1}.
+
+Thus:
+
+    integral_{R^n} f(x) dx
+
+equals:
+
+    integral_{-infinity}^{+infinity}
+    integral_{[0,pi)^(n-1)}
+        f(rho nu(theta))
+        |rho|^(n-1)
+        A(theta)
+    d theta
+    d rho
+
+up to the measure-zero coordinate singularities.
+
+No extra factor 1/2 is required.
+
+Why?
+
+Because:
+
+- the angular domain contains half of the oriented sphere;
+- the signed rho axis contains both signs.
+
+These exactly compensate.
+
+================================================================================
+10. EXTERIOR DIFFERENTIAL / WEDGE-PRODUCT FORM
+================================================================================
+
+Exterior differential forms provide a compact and rigorous way to track
+orientation signs.
+
+Let the Euclidean volume form be:
+
+    Omega
+    =
+    dx_1 wedge dx_2 wedge ... wedge dx_n.
+
+The pullback by:
+
+    Phi(rho,theta) = rho nu(theta)
+
+is:
+
+    Phi^* Omega
+    =
+    rho^(n-1)
+    A(theta)
+    d rho
+    wedge d theta_1
+    wedge ...
+    wedge d theta_{n-1}.
+
+This is the ORIENTED volume form.
+
+For scalar integration with ordinary positive measure, use its magnitude:
+
+    |rho|^(n-1) A(theta).
+
+The wedge product is antisymmetric:
+
+    da wedge db
+    =
+    - db wedge da.
+
+Therefore every swap of differential order introduces a minus sign.
+
+This is likely the sign phenomenon the project discussion was referring to.
+
+However:
+
+    wedge-order minus signs
+        must not be confused with
+    det(Givens) = -1.
+
+The Givens rotations used here have determinant +1.
+
+The wedge signs arise from coordinate orientation and differential ordering.
+
+================================================================================
+11. WEDGE-SIGN CHECK FOR THE SECOND HALF OF THE STANDARD AZIMUTH
+================================================================================
+
+On Region B of the conventional coordinate system, define:
+
+    rho = -r
+
+    theta_j = pi - phi_j,
+    j=1,...,n-2
+
+    theta_{n-1}=phi_{n-1}-pi.
+
+Then:
+
+    dr = -d rho
+
+and:
+
+    d phi_j = -d theta_j,
+    j=1,...,n-2
+
+while:
+
+    d phi_{n-1}=d theta_{n-1}.
+
+Therefore:
+
+    dr
+    wedge d phi_1
+    wedge ...
+    wedge d phi_{n-1}
+
+contributes:
+
+    (-1)^(1+n-2)
+    =
+    (-1)^(n-1)
+
+relative to:
+
+    d rho
+    wedge d theta_1
+    wedge ...
+    wedge d theta_{n-1}.
+
+At the same time:
+
+    r^(n-1)
+    =
+    (-rho)^(n-1)
+    =
+    (-1)^(n-1) rho^(n-1).
+
+The two orientation signs multiply to:
+
+    (-1)^(n-1) * (-1)^(n-1)
+    =
+    +1.
+
+Therefore the oriented differential form transforms consistently.
+
+This is an explicit exterior-calculus verification of the signed-coordinate
+change.
+
+For ordinary scalar integration, the absolute Jacobian gives the simpler final
+measure:
+
+    |rho|^(n-1) A(theta).
+
+================================================================================
+12. DIRECT LOW-DIMENSION CHECKS
+================================================================================
+
+n = 2:
+
+    x_1 = rho cos(theta_1)
+    x_2 = rho sin(theta_1)
+
+Jacobian:
+
+    det D Phi = rho.
+
+Thus:
+
+    dx_1 dx_2
+    =
+    |rho| d rho d theta_1.
+
+Domain:
+
+    rho in R
+    theta_1 in [0,pi).
+
+This is signed polar coordinates.
+
+------------------------------------------------------------
+
+n = 3:
+
+    x_1 = rho cos(theta_1)
+
+    x_2 = rho sin(theta_1) cos(theta_2)
+
+    x_3 = rho sin(theta_1) sin(theta_2)
+
+Jacobian:
+
+    det D Phi
+    =
+    rho^2 sin(theta_1).
+
+Thus:
+
+    dx
+    =
+    |rho|^2 sin(theta_1)
+    d rho d theta_1 d theta_2.
+
+Domain:
+
+    rho in R
+    theta_1,theta_2 in [0,pi).
+
+------------------------------------------------------------
+
+n = 4:
+
+    x_1 = rho cos(theta_1)
+
+    x_2 = rho sin(theta_1) cos(theta_2)
+
+    x_3 = rho sin(theta_1) sin(theta_2) cos(theta_3)
+
+    x_4 = rho sin(theta_1) sin(theta_2) sin(theta_3)
+
+Jacobian:
+
+    det D Phi
+    =
+    rho^3
+    sin^2(theta_1)
+    sin(theta_2).
+
+Thus:
+
+    dx
+    =
+    |rho|^3
+    sin^2(theta_1)
+    sin(theta_2)
+    d rho d theta_1 d theta_2 d theta_3.
+
+These low-dimensional expressions agree with the general formula.
+
+================================================================================
+13. SYMBOLIC VERIFICATION PERFORMED
+================================================================================
+
+The general hyperspherical map was symbolically differentiated for dimensions:
+
+    n = 2, 3, 4, 5.
+
+The computed determinants were verified to equal:
+
+    rho^(n-1)
+    product_{j=1}^{n-2}
+        sin^(n-1-j)(theta_j).
+
+Specifically:
+
+n=2:
+    rho
+
+n=3:
+    rho^2 sin(theta_1)
+
+n=4:
+    rho^3 sin^2(theta_1) sin(theta_2)
+
+n=5:
+    rho^4
+    sin^3(theta_1)
+    sin^2(theta_2)
+    sin(theta_3)
+
+This matches the dimension-general formula.
+
+This numerical/symbolic verification supports the derivation but does not replace
+the analytical proof above.
+
+================================================================================
+14. RADON ORIENTATION DOMAIN AS A PROJECTIVE FUNDAMENTAL DOMAIN
+================================================================================
+
+Return now to the Radon transform.
+
+The Radon offset:
+
+    s
+
+is already signed:
+
+    s in R.
+
+Therefore there is no need to use both omega and -omega independently.
+
+Use:
+
+    omega
+    =
+    nu(theta),
+
+with:
+
+    theta in D_n = [0,pi)^(n-1).
+
+Then define the projectively parameterized Radon representation:
+
+    R_proj f(theta,s)
+    =
+    Rf(nu(theta),s).
+
+Because:
+
+    Rf(omega,s)
+    =
+    Rf(-omega,-s),
+
+the pair:
+
+    theta in [0,pi)^(n-1),
+    s in R
+
+provides a nonredundant hyperplane representation almost everywhere.
+
+Thus the R&B parameter domain is naturally:
+
+    [0,pi)^(n-1) x R.
+
+This is the precise mathematical reason that:
+
+- every angular axis can use [0,pi);
+- the projection Span remains signed.
+
+Do NOT confuse the Radon offset s here with the signed radial point coordinate
+rho introduced earlier.
+
+They are analogous in sign handling but represent different geometric objects.
+
+================================================================================
+15. FIXED-FRAME RADON PROJECTION BY ORTHOGONAL CHANGE OF VARIABLES
+================================================================================
+
+This theorem gives the exact mathematical basis for the R&B implementation idea
+of:
+
+    transform orientation first,
+    then always project in one canonical frame.
+
+Let:
+
+    e_1 = (1,0,...,0)^T
+
+be the canonical normal.
+
+For angular configuration theta, choose:
+
+    Q(theta) in SO(n)
+
+such that:
+
+    Q(theta) e_1
+    =
+    nu(theta).
+
+Now perform the orthogonal change of variables:
+
+    x = Q(theta) y
+
+or:
+
+    y = Q(theta)^T x.
+
+Because Q is orthogonal:
+
+    dx = dy
+
+for scalar integration, since:
+
+    |det Q| = 1.
+
+Also:
+
+    x dot nu(theta)
+
+equals:
+
+    [Qy] dot [Qe_1]
+
+equals:
+
+    y dot e_1
+
+equals:
+
+    y_1.
+
+Therefore:
+
+    Rf(nu(theta),s)
+
+equals:
+
+    integral_{R^n}
+        f(Q(theta)y)
+        delta(s-y_1)
+    dy.
+
+Using the delta function to integrate out y_1:
+
+    Rf(nu(theta),s)
+
+equals:
+
+    integral_{R^(n-1)}
+        f(
+          Q(theta)
+          [s, y_2, ..., y_n]^T
+        )
+    d y_2 ... d y_n.
+
+This is the rigorous fixed-frame formula.
+
+================================================================================
+16. CRITICAL IMPLEMENTATION CONSEQUENCE: WHAT IS ACTUALLY SUMMED?
+================================================================================
+
+For the standard n-dimensional HYPERPLANE Radon transform, the output for each
+orientation is one-dimensional in s.
+
+Therefore, after transforming into the canonical frame:
+
+    y = Q^T x,
+
+the coordinate:
+
+    y_1 = s
+
+is RETAINED as the Projection Span axis.
+
+The remaining:
+
+    n - 1
+
+transverse coordinates:
+
+    y_2,...,y_n
+
+are integrated/summed out.
+
+Thus the correct conceptual implementation is:
+
+    orient tensor
+        ->
+    keep one canonical Span axis
+        ->
+    sum/integrate over all d-1 transverse axes
+        ->
+    obtain one 1D projection signal over S.
+
+This distinction is essential.
+
+For example:
+
+2D:
+    integrate 1 transverse axis
+    -> 1D signal
+
+3D:
+    integrate 2 transverse axes
+    -> 1D signal
+
+4D:
+    integrate 3 transverse axes
+    -> 1D signal
+
+If an implementation sums only ONE axis in 3D or 4D, it does NOT produce the
+standard hyperplane Radon transform; it produces a higher-dimensional projection.
+
+Therefore Codex must implement the intended hyperplane transform consistently
+with the desired output:
+
+    C x M1 x ... x M(d-1) x S.
+
+The phrase “fixed-axis projection” should therefore be interpreted precisely as:
+
+    a fixed canonical NORMAL/SPAN axis is retained;
+    all axes orthogonal to it are integrated.
+
+================================================================================
+17. EXTERIOR-FORM VIEW OF THE ORTHOGONAL CHANGE OF VARIABLES
+================================================================================
+
+Let:
+
+    x = Q y.
+
+Then:
+
+    dx_1 wedge ... wedge dx_n
+
+equals:
+
+    det(Q)
+    dy_1 wedge ... wedge dy_n.
+
+For the standard Givens construction:
+
+    det(Q)=+1.
+
+Hence:
+
+    dx_1 wedge ... wedge dx_n
+    =
+    dy_1 wedge ... wedge dy_n.
+
+If a general orthogonal transformation with determinant -1 were used instead,
+the oriented volume form would change sign.
+
+But ordinary scalar measure would still satisfy:
+
+    |det(Q)| = 1.
+
+Thus:
+
+    orthogonal coordinate transformations preserve Euclidean volume measure.
+
+This is the exact change-of-variables justification for transforming the tensor
+before applying the canonical projection.
+
+================================================================================
+18. ANGULAR SURFACE MEASURE
+================================================================================
+
+The orientation parameterization has its own surface-measure factor.
+
+For:
+
+    omega = nu(theta),
+
+the standard sphere surface element is:
+
+    d omega
+    =
+    A(theta)
+    d theta_1 ... d theta_{n-1},
+
+where:
+
+    A(theta)
+    =
+    sin^(n-2)(theta_1)
+    sin^(n-3)(theta_2)
+    ...
+    sin(theta_{n-2}).
+
+The final angle theta_{n-1} has no sine power.
+
+Important consequence:
+
+    uniform sampling in each theta_j
+        is NOT the same as
+    uniform sampling with respect to spherical surface area.
+
+R&B intentionally uses a regular angular tensor mesh because it is:
+
+- deterministic;
+- structurally simple;
+- compatible with M1 x M2 x ... tensor organization.
+
+This is mathematically valid as a parameter grid.
+
+However, if the implementation aims to numerically approximate a continuous
+integral over orientation space, the quadrature weights associated with
+A(theta) must be considered.
+
+Therefore distinguish:
+
+A. Representation sampling:
+   regular angular Mesh used as neural representation channels.
+
+B. Numerical quadrature:
+   weighted approximation to a continuous sphere/projective-space integral.
+
+Do not claim the regular Mesh is surface-uniform.
+
+An optional quadrature-weighted backprojection mode may later be useful.
+
+================================================================================
+19. PROJECTIVE ORIENTATION MEASURE AND FACTOR OF TWO
+================================================================================
+
+The full sphere contains both omega and -omega.
+
+The R&B orientation domain contains one representative per antipodal class
+almost everywhere.
+
+Therefore an integral over the complete sphere of an antipodally symmetric
+quantity can be written as twice the corresponding projective-domain integral.
+
+Schematically:
+
+    integral_{S^(n-1)} h(omega) d omega
+
+equals:
+
+    2
+    integral_{projective representative domain}
+        h(nu(theta))
+        A(theta)
+    d theta
+
+when:
+
+    h(omega)=h(-omega).
+
+This factor matters only when matching a specific continuous normalization.
+
+For a learned R&B module, global normalization can be chosen consistently and
+absorbed into the operator definition.
+
+Nevertheless, code and manuscript should explicitly define the normalization
+used rather than silently mixing full-sphere and projective-sphere conventions.
+
+================================================================================
+20. BACKPROJECTION / ADJOINT IN THE PROJECTIVE PARAMETERIZATION
+================================================================================
+
+For the conventional Radon transform, an adjoint/backprojection has the form:
+
+    R^* g(x)
+    =
+    integral g(omega, x dot omega) d omega
+
+up to the chosen normalization.
+
+Under the R&B projective orientation parameterization, a consistent
+projective-domain adjoint can be written:
+
+    R_proj^* g(x)
+    =
+    integral_{D_n}
+        g(theta, x dot nu(theta))
+        A(theta)
+    d theta
+
+again up to normalization convention.
+
+In a discrete implementation, this becomes a weighted or unweighted sum over
+orientation channels depending on the chosen discretization.
+
+Important:
+
+    backprojection is not automatically exact inversion.
+
+Exact Radon inversion may require:
+
+- dimension-dependent filtering;
+- suitable sampling;
+- correct quadrature;
+- sufficient orientation coverage;
+- interpolation accuracy.
+
+R&B does not need to claim exact reconstruction in order to use a mathematically
+consistent forward/backprojection pair for communication.
+
+================================================================================
+21. WHY A 1D LEARNABLE FILTER IS NATURAL
+================================================================================
+
+After each orientation is transformed into the canonical frame and all transverse
+coordinates are integrated, the result is:
+
+    a one-dimensional projection signal indexed by s.
+
+Therefore a 1D filter/convolution along the Span axis is geometrically natural.
+
+The classical filtered-backprojection picture is:
+
+    projection
+        ->
+    1D filtering
+        ->
+    backprojection.
+
+R&B generalizes the middle operation from a fixed analytical reconstruction
+filter to a learnable communication operator.
+
+However, keep two concepts separate:
+
+1. analytical inversion filter;
+2. learnable cross-representation mixer.
+
+The learned filter is not automatically a classical inverse filter.
+
+================================================================================
+22. CONNECTION TO THE R&B M–S–H REPRESENTATION
+================================================================================
+
+For a d-dimensional feature with C channels:
+
+1. Choose Orientation Mesh:
+       M1 x ... x M(d-1)
+
+2. Generate each direction:
+       nu(theta)=Q(theta)e_1
+
+3. Transform into canonical frame:
+       y=Q(theta)^T x
+
+4. Retain canonical Span coordinate:
+       y_1 = s
+
+5. Integrate all d-1 transverse coordinates.
+
+This produces:
+
+    C
+    x M1
+    x ...
+    x M(d-1)
+    x S.
+
+Thus:
+
+    M = Orientation Mesh
+
+and:
+
+    S = Projection Span
+
+have direct mathematical meanings.
+
+Then fold:
+
+    P
+    =
+    C product_j M_j.
+
+Obtain:
+
+    P x S.
+
+Then communication compression produces:
+
+    H x S,
+
+where:
+
+    H = Communication Handoff.
+
+H is a neural communication dimension, not part of the classical Radon geometry.
+
+Thus the mathematical geometry is:
+
+    M x S,
+
+while:
+
+    H
+
+is the learned communication interface constructed on top of that geometry.
+
+================================================================================
+23. R&B CONTROL VECTOR
+================================================================================
+
+The control vector is:
+
+    Upsilon
+    =
+    (upsilon_M, upsilon_S, upsilon_H).
+
+Interpretation:
+
+upsilon_M:
+    controls discretization of the Orientation Mesh.
+
+upsilon_S:
+    controls discretization of the Projection Span while preserving its support.
+
+upsilon_H:
+    controls the Handoff width after projection-channel folding.
+
+These controls are conceptually orthogonal:
+
+    M and S:
+        projection representation budget
+
+    H:
+        communication budget
+
+This distinction should remain explicit in both code and manuscript.
+
+================================================================================
+24. 1D EDGE CASE
+================================================================================
+
+For n = 1:
+
+    S^0 = {+1,-1}.
+
+After antipodal identification, there is only one unoriented direction.
+
+Therefore:
+
+    d - 1 = 0
+
+angular variables are required.
+
+The 1D case should naturally degenerate to:
+
+- no Orientation Mesh axes;
+- one signed Span coordinate;
+- projection representation equivalent to the original 1D coordinate under the
+  chosen normalization/convention.
+
+Do NOT invent a fake angular dimension for 1D merely to make the code look
+symmetric.
+
+This is an important test of whether the implementation is genuinely
+dimension-general.
+
+================================================================================
+25. BOUNDARY DEGENERACIES
+================================================================================
+
+At angles such as:
+
+    theta_1 = 0,
+
+later angular variables may cease to affect the direction.
+
+Example in 4D:
+
+if:
+
+    theta_1=0,
+
+then:
+
+    nu=(1,0,0,0)
+
+regardless of theta_2 and theta_3.
+
+Thus a regular tensor grid can contain duplicate direction vectors on coordinate
+boundaries.
+
+These sets have measure zero in the continuous parameterization.
+
+For the initial R&B implementation, two legitimate options exist:
+
+Option A:
+    preserve the regular grid and accept boundary duplicates.
+
+Advantages:
+- simplest tensor organization;
+- deterministic reshape;
+- direct M1 x ... x M(d-1) representation.
+
+Option B:
+    deduplicate boundary directions.
+
+Advantages:
+- avoids redundant computation.
+
+Disadvantages:
+- destroys the simplest regular tensor structure.
+
+Default recommendation for first implementation:
+
+    preserve the regular Mesh,
+    detect/log duplicates,
+    do not claim global one-to-one angular coordinates.
+
+Later evaluate whether deduplication is worthwhile.
+
+================================================================================
+26. DISCRETE IMPLEMENTATION VERSUS CONTINUOUS THEORY
+================================================================================
+
+The continuous theory assumes:
+
+- exact coordinate transforms;
+- continuous interpolation;
+- exact integration;
+- continuous angular domains.
+
+The implementation uses discrete tensors.
+
+Therefore errors can arise from:
+
+- spatial interpolation;
+- finite Mesh density;
+- finite Span density;
+- truncation/support conventions;
+- discrete summation;
+- boundary padding;
+- anisotropic voxel spacing;
+- numerical precision.
+
+The paper must distinguish:
+
+    mathematical parameterization correctness
+
+from:
+
+    exact discrete inversion.
+
+A discrete R&B implementation can be mathematically well-motivated without being
+an exact invertible Radon transform.
+
+================================================================================
+27. PHYSICAL SPACING
+================================================================================
+
+When feature axes correspond to physical coordinates with unequal spacing:
+
+    Delta x_1, ..., Delta x_n,
+
+geometric support and projection coordinates should be computed in physical or
+properly normalized coordinates when scientifically required.
+
+Using raw voxel counts alone can distort geometric distances.
+
+The exact policy should be configurable because neural feature maps may no longer
+have a direct physical voxel interpretation after multiple backbone stages.
+
+Potential modes:
+
+1. index-coordinate mode;
+2. normalized-coordinate mode;
+3. physical-spacing-aware mode.
+
+Do not hard-code one assumption before inspecting the actual biomedical data and
+feature hierarchy.
+
+================================================================================
+28. WHAT THE MATHEMATICS PROVES
+================================================================================
+
+The derivations above justify the following statements:
+
+1. Successive Givens rotations generate the desired n-dimensional
+   hyperspherical direction vector.
+
+2. Standard Givens rotations have determinant +1 and preserve Euclidean measure.
+
+3. A signed radial coordinate rho in R together with all angular variables in
+   [0,pi) parameterizes R^n almost everywhere.
+
+4. The corresponding scalar Jacobian is:
+
+       |rho|^(n-1)
+       sin^(n-2)(theta_1)
+       sin^(n-3)(theta_2)
+       ...
+       sin(theta_{n-2}).
+
+5. Exterior differential forms give the signed/oriented version:
+
+       rho^(n-1) A(theta)
+       d rho wedge d theta_1 wedge ... wedge d theta_{n-1}.
+
+6. Wedge-product minus signs arise from differential ordering/orientation and
+   must not be confused with the determinant of a Givens rotation.
+
+7. The n-dimensional Radon transform satisfies:
+
+       Rf(omega,s)=Rf(-omega,-s).
+
+8. Therefore one projective orientation representative with all angles in
+   [0,pi), together with signed s in R, is sufficient to describe Radon
+   hyperplanes almost everywhere.
+
+9. If Q(theta)e_1=nu(theta), the orthogonal change of variables x=Qy converts
+   projection at arbitrary orientation into projection in one canonical frame.
+
+10. For the standard hyperplane Radon transform, after this change of variables,
+    one canonical Span axis is retained and ALL n-1 transverse axes are
+    integrated.
+
+================================================================================
+29. WHAT THE MATHEMATICS DOES NOT YET PROVE
+================================================================================
+
+Do NOT claim the following without additional work:
+
+1. That a finite regular angular Mesh is surface-uniform.
+
+2. That a diagonal-based finite S automatically gives mathematically lossless
+   discrete reconstruction.
+
+3. That the chosen discrete backprojection is an exact inverse.
+
+4. That every angular tuple is globally unique.
+
+5. That one universal classical reconstruction filter applies unchanged to all
+   dimensions.
+
+6. That learned projection-domain interaction preserves all information.
+
+7. That R&B must outperform learned latent projection merely because the
+   geometry is mathematically valid.
+
+Those are empirical or additional analytical questions.
+
+================================================================================
+30. RECOMMENDED MATHEMATICAL UNIT TESTS FOR CODEX
+================================================================================
+
+Before biomedical experiments, Codex should implement mathematical tests.
+
+A. Givens tests
+- Q^T Q = I
+- det(Q) approximately +1
+- ||Q e_1|| = 1
+- expanded direction agrees with hyperspherical formula
+
+B. Low-dimensional formula tests
+- n=2
+- n=3
+- n=4
+- n=5 synthetic checks if practical
+
+C. Orientation-domain tests
+- all theta_j in [0,pi)
+- boundary behavior
+- duplicate-direction logging
+- antipodal representative checks
+
+D. Fixed-frame Radon tests
+For random x and theta:
+
+    x dot nu(theta)
+
+must equal:
+
+    [Q(theta)^T x]_1
+
+within numerical tolerance.
+
+E. Measure tests
+For numerical integration of simple radial functions, compare:
+- Cartesian integration
+- standard spherical coordinates
+- signed-all-[0,pi) coordinates
+
+F. Radon symmetry tests
+Numerically verify:
+
+    Rf(omega,s)
+    approximately
+    Rf(-omega,-s)
+
+for synthetic functions.
+
+G. Forward/backprojection adjoint test
+If the discrete implementation is intended as an adjoint pair, verify:
+
+    <R f, g>
+    approximately
+    <f, R^* g>
+
+under the chosen discrete inner products and weighting conventions.
+
+This test is more important than claiming exact inversion.
+
+================================================================================
+31. RECOMMENDED NOTATION FOR THE MANUSCRIPT
+================================================================================
+
+Use separate symbols for conceptually different objects.
+
+Suggested:
+
+    theta
+        angular parameters
+
+    nu(theta)
+        unit normal / projection direction
+
+    Q(theta)
+        complete Givens-generated orthogonal transform
+
+    rho
+        signed radial coordinate for the ordinary hyperspherical
+        change-of-variables theorem
+
+    s
+        signed Radon hyperplane offset / Projection Span coordinate
+
+    M_j
+        discrete Orientation Mesh size on angular axis j
+
+    S
+        number of Projection Span samples
+
+    H
+        Communication Handoff width
+
+    Upsilon
+        R&B control vector
+
+    upsilon_M
+    upsilon_S
+    upsilon_H
+        individual controls
+
+Do NOT reuse r/rho/s ambiguously.
+
+================================================================================
+32. CORE THEOREM PACKAGE FOR LATER PAPER WRITING
+================================================================================
+
+The manuscript can eventually organize the mathematics around the following
+results.
+
+LEMMA 1 — Givens Direction Construction
+
+Successive adjacent-plane Givens rotations generate the hyperspherical unit
+direction nu(theta).
+
+LEMMA 2 — Signed Hyperspherical Reparameterization
+
+The map:
+
+    Phi(rho,theta)=rho nu(theta)
+
+with:
+
+    rho in R
+    theta in [0,pi)^(n-1)
+
+covers R^n almost everywhere, with Jacobian magnitude:
+
+    |rho|^(n-1) A(theta).
+
+LEMMA 3 — Projective Radon Symmetry
+
+The Radon transform obeys:
+
+    Rf(omega,s)=Rf(-omega,-s).
+
+Therefore the projective orientation domain [0,pi)^(n-1) with signed s provides
+a nonredundant hyperplane parameterization almost everywhere.
+
+LEMMA 4 — Fixed-Frame Projection Equivalence
+
+For Q(theta)e_1=nu(theta):
+
+    Rf(nu(theta),s)
+
+equals the canonical-frame projection of the transformed function f(Q(theta)y)
+at y_1=s.
+
+COROLLARY — Dimension-General R&B Representation
+
+Any n-dimensional native feature can be mapped to a representation indexed by:
+
+    Orientation Mesh M
+    x
+    Projection Span S,
+
+providing the geometric basis for dimension-independent communication.
+
+================================================================================
+33. FINAL MATHEMATICAL INTERPRETATION
+================================================================================
+
+The mathematical foundation of R&B can be summarized as:
+
+First:
+
+    successive Givens rotations
+        provide
+    a dimension-general orientation construction.
+
+Second:
+
+    antipodal symmetry
+        allows
+    all angular variables to use the common half-open interval [0,pi).
+
+Third:
+
+    signed coordinates
+        recover
+    the information that would otherwise require the opposite orientation.
+
+Fourth:
+
+    orthogonal change of variables
+        converts
+    arbitrary-orientation Radon projection
+        into
+    one canonical fixed-frame projection operation.
+
+Fifth:
+
+    the resulting projection is always a one-dimensional signal over signed
+    offset s after integrating all transverse dimensions.
+
+Therefore heterogeneous native dimensions can share the same conceptual
+projection representation:
+
+    M x S
+
+before the learned Handoff/communication layer is applied.
+
+This is the mathematical basis on which the R&B neural communication framework
+should be implemented.
+
+================================================================================
+END OF R&B MATHEMATICAL FOUNDATION V1.0
+================================================================================

@@ -1,5 +1,8 @@
 # Experiment ledger
 
+**Status correction:** shared-head results in 001–003 do not test the user's separate-predictor formulation. Unimodal and late-fusion outcomes remain historical auxiliary results, not macro-F1-selected corrected baselines. See [specification audit](specification_audit/AUDIT.zh-CN.md). No new experiment was run during this audit.
+
+
 GitHub main is always the latest code and experiment record. Timestamp branches
 archive the previous main before an update; timestamps use Asia/Riyadh. Historical
 branches use timestamps only. Experiment identifiers remain in directories, not
