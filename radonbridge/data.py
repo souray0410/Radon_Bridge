@@ -40,7 +40,7 @@ def prepare(args):
                 if str(a["schema"]) != CACHE_SCHEMA or a["cfp"].shape != (2,3,96,96) or a["oct"].shape != (2,1,32,96,96):
                     raise ValueError("Cache mismatch")
             return
-        cfps, octs, indices, counts = [], [], [], []
+        cfps, octs, indices, counts, native_sizes = [], [], [], [], []
         for eye in ("left", "right"):
             cfp_path = Path(args.image_root) / row[eye + "_fundus_path"]
             # Existing exporter uses <archive-parent>/<archive-stem>/<slice>.
@@ -62,16 +62,18 @@ def prepare(args):
                     raise ValueError("Incomplete or duplicate OCT slices")
                 pick = np.round(np.linspace(0,len(ordered)-1,32)).astype(int)
                 planes = []
+                native_size = None
                 for k in pick:
                     with z.open(ordered[k][1]) as stream:
                         with Image.open(stream) as im:
-                            if im.size != (512,650): raise ValueError("Unexpected native OCT dimensions")
+                            if native_size is None: native_size=im.size
+                            if min(im.size)<32 or im.size!=native_size:raise ValueError("Invalid or inconsistent within-volume OCT dimensions")
                             planes.append(np.asarray(im.convert("L").resize((96,96),Image.Resampling.BILINEAR)))
-                octs.append(np.stack(planes)[None]); indices.append(np.asarray(ns)[pick]); counts.append(len(ns))
+                octs.append(np.stack(planes)[None]); indices.append(np.asarray(ns)[pick]); counts.append(len(ns));native_sizes.append(native_size)
         tmp = dst.with_suffix(".partial")
         with tmp.open("wb") as f:
             np.savez(f, cfp=np.stack(cfps), oct=np.stack(octs), schema=CACHE_SCHEMA,
-                     slice_numbers=np.stack(indices), native_slice_counts=counts)
+                     slice_numbers=np.stack(indices), native_slice_counts=counts,native_sizes=native_sizes)
         tmp.replace(dst)
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         for i, _ in enumerate(pool.map(one,records),1):
@@ -82,6 +84,13 @@ def prepare(args):
               "sampling":"32 ordered B-scans uniformly over the full 128-slice range; no spacing claim",
               "labels_sha256":hashlib.sha256(Path(args.labels).read_bytes()).hexdigest(),
               "selected_sha256":hashlib.sha256(root.joinpath("selected.csv").read_bytes()).hexdigest()}
+    shapes={}
+    for row in records:
+        with np.load(root/(row["order"]+".npz"),allow_pickle=False) as a:
+            # Earlier caches passed an explicit 512x650 check for every decoded plane.
+            for shape in a["native_sizes"] if "native_sizes" in a else [(512,650),(512,650)]:
+                key="x".join(map(str,shape));shapes[key]=shapes.get(key,0)+1
+    report["native_width_height_counts"]=shapes
     root.joinpath("audit.json").write_text(json.dumps(report,indent=2)); print(json.dumps(report),flush=True)
 
 
