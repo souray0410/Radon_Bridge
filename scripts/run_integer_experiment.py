@@ -26,7 +26,7 @@ class Controller:
     def __init__(self,args):
         self.args=args; self.root=Path(args.output); self.root.mkdir(parents=True,exist_ok=True)
         self.protocol=read_json(args.protocol)
-        if self.protocol['review_status']!='approved' or self.protocol['schema']!='two_stage_ratio_convergence_v3':
+        if self.protocol['review_status']!='approved' or self.protocol['schema'] not in {'two_stage_ratio_convergence_v3','two_stage_ablation_v1'}:
             raise ValueError('Only the explicitly approved ratio and convergence protocol may launch')
         self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
         self.ledger=read_json(self.root/'ledger.json') if (self.root/'ledger.json').exists() else {'jobs':[]}

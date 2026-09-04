@@ -1,3 +1,3 @@
 # Current experiment
 
-`2026_09_04_21_34_03` inherits completed stage one and the completed independent/R&B pair by hashes, then runs the remaining mechanism controls under the unchanged hard budget.
+`2026_09_04_21_41_26` is the authorized overnight position, M, S, rho ablation and conditional seed-3417 stability check.
