@@ -45,6 +45,9 @@ def main(args):
                       "allocator_cap_gib":8,"process_stop_mib":9728,
                       "source_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
                       "mhd_commit":subprocess.check_output(["git","-C","third_party/MHD_Project","rev-parse","HEAD"],text=True).strip()}
+    config["data_audit"]=json.loads((Path(args.data)/"audit.json").read_text())
+    weight_file=Path(os.environ.get("TORCH_HOME",str(Path.home()/".cache/torch")))/"hub/checkpoints/resnet18-f37072fd.pth"
+    if weight_file.exists():config["pretrained_sha256"]=hashlib.sha256(weight_file.read_bytes()).hexdigest()
     atomic_json(out/"config.json",config)
     def process_memory():
         r=subprocess.check_output(["nvidia-smi","--query-compute-apps=pid,used_memory","--format=csv,noheader,nounits"],text=True)
@@ -125,6 +128,26 @@ def main(args):
     torch.cuda.synchronize()
     print(json.dumps({"smoke_step_seconds":time.time()-t,"process_mib":process_memory(),
                       "initial_loss":float(loss.detach())}),flush=True)
+    # Independent optimization diagnostic on sixteen training participants.
+    # Restore the original parameters and discard optimizer state afterwards.
+    tiny=[]
+    for batch in loader(train,0):
+        tiny.append(tuple(v.to(device) for v in batch[:3]))
+        if len(tiny)==4:break
+    losses=[];t=time.time()
+    for step in range(40):
+        c,o,y=tiny[step%len(tiny)]
+        opt.zero_grad(set_to_none=True)
+        z,l=baseline.forward(c,o,y);baseline.backward();opt.step()
+        losses.append(float(l.detach()))
+    with torch.no_grad():
+        correct=0;total_n=0
+        for c,o,y in tiny:
+            z,_=baseline.forward(c,o,y);correct+=int((z.argmax(1)==y).sum());total_n+=len(y)
+    overfit={"participants":total_n,"steps":40,"first4_loss":float(np.mean(losses[:4])),
+             "last4_loss":float(np.mean(losses[-4:])),"accuracy":correct/total_n,"seconds":time.time()-t}
+    atomic_json(out/"tiny_overfit.json",overfit);print(json.dumps({"tiny_overfit":overfit}),flush=True)
+    del tiny,z,l
     baseline.load_state(initial);del initial,opt
     state,warm=run(baseline,"warmup",args.warmup_epochs)
     # Occlusion is an input-use diagnostic, not a separately trained unimodal baseline.
