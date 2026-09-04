@@ -6,7 +6,8 @@ spec=importlib.util.spec_from_file_location('protocol',Path(__file__).parents[1]
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 valid={'phase_mode':'formal','confirmation_seeds':[3411,3412,3413,3414,3415],
        'formal_arms':[{'id':'independent','mode':'baseline'},{'id':'rb','mode':'radon'}],
-       'recipes':[{'backbone':'resnet34'}], 'prior_gpu_minutes':20.,'max_minutes':220.,
+       'recipes':[{'backbone':'resnet34','adapt_stages':[1,2,3,4],'training_regime':'full_finetune'}],
+       'training_regime':'full_finetune','batchnorm_policy':'train','recipe_policy':'user_full_finetune_override','recipe_override_reason':'User correction', 'prior_gpu_minutes':20.,'max_minutes':220.,
        'qualification_summary_sha256':'a'*64,'qualification_summary_path':'/recorded/summary.json'}
 module.validate_formal_protocol(valid)
 invalid=[]

@@ -1,0 +1,10 @@
+{
+  "state": "stopped_by_user_correction",
+  "completed_trials": 0,
+  "last_epoch": 11,
+  "exit_status": 143,
+  "elapsed_minutes": 1.737153442700704,
+  "old_pid": 9431,
+  "reason": "User requires all network weights trainable; partial stage3+4 training superseded",
+  "source_commit": "662e61360758a204384bcd7af0935f2eecccd144"
+}
