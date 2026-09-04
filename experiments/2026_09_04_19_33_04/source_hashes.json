@@ -1,0 +1,11 @@
+{
+  "radonbridge/projector.py": "1e81cee50c5b650ad3047a156232a3081b998288ab5881c2b47d1c448a22974d",
+  "radonbridge/bridge.py": "f69ef92861829cc6b22524af0499ac382d7d4f198c8b1a69aafe522226a1fca0",
+  "radonbridge/model.py": "a91de01e918c7c8515bd1b26e3d4b0e8553553063c57f044e3e2cae27fa49226",
+  "radonbridge/experiment.py": "be7e95ba588078cf51fa68c5298125e431338ab2fdaf2593a47355ecd5cc2518",
+  "scripts/run_integer_experiment.py": "5c8ae8be83c7ee54ce641e822dc423179c8ecb0bded7c14b67529ed78bcf7288",
+  "scripts/summarize_integer_experiment.py": "c31f9e846a10fdd6202a6c6c90700b1489fbcb0bdac20919211d2ffd59e8d9eb",
+  "tests/check_integer_bridge.py": "64f49f6c06655f94de1ae82d0f7cb2115fc24a604c0a2723155c52a513c159ce",
+  "tests/check_accumulation.py": "0ce72adbae8ba935db27016620be1353fe35f5a97c1651b3d49979d0cefd9701",
+  "tests/check_scheduler.py": "f82751e890f13cf3bd7919931329513a878b3508c2560a333f8da8c081396d45"
+}

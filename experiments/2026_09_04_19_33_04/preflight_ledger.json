@@ -1,0 +1,18 @@
+{
+  "jobs": [
+    {
+      "id": "gpu_geometry",
+      "gpu": 0,
+      "gpu_seconds": 2.132415250000122,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 426
+    },
+    {
+      "id": "profile_b16",
+      "gpu": 0,
+      "gpu_seconds": 5.2906603319997885,
+      "exit_code": 0,
+      "sampled_peak_process_mib": 8598
+    }
+  ]
+}

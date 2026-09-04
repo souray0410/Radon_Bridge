@@ -1,0 +1,43 @@
+"""Exercise scheduling, accounting, overwrite protection and group budget gates without GPUs."""
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+from types import SimpleNamespace
+from unittest.mock import patch
+
+spec=importlib.util.spec_from_file_location('controller','scripts/run_integer_experiment.py')
+m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+processes=[]
+class Process:
+    def __init__(self,cmd,**kw):
+        self.pid=1000+len(processes);processes.append(self);self.returncode=None;self.ticks=0
+        directory=Path(cmd[cmd.index('--output')+1]);m.write_json(directory/'summary.json',{'passed':True})
+    def poll(self):
+        self.ticks+=1
+        if self.ticks>=2:self.returncode=0
+        return self.returncode
+    def terminate(self):self.returncode=-15
+    def kill(self):self.returncode=-9
+    def wait(self,**kw):self.returncode=0;return 0
+
+with tempfile.TemporaryDirectory() as tmp:
+    c=m.Controller.__new__(m.Controller);c.root=Path(tmp);c.args=SimpleNamespace(phase='preflight',data='/unused')
+    c.protocol={'prior_gpu_minutes':13.341};c.limit=60;c.ledger={'jobs':[]};c.active={};c.peak={}
+    c.phase='test';c.stop=False;c.stop_reason=None;c.commit=None
+    with patch.object(m,'devices',return_value={0:{'free':20000},1:{'free':20000}}), \
+         patch.object(m.subprocess,'Popen',Process), \
+         patch.object(m.subprocess,'check_output',side_effect=lambda *a,**k:'\n'.join(f'{p.pid}, 5000' for p in processes)), \
+         patch.object(m.time,'sleep',lambda _:None):
+        jobs=[m.job(str(i),m.config(1,3e-5)) for i in range(2)]
+        result=c.run_jobs(jobs)
+        assert len(result)==2 and {j['gpu'] for j in c.ledger['jobs']}=={0,1}
+        assert not c.active and all(p.returncode==0 for p in processes)
+        assert abs(c.used()-sum(j['gpu_seconds'] for j in c.ledger['jobs'])/60)<1e-12
+        assert c.group_fits([m.job('next',m.config(1,3e-5,epochs=6))],10)
+        c.limit=c.used()+.01
+        assert not c.group_fits([m.job('too_big',m.config(1,3e-5,epochs=6))],10)
+        try:c.start(jobs[0],0)
+        except RuntimeError:pass
+        else:raise AssertionError('Overwrite allowed')
+    print(json.dumps({'two_gpu_dispatch':True,'summed_gpu_accounting':True,'comparison_group_budget_gate':True,'overwrite_rejected':True}))

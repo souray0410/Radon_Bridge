@@ -1,0 +1,24 @@
+{
+  "geometry": [
+    {
+      "dimension": 2,
+      "device": "cuda",
+      "forward_relative_error": 7.178458219971297e-08,
+      "direct_bp_relative_error": 1.0400323170112328e-07
+    },
+    {
+      "dimension": 3,
+      "device": "cuda",
+      "forward_relative_error": 4.8821986242052967e-08,
+      "direct_bp_relative_error": 8.190299231832749e-08
+    },
+    {
+      "dimension": 4,
+      "device": "cuda",
+      "forward_relative_error": 8.944468439303807e-08,
+      "direct_bp_relative_error": 8.125042029971989e-08
+    }
+  ],
+  "seconds": 0.47259895600018353,
+  "passed": true
+}

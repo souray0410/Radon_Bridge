@@ -1,0 +1,46 @@
+{
+  "schema": "integer_eem_direct_bp_v1",
+  "review_status": "approved",
+  "stamp": "2026_09_04_19_33_04",
+  "M": 16,
+  "S": 64,
+  "H": 512,
+  "prior_gpu_minutes": 13.341,
+  "max_gpu_minutes": 60,
+  "effective_batch": 16,
+  "microbatch_candidates": [
+    16,
+    8,
+    4,
+    2
+  ],
+  "calibration": {
+    "seed": 3410,
+    "backbone_lrs": [
+      3e-06,
+      3e-05
+    ],
+    "epochs": 4
+  },
+  "screen": {
+    "seed": 3411,
+    "epochs": 6
+  },
+  "confirmation": {
+    "seeds": [
+      3412,
+      3413,
+      3414
+    ],
+    "epochs": 8
+  },
+  "test_used": false,
+  "authorization": "User explicitly requested implementation, GitHub/ws02 deployment, bounded automatic trials and 30-minute monitoring.",
+  "data": "/data/mengh/RadonBridge/cache/full1264_296",
+  "limitations": [
+    "Development set previously used for task screening",
+    "Participant-level glaucoma labels, not eye-level adjudication",
+    "OCT 32x96x96 cache; raw UKB mount unavailable",
+    "OCT ImageNet-inflated initialization"
+  ]
+}

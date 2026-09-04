@@ -1,161 +1,161 @@
-"""Small-feature nD reference Radon operator with an exact discrete transpose.
+"""Fixed n-D antipodal EEM, raw hyperplane Radon, and direct backprojection.
 
-The dense matrix is intentional for the bounded pilot, not a full-resolution
-production backend. Each row integrates multilinear native features over a
-Householder-oriented hyperplane, with zero extension beyond the lattice.
+The forward quadrature matrix and the backprojection gather are deliberately
+separate discretizations. Neither geometry is a learned reconstruction operator.
 """
-from __future__ import annotations
-
+from functools import lru_cache
 import itertools
 import math
-from functools import lru_cache
-
 import numpy as np
 import torch
 from torch import nn
 
+EEM_VERSION = 'antipodal_riesz2_projected_backtracking_v1'
 
-def orientations(mesh):
-    d = len(mesh) + 1
-    if d == 1:
-        return np.ones((1, 1)), np.ones(1)
-    if any(m < 1 for m in mesh):
-        raise ValueError("Every angular mesh size must be positive")
-    angles = [np.arange(m) * math.pi / m for m in mesh]
-    # Integrate the sphere's angular measure over nearest-sample parameter
-    # cells. Positive cell weights also handle M=1 and repeated pole samples.
-    roots, gw = np.polynomial.legendre.leggauss(16)
-    axis_weights = []
-    for j, a in enumerate(angles):
-        bounds = np.r_[0., (a[:-1] + a[1:]) / 2, math.pi]
-        w = []
-        for lo, hi in zip(bounds[:-1], bounds[1:]):
-            u = (hi + lo) / 2 + roots * (hi - lo) / 2
-            w.append(np.sum(gw * np.sin(u) ** (d - 2 - j)) * (hi - lo) / 2)
-        axis_weights.append(w)
-    directions, weights = [], []
-    for idx in itertools.product(*[range(m) for m in mesh]):
-        n, prod = [], 1.
-        for j, m in enumerate(idx):
-            n.append(prod * math.cos(angles[j][m]))
-            prod *= math.sin(angles[j][m])
-        n.append(prod)
-        directions.append(n)
-        weights.append(math.prod(axis_weights[j][m] for j, m in enumerate(idx)))
-    weights = np.asarray(weights)
-    return np.asarray(directions), weights / weights.sum()
+
+def positive_integer(value, name, minimum=1):
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        raise ValueError(f'{name} must be an integer >= {minimum}')
 
 
 def householder(n):
-    e = np.zeros_like(n); e[0] = 1
-    v = e - n
+    e = np.zeros_like(n); e[0] = 1.
+    v = e-n
     if np.linalg.norm(v) < 1e-12:
-        return np.eye(len(n))
+        return np.eye(len(n), dtype=np.float64)
     v /= np.linalg.norm(v)
-    return np.eye(len(n)) - 2 * np.outer(v, v)
+    return np.eye(len(n))-2*np.outer(v, v)
+
+
+@lru_cache(maxsize=64)
+def eem_directions(d, M):
+    positive_integer(d, 'dimension'); positive_integer(M, 'M')
+    if d == 1:
+        if M != 1:
+            raise ValueError('One-dimensional space has only one unoriented direction; use M=1')
+        return np.ones((1, 1)), {'version': EEM_VERSION, 'seeds': [], 'energy': 0., 'iterations': 0}
+    seeds = [20260904+100*d+j for j in range(4)]
+    if M == 1:
+        u = np.zeros((1, d)); u[0, 0] = 1
+        return u, {'version': EEM_VERSION, 'seeds': seeds, 'energy': 0., 'iterations': 0}
+    pair = np.triu_indices(M, 1)
+    def energy(u):
+        c = u@u.T
+        q = 1-c[pair]**2
+        return float(np.sum(1/q)) if np.all(q > 0) else math.inf
+    best = None
+    for seed in seeds:
+        u = np.random.default_rng(seed).normal(size=(M, d))
+        u /= np.linalg.norm(u, axis=1, keepdims=True)
+        value = energy(u)
+        for iteration in range(1500):
+            c = u@u.T; np.fill_diagonal(c, 0.)
+            coefficients = 2*c/np.maximum(1-c*c, 1e-15)**2
+            np.fill_diagonal(coefficients, 0.)
+            gradient = coefficients@u
+            gradient -= np.sum(gradient*u, axis=1, keepdims=True)*u
+            norm = np.linalg.norm(gradient)
+            if norm < 1e-9:
+                break
+            step = min(.1, 1/max(norm, 1.))
+            for _ in range(30):
+                candidate = u-step*gradient
+                candidate /= np.linalg.norm(candidate, axis=1, keepdims=True)
+                candidate_value = energy(candidate)
+                if candidate_value < value:
+                    u, value = candidate, candidate_value
+                    break
+                step *= .5
+            else:
+                break
+        if best is None or value < best[0]:
+            best = value, u.copy(), iteration+1, seed
+    value, u, iterations, chosen_seed = best
+    u = u@householder(u[0]).T
+    for row in u:
+        nonzero = np.flatnonzero(np.abs(row) > 1e-12)
+        if row[nonzero[-1]] < 0:
+            row *= -1
+    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    if np.min(1-(u@u.T)[pair]**2) <= 1e-8:
+        raise RuntimeError('EEM produced duplicate unoriented directions')
+    return u, {'version': EEM_VERSION, 'seeds': seeds, 'chosen_seed': chosen_seed,
+               'energy': value, 'iterations': iterations, 'max_iterations': 1500}
+
+
+def geometry(shape, S, spacing=None):
+    shape = tuple(shape); d = len(shape)
+    positive_integer(S, 'S', 2)
+    if not shape or min(shape) < 2:
+        raise ValueError('Every spatial extent must be >=2')
+    h = np.asarray(spacing if spacing is not None else (2/max(shape),)*d, dtype=np.float64)
+    if h.shape != (d,) or not np.all(np.isfinite(h)) or np.any(h <= 0):
+        raise ValueError('Invalid spacing')
+    radius = float(np.linalg.norm((np.asarray(shape)+1)*h/2))
+    s = np.linspace(-radius, radius, S)
+    count = max(3, math.ceil(2*radius/h.min())+1)
+    t = np.linspace(-radius, radius, count)
+    return h, radius, s, t
 
 
 @lru_cache(maxsize=24)
-def operator(shape, mesh, span, spacing=None):
-    shape, mesh = tuple(shape), tuple(mesh)
-    d = len(shape)
-    if len(mesh) != d - 1 or span < 1 or min(shape) < 2:
-        raise ValueError("Incompatible dimension, mesh, span or native shape")
-    ns, weights = orientations(mesh)
-    voxel_count = math.prod(shape)
-    if len(ns) * span * voxel_count > 8_000_000:
-        raise ValueError("Dense reference backend budget exceeded; use smaller pilot features")
-    h = np.asarray(spacing if spacing is not None else (2/max(shape),)*d)
-    if len(h)!=d or np.any(h<=0): raise ValueError("Invalid coordinate spacing")
-    # Includes the full support of the zero-extended multilinear basis.
-    radius = np.linalg.norm((np.asarray(shape) + 1) * h / 2)
-    s = np.linspace(-radius, radius, span) if span>1 else np.zeros(1)
-    transverse_count = max(3, math.ceil(2 * radius / h.min()) + 1)
-    transverse = np.linspace(-radius, radius, transverse_count)
-    axes = [s] + [transverse] * (d - 1)
-    if span*transverse_count**(d-1)>2_000_000: raise ValueError("Reference quadrature budget exceeded")
-    canonical = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(-1, d)
-    per_s = transverse_count ** (d - 1)
-    row = np.repeat(np.arange(span), per_s)
-    quadrature = (2 * radius / (transverse_count - 1)) ** (d - 1)
-    # Endpoints of transverse integration lie beyond the native tent support,
-    # except harmless zero-valued support-boundary samples.
-    result = np.zeros((len(ns) * span, voxel_count), dtype=np.float64)
-    strides = np.asarray([math.prod(shape[j + 1:]) for j in range(d)])
-    for k, n in enumerate(ns):
-        xyz = canonical @ householder(n).T
-        index = xyz / h + (np.asarray(shape) - 1) / 2
-        base = np.floor(index).astype(np.int64)
-        fraction = index - base
+def raw_operator(shape, M, S, spacing=None):
+    directions, _ = eem_directions(len(shape), M)
+    h, radius, s, t = geometry(shape, S, spacing)
+    d = len(shape); N = math.prod(shape)
+    if M*S*N > 8_000_000 or S*len(t)**(d-1) > 2_000_000:
+        raise ValueError('Dense reference geometry budget exceeded')
+    canonical = np.stack(np.meshgrid(s, *([t]*(d-1)), indexing='ij'), -1).reshape(-1, d)
+    rows = np.repeat(np.arange(S), len(t)**(d-1))
+    quadrature = (t[1]-t[0])**(d-1)
+    matrix = np.zeros((M*S, N), dtype=np.float64)
+    strides = np.asarray([math.prod(shape[j+1:]) for j in range(d)])
+    for m, n in enumerate(directions):
+        indices = (canonical@householder(n).T)/h+(np.asarray(shape)-1)/2
+        base = np.floor(indices).astype(np.int64); frac = indices-base
         for corner in itertools.product((0, 1), repeat=d):
-            corner = np.asarray(corner)
-            ix = base + corner
+            corner = np.asarray(corner); ix = base+corner
             valid = ((ix >= 0) & (ix < shape)).all(axis=1)
-            w = np.where(corner, fraction, 1 - fraction).prod(axis=1)
-            np.add.at(result, (k * span + row[valid], ix[valid] @ strides),
-                      w[valid] * quadrature * math.sqrt(weights[k]))
-    # Fixed geometry-only operator-norm upper bound, not a learnable gate.
-    scale = math.sqrt(result.sum(0).max() * result.sum(1).max())
-    if scale <= 0:
-        raise ValueError("Degenerate projector")
-    return torch.from_numpy(result / scale), float(scale)
+            w = np.where(corner, frac, 1-frac).prod(axis=1)
+            np.add.at(matrix, (m*S+rows[valid], ix[valid]@strides), w[valid]*quadrature)
+    return matrix
 
 
 class Projector(nn.Module):
-    def __init__(self, shape, mesh, span=16, scramble=False, spacing=None, random_projection=False):
+    def __init__(self, shape, M, S, spacing=None):
         super().__init__()
-        a, self.scale = operator(tuple(shape), tuple(mesh), span, None if spacing is None else tuple(spacing))
-        a = a.clone().float()
-        if scramble and random_projection:
-            raise ValueError("Select one projection control")
-        self.projection_kind = "householder_radon"
-        self.random_seed = None
-        if random_projection:
-            # Fixed control: preserve each Radon row norm, including zero rows.
-            # This matches Frobenius energy, not singular values or conditioning.
-            self.random_seed = 9817 + len(shape)
-            generator = torch.Generator().manual_seed(self.random_seed)
-            random = torch.randn(a.shape, generator=generator, dtype=a.dtype)
-            a = random * (a.norm(dim=1, keepdim=True) / random.norm(dim=1, keepdim=True).clamp_min(1e-12))
-            self.projection_kind = "fixed_random_row_norm_matched"
-        if scramble:
-            self.projection_kind = "spatially_scrambled_radon"
-            # Same singular values, sparsity, parameter count and compute;
-            # only native spatial organization is destroyed.
-            g = torch.Generator().manual_seed(971 + len(shape))
-            a = a[:, torch.randperm(a.shape[1], generator=g)]
-        self.register_buffer("matrix", a)
-        self.shape, self.span = tuple(shape), span
-        self.directions = math.prod(mesh)
-
-    def diagnostics(self):
-        if max(self.matrix.shape) > 2048:
-            raise ValueError("Spectral diagnostics restricted to small-stage matrices")
-        a = self.matrix.detach().cpu().double()
-        singular = torch.linalg.svdvals(a)
-        threshold = singular.max() * max(a.shape) * torch.finfo(torch.float32).eps
-        nonzero = singular[singular > threshold]
-        return {"projection_kind": self.projection_kind, "random_seed": self.random_seed,
-                "rows": a.shape[0], "columns": a.shape[1],
-                "frobenius_norm": float(a.norm()), "spectral_norm": float(singular.max()),
-                "numerical_rank": len(nonzero),
-                "effective_nonzero_condition": float(nonzero.max()/nonzero.min()) if len(nonzero) else None,
-                "reference_radon_scale": self.scale}
+        positive_integer(M, 'M'); positive_integer(S, 'S', 2)
+        self.shape, self.M, self.S = tuple(shape), M, S
+        directions, info = eem_directions(len(shape), M)
+        h, radius, s, _ = geometry(shape, S, spacing)
+        self.metadata = dict(info, directions=directions.tolist(), shape=list(shape), M=M, S=S,
+                             support=[-radius, radius], spacing=h.tolist(), angular_weight=math.pi**(len(shape)/2)/math.gamma(len(shape)/2)/M,
+                             projection_kind='raw_householder_radon', return_kind='direct_linear_interpolation')
+        # Float64 master geometry enables meaningful double precision verification.
+        # Training explicitly converts the whole graph to float32.
+        self.register_buffer('matrix', torch.from_numpy(raw_operator(tuple(shape), M, S, tuple(h)).copy()))
+        coords = np.stack(np.meshgrid(*[(np.arange(n)-(n-1)/2)*step for n, step in zip(shape, h)], indexing='ij'), -1).reshape(-1, len(shape))
+        position = (directions@coords.T+radius)/(s[1]-s[0])
+        lower = np.floor(position).astype(np.int64); fraction = position-lower
+        self.register_buffer('lower', torch.from_numpy(np.clip(lower, 0, S-1)))
+        self.register_buffer('upper', torch.from_numpy(np.clip(lower+1, 0, S-1)))
+        self.register_buffer('lower_weight', torch.from_numpy((1-fraction)*((lower>=0)&(lower<S))))
+        self.register_buffer('upper_weight', torch.from_numpy(fraction*((lower+1>=0)&(lower+1<S))))
+        self.angular_weight = self.metadata['angular_weight']
 
     def forward(self, x):
         if tuple(x.shape[2:]) != self.shape:
-            raise ValueError(f"Expected {self.shape}, got {tuple(x.shape[2:])}")
-        z = x.flatten(2) @ self.matrix.T
-        return z.reshape(x.shape[0], x.shape[1] * self.directions, self.span)
+            raise ValueError('Native feature shape changed')
+        p = x.flatten(2)@self.matrix.T
+        return p.reshape(x.shape[0], x.shape[1]*self.M, self.S)
 
-    def adjoint(self, z):
-        z = z.reshape(z.shape[0], -1, self.directions * self.span)
-        return (z @ self.matrix).reshape(z.shape[0], z.shape[1], *self.shape)
-
-
-class Return(nn.Module):
-    def __init__(self, projector):
-        super().__init__(); self.projector = projector
-
-    def forward(self, z):
-        return self.projector.adjoint(z)
+    def backproject(self, p):
+        b, cm, s = p.shape
+        if s != self.S or cm % self.M:
+            raise ValueError('Projection shape mismatch')
+        curves = p.reshape(b, cm//self.M, self.M, self.S)
+        delta = p.new_zeros((b, cm//self.M, math.prod(self.shape)))
+        for m in range(self.M):
+            curve = curves[:, :, m]
+            delta = delta+curve[..., self.lower[m]]*self.lower_weight[m]+curve[..., self.upper[m]]*self.upper_weight[m]
+        return (delta*self.angular_weight).reshape(b, cm//self.M, *self.shape)

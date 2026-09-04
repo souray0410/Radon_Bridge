@@ -1,7 +1,7 @@
 # Current experiment
 
-2026_09_04_15_23_46 — full-network joint training; upsilon_H=1/8 primary,1/16 and1/32 controls.
+`2026_09_04_19_33_04`: integer M/S/H, antipodal EEM, raw Radon and explicit direct backprojection.
 
-Protocol: 2026_09_04_15_23_46/protocol.json
-Runtime: /data/mengh/RadonBridge/runs/2026_09_04_15_23_46
-Previous partial-finetuning experiments are historical diagnostics only.
+See `2026_09_04_19_33_04/PLAN.zh-CN.md`, `protocol.json`, and `VERIFIED.zh-CN.md`.
+Remote execution: `ws02`, `/data/mengh/RadonBridge/runs/2026_09_04_19_33_04`.
+Historical shared-head, partial-finetuning, angular-grid and transpose-return runs do not evaluate this version.

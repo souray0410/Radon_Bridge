@@ -1,0 +1,49 @@
+{
+  "state": "complete",
+  "microbatch": 16,
+  "step_seconds": [
+    0.6456685410003047,
+    0.2869797390003441,
+    0.28542978900077287
+  ],
+  "modules_changed": {
+    "cfp_stage1": true,
+    "oct_stage1": true,
+    "cfp_stage2": true,
+    "oct_stage2": true,
+    "cfp_stage3": true,
+    "oct_stage3": true,
+    "cfp_stage4": true,
+    "oct_stage4": true,
+    "cfp_head": true,
+    "oct_head": true,
+    "bridge_0_exchange": true,
+    "bridge_1_exchange": true
+  },
+  "cross_branch_gradients": {
+    "cfp_to_oct": 8.352005004882812,
+    "oct_to_cfp": 0.39867767691612244
+  },
+  "gradient_norms": [
+    {
+      "cfp": 5.662468433380127,
+      "oct": 35.15152359008789,
+      "communication": 7.9975786209106445
+    },
+    {
+      "cfp": 2.974483013153076,
+      "oct": 9.345623016357422,
+      "communication": 1.5987659692764282
+    },
+    {
+      "cfp": 1.6663886308670044,
+      "oct": 1.524954915046692,
+      "communication": 0.5395256280899048
+    }
+  ],
+  "seconds": 3.248328202999801,
+  "peak_allocated_mib": 6244.341796875,
+  "peak_reserved_mib": 8186.0,
+  "passed": true,
+  "preflight_gpu_minutes": 0.12371792636666518
+}
