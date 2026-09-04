@@ -24,4 +24,4 @@ no multiplicity correction. Validation has already been inspected in older pilot
 Own allocator cap8GiB, own-process stop9.5GiB, training budget15minutes; other tasks untouched.
 
 Acceptance: tests/check_core.py and tests/check_requirements.py must pass on ws before launch.
-Actual reports will be added after execution; this protocol is not a results document.
+Execution completed successfully. See REPORT.zh-CN.md and summary.json for results; the protocol above remains unchanged.

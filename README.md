@@ -5,6 +5,8 @@ feature communication through explicit MHD V4 forward/backward. Read [requiremen
 [full source specifications](specification/README.md), [legacy audit](experiments/specification_audit/AUDIT.zh-CN.md)
 and [corrected pilot 005](experiments/005-separate-tasks/README.md).
 
+[005结果](experiments/005-separate-tasks/REPORT.zh-CN.md)：70 epoch正常完成，约5.08分钟；未见稳定桥接增益，续训稳定性是下一项诊断。
+
 ## Current pilot
 
 - UKB participant record-derived glaucoma; 256 training / 128 validation, both eyes.
