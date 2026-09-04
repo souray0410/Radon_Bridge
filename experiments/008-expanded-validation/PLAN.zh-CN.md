@@ -52,3 +52,5 @@ ResNet34适配与新控制尚待实现和验收，不能声称已经启动。资
 007全部38次及76组预测核对已完成；扩大缓存已完成（见data_preparation_status.json），测试影像未打开。
 资格检查代码与qualification_protocol.json已编写：非head-only配方转移规则固定为007最高末epoch均值，得到主干3e-6、head1e-4、wd0.01；四种组合均用同一组超参数。
 新主干待真实batch4验收通过后启动；固定随机投影控制仍留待下一阶段实现验收。
+
+ResNet34已取得官方ImageNet权重，batch4验收通过（源码fe3ea74）：MHD/原生梯度最大误差0、零桥接精确一致、峰值allocated1695.23MiB，证据见backbone_validation.json。资格检查使用run_expanded_qualification.sh，输出exp008_qualification。

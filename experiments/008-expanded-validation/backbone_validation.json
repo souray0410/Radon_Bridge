@@ -1,0 +1,18 @@
+{
+  "backbone": "resnet34",
+  "official_weight_files_sha256": {
+    "resnet34-b627a593.pth": "b627a593bcbe140c234610266fe4f8ae95ea42fc881d091c9b6052e6b1d0590f",
+    "resnet18-f37072fd.pth": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec"
+  },
+  "blocks_checked": [
+    3,
+    4,
+    6,
+    3
+  ],
+  "batch": 4,
+  "mhd_native_max_gradient_error": 0.0,
+  "zero_bridge_exact": true,
+  "finite_optimizer_step": true,
+  "peak_allocated_mib": 1695.2275390625
+}
