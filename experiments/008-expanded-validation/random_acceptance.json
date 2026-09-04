@@ -1,0 +1,59 @@
+{
+  "deterministic_fixed_draw": true,
+  "row_norms_match": true,
+  "adjoint": true,
+  "zero_bridge_exact": true,
+  "equal_learned_parameter_count": true,
+  "complete_mhd_gradient_checks": true,
+  "gpu_checked": true,
+  "spectral_diagnostics": [
+    {
+      "reference": {
+        "projection_kind": "householder_radon",
+        "random_seed": null,
+        "rows": 184,
+        "columns": 196,
+        "frobenius_norm": 2.5383081308221573,
+        "spectral_norm": 0.8215385780558454,
+        "numerical_rank": 142,
+        "effective_nonzero_condition": 8514.925317872305,
+        "reference_radon_scale": 0.6482730986045194
+      },
+      "random": {
+        "projection_kind": "fixed_random_row_norm_matched",
+        "random_seed": 9819,
+        "rows": 184,
+        "columns": 196,
+        "frobenius_norm": 2.5383081340112925,
+        "spectral_norm": 0.4225959057352915,
+        "numerical_rank": 156,
+        "effective_nonzero_condition": 915.0144479177302,
+        "reference_radon_scale": 0.6482730986045194
+      }
+    },
+    {
+      "reference": {
+        "projection_kind": "householder_radon",
+        "random_seed": null,
+        "rows": 368,
+        "columns": 288,
+        "frobenius_norm": 1.4603242155106857,
+        "spectral_norm": 0.6690400268149307,
+        "numerical_rank": 183,
+        "effective_nonzero_condition": 18714.134927129977,
+        "reference_radon_scale": 0.7681425432714897
+      },
+      "random": {
+        "projection_kind": "fixed_random_row_norm_matched",
+        "random_seed": 9820,
+        "rows": 368,
+        "columns": 288,
+        "frobenius_norm": 1.4603242174722688,
+        "spectral_norm": 0.25035812983626526,
+        "numerical_rank": 268,
+        "effective_nonzero_condition": 6892.151764957856,
+        "reference_radon_scale": 0.7681425432714897
+      }
+    }
+  ]
+}

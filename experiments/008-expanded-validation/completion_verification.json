@@ -1,0 +1,7 @@
+{
+  "trials": 4,
+  "epochs": 48,
+  "prediction_task_checks": 8,
+  "macro_metrics_and_confusion_matrices_match": true,
+  "test_used": false
+}

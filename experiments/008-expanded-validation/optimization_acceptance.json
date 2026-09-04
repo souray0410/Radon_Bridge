@@ -1,0 +1,9 @@
+{
+  "two_adamw_updates_cfp_standalone_vs_paired_max_error": [
+    0.0,
+    0.0
+  ],
+  "per_task_clipping_independence": true,
+  "unequal_other_task_gradients": true,
+  "loss_sum_preserves_standalone_gradient_scale": true
+}

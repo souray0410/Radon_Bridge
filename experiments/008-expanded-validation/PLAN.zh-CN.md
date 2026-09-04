@@ -56,3 +56,5 @@ ResNet34适配与新控制尚待实现和验收，不能声称已经启动。资
 ResNet34已取得官方ImageNet权重，batch4验收通过（源码fe3ea74）：MHD/原生梯度最大误差0、零桥接精确一致、峰值allocated1695.23MiB，证据见backbone_validation.json。资格检查使用run_expanded_qualification.sh，输出exp008_qualification。
 
 资格结果本次因SSH超时尚未取得。随机投影控制和formal运行分支已在本地实现，PyTorch/GPU验收待连接恢复；详情见CONNECTION_AND_NEXT_STAGE.zh-CN.md。不得跳过资格结果和验收直接启动。
+
+2026-09-04连接恢复，资格预测重算通过，按原规则选resnet18_s34。随机投影GPU/数值和独立优化验收均通过，结果与冻结正式协议见QUALIFICATION_REPORT.zh-CN.md及formal_protocol.json。旧待验收文字为历史进展记录。
