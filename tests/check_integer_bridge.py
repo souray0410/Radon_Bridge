@@ -65,7 +65,7 @@ class Objective(nn.Module):
     def forward(self,*xs): return sum(x.square().mean() for x in xs)
 
 
-def topology_check(dims, repeated=False):
+def topology_check(dims, repeated=False, participant_sampling=False):
     b=MHDBuilder(); inputs={}; cuts=[]; later=[]; outputs=[]
     for i,d in enumerate(dims):
         key=f'network{i}'; previous=b.node(key)
@@ -78,7 +78,11 @@ def topology_check(dims, repeated=False):
     loss=b.node('loss'); b.edge('objective',Objective(),outputs,[loss])
     original_nodes={k:n.id for k,n in b.by_name.items()}; original_edges=list(b.steps)
     samples=b.native_forward(inputs); baseline=samples['loss'].detach()
-    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=4,S=11,rho=.5,samples=samples)
+    directions={key:4*(i+1) for i,key in enumerate(cuts)} if participant_sampling else 4
+    ratios={key:.5/(i+1) for i,key in enumerate(cuts)} if participant_sampling else .5
+    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=directions,S=11,rho=ratios,samples=samples)
+    if participant_sampling:
+        assert [x['retained_channels'] for x in meta['participants']] == [2*(i+2) for i in range(len(cuts))]
     if repeated:
         _, second=attach_to_nodes(b,later,prefix='bridge_1_',M=3,S=9,rho=.25,samples=samples)
         assert (meta['M'],meta['S'],meta['rho']) != (second['M'],second['S'],second['rho'])
@@ -105,7 +109,7 @@ def topology_check(dims, repeated=False):
     x=[samples[k].detach() for k in cuts]; y=[torch.randn_like(v) for v in x]
     linear=relative(exchange(*[a+c for a,c in zip(x,y)]).detach().numpy(),(exchange(*x)+exchange(*y)).detach().numpy())
     assert linear<1e-10
-    return {'dimensions':dims,'repeated_distinct_configs':repeated,'native_topology_preserved':True,
+    return {'dimensions':dims,'repeated_distinct_configs':repeated,'participant_sampling':participant_sampling,'native_topology_preserved':True,
             'zero_bridge_exact':True,'mhd_gradient_relative_error':error,'cross_branch_gradient':float(grad.norm()),'linearity_error':linear}
 
 
@@ -121,6 +125,7 @@ def main():
             assert error<1e-4,(M,error); errors[M]=error
         result['eem_2d_gap_degrees']=errors
         result['topology']=[topology_check(dims,repeat) for dims,repeat in [([2,3],False),([2,3,4],False),([2,2,3,4],True)]]
+        result['topology'].append(topology_check([2,3],participant_sampling=True))
     result['geometry']=[geometry_check(d,a.device) for d in [2,3,4]]
     result['seconds']=time.monotonic()-start; result['passed']=True
     from pathlib import Path

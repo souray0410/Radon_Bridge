@@ -79,7 +79,8 @@ def main(args):
     train=PairedDataset(args.data,'train',224); val=PairedDataset(args.data,'validation',224)
     assert len(train)==1264 and len(val)==296
     assert not ({r['participant_id'] for r in train.rows}&{r['participant_id'] for r in val.rows})
-    recipe={'adapt_stages':[1,2,3,4],'backbone_lr':cfg['backbone_lr'],'head_bridge_lr':1e-4,
+    recipe={'adapt_stages':[1,2,3,4],'backbone_lr':cfg['backbone_lr'],
+            'head_lr':cfg.get('head_lr',1e-4),'bridge_lr':cfg.get('bridge_lr',1e-4),
             'weight_decay':.01,'training_regime':'full_finetune'}
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
@@ -101,7 +102,9 @@ def main(args):
             raise ValueError('Independent pretraining cannot contain a bridge')
         opt=configure_optimizer(g,recipe)
         initial_hash=parameter_hash(g)
+        initial_learning_rates={group['name']:group['lr'] for group in opt.param_groups}
         info={'configuration':cfg,'initial_native_sha256':initial_hash,'groups':g.communication_groups,
+              'initial_learning_rates':initial_learning_rates,
               'parameters':sum(p.numel() for p in g.graph.parameters()),
               'trainable_parameters':sum(p.numel() for p in g.graph.parameters() if p.requires_grad),
               'parent_checkpoints':parents,'batchnorm_policy':'train','initialization':'CFP ImageNet; OCT inflated ImageNet, not OCT-specific pretraining'}
@@ -216,6 +219,7 @@ def main(args):
         report={'state':'complete' if converged else 'incomplete','stop_reason':'validation_plateau' if converged else 'epoch_cap',
                 'converged_by_policy':converged,'epochs_ran':epoch,'epoch_seconds':epoch_times,
                 'selection':{k:m.state() for k,m in monitors.items()},'configuration':cfg,'initial_native_sha256':initial_hash,
+                'initial_learning_rates':initial_learning_rates,
                 'parent_checkpoints':parents,'modality_checkpoints':modality_checkpoints,'initial':initial,
                 'stopping_metrics':final,'selected':selected,'train_stopping_metrics':train_final,'seconds':time.monotonic()-start,
                 'parameters':info['parameters'],'trainable_parameters':info['trainable_parameters'],

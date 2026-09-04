@@ -1,5 +1,6 @@
 """Ratio-configured, native-node-preserving many-participant Rhythm Bridge."""
 from dataclasses import dataclass
+from collections.abc import Mapping
 import math
 import torch
 from torch import nn
@@ -10,6 +11,15 @@ class FeatureSpec:
     key: str
     channels: int
     shape: tuple
+
+
+def participant_values(value, keys, name):
+    """A scalar broadcasts; a mapping must identify every participant exactly."""
+    if isinstance(value, Mapping):
+        if set(value) != set(keys):
+            raise ValueError(f'{name} keys must match participant keys exactly')
+        return [value[key] for key in keys]
+    return [value for _ in keys]
 
 class LinearMixer(nn.Module):
     def __init__(self,widths,kernel_size=3,self_only=False):
@@ -30,27 +40,33 @@ class LinearMixer(nn.Module):
 class BridgeExchange(nn.Module):
     def __init__(self, specs, *, M, S, rho, mode='radon'):
         super().__init__()
-        for name, value, minimum in [('M', M, 1), ('S', S, 2)]:
-            positive_integer(value, name, minimum)
-        if isinstance(rho, bool) or not isinstance(rho, (int, float)) or not math.isfinite(rho) or not 0 < rho <= 1:
-            raise ValueError('rho must be a finite compression ratio in (0,1]')
+        self.keys = [s.key for s in specs]
+        if not self.keys or len(set(self.keys)) != len(self.keys):
+            raise ValueError('Distinct nonempty participant keys required')
+        directions = participant_values(M, self.keys, 'M')
+        ratios = participant_values(rho, self.keys, 'rho')
+        positive_integer(S, 'S', 2)
+        for value in directions:
+            positive_integer(value, 'M', 1)
+        for value in ratios:
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 < value <= 1:
+                raise ValueError('rho must be a finite compression ratio in (0,1]')
         if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled'):
             raise ValueError(mode)
-        self.keys = [s.key for s in specs]
         self.shapes = [(s.channels, *s.shape) for s in specs]
         self.lengths = [math.prod(s) for s in self.shapes]
         self.mode, self.M, self.S, self.rho = mode, M, S, rho
         kind={'random':GaussianProjector,'scrambled':ScrambledProjector}.get(mode,Projector)
         self.projectors = nn.ModuleList([] if mode == 'pooled' else [
-            kind(s.shape,M,S,seed=int(torch.initial_seed())+1009*i+len(s.shape)) if mode in ('random','scrambled') else kind(s.shape,M,S)
+            kind(s.shape,directions[i],S,seed=int(torch.initial_seed())+1009*i+len(s.shape)) if mode in ('random','scrambled') else kind(s.shape,directions[i],S)
             for i,s in enumerate(specs)])
-        widths = [s.channels if mode == 'pooled' else s.channels*M for s in specs]
-        retained = [max(1, math.floor(rho*w)) for w in widths]
+        widths = [s.channels if mode == 'pooled' else s.channels*directions[i] for i,s in enumerate(specs)]
+        retained = [max(1, math.floor(ratio*w)) for ratio,w in zip(ratios,widths)]
         self.compress = nn.ModuleList([nn.Conv1d(w, h, 1, bias=False) for w,h in zip(widths,retained)])
         self.expand = nn.ModuleList([nn.Conv1d(h, w, 1, bias=False) for w,h in zip(widths,retained)])
         self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else 3, mode == 'self')
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [
-            {'key': s.key, 'channels': s.channels, 'shape': list(s.shape), 'projected_channels': w,
+            {'key': s.key, 'channels': s.channels, 'shape': list(s.shape), 'M': directions[i], 'rho': ratios[i], 'projected_channels': w,
              'retained_channels': retained[i], 'achieved_width_ratio': retained[i]/w,
              'geometry': self.projectors[i].metadata if mode != 'pooled' else None}
             for i, (s, w) in enumerate(zip(specs, widths))]}
