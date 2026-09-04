@@ -1,0 +1,54 @@
+{
+  "schema": "two_stage_ratio_convergence_v3",
+  "review_status": "approved",
+  "stamp": "2026_09_04_21_14_11",
+  "M": 16,
+  "S": 64,
+  "rho": 0.125,
+  "seeds": [
+    3416
+  ],
+  "positions": [
+    3
+  ],
+  "arm_groups": [
+    [
+      "independent",
+      "radon"
+    ],
+    [
+      "random",
+      "scrambled"
+    ],
+    [
+      "self",
+      "pooled"
+    ]
+  ],
+  "convergence": {
+    "min_epochs": 8,
+    "max_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "lr_patience": 3,
+    "lr_factor": 0.3
+  },
+  "prior_gpu_minutes": 49.30395892529999,
+  "max_gpu_minutes": 24.037041074700007,
+  "original_round_cap_gpu_minutes": 60,
+  "effective_batch": 16,
+  "backbone_lr": 3e-05,
+  "head_bridge_lr": 0.0001,
+  "data": "/data/mengh/RadonBridge/cache/full1264_296",
+  "test_used": false,
+  "authorization": "User authorized ratio compression, independent modality pretraining until validation plateau then full joint training until plateau, broad controls, invalid-output cleanup, deployment and execution. Existing time and memory caps retained. Stage one completed under the immediately preceding source; scheduler continuation is authorized.",
+  "pretrained_from": {
+    "3416": {
+      "summary": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416/summary.json",
+      "summary_sha256": "9de0e968be08939e5b9e5efae231168a2a40f3f2fa089539db0e37d870e0501a",
+      "source_commit": "c08f92259f8a1b682935e8e0e1d14d2479a36bb6",
+      "cfp_sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e",
+      "oct_sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+    }
+  }
+}

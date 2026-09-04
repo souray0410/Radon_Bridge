@@ -188,21 +188,37 @@ def main(args):
     batch=preflight['microbatch']
     report={'trials':{},'training_protocol':'independent modality validation plateau then matched joint validation plateau',
             'source_commit':c.commit,'test_used':False}
-    # Profile the heaviest configuration and include validation, checkpoint I/O and startup allowance.
+    # The GPU profile is only a pre-training fallback.  Once a complete real
+    # stage is available, its full epoch times include validation and shared
+    # machine contention and are the safer basis for the next pair.
     seconds_per_epoch=max(preflight['profile']['step_seconds'][1:])*math_ceil(1264/batch)*1.4+5
     for seed in c.protocol['seeds']:
         c.phase=f'independent_pretraining_{seed}'
-        warm=config(seed,c.protocol['backbone_lr'],batch=batch,protocol=c.protocol)
-        warm['training_stage']='independent';warm['budget_estimate_epochs']=warm['convergence']['min_epochs'];warm_job=job(f'pretrain_{seed}',warm)
-        if not c.group_fits([warm_job],seconds_per_epoch):return
-        completed=c.run_jobs([warm_job]);result=completed[warm_job['id']]
-        report['trials'].update(completed);write_json(c.root/'partial_summary.json',report)
+        inherited=c.protocol.get('pretrained_from',{}).get(str(seed))
+        if inherited:
+            source=Path(inherited['summary'])
+            if hashlib.sha256(source.read_bytes()).hexdigest()!=inherited['summary_sha256']:
+                raise ValueError('Inherited stage-one summary hash mismatch')
+            result=read_json(source)
+            if result['configuration']['seed']!=seed or result['configuration']['training_stage']!='independent':
+                raise ValueError('Inherited checkpoint is not the requested independent stage')
+            for branch in ('cfp','oct'):
+                if result['modality_checkpoints'][branch]['sha256']!=inherited[f'{branch}_sha256']:
+                    raise ValueError('Inherited modality checkpoint hash differs from the approved protocol')
+            report['pretraining_reference']={str(seed):inherited}
+        else:
+            warm=config(seed,c.protocol['backbone_lr'],batch=batch,protocol=c.protocol)
+            warm['training_stage']='independent';warm['budget_estimate_epochs']=warm['convergence']['min_epochs'];warm_job=job(f'pretrain_{seed}',warm)
+            if not c.group_fits([warm_job],seconds_per_epoch):return
+            completed=c.run_jobs([warm_job]);result=completed[warm_job['id']]
+            report['trials'].update(completed);write_json(c.root/'partial_summary.json',report)
         if not result['converged_by_policy']:
             c.status('needs_attention',reason='Stage one hit epoch cap without validation plateau; no stage two launched');return
         parents=result['modality_checkpoints'];assert set(parents)=={'cfp','oct'}
         # Actual epoch duration can exceed a short profile under shared-machine load.
-        seconds_per_epoch=max(seconds_per_epoch,max(result['epoch_seconds']))
+        seconds_per_epoch=max(result['epoch_seconds'])*1.2
         hashes=set()
+        expected_epochs=min(c.protocol['convergence']['max_epochs'],math_ceil(max(result['epochs_ran'],c.protocol['convergence']['min_epochs'])*1.5))
         for modes in c.protocol['arm_groups']:
             c.phase=f"continuations_{seed}_{'_'.join(modes)}"
             jobs=[]
@@ -210,7 +226,7 @@ def main(args):
                 cfg=config(seed,c.protocol['backbone_lr'],() if mode=='independent' else c.protocol['positions'],
                            'radon' if mode=='independent' else mode,batch=batch,protocol=c.protocol)
                 cfg.update(training_stage='communication',parent_checkpoints=parents,
-                           budget_estimate_epochs=min(cfg['convergence']['max_epochs'],math_ceil(max(result['epochs_ran'],cfg['convergence']['min_epochs'])*1.5)))
+                           budget_estimate_epochs=expected_epochs)
                 jobs.append(job(f'confirm_{seed}_{mode}',cfg))
             # Estimate from the observed stage-one plateau with 50% epoch headroom plus the group time margin.
             # Convergence is not predictable: the hard budget guard can still interrupt an incomplete pair.
@@ -223,6 +239,8 @@ def main(args):
             if not all(r['converged_by_policy'] for r in completed.values()):
                 c.status('needs_attention',reason='Comparison contains a non-converged epoch-cap run; not a completed comparison');return
             seconds_per_epoch=max(seconds_per_epoch,max(t for r in completed.values() for t in r['epoch_seconds']))
+            expected_epochs=min(c.protocol['convergence']['max_epochs'],
+                                math_ceil(max(r['epochs_ran'] for r in completed.values())*1.5))
     report['new_gpu_minutes']=c.used();report['cumulative_gpu_minutes']=c.protocol['prior_gpu_minutes']+c.used()
     write_json(c.root/'summary.json',report);c.status('complete')
 
