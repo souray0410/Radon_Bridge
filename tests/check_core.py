@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from radonbridge.projector import Projector, orientations, householder
 from radonbridge.model import PilotGraph
+from radonbridge.projector import operator
 
 
 def main():
@@ -25,6 +26,22 @@ def main():
         assert torch.autograd.gradcheck(p.adjoint,(z,),fast_mode=True)
         assert (p.matrix>=0).all()
         report[f"{d}d"]={"householder_error":herr,"mapping_error":nerr,"adjoint_abs_error":error,"gradient_check":True}
+    # Adjoint consistency alone could pass for a wrong forward operator.
+    # Independently compare translated Gaussian hyperplane integrals.
+    for d in (2,3):
+        shape=(17,)*d;mesh=(3,)*(d-1);span=33;sigma=.25
+        h=2/17;coords=[(np.arange(17)-8)*h]*d
+        xyz=np.stack(np.meshgrid(*coords,indexing="ij"),-1)
+        mu=np.array([.2,-.1,.1][:d])
+        f=np.exp(-((xyz-mu)**2).sum(-1)/(2*sigma**2))
+        a,scale=operator(shape,mesh,span);ns,w=orientations(mesh)
+        pred=(a.numpy()@f.ravel()).reshape(-1,span)*scale/np.sqrt(w[:,None])
+        radius=np.linalg.norm((np.array(shape)+1)*h/2)
+        s=np.linspace(-radius,radius,span)
+        exact=(2*np.pi*sigma**2)**((d-1)/2)*np.exp(-(s[None,:]-ns@mu[:,None])**2/(2*sigma**2))
+        err=float(np.max(np.abs(pred-exact))/exact.max())
+        assert err<.10,err
+        report[f"gaussian_{d}d"]={"relative_peak_error":err,"tolerance":.10}
     c=torch.randn(1,2,3,96,96);o=torch.randn(1,2,1,32,96,96);y=torch.tensor([1])
     baseline=PilotGraph();b_logits,_=baseline.forward(c,o,y)
     g=PilotGraph("radon"); logits,loss=g.forward(c,o,y)
