@@ -111,6 +111,8 @@ class MeanLoss(nn.Module):
 
 class PilotGraph:
     def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None, loss_reduction="mean", mixer_kernel_size=3):
+        if mode not in ("baseline", "radon", "scrambled", "self", "random"): raise ValueError(mode)
+        if head_mode == "shared_legacy" and mode == "random": raise ValueError("Random control is separate-task only")
         if modalities not in ("both", "cfp", "oct"): raise ValueError(modalities)
         if cfp_size not in (96, 224): raise ValueError(cfp_size)
         if modalities != "both" and mode != "baseline": raise ValueError("Bridge requires both modalities")
@@ -176,7 +178,7 @@ class PilotGraph:
         for stage in range(1,5):
             for name in branches:
                 out=node(f"{name}_stage{stage}");edge(f"{name}_stage{stage}",backbones[name][stage-1],[features[name]],[out]);features[name]=out
-            if stage in bridge_stages and mode in ("radon","scrambled","self"):bridge(stage)
+            if stage in bridge_stages and mode in ("radon","scrambled","self","random"):bridge(stage)
         pooled=[];losses=[]
         for name in branches:
             pool=node(name+"_participant");edge(name+"_pool",EyePool(),[features[name]],[pool]);pooled.append(pool)

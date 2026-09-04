@@ -53,7 +53,7 @@ def attach_group(node,edge,specs,inputs,prefix,upsilon=(1.,1.,.03125),mode="rado
     """Only sees feature nodes; returns the SAME participant keys, never task heads."""
     keys=[s.key for s in specs]
     if len(set(keys))!=len(keys) or set(keys)!=set(inputs) or not keys:raise ValueError("Participant identity mismatch")
-    if mode not in ("off","radon","scrambled","self"):raise ValueError(mode)
+    if mode not in ("off","radon","scrambled","self","random"):raise ValueError(mode)
     if len(upsilon)!=3 or any(not 0<u<=1 for u in upsilon):raise ValueError("Use explicit off; upsilon in (0,1]")
     geometries=[s.geometry() for s in specs];reference_span=max(g[2] for g in geometries)
     span=max(1,round(upsilon[1]*reference_span));meta={"mode":mode,"upsilon":list(upsilon),"span_reference":reference_span,"span":span,"participants":[]}
@@ -61,12 +61,12 @@ def attach_group(node,edge,specs,inputs,prefix,upsilon=(1.,1.,.03125),mode="rado
     projected={};projectors={};widths={}
     for spec,(spacing,radius,s0) in zip(specs,geometries):
         key=spec.key;mesh=tuple(max(1,round(upsilon[0]*m)) for m in spec.mesh_reference)
-        p=Projector(spec.shape,mesh,span,scramble=mode=="scrambled",spacing=spacing)
+        p=Projector(spec.shape,mesh,span,scramble=mode=="scrambled",spacing=spacing,random_projection=mode=="random")
         width=spec.channels*math.prod(mesh);h=max(1,round(upsilon[2]*width));widths[key]=(width,h);projectors[key]=p
         n=node(prefix+key+"_projected");edge(prefix+key+"_project",p,[inputs[key]],[n])
         u=node(prefix+key+"_handoff");edge(prefix+key+"_compress",nn.Conv1d(width,h,1,bias=False),[n],[u]);projected[key]=u
         ns,_=orientations(mesh)
-        meta["participants"].append(asdict(spec)|{"mesh":mesh,"span_reference":s0,"support":[-radius,radius],"effective_spacing":spacing,"P":width,"H":h,"unique_directions":len(np.unique(np.round(ns,10),axis=0)),"operator_scale":p.scale})
+        meta["participants"].append(asdict(spec)|{"mesh":mesh,"span_reference":s0,"support":[-radius,radius],"effective_spacing":spacing,"P":width,"H":h,"unique_directions":len(np.unique(np.round(ns,10),axis=0)),"operator_scale":p.scale,"projection_kind":p.projection_kind,"projection_random_seed":p.random_seed})
     mixed=[node(prefix+k+"_mixed") for k in keys]
     edge(prefix+"mixer",LinearMixer([widths[k][1] for k in keys],kernel_size,mode=="self"),[projected[k] for k in keys],mixed)
     outputs={}

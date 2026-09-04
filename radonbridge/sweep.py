@@ -18,6 +18,7 @@ from .data import PairedDataset
 from .metrics import classification_metrics
 from .model import PilotGraph
 from .optimization import configure_optimizer, clip_task_gradients
+from .protocol import validate_formal_protocol
 
 
 def write_json(path, value):
@@ -55,6 +56,15 @@ def main(args):
     if subprocess.check_output(['git', 'status', '--porcelain'], text=True).strip():
         raise RuntimeError('Commit source before running')
     protocol = json.loads(Path(args.protocol).read_text())
+    validate_formal_protocol(protocol)
+    if protocol.get('phase_mode') == 'formal':
+        evidence = Path(protocol['qualification_summary_path']).read_bytes()
+        if hashlib.sha256(evidence).hexdigest() != protocol['qualification_summary_sha256']:
+            raise ValueError('Qualification evidence changed')
+        qualification = json.loads(evidence)
+        selected = qualification['trials'][qualification['selections']['baseline']]['configuration']['recipe']
+        if selected != protocol['recipes'][0] or protocol['prior_gpu_minutes'] < qualification['elapsed_minutes']:
+            raise ValueError('Recipe or prior budget does not match qualification')
     assert protocol['loss_reduction'] == 'sum' and protocol['clip_policy'] == 'per_task'
     started = time.monotonic()
     torch.set_num_threads(3)
@@ -66,7 +76,8 @@ def main(args):
     val = PairedDataset(args.data, 'validation', 224)
     assert not ({r['participant_id'] for r in train.rows} & {r['participant_id'] for r in val.rows})
     weight = Path(os.environ['TORCH_HOME']) / 'hub/checkpoints/resnet18-f37072fd.pth'
-    total_trials = len(protocol['recipes']) + len(protocol['bridges']) + 5 * len(protocol['confirmation_seeds'])
+    total_trials = (len(protocol['formal_arms']) * len(protocol['confirmation_seeds']) if protocol.get('phase_mode') == 'formal'
+                    else len(protocol['recipes']) + len(protocol['bridges']) + 5 * len(protocol['confirmation_seeds']))
     source = {'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
               'mhd_commit': subprocess.check_output(['git', '-C', 'third_party/MHD_Project', 'rev-parse', 'HEAD'], text=True).strip(),
               'protocol_sha256': hashlib.sha256(Path(args.protocol).read_bytes()).hexdigest(),
@@ -187,8 +198,31 @@ def main(args):
 
     no_bridge = {'id': 'independent', 'mode': 'baseline', 'stages': [], 'upsilon': [1., 1., 1/32],
                  'mesh_reference': {'cfp': [8], 'oct': [4, 4]}, 'kernel': 3}
+    def finish():
+        report['phase'] = 'complete'
+        report['elapsed_minutes'] = (time.monotonic() - started) / 60
+        report['sampled_peak_process_mib'] = own_peak
+        report['cumulative_008_gpu_minutes'] = protocol.get('prior_gpu_minutes', 0.) + report['elapsed_minutes']
+        assert len(report['trials']) == total_trials
+        write_json(out / 'summary.json', report); status(state='complete')
+
     try:
         status()
+        if protocol.get('phase_mode') == 'formal':
+            report['phase'] = 'seed_confirmation'
+            recipe = protocol['recipes'][0]
+            for seed in protocol['confirmation_seeds']:
+                for arm in protocol['formal_arms']:
+                    identifier = f'confirm_{seed}_{arm["id"]}'
+                    trial(identifier, recipe, arm, seed)
+                    if arm['mode'] != 'baseline':
+                        baseline_id = f'confirm_{seed}_independent'
+                        intervals = paired_interval(out / baseline_id / 'last_predictions.npz', out / identifier / 'last_predictions.npz')
+                        for task in intervals:
+                            intervals[task]['delta_macro_f1'] = report['trials'][identifier]['fixed_last']['tasks'][task]['macro_f1'] - report['trials'][baseline_id]['fixed_last']['tasks'][task]['macro_f1']
+                        report['comparisons'][identifier] = intervals
+            finish()
+            return
         for recipe in protocol['recipes']:
             trial('baseline_' + recipe['id'], recipe, no_bridge, protocol['screen_seed'])
         chosen_id = max(report['trials'], key=lambda k: (report['trials'][k]['fixed_last']['mean_task_macro_f1'], -report['trials'][k]['configuration']['trainable_parameters']))

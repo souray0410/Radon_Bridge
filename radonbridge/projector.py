@@ -102,11 +102,24 @@ def operator(shape, mesh, span, spacing=None):
 
 
 class Projector(nn.Module):
-    def __init__(self, shape, mesh, span=16, scramble=False, spacing=None):
+    def __init__(self, shape, mesh, span=16, scramble=False, spacing=None, random_projection=False):
         super().__init__()
         a, self.scale = operator(tuple(shape), tuple(mesh), span, None if spacing is None else tuple(spacing))
         a = a.clone().float()
+        if scramble and random_projection:
+            raise ValueError("Select one projection control")
+        self.projection_kind = "householder_radon"
+        self.random_seed = None
+        if random_projection:
+            # Fixed control: preserve each Radon row norm, including zero rows.
+            # This matches Frobenius energy, not singular values or conditioning.
+            self.random_seed = 9817 + len(shape)
+            generator = torch.Generator().manual_seed(self.random_seed)
+            random = torch.randn(a.shape, generator=generator, dtype=a.dtype)
+            a = random * (a.norm(dim=1, keepdim=True) / random.norm(dim=1, keepdim=True).clamp_min(1e-12))
+            self.projection_kind = "fixed_random_row_norm_matched"
         if scramble:
+            self.projection_kind = "spatially_scrambled_radon"
             # Same singular values, sparsity, parameter count and compute;
             # only native spatial organization is destroyed.
             g = torch.Generator().manual_seed(971 + len(shape))
@@ -114,6 +127,20 @@ class Projector(nn.Module):
         self.register_buffer("matrix", a)
         self.shape, self.span = tuple(shape), span
         self.directions = math.prod(mesh)
+
+    def diagnostics(self):
+        if max(self.matrix.shape) > 2048:
+            raise ValueError("Spectral diagnostics restricted to small-stage matrices")
+        a = self.matrix.detach().cpu().double()
+        singular = torch.linalg.svdvals(a)
+        threshold = singular.max() * max(a.shape) * torch.finfo(torch.float32).eps
+        nonzero = singular[singular > threshold]
+        return {"projection_kind": self.projection_kind, "random_seed": self.random_seed,
+                "rows": a.shape[0], "columns": a.shape[1],
+                "frobenius_norm": float(a.norm()), "spectral_norm": float(singular.max()),
+                "numerical_rank": len(nonzero),
+                "effective_nonzero_condition": float(nonzero.max()/nonzero.min()) if len(nonzero) else None,
+                "reference_radon_scale": self.scale}
 
     def forward(self, x):
         if tuple(x.shape[2:]) != self.shape:
