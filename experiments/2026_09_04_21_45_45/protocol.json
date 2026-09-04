@@ -1,0 +1,81 @@
+{
+  "schema": "two_stage_ratio_convergence_v3",
+  "review_status": "approved",
+  "stamp": "2026_09_04_21_45_45",
+  "M": 16,
+  "S": 64,
+  "rho": 0.125,
+  "seeds": [
+    3416
+  ],
+  "positions": [
+    3
+  ],
+  "arm_groups": [
+    [
+      "independent",
+      "radon"
+    ],
+    [
+      "random",
+      "scrambled"
+    ],
+    [
+      "self",
+      "pooled"
+    ]
+  ],
+  "convergence": {
+    "min_epochs": 8,
+    "max_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "lr_patience": 3,
+    "lr_factor": 0.3
+  },
+  "prior_gpu_minutes": 133.341,
+  "max_gpu_minutes": 20.0,
+  "original_round_cap_gpu_minutes": 60,
+  "effective_batch": 16,
+  "backbone_lr": 3e-05,
+  "head_bridge_lr": 0.0001,
+  "data": "/data/mengh/RadonBridge/cache/full1264_296",
+  "test_used": false,
+  "authorization": "User authorized ratio compression, independent modality pretraining until validation plateau then full joint training until plateau, broad controls, invalid-output cleanup, deployment and execution. Existing time and memory caps retained. Stage one completed under the immediately preceding source; scheduler continuation is authorized. Completed comparison pair may be inherited by immutable summary/checkpoint hashes; remaining controls continue within the unchanged hard round cap. Overnight sequence includes the remaining self-only and pooled communication control pair after ablations.",
+  "pretrained_from": {
+    "3416": {
+      "summary": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416/summary.json",
+      "summary_sha256": "9de0e968be08939e5b9e5efae231168a2a40f3f2fa089539db0e37d870e0501a",
+      "source_commit": "c08f92259f8a1b682935e8e0e1d14d2479a36bb6",
+      "cfp_sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e",
+      "oct_sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+    }
+  },
+  "continuation_from": {
+    "partial_summary": "/data/mengh/RadonBridge/runs/2026_09_04_21_34_03/partial_summary.json",
+    "partial_summary_sha256": "f5d1df84f46eecbaa85445715859d6fdf556af1bd91c67c666f03c518682d1d4",
+    "source_commit": "67f650d913553f49c774800657ebe150c106390f"
+  },
+  "inherited_trials": {
+    "pretrain_3416": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416",
+      "summary_sha256": "9de0e968be08939e5b9e5efae231168a2a40f3f2fa089539db0e37d870e0501a"
+    },
+    "confirm_3416_independent": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_04_21_14_11/confirm_3416_independent",
+      "summary_sha256": "3080a9a3a3eba1612fb0dd54d1c7fccd1dd47d7f93d6924e427f306c0b63a8e4"
+    },
+    "confirm_3416_radon": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_04_21_14_11/confirm_3416_radon",
+      "summary_sha256": "07f48870b16ab8c00041cf61f3ee2753db6076cf8030b3f819fc128d01af2c77"
+    },
+    "confirm_3416_random": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_04_21_34_03/confirm_3416_random",
+      "summary_sha256": "c214354d28d85e7c6825c483918f0770ba6fefee65072910812e3fad6c688d68"
+    },
+    "confirm_3416_scrambled": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_04_21_34_03/confirm_3416_scrambled",
+      "summary_sha256": "373097527f28d46a2f0aa92d6abe035d7744ef223dcad52bc0fb9c74e110f48b"
+    }
+  }
+}

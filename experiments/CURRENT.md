@@ -1,3 +1,3 @@
-# Current experiment
+# Current experiment sequence
 
-`2026_09_04_21_41_26` is the authorized overnight position, M, S, rho ablation and conditional seed-3417 stability check.
+`2026_09_04_21_41_26` runs overnight ablations, then `2026_09_04_21_45_45` fills the remaining self-only/pooled mechanism pair.
