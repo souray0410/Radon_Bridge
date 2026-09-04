@@ -1,7 +1,9 @@
 # Experiment ledger
 
 GitHub main is always the latest code and experiment record. Timestamp branches
-archive the previous main before an update; timestamps use Asia/Riyadh. Explicit
+archive the previous main before an update; timestamps use Asia/Riyadh. Historical
+branches use timestamps only. Experiment identifiers remain in directories, not
+branch names. See [migration map](BRANCH_ARCHIVE.json). Explicit
 source tags remain the immutable link from results to the actual executable code.
 ws keeps one checkout on main, with independent data/cache/result storage.
 
