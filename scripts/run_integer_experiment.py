@@ -188,6 +188,22 @@ def main(args):
     batch=preflight['microbatch']
     report={'trials':{},'training_protocol':'independent modality validation plateau then matched joint validation plateau',
             'source_commit':c.commit,'test_used':False}
+    completed_modes=set()
+    continuation=c.protocol.get('continuation_from')
+    if continuation:
+        source=Path(continuation['partial_summary'])
+        if hashlib.sha256(source.read_bytes()).hexdigest()!=continuation['partial_summary_sha256']:
+            raise ValueError('Inherited continuation summary hash mismatch')
+        inherited=read_json(source)
+        report['trials'].update(inherited['trials'])
+        completed_modes={name.rsplit('_',1)[-1] for name in inherited['trials'] if name.startswith('confirm_')}
+        report['continuation_reference']=continuation
+        for identifier,item in c.protocol.get('inherited_trials',{}).items():
+            directory=Path(item['directory'])
+            if hashlib.sha256((directory/'summary.json').read_bytes()).hexdigest()!=item['summary_sha256']:
+                raise ValueError('Inherited trial summary hash mismatch')
+            target=c.root/identifier
+            if not target.exists():target.symlink_to(directory, target_is_directory=True)
     # The GPU profile is only a pre-training fallback.  Once a complete real
     # stage is available, its full epoch times include validation and shared
     # machine contention and are the safer basis for the next pair.
@@ -216,10 +232,18 @@ def main(args):
             c.status('needs_attention',reason='Stage one hit epoch cap without validation plateau; no stage two launched');return
         parents=result['modality_checkpoints'];assert set(parents)=={'cfp','oct'}
         # Actual epoch duration can exceed a short profile under shared-machine load.
-        seconds_per_epoch=max(result['epoch_seconds'])*1.2
+        if completed_modes:
+            previous=[v for k,v in report['trials'].items() if k.startswith(f'confirm_{seed}_')]
+            seconds_per_epoch=max(max(v['epoch_seconds']) for v in previous)
+            expected_epochs=min(c.protocol['convergence']['max_epochs'],
+                                math_ceil(max(v['epochs_ran'] for v in previous)*1.25))
+        else:
+            seconds_per_epoch=max(result['epoch_seconds'])*1.2
+            expected_epochs=min(c.protocol['convergence']['max_epochs'],math_ceil(max(result['epochs_ran'],c.protocol['convergence']['min_epochs'])*1.5))
         hashes=set()
-        expected_epochs=min(c.protocol['convergence']['max_epochs'],math_ceil(max(result['epochs_ran'],c.protocol['convergence']['min_epochs'])*1.5))
         for modes in c.protocol['arm_groups']:
+            if set(modes)<=completed_modes:continue
+            if set(modes)&completed_modes:raise ValueError('Only complete comparison pairs may be inherited')
             c.phase=f"continuations_{seed}_{'_'.join(modes)}"
             jobs=[]
             for mode in modes:
@@ -239,8 +263,9 @@ def main(args):
             if not all(r['converged_by_policy'] for r in completed.values()):
                 c.status('needs_attention',reason='Comparison contains a non-converged epoch-cap run; not a completed comparison');return
             seconds_per_epoch=max(seconds_per_epoch,max(t for r in completed.values() for t in r['epoch_seconds']))
+            completed_modes.update(modes)
             expected_epochs=min(c.protocol['convergence']['max_epochs'],
-                                math_ceil(max(r['epochs_ran'] for r in completed.values())*1.5))
+                                math_ceil(max(r['epochs_ran'] for r in completed.values())*1.25))
     report['new_gpu_minutes']=c.used();report['cumulative_gpu_minutes']=c.protocol['prior_gpu_minutes']+c.used()
     write_json(c.root/'summary.json',report);c.status('complete')
 

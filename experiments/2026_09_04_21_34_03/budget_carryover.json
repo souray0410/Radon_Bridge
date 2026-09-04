@@ -1,0 +1,15 @@
+{
+  "prior_gpu_minutes": 55.964450315533306,
+  "remaining_gpu_minutes": 17.37654968446669,
+  "completed": [
+    "independent modality pretraining",
+    "continued independent control",
+    "stage3 radon bridge"
+  ],
+  "next": [
+    "fixed Gaussian random projection",
+    "fixed spatial scramble",
+    "self only",
+    "pooled communication"
+  ]
+}

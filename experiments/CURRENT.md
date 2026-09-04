@@ -1,3 +1,3 @@
 # Current experiment
 
-`2026_09_04_21_14_11`: inherits the completed independent stage from `2026_09_04_20_27_40`; matched continuations use corrected empirical budget estimation.
+`2026_09_04_21_34_03` inherits completed stage one and the completed independent/R&B pair by hashes, then runs the remaining mechanism controls under the unchanged hard budget.
