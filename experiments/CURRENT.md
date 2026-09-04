@@ -1,5 +1,13 @@
 # Current experiment
 
-Active plan: `2026_09_04_23_54_10` — R&B (Radon Bridge), restored backbone/head/bridge learning rates 3e-5 / 1e-4 / 1e-4. Fix stage3, M=32, S=64 and compare rho=1/16, 1/8, 1/4, 1/2. Use seed3416 for the matched sweep; explicitly reuse its completed no-bridge, rho=1/16 and rho=1/8 references, and add rho=1/4 and rho=1/2 within the inherited global budget.
+Active: `2026_09_04_23_54_10` — R&B (Radon Bridge).
 
-The lower-native-LR study `2026_09_04_22_32_30` completed all four trials and is retained as a historical negative result. It is no longer the active default. Per-source M/rho support remains available; this study uses equal scalar values. All prior run artifacts remain immutable.
+- Backbone LR: 3e-5 and 6e-5; head/bridge LR: 1e-4 / 1e-4.
+- Fixed stage3, M=32, S=64; uniform rho=1/16, 1/8, 1/4.
+- Seeds3416/3417: each LR has three rho arms plus its own no-bridge control (16 fresh trials).
+- Existing independent best checkpoints; batch16, full fine-tuning, BN updates and validation plateau rules unchanged.
+- GPU time budgets explicitly removed by the user. Continue actual time accounting; keep the 10 GiB per-GPU project memory limit and other LOOK workloads.
+
+The lower-native-LR study `2026_09_04_22_32_30` remains historical negative evidence, not an active default. Per-source M/rho support remains available; this study uses equal scalar values.
+
+ρ=1/2 was deferred by the user after exceeding the 10 GiB profile limit; it is excluded from this experiment matrix.

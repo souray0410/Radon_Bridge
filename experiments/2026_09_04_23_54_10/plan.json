@@ -1,7 +1,5 @@
 {
   "study": "R&B restored learning rates and M32 rho sweep",
-  "seed": 3416,
-  "backbone_lr": 3e-05,
   "head_lr": 0.0001,
   "bridge_lr": 0.0001,
   "M": 32,
@@ -9,8 +7,7 @@
   "rho_values": [
     0.0625,
     0.125,
-    0.25,
-    0.5
+    0.25
   ],
   "positions": [
     3
@@ -25,18 +22,24 @@
     "lr_patience": 3,
     "lr_factor": 0.3
   },
-  "pretraining": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416",
-  "reuse": {
-    "independent": "/data/mengh/RadonBridge/runs/2026_09_04_21_14_11/confirm_3416_independent",
-    "rho_1_16": "/data/mengh/RadonBridge/runs/2026_09_04_22_24_45/fixed_width_m32",
-    "rho_1_8": "/data/mengh/RadonBridge/runs/2026_09_04_21_41_26/m32"
+  "pretraining": {
+    "3416": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416",
+    "3417": "/data/mengh/RadonBridge/runs/2026_09_04_21_41_26/pretrain_3417"
   },
-  "new_rho_values": [
-    0.25,
-    0.5
-  ],
   "predecessor": "/data/mengh/RadonBridge/runs/2026_09_04_22_32_30",
-  "global_gpu_minutes": 240,
   "gpu_memory_limit_gib": 10,
-  "test_used": false
+  "test_used": false,
+  "seeds": [
+    3416,
+    3417
+  ],
+  "gpu_time_policy": "unlimited_until_convergence",
+  "max_gpu_minutes": null,
+  "backbone_lrs": [
+    3e-05,
+    6e-05
+  ],
+  "excluded_rho": {
+    "0.5": "User deferred after batch16 profile exceeded the 10 GiB memory limit."
+  }
 }

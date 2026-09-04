@@ -24,7 +24,10 @@ def verify(p):
     assert source_hashes() == p['accepted_source_hashes'], 'Accepted source changed'
     assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() == p['source_commit']
     assert not subprocess.check_output(['git', 'status', '--porcelain'], text=True).strip()
-    assert p['prior_gpu_minutes'] + p['max_gpu_minutes'] <= 240
+    if p.get('gpu_time_policy') == 'unlimited_until_convergence':
+        assert p['max_gpu_minutes'] is None
+    else:
+        assert p['prior_gpu_minutes'] + p['max_gpu_minutes'] <= 240
     assert sha(__file__) == p['driver_sha256']
     for item in p['references'].values():
         assert sha(Path(item['directory']) / 'summary.json') == item['summary_sha256']

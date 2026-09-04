@@ -4,6 +4,7 @@ import atexit
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -28,7 +29,12 @@ class Controller:
         self.protocol=read_json(args.protocol)
         if self.protocol['review_status']!='approved' or self.protocol['schema'] not in {'two_stage_ratio_convergence_v3','two_stage_ablation_v1'}:
             raise ValueError('Only the explicitly approved ratio and convergence protocol may launch')
-        self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
+        if self.protocol.get('gpu_time_policy') == 'unlimited_until_convergence':
+            if self.protocol['max_gpu_minutes'] is not None:
+                raise ValueError('Unlimited GPU time must use a null minute limit')
+            self.limit=float('inf')
+        else:
+            self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
         self.ledger=read_json(self.root/'ledger.json') if (self.root/'ledger.json').exists() else {'jobs':[]}
         self.active={}; self.peak={}; self.phase=args.phase; self.stop=False; self.stop_reason=None
         self.commit=None
@@ -65,7 +71,7 @@ class Controller:
     def status(self,state,**kw):
         write_json(self.root/'status.json',{'state':state,'phase':self.phase,'controller_pid':os.getpid(),
             'source_commit':self.commit,'new_gpu_minutes':self.used(),'prior_gpu_minutes':self.protocol['prior_gpu_minutes'],
-            'cumulative_gpu_minutes':self.protocol['prior_gpu_minutes']+self.used(),'budget_gpu_minutes':self.limit,
+            'cumulative_gpu_minutes':self.protocol['prior_gpu_minutes']+self.used(),'budget_gpu_minutes':self.limit if math.isfinite(self.limit) else None,
             'active':[{'id':k,'pid':v['process'].pid,'gpu':v['gpu']} for k,v in self.active.items()],
             'finished_jobs':len(self.ledger['jobs']),'updated_at':time.time(),**kw})
 

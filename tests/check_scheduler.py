@@ -41,3 +41,18 @@ with tempfile.TemporaryDirectory() as tmp:
         except RuntimeError:pass
         else:raise AssertionError('Overwrite allowed')
     print(json.dumps({'two_gpu_dispatch':True,'summed_gpu_accounting':True,'comparison_group_budget_gate':True,'overwrite_rejected':True}))
+
+# Explicitly unlimited studies must still dispatch and account beyond the old cap.
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp); protocol=root/'protocol.json'
+    m.write_json(protocol,{'review_status':'approved','schema':'two_stage_ratio_convergence_v3',
+        'prior_gpu_minutes':500,'max_gpu_minutes':None,'gpu_time_policy':'unlimited_until_convergence'})
+    args=SimpleNamespace(output=str(root),protocol=str(protocol),phase='preflight',data='/unused')
+    c=m.Controller(args)
+    assert c.group_fits([m.job('large',m.config(1,3e-5,epochs=60))],10000)
+    state=json.loads((root/'status.json').read_text())
+    assert state['budget_gpu_minutes'] is None and state['cumulative_gpu_minutes']==500
+    assert 'Infinity' not in (root/'status.json').read_text()
+    c.shutdown()
+    __import__("atexit").unregister(c.shutdown)
+    print(json.dumps({'unlimited_accepts_prior_over_240':True,'unlimited_group_gate':True,'valid_json_null_limit':True}))
