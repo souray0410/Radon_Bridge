@@ -13,3 +13,5 @@
 目前可报告的历史性能在../008-expanded-validation/QUALIFICATION_REPORT.zh-CN.md与../007-combination-sweep/REPORT.zh-CN.md，均不属于本次全联合训练结果。测试集290人本阶段不读不评估。
 
 最新拓扑修订见TOPOLOGY_REVISION.zh-CN.md；旧验收文件不能冒充新的原位level拓扑已通过。
+
+新原位level拓扑已于08807b8完成数值/GPU验收；当前证据和预算见VERIFIED.zh-CN.md。通用API使用示例见tests/check_inplace_topology.py。

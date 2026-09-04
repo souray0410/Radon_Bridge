@@ -183,8 +183,8 @@
       }
     }
   ],
-  "prior_gpu_minutes": 12.341,
-  "max_minutes": 227.5,
+  "prior_gpu_minutes": 13.341,
+  "max_minutes": 226.5,
   "qualification_summary_path": "/data/mengh/RadonBridge/runs/exp008_qualification/summary.json",
   "qualification_summary_sha256": "30cb348c6a19f5fbf488a142e78cc99dfc33393e3ae3d84950ed5d624f287b64",
   "training_participants": 1264,
@@ -202,7 +202,8 @@
     "additional_initialization_and_final_evaluation_minutes": 5,
     "estimated_minutes": 213.14755943313685,
     "original_20epoch_estimated_minutes": 265.18444929142106,
-    "epoch_choice": "Reduce all seven arms from20 to16 before any full-finetuning performance result, to fit cumulative240GPU-minute budget"
+    "epoch_choice": "Reduce all seven arms from20 to16 before any full-finetuning performance result, to fit cumulative240GPU-minute budget",
+    "note": "Retain the slower pre-layout-change benchmark for a conservative bound; new in-place topology is slightly faster"
   },
   "limitations": [
     "Development validation was used for prior LOOK task selection",
@@ -227,7 +228,7 @@
   "budget_ledger": {
     "qualification_minutes_rounded_up": 9.603,
     "stopped_partial_run_minutes_rounded_up": 1.738,
-    "acceptance_minutes_conservative_allowance": 1.0,
+    "acceptance_minutes_conservative_allowance": 2.0,
     "latest_three_acceptance_wall_seconds": [
       3.59,
       3.27,
@@ -236,11 +237,21 @@
   },
   "acceptance_sources": {
     "h32": "2729691",
-    "h8_h16": "dea446c"
+    "h8_h16": "dea446c",
+    "level_inplace": "08807b8",
+    "inplace_h8_step_seconds": [
+      0.329830643999685,
+      0.054780590999598644,
+      0.05474036099985824,
+      0.05446795399984694,
+      0.05404652300012458
+    ]
   },
   "experiment_timestamp": "2026_09_04_15_23_46",
   "timezone": "Asia/Riyadh",
   "supersedes": "/data/mengh/RadonBridge/runs/exp008_formal",
   "budget_scope": "Same cumulative240GPU-minute budget; timestamp change does not reset usage",
-  "topology": "level_inplace"
+  "topology": "level_inplace",
+  "review_status": "awaiting_user_review",
+  "superseded_by_review_plan": "REVIEW_PLAN.zh-CN.md"
 }

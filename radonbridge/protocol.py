@@ -3,6 +3,8 @@ import math
 import re
 
 def validate_formal_protocol(protocol):
+    if protocol.get('review_status') == 'awaiting_user_review':
+        raise ValueError('User requested design review before training; this protocol is not authorized to launch yet')
     if protocol.get('phase_mode') != 'formal':
         return
     seeds = protocol['confirmation_seeds']; arms = protocol['formal_arms']

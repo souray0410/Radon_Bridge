@@ -1,0 +1,1 @@
+{"complete_groups": [[2, 3], [2, 2], [3, 3], [1, 2, 3], [1, 2, 3, 4]], "repeated_groups": 2, "cross_gradients": true, "self_blocks_cross_gradients": true, "mhd_native_gradients_match": true, "separate_heads": true, "standalone_equals_no_bridge": true, "locations": [[2], [3], [2, 3]], "msh_controls": true, "physical_spacing": true, "macro_f1_verified": true, "gpu_checked": true}
