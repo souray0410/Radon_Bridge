@@ -1,0 +1,16 @@
+{
+  "source_commit": "26c62a65aec96df5c9d4d7f5c8e3b903f2988392",
+  "script_sha256": "02a48e442d48654d79f5c04d3ee3e950b31a918eaed46c274474daada888442e",
+  "labels_sha256": "eae604091a1094ed70ff4edbcf6e59d00b57b5be124fb4ac5f76ece1beac0d8d",
+  "train": 1264,
+  "validation": 296,
+  "old_train": 256,
+  "old_validation": 128,
+  "workers": 2,
+  "test_images_opened": false,
+  "validation_role": "development; used in previous task selection",
+  "runtime_source_sha256": {
+    "radonbridge/data.py": "4e1369c03e1e93f6c70a5250ead39876773fc85f3e97f15d4a06c0d678b0ddf7",
+    "radonbridge/resolution.py": "646c7d6fbf780b1962b4a089ee9978d79c268601d7146d12c5ca451e078f1b79"
+  }
+}

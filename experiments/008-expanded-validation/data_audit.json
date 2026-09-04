@@ -1,0 +1,20 @@
+{
+  "schema": "fullspan32_cfp96_oct96_v1",
+  "participants": 1560,
+  "split_counts": {
+    "('train', 0)": 632,
+    "('train', 1)": 632,
+    "('validation', 0)": 148,
+    "('validation', 1)": 148
+  },
+  "patient_overlap": 0,
+  "test_used": false,
+  "seconds": 819.6002011299133,
+  "sampling": "32 ordered B-scans uniformly over the full 128-slice range; no spacing claim",
+  "labels_sha256": "eae604091a1094ed70ff4edbcf6e59d00b57b5be124fb4ac5f76ece1beac0d8d",
+  "selected_sha256": "4285250208dd1496a6912ed6e072abf9d2aa87e05216e78be6ad405e9ea7d24c",
+  "native_width_height_counts": {
+    "512x650": 3108,
+    "512x480": 12
+  }
+}

@@ -83,9 +83,11 @@ def inflate(module):
     return result
 
 
-def pretrained_backbones():
-    from torchvision.models import resnet18, ResNet18_Weights
-    c = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+def pretrained_backbones(name="resnet18"):
+    from torchvision.models import resnet18, resnet34, ResNet18_Weights, ResNet34_Weights
+    if name == "resnet18": c = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    elif name == "resnet34": c = resnet34(weights=ResNet34_Weights.IMAGENET1K_V1)
+    else: raise ValueError(name)
     o = inflate(c)
     # Preserve all B-scans through the stem, then use volumetric layer strides.
     old = o.conv1
@@ -133,8 +135,9 @@ class PilotGraph:
                 blocks.append(nn.Sequential(Residual(d, cin, cout, 2), Residual(d, cout, cout)))
                 cin = cout
             backbones[name] = blocks
-        if backbone == "resnet18": backbones = pretrained_backbones()
-        last_channels=512 if backbone == "resnet18" else 64
+        if backbone not in ("tiny", "resnet18", "resnet34"): raise ValueError(backbone)
+        if backbone in ("resnet18", "resnet34"): backbones = pretrained_backbones(backbone)
+        last_channels=512 if backbone in ("resnet18", "resnet34") else 64
         # Build all task heads before any communication parameters. Their initial
         # states are identical whether branches are trained alone or together.
         if head_mode == "separate": heads={name:nn.Linear(last_channels,2) for name in ("cfp","oct")}
@@ -145,8 +148,8 @@ class PilotGraph:
         self.communication_groups=[]
         def bridge(stage):
             prefix="" if head_mode == "shared_legacy" else f"bridge_s{stage}_"
-            channels=([64,128,256][stage-1] if backbone=="resnet18" else [8,16,32][stage-1])
-            if backbone=="resnet18":
+            channels=([64,128,256][stage-1] if backbone in ("resnet18", "resnet34") else [8,16,32][stage-1])
+            if backbone in ("resnet18", "resnet34"):
                 stride=2**(stage+1);depth=32//(2**(stage-1))
             else:stride=2**stage;depth=32//stride
             shapes=((cfp_size//stride,)*2,(depth,96//stride,96//stride))

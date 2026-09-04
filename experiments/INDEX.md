@@ -43,3 +43,5 @@ same 128 participants. Do not select medical endpoints by the apparent R&B gain.
 ## 008 — expanded cohort and rigorous development validation
 
 [Execution plan](008-expanded-validation/PLAN.zh-CN.md). Verified1264train/296development-validation, sealed290test not evaluated. CPU cache preparation first; larger backbone/5-seed controls pending implementation after007. Thirty-minute monitoring.
+
+007 completed:38trials/304epochs;76prediction-task checks passed. Expanded1264/296cache prepared. Qualification protocol forResNet18/34 × stage4/stage3+4 fixed before launch.

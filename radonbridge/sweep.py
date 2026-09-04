@@ -72,11 +72,12 @@ def main(args):
               'protocol_sha256': hashlib.sha256(Path(args.protocol).read_bytes()).hexdigest(),
               'weight_sha256': hashlib.sha256(weight.read_bytes()).hexdigest(), 'protocol': protocol,
               'torch': torch.__version__, 'device': torch.cuda.get_device_name(),
+              'weight_files_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in weight.parent.glob('resnet*.pth')},
               'train_count': len(train), 'validation_count': len(val), 'test_used': False,
               'data_audit': json.loads((Path(args.data) / 'audit.json').read_text()),
               'cfp_audit': json.loads((Path(args.data) / 'cfp224/audit.json').read_text())}
     write_json(out / 'config.json', source)
-    report = {'source_commit': source['commit'], 'phase': 'baseline_screen', 'total_trials': total_trials,
+    report = {'source_commit': source['commit'], 'phase': protocol.get('phase_mode', 'baseline_screen'), 'total_trials': total_trials,
               'trials': {}, 'selections': {}, 'comparisons': {}, 'test_used': False,
               'limitations': protocol['limitations']}
     own_peak = 0
@@ -130,7 +131,7 @@ def main(args):
         budget(); status(current_trial=identifier, epoch=0)
         directory = out / identifier; directory.mkdir()
         torch.manual_seed(seed); np.random.seed(seed)
-        g = PilotGraph(arm['mode'], seed=seed, device='cuda', backbone='resnet18', cfp_size=224,
+        g = PilotGraph(arm['mode'], seed=seed, device='cuda', backbone=recipe.get('backbone', 'resnet18'), cfp_size=224,
                        bridge_stages=tuple(arm['stages']), upsilon=tuple(arm['upsilon']),
                        mesh_references=arm['mesh_reference'], mixer_kernel_size=arm['kernel'], loss_reduction='sum')
         opt = configure_optimizer(g, recipe)
@@ -194,6 +195,13 @@ def main(args):
         recipe = report['trials'][chosen_id]['configuration']['recipe']
         baseline = report['trials'][chosen_id]['fixed_last']['tasks']
         report['selections']['baseline'] = chosen_id
+        if protocol.get('phase_mode') == 'qualification':
+            report['phase'] = 'complete'
+            report['elapsed_minutes'] = (time.monotonic() - started) / 60
+            report['sampled_peak_process_mib'] = own_peak
+            assert len(report['trials']) == total_trials
+            write_json(out / 'summary.json', report); status(state='complete')
+            return
         report['phase'] = 'bridge_screen'; status(selected_baseline=chosen_id)
         for arm in protocol['bridges']:
             trial('screen_' + arm['id'], recipe, arm, protocol['screen_seed'])

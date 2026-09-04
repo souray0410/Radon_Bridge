@@ -1,0 +1,116 @@
+{
+  "phase_mode": "qualification",
+  "screen_seed": 3410,
+  "confirmation_seeds": [],
+  "epochs": 12,
+  "max_minutes": 60,
+  "batch_size": 4,
+  "loss_reduction": "sum",
+  "clip_policy": "per_task",
+  "clip_max_norm": 5.0,
+  "recipes": [
+    {
+      "id": "resnet18_s4",
+      "backbone": "resnet18",
+      "adapt_stages": [
+        4
+      ],
+      "backbone_lr": 3e-06,
+      "head_bridge_lr": 0.0001,
+      "weight_decay": 0.01
+    },
+    {
+      "id": "resnet18_s34",
+      "backbone": "resnet18",
+      "adapt_stages": [
+        3,
+        4
+      ],
+      "backbone_lr": 3e-06,
+      "head_bridge_lr": 0.0001,
+      "weight_decay": 0.01
+    },
+    {
+      "id": "resnet34_s4",
+      "backbone": "resnet34",
+      "adapt_stages": [
+        4
+      ],
+      "backbone_lr": 3e-06,
+      "head_bridge_lr": 0.0001,
+      "weight_decay": 0.01
+    },
+    {
+      "id": "resnet34_s34",
+      "backbone": "resnet34",
+      "adapt_stages": [
+        3,
+        4
+      ],
+      "backbone_lr": 3e-06,
+      "head_bridge_lr": 0.0001,
+      "weight_decay": 0.01
+    }
+  ],
+  "bridges": [],
+  "lr_source_trial": "baseline_s34_3e6",
+  "lr_selection_rule": "Highest fixed-last mean task F1 among007 non-head-only baseline recipes; transfer LR and weight decay to all4 qualification trials",
+  "selection_rule": "Highest fixed-last mean task macro-F1; tie fewer trainable parameters",
+  "training_participants": 1264,
+  "development_validation_participants": 296,
+  "test_used": false,
+  "frozen_007_candidates": [
+    {
+      "id": "rb_s3",
+      "stages": [
+        3
+      ],
+      "mode": "radon",
+      "upsilon": [
+        1.0,
+        1.0,
+        0.03125
+      ],
+      "kernel": 3,
+      "mesh_reference": {
+        "cfp": [
+          8
+        ],
+        "oct": [
+          4,
+          4
+        ]
+      }
+    },
+    {
+      "id": "rb_shalf_s3",
+      "stages": [
+        3
+      ],
+      "mode": "radon",
+      "upsilon": [
+        1.0,
+        0.5,
+        0.03125
+      ],
+      "kernel": 3,
+      "mesh_reference": {
+        "cfp": [
+          8
+        ],
+        "oct": [
+          4,
+          4
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Development validation was used for prior LOOK task selection",
+    "Qualification is a comparison, not proof that the winner is a strong clinical baseline",
+    "ImageNet CFP and 2D-inflated OCT, not OCT pretrained weights",
+    "No within-trial stage switch or optimizer reset",
+    "Fixed last epoch primary, selected epoch supplementary",
+    "008 cumulative training cap4 GPU hours; record qualification time before later stage"
+  ]
+}
