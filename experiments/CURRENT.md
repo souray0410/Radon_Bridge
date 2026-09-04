@@ -1,11 +1,5 @@
-# Current experiment sequence
+# Current experiment
 
-`2026_09_04_21_41_26` runs overnight ablations, then `2026_09_04_21_45_45` fills the remaining self-only/pooled mechanism pair.
+Active plan: `2026_09_04_23_54_10` — R&B (Radon Bridge), restored backbone/head/bridge learning rates 3e-5 / 1e-4 / 1e-4. Fix stage3, M=32, S=64 and compare rho=1/16, 1/8, 1/4, 1/2. Use seed3416 for the matched sweep; explicitly reuse its completed no-bridge, rho=1/16 and rho=1/8 references, and add rho=1/4 and rho=1/2 within the inherited global budget.
 
-Both original queues stopped at their group-budget gates. The detached continuation
-`2026_09_04_22_24_45` completes seed3417 and mechanism controls within one inherited
-global budget. The next study `2026_09_04_22_32_30` waits for it, then reruns the
-seed3416/3417 matched no-bridge/M32 pairs at lower backbone/head learning rates.
-It retains scalar M32/rho1_8; participant-specific M/rho is supported but not used
-in this learning-rate comparison. Runtime status and accounting live under each
-run directory on ws02.
+The lower-native-LR study `2026_09_04_22_32_30` completed all four trials and is retained as a historical negative result. It is no longer the active default. Per-source M/rho support remains available; this study uses equal scalar values. All prior run artifacts remain immutable.

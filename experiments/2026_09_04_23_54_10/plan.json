@@ -1,0 +1,42 @@
+{
+  "study": "R&B restored learning rates and M32 rho sweep",
+  "seed": 3416,
+  "backbone_lr": 3e-05,
+  "head_lr": 0.0001,
+  "bridge_lr": 0.0001,
+  "M": 32,
+  "S": 64,
+  "rho_values": [
+    0.0625,
+    0.125,
+    0.25,
+    0.5
+  ],
+  "positions": [
+    3
+  ],
+  "microbatch": 16,
+  "effective_batch": 16,
+  "convergence": {
+    "min_epochs": 8,
+    "max_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "lr_patience": 3,
+    "lr_factor": 0.3
+  },
+  "pretraining": "/data/mengh/RadonBridge/runs/2026_09_04_20_27_40/pretrain_3416",
+  "reuse": {
+    "independent": "/data/mengh/RadonBridge/runs/2026_09_04_21_14_11/confirm_3416_independent",
+    "rho_1_16": "/data/mengh/RadonBridge/runs/2026_09_04_22_24_45/fixed_width_m32",
+    "rho_1_8": "/data/mengh/RadonBridge/runs/2026_09_04_21_41_26/m32"
+  },
+  "new_rho_values": [
+    0.25,
+    0.5
+  ],
+  "predecessor": "/data/mengh/RadonBridge/runs/2026_09_04_22_32_30",
+  "global_gpu_minutes": 240,
+  "gpu_memory_limit_gib": 10,
+  "test_used": false
+}
