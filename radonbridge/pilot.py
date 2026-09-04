@@ -56,10 +56,10 @@ def main(args):
         return used
     def check_budget():
         if time.time()-start>args.max_minutes*60:raise RuntimeError("Pilot time budget reached; checkpoints retained")
-    def configure(g, bridge_only=False):
+    def configure(g, phase="warmup"):
         for name,module in g.modules_by_name().items():
-            enabled=(name in ("cfp_stage4","oct_stage4","classifier")) or any(s in name for s in ("compress","expand","mixer"))
-            if bridge_only:enabled=any(s in name for s in ("compress","expand","mixer"))
+            enabled=name=="classifier" or any(s in name for s in ("compress","expand","mixer"))
+            if phase=="warmup":enabled=name in ("cfp_stage4","oct_stage4","classifier")
             for p in module.parameters():p.requires_grad_(enabled)
         g.graph.train()
         for module in g.modules_by_name().values():
@@ -82,10 +82,10 @@ def main(args):
         if save is not None:np.savez(save,ids=np.asarray(ids),y=y,p=p)
         return metrics(y,p)
     history=[];peak_process=0
-    def run(g,name,epochs,initial=None):
+    def run(g,name,epochs,initial=None,phase="arms"):
         nonlocal peak_process
         if initial:g.load_state(initial)
-        opt=configure(g)
+        opt=configure(g,phase)
         best=None;best_state=None;best_epoch=-1
         for epoch in range(epochs):
             check_budget(); t=time.time();configure_training(g)
@@ -122,7 +122,7 @@ def main(args):
     baseline=PilotGraph("baseline",args.seed,device,backbone="resnet18")
     # Verify real pretrained graph shapes and peak memory on one full batch.
     c,o,y,_=next(iter(loader(train)))
-    opt=configure(baseline);t=time.time()
+    opt=configure(baseline,"warmup");t=time.time()
     initial=baseline.save_state()
     _,loss=baseline.forward(c.to(device),o.to(device),y.to(device));baseline.backward();opt.step()
     torch.cuda.synchronize()
@@ -149,14 +149,14 @@ def main(args):
     atomic_json(out/"tiny_overfit.json",overfit);print(json.dumps({"tiny_overfit":overfit}),flush=True)
     del tiny,z,l
     baseline.load_state(initial);del initial,opt
-    state,warm=run(baseline,"warmup",args.warmup_epochs)
+    state,warm=run(baseline,"warmup",args.warmup_epochs,phase="warmup")
     # Occlusion is an input-use diagnostic, not a separately trained unimodal baseline.
     ablation={"zero_cfp":evaluate(baseline,val,ablate="cfp"),"zero_oct":evaluate(baseline,val,ablate="oct")}
     atomic_json(out/"warmup_report.json",warm|{"input_occlusion":ablation})
     del baseline;torch.cuda.empty_cache()
     results={}
     for mode in ("baseline","radon","scrambled","self"):
-        g=PilotGraph(mode,args.seed,device,backbone="resnet18")
+        g=PilotGraph(mode,args.seed,device,backbone="resnet18",handoff_ratio=args.handoff_ratio)
         _,results[mode]=run(g,mode,args.arm_epochs,state)
         del g;torch.cuda.empty_cache()
     # Paired bootstrap uses identical validation participants across all arms.
@@ -188,4 +188,5 @@ if __name__=="__main__":
     p.add_argument("--batch",type=int,default=4);p.add_argument("--warmup-epochs",type=int,default=10)
     p.add_argument("--arm-epochs",type=int,default=5);p.add_argument("--seed",type=int,default=3407)
     p.add_argument("--lr",type=float,default=1e-4);p.add_argument("--max-minutes",type=float,default=60)
+    p.add_argument("--handoff-ratio",type=float,default=.03125)
     main(p.parse_args())

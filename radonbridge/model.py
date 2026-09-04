@@ -97,7 +97,7 @@ def pretrained_backbones():
 
 
 class PilotGraph:
-    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny"):
+    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25):
         torch.manual_seed(seed)
         self.nodes, self.edges, self.steps = [], [], []
         self.by_name = {}
@@ -135,7 +135,7 @@ class PilotGraph:
             for name, shape, mesh in [("cfp", shapes[0], (8,)), ("oct", shapes[1], (4, 4))]:
                 p = Projector(shape, mesh, span=16, scramble=mode == "scrambled")
                 projectors[name] = p
-                width = bridge_channels * p.directions; h = max(1, round(width * .25)); widths[name] = (width, h)
+                width = bridge_channels * p.directions; h = max(1, round(width * handoff_ratio)); widths[name] = (width, h)
                 z = node(name + "_projected"); edge(name + "_project", p, [features[name]], [z])
                 u = node(name + "_handoff"); edge(name + "_compress", nn.Conv1d(width, h, 1, bias=False), [z], [u])
                 handoffs[name] = u

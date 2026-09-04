@@ -23,7 +23,8 @@ directions. Householder's continuous self-inverse property does not establish
 that repeated interpolation is self-inverse.
 
 Flattening channels and directions produces `[B,P,S]`, where P=C*prod(M).
-Post-projection linear compression uses H=round(0.25*P). Compressed tensors are
+Post-projection linear compression uses configurable H=round(upsilon_H*P); the
+small-cohort default is upsilon_H=0.03125 after the initial 0.25 pilot overfit. Compressed tensors are
 concatenated, linearly convolved along S, split by participant branch, expanded,
 backprojected and directly added to their own native feature. Thus the fixed-
 geometry bridge is one structured linear map. Geometry's advantage is an

@@ -76,3 +76,8 @@ Next decisions depend on these observations: strengthen weak baselines; repeat
 promising matched comparisons; then evaluate logMAR/age/structural tasks and
 generic learned projection/cross-attention. Do not select a medical endpoint
 solely because it maximizes R&B's apparent gain.
+
+The first feedback run used Handoff 0.25 and showed immediate overfitting. The
+current default is 0.03125. After warmup, backbone stage 4 is fixed and matched
+arms train only the classifier, plus bridge parameters where present. This is
+an evidence-driven pilot change; it is not a selected final hyperparameter.
