@@ -11,3 +11,6 @@ Active: `2026_09_04_23_54_10` — R&B (Radon Bridge).
 The lower-native-LR study `2026_09_04_22_32_30` remains historical negative evidence, not an active default. Per-source M/rho support remains available; this study uses equal scalar values.
 
 ρ=1/2 was deferred by the user after exceeding the 10 GiB profile limit; it is excluded from this experiment matrix.
+
+
+Queued follow-up: `2026_09_05_00_05_58` adds Gaussian projection, spatially scrambled Radon, self-only and pooled communication for both backbone LRs and seeds (16 additional trials). Match standard R&B and no-bridge references from the active study at M32/S64/rho1_8; pooled M/S are inapplicable and capacity differs. Combined final report: 32 trials. Deploy only after the active remote queue releases its lock.
