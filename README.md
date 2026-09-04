@@ -86,3 +86,7 @@ on one GPU with a 2064 MiB peak. R&B showed no reliable added benefit. A subsequ
 zero-training equal-probability fusion reached exploratory validation AUROC
 0.6892; paired uncertainty intervals still cross zero. This practical baseline
 will be retained in subsequent studies.
+
+## Training independence correction
+
+[005复核](experiments/006-implementation-audit/REPORT.zh-CN.md) identified coupled global gradient clipping and an unvalidated baseline. New training protocols must explicitly set `loss_reduction: "sum"`, `clip_policy: "per_task"`, `warmup_adapt_stages`, and `adapt_stages`. The archived005 protocol is deliberately rejected by the new trainer; use its timestamp source to reproduce the historical run. Run `python tests/check_optimization.py` before new training. No improved performance is claimed from this correction alone.

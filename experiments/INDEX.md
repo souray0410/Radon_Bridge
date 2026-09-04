@@ -31,3 +31,7 @@ same 128 participants. Do not select medical endpoints by the apparent R&B gain.
 ## 005 — corrected separate task paths
 
 [Protocol](005-separate-tasks/README.md) · [Report](005-separate-tasks/REPORT.zh-CN.md). Source 88882f4; completed70epochs /5.08min. Per-task macro-F1; no stable R&B gain. Historical shared-head runs remain separate.
+
+## 006 — implementation and optimization audit
+
+[Report](006-implementation-audit/REPORT.zh-CN.md). Real checkpoint diagnostics found large train/validation gaps and coupled gradient clipping; new optimizer independence gate added. No new performance training.

@@ -63,3 +63,7 @@ CFP独立暖启动选中epoch1：F1=59.94%；OCT独立暖启动选中epoch9：F1
 - exp005_core_validation.json / exp005_requirements_validation.json：数值与架构验收。
 - radon_s2_s3_model.json：实际通信尺寸、支持范围、算子缩放、参数量。
 - ws原始记录：/data/mengh/RadonBridge/runs/exp005；本报告未新增训练。
+
+## 后续审计补充
+
+[006复核](../006-implementation-audit/REPORT.zh-CN.md)发现共同梯度裁剪造成优化耦合，且真实最后检查点存在明显训练/验证差距。原始数字不变；005不能当成严格优化独立的对照，也不能代表已建立强基线。

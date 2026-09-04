@@ -8,6 +8,7 @@ from sklearn.metrics import f1_score
 from .data import PairedDataset
 from .model import PilotGraph
 from .metrics import classification_metrics
+from .optimization import configure_optimizer, clip_task_gradients
 
 
 def main(args):
@@ -16,6 +17,8 @@ def main(args):
     if any(out.iterdir()):raise RuntimeError("Output must be empty")
     if subprocess.check_output(["git","status","--porcelain"],text=True).strip():raise RuntimeError("Commit source first")
     protocol=json.loads(Path(args.protocol).read_text());seed=protocol["seed"]
+    if protocol.get("loss_reduction") != "sum" or protocol.get("clip_policy") != "per_task":
+        raise ValueError("New runs require explicit sum losses and per_task clipping; use archived source for experiment005")
     torch.set_num_threads(3);torch.manual_seed(seed);np.random.seed(seed)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True;torch.use_deterministic_algorithms(True)
     torch.cuda.set_per_process_memory_fraction(8*1024**3/torch.cuda.get_device_properties(0).total_memory)
@@ -41,14 +44,6 @@ def main(args):
         g.graph.train()
         for m in g.graph.modules():
             if isinstance(m,(torch.nn.BatchNorm2d,torch.nn.BatchNorm3d)):m.eval()
-    def configure(g,warm=False):
-        groups=[]
-        for name,module in g.modules_by_name().items():
-            enabled=name.endswith("_head") or name.startswith("bridge_") or name.endswith("_stage4") or (not warm and name.endswith("_stage3"))
-            params=list(module.parameters())
-            for p in params:p.requires_grad_(enabled)
-            if enabled and params:groups.append({"params":params,"lr":protocol["backbone_lr"] if "_stage" in name else protocol["head_bridge_lr"]})
-        return torch.optim.AdamW(groups,weight_decay=.01)
     @torch.no_grad()
     def evaluate(g,dataset,save=None):
         g.graph.eval();preds={k:[] for k in g.branches};ys=[];ids=[]
@@ -63,13 +58,13 @@ def main(args):
     peak=0
     def fit(g,name,epochs,warm=False):
         nonlocal peak
-        opt=configure(g,warm);best=evaluate(g,val);beststate=g.save_state();bestepoch=0
+        opt=configure_optimizer(g,protocol,warm);best=evaluate(g,val);beststate=g.save_state();bestepoch=0
         (out/(name+"_model.json")).write_text(json.dumps({"groups":g.communication_groups,"parameters":sum(p.numel() for p in g.graph.parameters()),"trainable_parameters":sum(p.numel() for p in g.graph.parameters() if p.requires_grad)},indent=2))
         for epoch in range(epochs):
             budget();training(g);losses={k:0. for k in g.branches};n=0;t=time.monotonic()
             for c,o,y,_ in loader(train,epoch):
                 opt.zero_grad(set_to_none=True);_,loss=g.forward(c.cuda(),o.cuda(),y.cuda());g.backward()
-                torch.nn.utils.clip_grad_norm_([p for p in g.graph.parameters() if p.requires_grad],5.);opt.step()
+                clip_task_gradients(g,protocol.get("clip_max_norm",5.));opt.step()
                 for k in losses:losses[k]+=float(g.by_name[k+"_loss"].feature_message.current_state.detach())*len(y)
                 n+=len(y);budget()
             result=evaluate(g,val);peak=max(peak,memory())
@@ -84,13 +79,13 @@ def main(args):
         return beststate,{"fixed_last":last,"selected":evaluate(g,val,out/(name+"_selected_predictions.npz")),"selected_epoch":bestepoch,"selected_train":evaluate(g,train)}
     warmstates={};warmresults={}
     for branch in ("cfp","oct"):
-        g=PilotGraph(seed=seed,device="cuda",backbone="resnet18",cfp_size=224,modalities=branch)
+        g=PilotGraph(seed=seed,device="cuda",backbone="resnet18",cfp_size=224,modalities=branch,loss_reduction="sum")
         warmstates[branch],warmresults[branch]=fit(g,"warm_"+branch,protocol["warmup_epochs"],True)
         del g;torch.cuda.empty_cache()
     initial=warmstates["cfp"]|warmstates["oct"];del warmstates
     results={}
     for spec in protocol["arms"]:
-        g=PilotGraph(spec["mode"],seed,"cuda",backbone="resnet18",cfp_size=224,bridge_stages=tuple(spec["stages"]),upsilon=tuple(protocol["upsilon"]))
+        g=PilotGraph(spec["mode"],seed,"cuda",backbone="resnet18",cfp_size=224,bridge_stages=tuple(spec["stages"]),upsilon=tuple(protocol["upsilon"]),loss_reduction="sum")
         g.load_state(initial)
         _,results[spec["id"]]=fit(g,spec["id"],protocol["arm_epochs"])
         del g;torch.cuda.empty_cache()

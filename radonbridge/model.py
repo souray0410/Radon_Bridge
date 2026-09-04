@@ -99,11 +99,16 @@ def pretrained_backbones():
 
 
 class MeanLoss(nn.Module):
-    def forward(self, *losses): return torch.stack(losses).mean()
+    def __init__(self, reduction="mean"):
+        super().__init__()
+        if reduction not in ("mean", "sum"): raise ValueError(reduction)
+        self.reduction = reduction
+    def forward(self, *losses):
+        return torch.stack(losses).sum() if self.reduction == "sum" else torch.stack(losses).mean()
 
 
 class PilotGraph:
-    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None):
+    def __init__(self, mode="baseline", seed=3407, device="cpu", backbone="tiny", handoff_ratio=.25, cfp_size=96, modalities="both", head_mode="separate", bridge_stages=(3,), upsilon=None, mesh_references=None, loss_reduction="mean"):
         if modalities not in ("both", "cfp", "oct"): raise ValueError(modalities)
         if cfp_size not in (96, 224): raise ValueError(cfp_size)
         if modalities != "both" and mode != "baseline": raise ValueError("Bridge requires both modalities")
@@ -177,7 +182,7 @@ class PilotGraph:
                 task_loss=node(name+"_loss");edge(name+"_criterion",Loss(),[logits,target],[task_loss]);losses.append(task_loss)
         loss=node("loss")
         if head_mode == "separate":
-            edge("task_loss_mean",MeanLoss(),losses,[loss])
+            edge("task_loss_"+loss_reduction,MeanLoss(loss_reduction),losses,[loss])
         else:
             joined=node("joined");edge("join",Join() if len(branches)==2 else nn.Identity(),pooled,[joined])
             logits=node("logits");edge("classifier",head,[joined],[logits]);edge("criterion",Loss(),[logits,target],[loss])
