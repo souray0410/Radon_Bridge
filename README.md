@@ -17,7 +17,7 @@ paired experiment produces a useful direction for a subsequent study.
 - ImageNet ResNet18 for CFP; the same filters inflated into 3D for OCT.
   Inflation averages a 2D kernel along the new depth axis and sums the first
   layer's RGB kernels for a grayscale input. It is not OCT-specific pretraining.
-- First three stages frozen, fourth stage and classifier adapted. BatchNorm
+- During warmup, first three stages frozen, fourth stage and classifier adapted. BatchNorm
   running statistics frozen. This deliberately measures a cheap adaptation
   regime rather than full-network optimization.
 - Baseline warmup, then four matched continuations from the same baseline:

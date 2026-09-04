@@ -41,7 +41,7 @@ def main(args):
     config=vars(args)|{"torch":torch.__version__,"gpu":torch.cuda.get_device_name(),
                       "train_participants":len(train),"validation_participants":len(val),
                       "pretraining":"torchvision ResNet18 ImageNet1K V1; OCT uses depth-averaged 3D inflation",
-                      "trainable":"stage4, classifier, and bridge; stage1-3 frozen; BatchNorm statistics frozen",
+                      "trainable":"warmup: stage4 and classifier; arms: classifier and bridge only; BatchNorm statistics frozen",
                       "allocator_cap_gib":8,"process_stop_mib":9728,
                       "source_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
                       "mhd_commit":subprocess.check_output(["git","-C","third_party/MHD_Project","rev-parse","HEAD"],text=True).strip()}
