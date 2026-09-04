@@ -35,6 +35,14 @@ def verify(p):
         for j in group['jobs']:
             for parent in j['config']['parent_checkpoints'].values():
                 assert sha(parent['path']) == parent['sha256']
+            for bridge in j['config']['bridges']:
+                if bridge.get('compression') == 'fixed_svd_channel':
+                    from radonbridge.svd_basis import _load_basis
+                    for key, artifact in bridge['basis_files'].items():
+                        assert sha(artifact['path']) == artifact['sha256']
+                        _, _, metadata = _load_basis(artifact['path'], artifact['sha256'])
+                        assert metadata['source_key'] == key and metadata['seed'] == j['config']['seed']
+                        assert metadata['provenance']['parent_checkpoints'] == j['config']['parent_checkpoints']
 
 
 def bootstrap(root, protocol):

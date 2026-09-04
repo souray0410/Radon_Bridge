@@ -80,7 +80,11 @@ class Controller:
         if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
         path.mkdir()
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),CUBLAS_WORKSPACE_CONFIG=':4096:8')
-        if job.get('audit'):
+        if job.get('basis_fit'):
+            write_json(path/'configuration.json',job['config'])
+            cmd=[sys.executable,'-m','radonbridge.svd_basis','--config',str(path/'configuration.json'),
+                 '--output',str(path),'--data',self.args.data]
+        elif job.get('audit'):
             cmd=[sys.executable,'tests/check_two_stage.py','--device','cuda','--output',str(path/'summary.json')]
         elif job.get('geometry'):
             cmd=[sys.executable,'tests/check_integer_bridge.py','--device','cuda','--output',str(path/'summary.json')]

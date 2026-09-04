@@ -51,10 +51,12 @@ class PilotGraph:
             finally:
                 for m, value in training.items(): m.training = value
             for index, cfg in enumerate(configs):
-                if set(cfg) != {'nodes', 'M', 'S', 'rho', 'mode'}:
-                    raise ValueError('Each bridge requires exactly nodes, M, S, rho, mode')
+                required={'nodes','M','S','rho','mode'}
+                if not required<=set(cfg) or set(cfg)-required-{'compression','basis_files'}:
+                    raise ValueError('Bridge requires nodes/M/S/rho/mode; optional compression/basis_files')
                 _, metadata = attach_to_nodes(builder, cfg['nodes'], prefix=f'bridge_{index}_', samples=samples,
-                                               M=cfg['M'], S=cfg['S'], rho=cfg['rho'], mode=cfg['mode'])
+                                               M=cfg['M'], S=cfg['S'], rho=cfg['rho'], mode=cfg['mode'],
+                                               compression=cfg.get('compression','learned_projected'), basis_files=cfg.get('basis_files'))
                 self.communication_groups.append(metadata)
             del samples
         self.graph = builder.compile(device).float()

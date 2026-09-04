@@ -85,6 +85,11 @@ def main(args):
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
         g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda')
+        basis_artifacts=[]
+        for group in g.communication_groups:
+            module=g.modules_by_name()[group['exchange_edge_name']]
+            basis_artifacts.extend(module.export_fixed_bases(out.parent/'bases'))
+        if basis_artifacts:write_json(out/'basis_manifest.json',basis_artifacts)
         parents={}
         if cfg.get('training_stage')=='communication':
             if set(cfg.get('parent_checkpoints',{})) != {'cfp','oct'}:

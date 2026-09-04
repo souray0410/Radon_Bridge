@@ -65,7 +65,7 @@ class Objective(nn.Module):
     def forward(self,*xs): return sum(x.square().mean() for x in xs)
 
 
-def topology_check(dims, repeated=False, participant_sampling=False):
+def topology_check(dims, repeated=False, participant_sampling=False, compression="learned_projected", basis_files=None):
     b=MHDBuilder(); inputs={}; cuts=[]; later=[]; outputs=[]
     for i,d in enumerate(dims):
         key=f'network{i}'; previous=b.node(key)
@@ -80,7 +80,7 @@ def topology_check(dims, repeated=False, participant_sampling=False):
     samples=b.native_forward(inputs); baseline=samples['loss'].detach()
     directions={key:4*(i+1) for i,key in enumerate(cuts)} if participant_sampling else 4
     ratios={key:.5/(i+1) for i,key in enumerate(cuts)} if participant_sampling else .5
-    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=directions,S=11,rho=ratios,samples=samples)
+    _, meta=attach_to_nodes(b,cuts,prefix='bridge_0_',M=directions,S=11,rho=ratios,samples=samples,compression=compression,basis_files=basis_files)
     if participant_sampling:
         assert [x['retained_channels'] for x in meta['participants']] == [2*(i+2) for i in range(len(cuts))]
     if repeated:
