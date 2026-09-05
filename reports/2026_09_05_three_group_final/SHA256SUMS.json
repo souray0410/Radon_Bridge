@@ -1,0 +1,15 @@
+{
+  "REPORT_CONTRACT.zh-CN.md": "6008cfa671b56e7daf276de069fb7977047b485cda6ad783ea015ab695ddb770",
+  "summary.json": "fb1bf7cf5b9b6ca71b4990b570fbc44977d7e842680efdbbe35814f0c207c8ed",
+  "FINAL_ACCEPTANCE.json": "22a296d3bffe73e9c80b781bad9565604b5211ec597daaa3b74958420556b260",
+  "build_advisor_report.py": "d2d07dac99a473c970189329f7c6cdb14e2ca15f375c4c36ceb72c370a43a7f7",
+  "Radon_Bridge_Three_Group_Advisor_Report.pdf": "47c73db89b35348fd349ede98fd5b1640c548e7160b2e68e691d445455c61be1",
+  "diagnostics_and_provenance.json": "31629d21da14a42ad78fc5706a963ff7bf5cdb4a0e7870386dc013aa82dfe649",
+  "main_comparison.png": "b7b6ae72ef8cb7f0af4f7a1f9298525fdf07d2b2759b98d239e26e328e54dba1",
+  "paired_uncentered.csv": "4c75ce26f56212145455c265e52f423fbc5147debe29a1c200863d84221584a6",
+  "README.zh-CN.md": "e19f2e9c6e264a7d054e119c58f5481c795712807c38458e7128cd16586b87d1",
+  "paired_centering.csv": "67e4264be9755b6135f37731bc48378013f45a0a864b61532385462a9679cf96",
+  "predeployment_comparison_audit.json": "c74137dc30889a03991bef41291be1d821f38b20c30dc23ddef8356904c2c8a8",
+  "results.csv": "7e2dba44a0cb38a1175c4a873888cc606516e3638c3962e127814671c39b5a34",
+  "paired_learned_channel.csv": "435c735dde5c5a9e20d81d83ebb2419acfb04202a3b462365445bcced8ce87b8"
+}

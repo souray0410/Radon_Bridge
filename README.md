@@ -1,17 +1,28 @@
-# Rhythm Bridge
+# R&B — Radon Bridge
 
-当前实验：`2026_09_04_20_27_40`。当前协议见 [实验说明](experiments/2026_09_04_20_27_40/METHOD.zh-CN.md) 和 [protocol.json](experiments/2026_09_04_20_27_40/protocol.json)。
+两条完整ResNet18分别处理CFP与OCT，保留各自主干、任务头、CE损失和预测。先独立监督训练至开发集平台期，再恢复各自最佳检查点，通过MHD V4的中间节点接入线性R&B，进行全参数联合训练，BN正常更新。
 
-两条完整 ResNet18 分别学习 CFP 和 OCT 分类，达到开发集平台期后，加载各自最佳检查点，在原有中间节点加入线性 R&B 并全参数联合训练至平台期。各分支保留头、损失和预测，主指标为各自 macro-F1。
+## 最新结果：三组配对实验已完成
 
-当前桥接口为 `nodes, M, S, rho, mode`，初测 `M=16, S=64, rho=1/8`。压缩保留数由实际输入宽度计算，不再固定512。固定对跖 EEM → Householder Radon → 展平 → 独立线性压缩 → 拼接线性卷积 → 独立恢复 → 普通直接反投影 → 原节点残差。固定几何没有训练参数。
+[完整结果与说明](reports/2026_09_05_three_group_final/README.zh-CN.md) · [23页导师汇报PDF](reports/2026_09_05_three_group_final/Radon_Bridge_Three_Group_Advisor_Report.pdf) · [129项结果CSV](reports/2026_09_05_three_group_final/results.csv) · [最终验收](reports/2026_09_05_three_group_final/FINAL_ACCEPTANCE.json)
 
-正式代码在 GitHub main，远端唯一当前工作副本为 `ws02:/home/mengh/RadonBridge`。数据、检查点和参与者级预测只保存在 `/data/mengh/RadonBridge`。两张GPU各最多10GiB；本轮剩余预算继承旧账，换时间戳不重新计费。
+非中心化SVD、中心化拟合SVD、可学习原生通道编解码三组各36项，另21项无桥/原可学习CM/固定随机QR参照，共129项，全部达到预设平台期。三种子3416–3418、ρ=1/16/1/8/1/4，主组包含标准Radon、自身处理、空间打乱和等宽线性重采样。报告保留负结果、逐种子结果、配对区间与实际成本，不把开发集结果当作独立测试证据。
 
-当前入口为 `scripts/run_integer_experiment.py`（文件名保留，实际要求新v3协议），汇总入口为 `scripts/summarize_integer_experiment.py`。无效历史结果已从当前版本移除；远端剩余旧诊断与验收因自动审批拒绝永久删除，已可恢复地归档，不再用于结论。纯时间戳 Git 分支保留源码历史。`legacy_*` 仅为旧代码依赖与溯源，不可启动旧试验。
+![Main comparison](reports/2026_09_05_three_group_final/main_comparison.png)
 
-验收包括 `check_integer_bridge.py`、`check_two_stage.py`、`check_accumulation.py`、`check_convergence.py` 和 `check_scheduler.py`；结果以本实验目录的验收文件为准。实现正确与临床有效分别判断；目前没有本协议的效果结论。
+## 当前实现与协议
 
-## Centered-fit SVD supplement
+- stage3、M32、S64；第二阶段backbone LR=6e−5、head/bridge LR=1e−4，batch16。AdamW WD0.01，各分支与桥分别裁剪5。
+- 至少8轮；连续6轮无超过0.001的实质改善判平台；3轮停滞LR×0.3；最多60轮仅保护上限。按两任务macro-F1平均值选择共同检查点。
+- 默认`learned_projected`：Radon后展平C×M通道，再进行可学习压缩/恢复。与新增`learned_channel`的Radon前逐点C→r编码、反投影后r→C恢复不同。
+- 固定通道版本支持非中心化SVD、中心化拟合SVD和随机QR；基为持久化buffer。中心化仅改变基拟合统计量，运行时不减/加均值。固定版本桥内只有中间卷积可学习。
+- 几何使用固定EEM、Householder Radon与普通直接反投影；中间kernel=3线性卷积，无偏置、零初始化。桥内无激活、门控或BN，残差写回原MHD Node ID。
+- M/ρ支持逐来源配置；当前快速实验两来源使用相同值。固定通道与可学习原生通道版本ρ表示维数比例，r=max(1,floor(ρC))、h=rM；不是能量阈值。
 
-`fixed_centered_svd_channel` fits training-channel covariance after global mean subtraction, then uses the same linear `Q^T X` / `Q delta` runtime as `fixed_svd_channel`. It does not subtract or add a mean at runtime. The uncentered basis maximizes retained raw energy; the centered-fit basis maximizes retained centered variance. Reports distinguish both quantities. See [accepted paired protocol](experiments/2026_09_05_10_09_52/PLAN.zh-CN.md).
+生效要求及历史覆盖关系见[REQUIREMENTS.md](REQUIREMENTS.md)，配对与展示标准见[报告约定](experiments/2026_09_05_13_32_31/REPORT_CONTRACT.zh-CN.md)。训练源码归档于时间戳分支`2026_09_05_13_32_31`（35675f4）；之后的结果文档提交不改变训练实现。
+
+## 数据与运行边界
+
+正式代码在GitHub，训练机器为`ws02`。1264训练、296开发验证；开发集参与过任务/配置筛选，所有结果均为探索性证据，不读取测试集。数据、模型与参与者级预测保留于远端`/data/mengh/RadonBridge`，GitHub仅同步代码、协议和不含参与者标识的汇总。
+
+GPU时长不限但持续记账；每卡本项目≤10 GiB，不影响其他LOOK任务。未平台、OOM或失败均不能算完整实验，不能自动改变batch或收敛标准。代码和诊断验收与医学有效性结论分别解释。
