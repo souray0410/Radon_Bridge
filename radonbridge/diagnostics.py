@@ -65,11 +65,29 @@ def release_forward_graph(g):
                 setattr(module,attr,[v.detach() for v in getattr(module,attr)])
 
 
+def learned_rowspace(codec,device):
+    # Separate subspace retention from learned encoder amplification.
+    from types import SimpleNamespace
+    from .svd_basis import tensor_sha
+    e=codec.encoder.weight.detach().squeeze(-1).cpu().double()
+    d=codec.decoder.weight.detach().squeeze(-1).cpu().double()
+    _,singular,vh=torch.linalg.svd(e,full_matrices=False)
+    tolerance=max(e.shape)*torch.finfo(e.dtype).eps*float(singular.max())
+    rank=int((singular>tolerance).sum());q=vh[:rank].T.contiguous().to(device)
+    metadata={'role':'orthogonal projector onto current learned encoder row space; not encoder amplitude',
+        'numerical_rank':rank,'rank_tolerance':tolerance,'encoder_singular_values':singular.tolist(),
+        'encoder_sha256':tensor_sha(e),'decoder_sha256':tensor_sha(d),
+        'decoder_minus_encoder_transpose_l2':float((d-e.T).norm()),'initialization':codec.metadata}
+    return SimpleNamespace(q=q,encode=lambda x:torch.einsum('cr,bc...->br...',q.to(x),x),metadata=metadata)
+
+
 def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
     device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get('bridge_0_exchange')
     keys=['cfp_stage3','oct_stage3'];bases={}
     for key in keys:
-        if exchange is not None and exchange.compression!='learned_projected':
+        if exchange is not None and exchange.compression=='learned_channel':
+            bases[key]=learned_rowspace(exchange.channel_codecs[exchange.keys.index(key)],device)
+        elif exchange is not None and exchange.compression!='learned_projected':
             bases[key]=exchange.channel_bases[exchange.keys.index(key)]
         else:bases[key]=FixedChannelBasis(256,32,key,basis_refs[key]).to(device=device,dtype=torch.float32)
     accum={k:{'input_energy':0.,'retained_energy':0.,'delta_energy':0.} for k in keys}
@@ -96,6 +114,9 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                     x=exchange.latest_inputs[exchange.keys.index(key)] if exchange is not None else g.by_name[key].feature_message.current_state
                     dx=exchange.latest_deltas[exchange.keys.index(key)] if exchange is not None else None
                     values=accum[key];values['input_energy']+=float(x.double().square().sum());values['retained_energy']+=float(bases[key].encode(x).double().square().sum())
+                    if exchange is not None and exchange.compression=='learned_channel':
+                        codec=exchange.channel_codecs[exchange.keys.index(key)]
+                        values['encoded_energy']=values.get('encoded_energy',0.)+float(codec.encode(x).double().square().sum())
                     if dx is not None:values['delta_energy']+=float(dx.double().square().sum())
                     f=x.detach().movedim(1,0).reshape(x.shape[1],-1).double();q=bases[key].q.double()
                     v=f.sum(1);sums[key]+=v.cpu();projected_sums[key]+=(q.T@v).cpu();counts[key]+=f.shape[1]
@@ -122,8 +143,11 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
         mean_energy=float(sums[key].square().sum())/counts[key];retained_mean_energy=float(projected_sums[key].square().sum())/counts[key]
         variance_energy=max(0.,den-mean_energy);retained_variance=max(0.,values['retained_energy']-retained_mean_energy)
         values.update(mean_energy_fraction=mean_energy/den if den>0 else None,retained_variance_ratio=retained_variance/variance_energy if variance_energy>0 else None,centering_scope='global training channel mean; not per participant')
+        if 'encoded_energy' in values:values['encoded_energy_ratio']=values['encoded_energy']/den if den>0 else None
         values['projection_basis']=bases[key].metadata
         values['projection_role']='actual channel compression' if exchange is not None and exchange.compression!='learned_projected' else 'parent SVD diagnostic subspace; not the learned CM map'
+        if exchange is not None and exchange.compression=='learned_channel':
+            values['projection_role']='current encoder row-space orthogonal projection; encoded_energy_ratio separately measures scaling'
     return {'energy':accum,'gradient_groups':result,'probe_ids':probe_ids,'probe_ids_sha256':hashlib.sha256(json.dumps(probe_ids,separators=(',',':')).encode()).hexdigest(),
             'probe_participants':probe_count,'energy_participants':len(data) if energy_limit is None else energy_limit,
             'state_parameters_bn_gradients_rng_preserved':True,'test_used':False}

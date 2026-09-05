@@ -4,6 +4,7 @@ from collections.abc import Mapping
 import math
 import torch
 from torch import nn
+from .learned_channel import LearnedChannelCodec
 from .svd_basis import FixedChannelBasis, BASIS_VERSION, QR_VERSION, CENTERED_VERSION
 from .projector import Projector, ScrambledProjector, GaussianProjector, LinearResampleProjector, positive_integer
 
@@ -54,7 +55,7 @@ class BridgeExchange(nn.Module):
                 raise ValueError('rho must be a finite compression ratio in (0,1]')
         if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled', 'linear_resample'):
             raise ValueError(mode)
-        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel'):
+        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel','learned_channel'):
             raise ValueError('Unknown compression method')
         if compression in ('fixed_svd_channel','fixed_centered_svd_channel') and mode not in ('radon','self','scrambled','linear_resample'):
             raise ValueError('Unsupported SVD mechanism')
@@ -62,7 +63,7 @@ class BridgeExchange(nn.Module):
             raise ValueError('Random orthogonal channel control supports only standard Radon')
         if compression=='learned_projected' and mode=='linear_resample':
             raise ValueError('Linear resampling is a fixed SVD control')
-        if compression=='learned_projected' and basis_files is not None:
+        if compression in ('learned_projected','learned_channel') and basis_files is not None:
             raise ValueError('basis_files is only valid for fixed channel compression')
         self.compression=compression
         self.shapes = [(s.channels, *s.shape) for s in specs]
@@ -77,6 +78,11 @@ class BridgeExchange(nn.Module):
         if compression=='learned_projected':
             self.compress = nn.ModuleList([nn.Conv1d(w, h, 1, bias=False) for w,h in zip(widths,retained)])
             self.expand = nn.ModuleList([nn.Conv1d(h, w, 1, bias=False) for w,h in zip(widths,retained)])
+        elif compression=='learned_channel':
+            if mode not in ('radon','self','scrambled','linear_resample'):raise ValueError('Unsupported learned channel mechanism')
+            ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
+            self.channel_codecs=nn.ModuleList([LearnedChannelCodec(s.channels,rank,s.key,int(torch.initial_seed())) for s,rank in zip(specs,ranks)])
+            retained=[rank*m for rank,m in zip(ranks,directions)]
         else:
             if not isinstance(basis_files,dict) or set(basis_files)!=set(self.keys):
                 raise ValueError('basis_files must match participant keys exactly')
@@ -92,7 +98,10 @@ class BridgeExchange(nn.Module):
         self.metadata['compression']=compression
         self.metadata['stored_bridge_parameters']=sum(p.numel() for p in self.parameters())
         self.metadata['effective_bridge_parameters']=self.metadata['stored_bridge_parameters']-self.mixer.conv.weight.numel()+int(self.mixer.mask.sum())
-        if compression!='learned_projected':
+        if compression=='learned_channel':
+            for participant,codec in zip(self.metadata['participants'],self.channel_codecs):
+                participant.update(channel_rank=codec.metadata['channel_rank'],effective_channel_ratio=codec.metadata['channel_rank']/codec.metadata['channels'],channel_codec=codec.metadata)
+        elif compression!='learned_projected':
             for participant,basis in zip(self.metadata['participants'],self.channel_bases):
                 participant['channel_rank']=basis.q.shape[1]
                 participant['effective_channel_ratio']=basis.q.shape[1]/basis.q.shape[0]
@@ -100,7 +109,7 @@ class BridgeExchange(nn.Module):
         self.latest_inputs = self.latest_deltas = None
 
     def export_fixed_bases(self, directory):
-        if self.compression=='learned_projected':return []
+        if self.compression in ('learned_projected','learned_channel'):return []
         artifacts=[basis.export(directory) for basis in self.channel_bases]
         for participant,artifact in zip(self.metadata['participants'],artifacts):participant['basis']=artifact
         return artifacts
@@ -110,7 +119,11 @@ class BridgeExchange(nn.Module):
             raise ValueError('Participant shapes changed')
         if len({x.shape[0] for x in features}) != 1:
             raise ValueError('Participants must share batch alignment')
-        if self.compression!='learned_projected':
+        if self.compression=='learned_channel':
+            encoded=[projector(codec.encode(x)) for codec,projector,x in zip(self.channel_codecs,self.projectors,features)]
+            mixed=self.mixer(*encoded)
+            deltas=[codec.decode(projector.backproject(p)) for codec,projector,p in zip(self.channel_codecs,self.projectors,mixed)]
+        elif self.compression!='learned_projected':
             encoded=[projector(basis.encode(x)) for basis,projector,x in zip(self.channel_bases,self.projectors,features)]
             mixed=self.mixer(*encoded)
             deltas=[basis.decode(projector.backproject(p)) for basis,projector,p in zip(self.channel_bases,self.projectors,mixed)]

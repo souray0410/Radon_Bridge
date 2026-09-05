@@ -90,16 +90,23 @@ def _load_basis(path, expected_sha):
     return q,values,metadata
 
 
-def save_random_basis(reference, directory):
-    """Data-independent QR; use the paired training moment only to report energy."""
-    _,_,original=_load_basis(reference['path'],reference['sha256'])
-    if original['version']!=BASIS_VERSION:raise ValueError('QR energy reference must be the original SVD artifact')
-    c=original['channels'];seed=original['seed'];key=original['source_key']
+def random_orthogonal_matrix(seed, source_key, channels):
+    """Same data-independent initialization as the accepted random QR control."""
+    c=channels;key=source_key
     payload=json.dumps({'seed':seed,'source_key':key,'channels':c,'version':QR_VERSION},sort_keys=True,separators=(',',':'))
     digest=hashlib.sha256(payload.encode('utf-8')).digest();basis_seed=int.from_bytes(digest[:8],'big')&((1<<63)-1)
     generator=torch.Generator(device='cpu').manual_seed(basis_seed)
     q,r=torch.linalg.qr(torch.randn(c,c,generator=generator,dtype=torch.float64,device='cpu'))
     q=(q*torch.where(r.diagonal()<0,-1.,1.)).contiguous()
+    return q,basis_seed,payload,digest
+
+
+def save_random_basis(reference, directory):
+    """Data-independent QR; use the paired training moment only to report energy."""
+    _,_,original=_load_basis(reference['path'],reference['sha256'])
+    if original['version']!=BASIS_VERSION:raise ValueError('QR energy reference must be the original SVD artifact')
+    c=original['channels'];seed=original['seed'];key=original['source_key']
+    q,basis_seed,payload,digest=random_orthogonal_matrix(seed,key,c)
     with np.load(reference['path'],allow_pickle=False) as z:moment=torch.from_numpy(z['second_moment'].copy())
     energy=(q*(moment@q)).sum(0).clamp_min(0)
     metadata=dict(original,version=QR_VERSION,fit_split=None,energy_evaluation_split='train',basis_construction='data_independent_gaussian_QR',
