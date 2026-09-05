@@ -66,12 +66,12 @@ def basis_checks(tmp):
     return {'orthogonal':True,'nested_ranks':[16,32,64],'rng_unchanged':True,'energy_order_matches_svd':True,'shared_basis_across_ranks':True,'commutes_2d_3d':True,'only_mixer_trainable':True,'checkpoint_verified':True}
 
 
-def checkpoint_optimizer_checks(tmp):
+def checkpoint_optimizer_checks(tmp,compression='fixed_svd_channel',basis_factory=artifact):
     c=torch.randn(1,2,3,224,224);o=torch.randn(1,2,1,32,96,96);y=torch.tensor([1])
     g=PilotGraph(seed=3416);g.graph.eval()
     with torch.no_grad():expected={k:v.clone() for k,v in g.forward(c,o,y)[0].items()}
     native=g.save_state();del g
-    cfg={'nodes':['cfp_stage3','oct_stage3'],'M':4,'S':11,'rho':.125,'mode':'radon','compression':'fixed_svd_channel','basis_files':{key:artifact(tmp,256,key,3418)[0] for key in ['cfp_stage3','oct_stage3']}}
+    cfg={'nodes':['cfp_stage3','oct_stage3'],'M':4,'S':11,'rho':.125,'mode':'radon','compression':compression,'basis_files':{key:basis_factory(tmp,256,key,3418)[0] for key in ['cfp_stage3','oct_stage3']}}
     g=PilotGraph(seed=3416,bridge_configs=[cfg]);g.load_native_state(native);g.graph.eval()
     with torch.no_grad():actual=g.forward(c,o,y)[0]
     assert all(torch.equal(actual[k],expected[k]) for k in expected)

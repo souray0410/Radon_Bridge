@@ -73,6 +73,7 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
             bases[key]=exchange.channel_bases[exchange.keys.index(key)]
         else:bases[key]=FixedChannelBasis(256,32,key,basis_refs[key]).to(device=device,dtype=torch.float32)
     accum={k:{'input_energy':0.,'retained_energy':0.,'delta_energy':0.} for k in keys}
+    sums={k:torch.zeros(bases[k].q.shape[0],dtype=torch.float64) for k in keys};projected_sums={k:torch.zeros(bases[k].q.shape[1],dtype=torch.float64) for k in keys};counts={k:0 for k in keys}
     groups={k:list(modules[k].parameters()) for k in keys}
     if exchange is not None:
         for name,m in exchange.named_modules():
@@ -96,6 +97,9 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                     dx=exchange.latest_deltas[exchange.keys.index(key)] if exchange is not None else None
                     values=accum[key];values['input_energy']+=float(x.double().square().sum());values['retained_energy']+=float(bases[key].encode(x).double().square().sum())
                     if dx is not None:values['delta_energy']+=float(dx.double().square().sum())
+                    f=x.detach().movedim(1,0).reshape(x.shape[1],-1).double();q=bases[key].q.double()
+                    v=f.sum(1);sums[key]+=v.cpu();projected_sums[key]+=(q.T@v).cpu();counts[key]+=f.shape[1]
+                    del f,q,v
         for c,o,y,_ in loader(Subset(data,indices),batch,0):
             g.forward(c.to(device),o.to(device),y.to(device))
             for i,branch in enumerate(['cfp','oct']):
@@ -115,6 +119,9 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
     for key,values in accum.items():
         den=values['input_energy'];values['retained_energy_ratio']=values['retained_energy']/den if den>0 else None
         values['delta_over_input_l2']=(values['delta_energy']/den)**.5 if den>0 else None
+        mean_energy=float(sums[key].square().sum())/counts[key];retained_mean_energy=float(projected_sums[key].square().sum())/counts[key]
+        variance_energy=max(0.,den-mean_energy);retained_variance=max(0.,values['retained_energy']-retained_mean_energy)
+        values.update(mean_energy_fraction=mean_energy/den if den>0 else None,retained_variance_ratio=retained_variance/variance_energy if variance_energy>0 else None,centering_scope='global training channel mean; not per participant')
         values['projection_basis']=bases[key].metadata
         values['projection_role']='actual channel compression' if exchange is not None and exchange.compression!='learned_projected' else 'parent SVD diagnostic subspace; not the learned CM map'
     return {'energy':accum,'gradient_groups':result,'probe_ids':probe_ids,'probe_ids_sha256':hashlib.sha256(json.dumps(probe_ids,separators=(',',':')).encode()).hexdigest(),

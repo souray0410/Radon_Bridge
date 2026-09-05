@@ -4,7 +4,7 @@ from collections.abc import Mapping
 import math
 import torch
 from torch import nn
-from .svd_basis import FixedChannelBasis, BASIS_VERSION, QR_VERSION
+from .svd_basis import FixedChannelBasis, BASIS_VERSION, QR_VERSION, CENTERED_VERSION
 from .projector import Projector, ScrambledProjector, GaussianProjector, LinearResampleProjector, positive_integer
 
 @dataclass(frozen=True)
@@ -54,9 +54,9 @@ class BridgeExchange(nn.Module):
                 raise ValueError('rho must be a finite compression ratio in (0,1]')
         if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled', 'linear_resample'):
             raise ValueError(mode)
-        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel'):
+        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel'):
             raise ValueError('Unknown compression method')
-        if compression=='fixed_svd_channel' and mode not in ('radon','self','scrambled','linear_resample'):
+        if compression in ('fixed_svd_channel','fixed_centered_svd_channel') and mode not in ('radon','self','scrambled','linear_resample'):
             raise ValueError('Unsupported SVD mechanism')
         if compression=='fixed_random_orthogonal_channel' and mode!='radon':
             raise ValueError('Random orthogonal channel control supports only standard Radon')
@@ -81,7 +81,7 @@ class BridgeExchange(nn.Module):
             if not isinstance(basis_files,dict) or set(basis_files)!=set(self.keys):
                 raise ValueError('basis_files must match participant keys exactly')
             ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
-            self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
+            self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else CENTERED_VERSION if compression=='fixed_centered_svd_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
             retained=[rank*m for rank,m in zip(ranks,directions)]
         self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else 3, mode == 'self')
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [

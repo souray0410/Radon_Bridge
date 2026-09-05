@@ -11,3 +11,7 @@
 当前入口为 `scripts/run_integer_experiment.py`（文件名保留，实际要求新v3协议），汇总入口为 `scripts/summarize_integer_experiment.py`。无效历史结果已从当前版本移除；远端剩余旧诊断与验收因自动审批拒绝永久删除，已可恢复地归档，不再用于结论。纯时间戳 Git 分支保留源码历史。`legacy_*` 仅为旧代码依赖与溯源，不可启动旧试验。
 
 验收包括 `check_integer_bridge.py`、`check_two_stage.py`、`check_accumulation.py`、`check_convergence.py` 和 `check_scheduler.py`；结果以本实验目录的验收文件为准。实现正确与临床有效分别判断；目前没有本协议的效果结论。
+
+## Centered-fit SVD supplement
+
+`fixed_centered_svd_channel` fits training-channel covariance after global mean subtraction, then uses the same linear `Q^T X` / `Q delta` runtime as `fixed_svd_channel`. It does not subtract or add a mean at runtime. The uncentered basis maximizes retained raw energy; the centered-fit basis maximizes retained centered variance. Reports distinguish both quantities. See [accepted paired protocol](experiments/2026_09_05_10_09_52/PLAN.zh-CN.md).

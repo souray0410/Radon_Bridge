@@ -36,7 +36,7 @@ def verify(p):
             for parent in j['config']['parent_checkpoints'].values():
                 assert sha(parent['path']) == parent['sha256']
             for bridge in j['config']['bridges']:
-                if bridge.get('compression') in ('fixed_svd_channel','fixed_random_orthogonal_channel'):
+                if bridge.get('compression') in ('fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel'):
                     from radonbridge.svd_basis import _load_basis
                     for key, artifact in bridge['basis_files'].items():
                         assert sha(artifact['path']) == artifact['sha256']

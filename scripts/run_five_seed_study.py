@@ -74,10 +74,10 @@ def verify(p,records):
             for parent in cfg.get('parent_checkpoints',{}).values():assert sha(parent['path'])==parent['sha256']
             for b in cfg['bridges']:
                 for key,ref in b.get('basis_files',{}).items():
-                    from radonbridge.svd_basis import _load_basis,BASIS_VERSION,QR_VERSION
+                    from radonbridge.svd_basis import _load_basis,BASIS_VERSION,QR_VERSION,CENTERED_VERSION
                     assert sha(ref['path'])==ref['sha256'];_,_,meta=_load_basis(ref['path'],ref['sha256'])
                     assert meta['seed']==r['seed'] and meta['source_key']==key and meta['provenance']['parent_checkpoints']==cfg['parent_checkpoints']
-                    assert meta['version']==(QR_VERSION if b['compression']=='fixed_random_orthogonal_channel' else BASIS_VERSION)
+                    assert meta['version']==(QR_VERSION if b['compression']=='fixed_random_orthogonal_channel' else CENTERED_VERSION if b['compression']=='fixed_centered_svd_channel' else BASIS_VERSION)
 
 
 def manifest(root,records,bases,qr):

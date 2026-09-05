@@ -11,6 +11,7 @@ from torch import nn
 
 BASIS_VERSION='train_channel_second_moment_eigh_v1'
 QR_VERSION='channel_random_qr_v1'
+CENTERED_VERSION='train_channel_centered_covariance_eigh_v1'
 
 
 def tensor_sha(t):return hashlib.sha256(t.detach().cpu().contiguous().numpy().tobytes()).hexdigest()
@@ -44,18 +45,47 @@ def save_basis(moment, count, directory, source_key, seed, provenance):
     return {'path':str(path.resolve()),'sha256':file_sha(path)}
 
 
+def save_centered_basis(moment, channel_sum, count, directory, source_key, seed, provenance):
+    """Fit covariance directions; runtime projection is Q^T X, with no mean shift."""
+    if moment.dtype!=torch.float64 or moment.device.type!='cpu' or channel_sum.dtype!=torch.float64 or channel_sum.device.type!='cpu' or count<=0:
+        raise ValueError('Expected CPU float64 sufficient statistics')
+    c=moment.shape[0]
+    if moment.shape!=(c,c) or channel_sum.shape!=(c,) or not torch.isfinite(moment).all() or not torch.isfinite(channel_sum).all():
+        raise ValueError('Invalid sufficient statistics')
+    second=(moment+moment.T)/(2*count);mean=channel_sum/count
+    covariance=second-torch.outer(mean,mean);values,q=torch.linalg.eigh(covariance)
+    if values[0]<-1e-10*max(1.,float(second.trace())) or values.sum()<=0:raise ValueError('Invalid centered covariance')
+    values=values.flip(0).clamp_min(0);q=q.flip(1)
+    pivots=q.abs().argmax(dim=0);q=(q*torch.where(q[pivots,torch.arange(c)]<0,-1.,1.)).contiguous()
+    energies=(q*(second@q)).sum(0).clamp_min(0)
+    metadata={'version':CENTERED_VERSION,'source_key':source_key,'seed':seed,'channels':c,'sampled_channel_vectors':count,
+        'centered':True,'centering_scope':'training-set channel mean over all participants, eyes and spatial positions',
+        'runtime_centering':False,'runtime_projection':'Q^T X; decode Q delta; no mean subtraction or addition',
+        'fit_split':'train','test_used':False,'normalization':'FF^T/N - mean mean^T; eigenvalues are centered variances; energies are q^T(FF^T/N)q',
+        'ordering':'descending centered variance; maximum-absolute entry of each column nonnegative',
+        'mean_energy_fraction':float(mean.square().sum()/second.trace()),'full_master_sha256':tensor_sha(q),
+        'mean_sha256':tensor_sha(mean),'torch_version':torch.__version__,'provenance':provenance}
+    directory=Path(directory);directory.mkdir(parents=True,exist_ok=True)
+    identity=hashlib.sha256(json.dumps([seed,source_key,CENTERED_VERSION],separators=(',',':')).encode()).hexdigest()[:16]
+    path=directory/f'seed{seed}_{identity}_centered.npz'
+    if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
+    tmp=path.with_suffix(f'.{os.getpid()}.tmp')
+    with tmp.open('wb') as f:np.savez(f,q=q.numpy(),eigenvalues=values.numpy(),energies=energies.numpy(),mean=mean.numpy(),second_moment=second.numpy(),covariance=covariance.numpy(),metadata=json.dumps(metadata,sort_keys=True))
+    tmp.replace(path);return {'path':str(path.resolve()),'sha256':file_sha(path)}
+
+
 @lru_cache(maxsize=64)
 def _load_basis(path, expected_sha):
     if file_sha(path)!=expected_sha:raise ValueError('SVD basis file SHA256 mismatch')
     with np.load(path,allow_pickle=False) as z:
         q=torch.from_numpy(z['q'].copy());metadata=json.loads(str(z['metadata']))
-        values=torch.from_numpy(z['eigenvalues' if metadata['version']==BASIS_VERSION else 'energies'].copy())
-    if metadata['version'] not in (BASIS_VERSION,QR_VERSION) or metadata['energy_evaluation_split' if metadata['version']==QR_VERSION else 'fit_split']!='train' or metadata['centered'] or metadata['test_used']:
-        raise ValueError('Basis must be the accepted training-only uncentered SVD')
+        values=torch.from_numpy(z['eigenvalues' if metadata['version'] in (BASIS_VERSION,CENTERED_VERSION) else 'energies'].copy())
+    if metadata['version'] not in (BASIS_VERSION,QR_VERSION,CENTERED_VERSION) or metadata['energy_evaluation_split' if metadata['version']==QR_VERSION else 'fit_split']!='train' or metadata['centered']!=(metadata['version']==CENTERED_VERSION) or metadata['test_used']:
+        raise ValueError('Basis must match an accepted training-only fitting algorithm')
     if q.dtype!=torch.float64 or q.shape!=(metadata['channels'],metadata['channels']) or not torch.isfinite(q).all() or tensor_sha(q)!=metadata['full_master_sha256']:
         raise ValueError('Invalid SVD basis tensor')
     if not torch.allclose(q.T@q,torch.eye(len(q),dtype=q.dtype),atol=1e-10,rtol=0):raise ValueError('Basis is not orthogonal')
-    if values.shape!=(len(q),) or not torch.isfinite(values).all() or (values<0).any() or (metadata['version']==BASIS_VERSION and (values[1:]>values[:-1]).any()) or values.sum()<=0:
+    if values.shape!=(len(q),) or not torch.isfinite(values).all() or (values<0).any() or (metadata['version'] in (BASIS_VERSION,CENTERED_VERSION) and (values[1:]>values[:-1]).any()) or values.sum()<=0:
         raise ValueError('Invalid ordered energy spectrum')
     return q,values,metadata
 
@@ -95,6 +125,10 @@ class FixedChannelBasis(nn.Module):
         self.register_buffer('q',self._master.clone())
         self.metadata=dict(metadata,channel_rank=retained,retained_energy_ratio=float(values[:retained].sum()/values.sum()),
                            retained_master_sha256=tensor_sha(self._master),artifact=self.artifact)
+        if version==CENTERED_VERSION:
+            with np.load(artifact['path'],allow_pickle=False) as z:energies=z['energies'].copy();mean=torch.from_numpy(z['mean'].copy())
+            if energies.shape!=(channels,) or (energies<0).any() or tensor_sha(mean)!=metadata['mean_sha256'] or not np.isfinite(energies).all() or energies.sum()<=0:raise ValueError('Invalid centered basis energy metadata')
+            self.metadata.update(retained_variance_ratio=float(values[:retained].sum()/values.sum()),retained_energy_ratio=float(energies[:retained].sum()/energies.sum()))
 
     def encode(self,x):return torch.einsum('cr,bc...->br...',self.q,x)
     def decode(self,x):return torch.einsum('cr,br...->bc...',self.q,x)
@@ -134,7 +168,9 @@ def fit_training_bases(config, output, data):
         assert saved['branch']==branch and saved['seed']==seed and saved['training_stage']=='independent' and saved['stop_reason']=='validation_plateau'
         g.load_native_state(saved['model'],branch)
     assert set(config['parent_checkpoints'])=={'cfp','oct'}
-    initial=parameter_hash(g);moments={};counts={};ids=[]
+    initial=parameter_hash(g);moments={};counts={};ids=[];sums={}
+    centered=config.get('fit_centered',False)
+    if centered and set(config.get('uncentered_basis_files',{}))!=set(config['nodes']):raise ValueError('Paired centered fit requires original bases')
     with torch.no_grad():
         for c,o,y,keys in loader(train,config['microbatch'],seed):
             g.forward(c.cuda(),o.cuda(),y.cuda());ids.extend(keys)
@@ -143,13 +179,24 @@ def fit_training_bases(config, output, data):
                 f=x.movedim(1,0).reshape(x.shape[1],-1).cpu().double()
                 moments[key]=moments.get(key,torch.zeros(f.shape[0],f.shape[0],dtype=torch.float64))+f@f.T
                 counts[key]=counts.get(key,0)+f.shape[1]
+                if centered:sums[key]=sums.get(key,torch.zeros(f.shape[0],dtype=torch.float64))+f.sum(1)
             write_json(output/'progress.json',{'participants':len(ids),'seconds':time.monotonic()-start})
     assert len(ids)==1264 and len(set(ids))==1264 and parameter_hash(g)==initial
     provenance={'parent_checkpoints':config['parent_checkpoints'],'initial_native_sha256':initial,
                 'participant_ids_sha256':hashlib.sha256(json.dumps(ids,separators=(',',':')).encode()).hexdigest(),
                 'participants':len(ids),'source_commit':config['source_commit'],'data_audit_sha256':file_sha(Path(data)/'audit.json'),
                 'batchnorm':'eval; unchanged','fit_domain':'native stage3 channel features; all eyes and spatial positions equally weighted'}
-    bases={key:save_basis(moment,counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
+    if centered:
+        for key,moment in moments.items():
+            ref=config['uncentered_basis_files'][key];_,_,meta=_load_basis(ref['path'],ref['sha256'])
+            assert meta['version']==BASIS_VERSION and meta['seed']==seed and meta['source_key']==key
+            assert meta['provenance']['parent_checkpoints']==config['parent_checkpoints'] and meta['sampled_channel_vectors']==counts[key]
+            assert meta['provenance']['initial_native_sha256']==initial and meta['provenance']['participant_ids_sha256']==provenance['participant_ids_sha256']
+            with np.load(ref['path'],allow_pickle=False) as z:old_moment=torch.from_numpy(z['second_moment'].copy())
+            assert torch.allclose(moment/counts[key],old_moment,atol=1e-10,rtol=1e-10),'Paired source statistics changed'
+        provenance['uncentered_basis_files']=config['uncentered_basis_files']
+        bases={key:save_centered_basis(moment,sums[key],counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
+    else:bases={key:save_basis(moment,counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
     write_json(output/'summary.json',{'state':'complete','passed':True,'seed':seed,'bases':bases,'provenance':provenance,'seconds':time.monotonic()-start,'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False})
 
 if __name__=='__main__':
