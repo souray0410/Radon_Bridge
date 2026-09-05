@@ -1,0 +1,137 @@
+{
+  "group": "A",
+  "primary_count": 3,
+  "max_abs_t_critical_95": 2.362065415997483,
+  "contrasts": [
+    {
+      "id": "qr_radon_minus_self",
+      "terms": [
+        [
+          "qr_radon",
+          1
+        ],
+        [
+          "qr_self",
+          -1
+        ]
+      ],
+      "seeds": [
+        3416,
+        3417,
+        3418
+      ],
+      "rhos": [
+        0.0625,
+        0.125,
+        0.25
+      ],
+      "branches": [
+        "cfp",
+        "oct"
+      ],
+      "difference_pp": 2.6296823847067845,
+      "ci95_pp": [
+        0.6537874118063609,
+        4.622832503988758
+      ],
+      "simultaneous_ci95_pp": [
+        0.23829791271981282,
+        5.021066856693756
+      ],
+      "bootstrap_sd_pp": 1.012412465713659,
+      "zero_variance": false,
+      "classification": "unresolved"
+    },
+    {
+      "id": "qr_radon_minus_scrambled",
+      "terms": [
+        [
+          "qr_radon",
+          1
+        ],
+        [
+          "qr_scrambled",
+          -1
+        ]
+      ],
+      "seeds": [
+        3416,
+        3417,
+        3418
+      ],
+      "rhos": [
+        0.0625,
+        0.125,
+        0.25
+      ],
+      "branches": [
+        "cfp",
+        "oct"
+      ],
+      "difference_pp": 0.18081278046260918,
+      "ci95_pp": [
+        -0.8971922288651932,
+        1.288067180773548
+      ],
+      "simultaneous_ci95_pp": [
+        -1.120875493446542,
+        1.4825010543717603
+      ],
+      "bootstrap_sd_pp": 0.5510805353201692,
+      "zero_variance": false,
+      "classification": "unresolved"
+    },
+    {
+      "id": "basis_spatial_interaction",
+      "terms": [
+        [
+          "svd_radon",
+          1
+        ],
+        [
+          "svd_scrambled",
+          -1
+        ],
+        [
+          "qr_radon",
+          -1
+        ],
+        [
+          "qr_scrambled",
+          1
+        ]
+      ],
+      "seeds": [
+        3416,
+        3417,
+        3418
+      ],
+      "rhos": [
+        0.0625,
+        0.125,
+        0.25
+      ],
+      "branches": [
+        "cfp",
+        "oct"
+      ],
+      "difference_pp": 1.794285090541944,
+      "ci95_pp": [
+        0.3191341192028336,
+        3.2677451423741855
+      ],
+      "simultaneous_ci95_pp": [
+        0.02566026344954997,
+        3.562909917634338
+      ],
+      "bootstrap_sd_pp": 0.7487620008802833,
+      "zero_variance": false,
+      "classification": "unresolved"
+    }
+  ],
+  "zero_sd_tolerance_pp": 1e-10,
+  "resamples": 10000,
+  "participants": 296,
+  "shared_indices_sha256": "3fd23b3b74391d1b97442fc7feaf855da44bca234c510274c57ce3fcc11f1e93",
+  "interpretation": "Exploratory follow-up designed after earlier results. Conditional on fitted models and selected development checkpoints. Views, widths and seeds are not additional participants."
+}

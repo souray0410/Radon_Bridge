@@ -1,0 +1,236 @@
+{
+  "counts": {
+    "train": 1264,
+    "development": 296
+  },
+  "case_control_counts": {
+    "train": [
+      632,
+      632
+    ],
+    "development": [
+      148,
+      148
+    ]
+  },
+  "selected_csv_sha256": "4285250208dd1496a6912ed6e072abf9d2aa87e05216e78be6ad405e9ea7d24c",
+  "endpoint": "Same record-derived glaucoma phenotype for CFP and OCT branches",
+  "label_source": "UKB records; verify specific source and timing columns below. No newly created expert image gold standard.",
+  "development_role": "Historically used for configuration selection; this is exploratory controlled benchmarking.",
+  "limitations": [
+    "Balanced case-control sampling; predictive values and calibration do not represent population prevalence.",
+    "Ethics approval, UKB application/license details and any missing exclusion/timing information require author verification."
+  ],
+  "columns": {
+    "assessment_age": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "mean": 62.13607594936709,
+        "sample_sd": 6.566584169999313,
+        "median": 63.0,
+        "q25": 59.0,
+        "q75": 67.0,
+        "min": 41.0,
+        "max": 75.0
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "mean": 61.95945945945946,
+        "sample_sd": 6.498895216023979,
+        "median": 64.0,
+        "q25": 58.75,
+        "q75": 67.0,
+        "min": 44.0,
+        "max": 74.0
+      }
+    },
+    "sex": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "1": 696,
+          "0": 568
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "1": 158,
+          "0": 138
+        }
+      }
+    },
+    "assessment_centre": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "11024": 388,
+          "11021": 244,
+          "11020": 196,
+          "11014": 190,
+          "11018": 162,
+          "11016": 82,
+          "11022": 2
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "11024": 74,
+          "11021": 64,
+          "11014": 48,
+          "11020": 44,
+          "11018": 42,
+          "11016": 22,
+          "11022": 2
+        }
+      }
+    },
+    "candidate_status": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "strict_control": 632,
+          "prevalent_case": 632
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "strict_control": 148,
+          "prevalent_case": 148
+        }
+      }
+    },
+    "candidate_label": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "normal": 632,
+          "glaucoma": 632
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "normal": 148,
+          "glaucoma": 148
+        }
+      }
+    },
+    "reference_standard_type": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "record_derived_clinical_phenotype": 1264
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "record_derived_clinical_phenotype": 296
+        }
+      }
+    },
+    "label_id": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "0": 632,
+          "1": 632
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "0": 148,
+          "1": 148
+        }
+      }
+    },
+    "label_name": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "normal": 632,
+          "glaucoma": 632
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "normal": 148,
+          "glaucoma": 148
+        }
+      }
+    },
+    "age_5year_bin": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "65": 448,
+          "60": 386,
+          "55": 180,
+          "70": 84,
+          "50": 80,
+          "45": 66,
+          "40": 18,
+          "75": 2
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "65": 120,
+          "60": 76,
+          "55": 38,
+          "50": 28,
+          "70": 16,
+          "45": 14,
+          "40": 4
+        }
+      }
+    },
+    "reference_source": {
+      "train": {
+        "available": 1264,
+        "missing": 0,
+        "counts": {
+          "UKB self-report, HES/ICD, diagnosis timing, and procedure records": 1264
+        }
+      },
+      "validation": {
+        "available": 296,
+        "missing": 0,
+        "counts": {
+          "UKB self-report, HES/ICD, diagnosis timing, and procedure records": 296
+        }
+      }
+    }
+  },
+  "test_used": false,
+  "unverified_items": [
+    "Ethics committee and approval number",
+    "UKB approved application number and data license",
+    "Full source cohort denominator and exclusion flow",
+    "Label timing relative to imaging if not recoverable from provided columns"
+  ]
+}

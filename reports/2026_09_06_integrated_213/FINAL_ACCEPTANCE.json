@@ -1,0 +1,14 @@
+{
+  "state": "complete",
+  "pages": 81,
+  "rendered_pages": 81,
+  "visual_review": "All pages inspected in rendered page contact sheets; dense statistical/result and conclusion pages additionally inspected at full render resolution.",
+  "pypdf_reopen": true,
+  "csv_single_width_rows": 204,
+  "csv_joint_views": 27,
+  "unique_joint_models": 9,
+  "new_converged_trainings": 27,
+  "diagnostic_views": 45,
+  "test_used": false,
+  "report_sha256": "4c3a04bccfb150c786c32e28b4b28e33b43b8128215331188b8c7d6a39cbc565"
+}
