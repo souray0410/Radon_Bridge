@@ -100,8 +100,15 @@ def run(args):
                 except BlockingIOError:pass
             time.sleep(10)
         records,bases,prior=accept_previous(root)
+        if args.prior_attempt:
+            previous_attempt=Path(args.prior_attempt).resolve()
+            assert read(previous_attempt/'queue_status.json')['state']=='needs_attention' and not (previous_attempt/'run_source.json').exists()
+            failed_ledger=read(previous_attempt/'preflight/ledger.json')
+            carried=sum(j['gpu_seconds'] for j in failed_ledger['jobs'])/60
+            prior+=carried
+            write_json(root/'prior_attempt_acceptance.json',{'directory':str(previous_attempt),'ledger_sha256':sha(previous_attempt/'preflight/ledger.json'),'carried_gpu_minutes':carried,'reason':'External GPU0 occupancy during diagnostic initialization; all9 training profiles passed. Repeat preflight using both GPUs when free memory permits; prefer GPU1 and require12GiB free at dispatch. Preserve all failures and costs.','no_stage_two_training_started':True})
         p={'schema':'two_stage_ratio_convergence_v3','review_status':'approved','source_commit':commit,'accepted_source_hashes':source_hashes(),
-            'prior_gpu_minutes':prior,'max_gpu_minutes':None,'gpu_time_policy':'unlimited_until_convergence','data':DATA,'seeds':SEEDS,'rhos':RHOS,
+            'prior_gpu_minutes':prior,'max_gpu_minutes':None,'gpu_time_policy':'unlimited_until_convergence','gpu_indices':[1,0],'min_free_gpu_mib':12288,'data':DATA,'seeds':SEEDS,'rhos':RHOS,
             'new_stage_two_jobs':57,'new_training_jobs':57,'new_pretraining_jobs':0,'basis_fit_jobs':0,'diagnostic_jobs':57,'pairing_checkpoints':54,'latency_checkpoints':33,'reused_results':129,
             'total_stage_two_results':186,'predecessor':str(PREVIOUS),'convergence':dict(DEFAULT_POLICY),
             'bootstrap_resamples':10000,'primary_contrasts':31,'simultaneous_interval':'centered bootstrap max absolute t, bootstrap SD scaling',
@@ -147,7 +154,7 @@ def run(args):
         write_json(root/'queue_status.json',{'state':'complete','pid':os.getpid(),'source_commit':commit,'report_complete':True})
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--deploy-repo');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--deploy-repo');p.add_argument('--prior-attempt');a=p.parse_args()
     try:run(a)
     except BlockingIOError:raise SystemExit('Duplicate queue rejected')
     except BaseException:

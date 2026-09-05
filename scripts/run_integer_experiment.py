@@ -35,6 +35,8 @@ class Controller:
             self.limit=float('inf')
         else:
             self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
+        self.gpus=self.protocol.get('gpu_indices',[0,1])
+        if not self.gpus or len(set(self.gpus))!=len(self.gpus) or any(g not in [0,1] for g in self.gpus):raise ValueError('Invalid allowed GPU list')
         self.ledger=read_json(self.root/'ledger.json') if (self.root/'ledger.json').exists() else {'jobs':[]}
         self.active={}; self.peak={}; self.phase=args.phase; self.stop=False; self.stop_reason=None
         self.commit=None
@@ -116,8 +118,8 @@ class Controller:
                     elif time.monotonic()-active['stop_at']>20:active['process'].kill()
             elif not failed:
                 info=devices(); occupied={v['gpu'] for v in self.active.values()}
-                for gpu in [0,1]:
-                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=10240 and queue[0].get('gpu',gpu)==gpu:
+                for gpu in self.gpus:
+                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=self.protocol.get('min_free_gpu_mib',10240) and queue[0].get('gpu',gpu)==gpu:
                         self.start(queue.pop(0),gpu)
             # Own workers are the only CUDA processes started by this locked controller.
             usage=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,used_memory','--format=csv,noheader,nounits'],text=True)

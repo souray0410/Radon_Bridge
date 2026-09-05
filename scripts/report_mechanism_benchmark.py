@@ -32,7 +32,7 @@ def dataset_card(data):
         'limitations':['Balanced case-control sampling; predictive values and calibration do not represent population prevalence.','Ethics approval, UKB application/license details and any missing exclusion/timing information require author verification.'], 'columns':{},'test_used':False}
     tokens=['age','sex','gender','centre','center','label','reference','phenotype','candidate','task_profile','diagnosis','timing','exclusion']
     for col in f.columns:
-        if col=='participant_id' or any(t in col.lower() for t in ['path','file','id','order']):continue
+        if col=='participant_id' or any(t in col.lower() for t in ['path','file','order']):continue
         if not any(t in col.lower() for t in tokens):continue
         result['columns'][col]={}
         for split,frame in f.groupby('split'):
@@ -156,7 +156,7 @@ def build(root,resamples=10000,make_plots=True):
         path=Path(r['directory']);d=read(path/'summary.json');assert d['state']=='complete' and d['converged_by_policy'] and d['stop_reason']=='validation_plateau' and not d['test_used']
         hashes={n:sha(path/n) for n in FILES}
         if r['reused']:
-            assert hashes==r['accepted_hashes']==old[r['id']]['result_hashes'];row=dict(old[r['id']])
+            assert hashes==r['accepted_hashes']==old[r['id']]['result_hashes'];row=dict(old[r['id']],reused=True,accepted_hashes=hashes)
         else:
             info=read(path/'model.json');diagpath=root/('diagnostic_'+r['id'])/'summary.json';diag=read(diagpath)
             assert diag['passed'] and not diag['preflight'] and diag['selected_sha256']==hashes['selected.pt']

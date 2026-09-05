@@ -23,7 +23,7 @@ class Process:
 
 with tempfile.TemporaryDirectory() as tmp:
     c=m.Controller.__new__(m.Controller);c.root=Path(tmp);c.args=SimpleNamespace(phase='preflight',data='/unused')
-    c.protocol={'prior_gpu_minutes':13.341};c.limit=60;c.ledger={'jobs':[]};c.active={};c.peak={}
+    c.gpus=[0,1];c.protocol={'prior_gpu_minutes':13.341};c.limit=60;c.ledger={'jobs':[]};c.active={};c.peak={}
     c.phase='test';c.stop=False;c.stop_reason=None;c.commit=None
     with patch.object(m,'devices',return_value={0:{'free':20000},1:{'free':20000}}), \
          patch.object(m.subprocess,'Popen',Process), \
@@ -40,7 +40,10 @@ with tempfile.TemporaryDirectory() as tmp:
         try:c.start(jobs[0],0)
         except RuntimeError:pass
         else:raise AssertionError('Overwrite allowed')
-    print(json.dumps({'two_gpu_dispatch':True,'summed_gpu_accounting':True,'comparison_group_budget_gate':True,'overwrite_rejected':True}))
+        c.limit=60;c.gpus=[1]
+        single=c.run_jobs([m.job('single2',m.config(1,3e-5)),m.job('single3',m.config(1,3e-5))])
+        assert len(single)==2 and all(j['gpu']==1 for j in c.ledger['jobs'][-2:])
+    print(json.dumps({'two_gpu_dispatch':True,'summed_gpu_accounting':True,'comparison_group_budget_gate':True,'overwrite_rejected':True,'single_gpu_allowlist':True}))
 
 # Explicitly unlimited studies must still dispatch and account beyond the old cap.
 with tempfile.TemporaryDirectory() as tmp:
