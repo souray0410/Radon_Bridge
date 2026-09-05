@@ -1,0 +1,12 @@
+# 执行记录
+
+- 固定训练提交：bb1521cfa7b995eeae217b9df5273e7287d96b47。
+- 时间戳训练分支：2026_09_05_17_48_55。
+- 唯一运行目录：ws02:/data/mengh/RadonBridge/runs/2026_09_05_17_48_55。
+- 隔离检出：ws02:/tmp/radonbridge_benchmark_2026_09_05_17_48_55。
+- 控制器启动PID560371，仅作历史启动记录，当前状态须现场核对。
+- 启动过程的bundle默认HEAD未指向main，第一次仅报脚本不存在，没有启动训练。明确检出origin/main后再次启动。initial_checkout_failure.log和launch_deviation.json保留，不改变实验标准。
+- 控制器依次核验129引用，预检9结构和完整诊断，核验配对缓存，通过后持锁部署和训练。源码运行时不修改。
+- 本地收取目录：output/radon_bridge_mechanism_benchmark。收取器只复制完整报告；最终PDF与全部页面视觉审核由同任务收尾自动化完成。
+- 沿用r-b自动化：健康/无变化保持安静，完成/失败/需处理通知，最终交付后暂停。
+- TRIPOD_AI_MAPPING.zh-CN.md为文档补充，不改变固定训练代码或既定实验臂。
