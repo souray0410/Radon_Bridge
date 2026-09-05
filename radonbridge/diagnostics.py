@@ -48,6 +48,23 @@ def cosine(a,b):
             'undefined_reason':None if an>0 and bn>0 else 'zero_gradient_norm'}
 
 
+def release_forward_graph(g):
+    """Release diagnostic activations after both CE gradients were collected.
+
+    autograd.grad only traverses requested stage3/bridge parameters. Saved
+    activations upstream of them can therefore survive, including the CFP
+    graph retained for the first CE. MHD keeps node values and a forward trace;
+    detach those caches between probe batches, without changing model state.
+    """
+    g.graph._forward_trace.clear()
+    for node in g.nodes:
+        node.feature_message.current_state=node.feature_message.current_state.detach()
+    for module in g.modules_by_name().values():
+        for attr in ['latest_inputs','latest_deltas']:
+            if hasattr(module,attr):
+                setattr(module,attr,[v.detach() for v in getattr(module,attr)])
+
+
 def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
     device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get('bridge_0_exchange')
     keys=['cfp_stage3','oct_stage3'];bases={}
@@ -90,7 +107,8 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                         assert torch.isfinite(grad).all()
                         gradients[branch][offset:offset+p.numel()].add_(grad.detach().cpu().flatten().double(),alpha=len(y)/probe_count)
                     offset+=p.numel()
-                del gs
+                del gs,grad,loss
+            release_forward_graph(g)
     result={key:cosine(gradients['cfp'][lo:hi],gradients['oct'][lo:hi]) for key,(lo,hi) in slices.items()}
     if exchange is not None and exchange.compression!='learned_projected':
         v=result['bridge_0_exchange.mixer.conv'];assert v['cosine'] is None or abs(v['cosine'])<1e-10,'Fixed single-bridge output-row support is not disjoint'
@@ -122,7 +140,7 @@ def main(cfg,out,data_path):
             assert set(saved['model'])==set(g.modules_by_name())
             for key,module in g.modules_by_name().items():module.load_state_dict(saved['model'][key],strict=True)
             del saved
-        results[phase]=analyze_graph(g,train,cfg['basis_files'],batch=16,probe_count=16 if preflight else 128,energy_limit=16 if preflight else None)
+        results[phase]=analyze_graph(g,train,cfg['basis_files'],batch=16,probe_count=cfg.get('probe_count',16 if preflight else 128),energy_limit=cfg.get('energy_limit',16 if preflight else None))
         write_json(out/'progress.json',{'completed_phase':phase,'seconds':time.monotonic()-start})
     write_json(out/'summary.json',{'state':'complete','passed':True,'preflight':preflight,'trial_directory':str(trial),'selected_sha256':cfg['selected_sha256'],
         'phases':results,'seconds':time.monotonic()-start,'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False})

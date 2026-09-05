@@ -1,0 +1,15 @@
+{
+  "matrix_unique_results": 57,
+  "seeds": [3416,3417,3418],
+  "rho": [0.0625,0.125,0.25],
+  "accepted_references": 18,
+  "new_stage_two": 39,
+  "new_independent_pretraining": 1,
+  "cpu_mechanism_compatibility_passed": true,
+  "report_fixture_passed": true,
+  "report_fixture_not_research_results": true,
+  "paired_contrasts_per_branch": 72,
+  "baseline_full_diagnostic_regression_passed": true,
+  "baseline_diagnostic_peak_reserved_mib": 5472.0,
+  "max_rho_full_gpu_acceptance": "pending; deployment gated by runtime gpu_acceptance.json"
+}
