@@ -80,7 +80,10 @@ class Controller:
         if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
         path.mkdir()
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),CUBLAS_WORKSPACE_CONFIG=':4096:8')
-        if job.get('diagnostic'):
+        if job.get('analysis'):
+            write_json(path/'configuration.json',job['config'])
+            cmd=[sys.executable,'-m','radonbridge.communication_analysis','--config',str(path/'configuration.json'),'--output',str(path),'--data',self.args.data]
+        elif job.get('diagnostic'):
             write_json(path/'configuration.json',job['config'])
             cmd=[sys.executable,'-m','radonbridge.diagnostics','--config',str(path/'configuration.json'),'--output',str(path),'--data',self.args.data]
         elif job.get('basis_fit'):
@@ -114,7 +117,7 @@ class Controller:
             elif not failed:
                 info=devices(); occupied={v['gpu'] for v in self.active.values()}
                 for gpu in [0,1]:
-                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=10240:
+                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=10240 and queue[0].get('gpu',gpu)==gpu:
                         self.start(queue.pop(0),gpu)
             # Own workers are the only CUDA processes started by this locked controller.
             usage=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,used_memory','--format=csv,noheader,nounits'],text=True)

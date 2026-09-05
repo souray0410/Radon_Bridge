@@ -85,13 +85,15 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
     device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get('bridge_0_exchange')
     keys=['cfp_stage3','oct_stage3'];bases={}
     for key in keys:
-        if exchange is not None and exchange.compression=='learned_channel':
+        if exchange is not None and getattr(exchange,'family','radon')!='radon':
+            bases[key]=None
+        elif exchange is not None and exchange.compression=='learned_channel':
             bases[key]=learned_rowspace(exchange.channel_codecs[exchange.keys.index(key)],device)
         elif exchange is not None and exchange.compression!='learned_projected':
             bases[key]=exchange.channel_bases[exchange.keys.index(key)]
         else:bases[key]=FixedChannelBasis(256,32,key,basis_refs[key]).to(device=device,dtype=torch.float32)
     accum={k:{'input_energy':0.,'retained_energy':0.,'delta_energy':0.} for k in keys}
-    sums={k:torch.zeros(bases[k].q.shape[0],dtype=torch.float64) for k in keys};projected_sums={k:torch.zeros(bases[k].q.shape[1],dtype=torch.float64) for k in keys};counts={k:0 for k in keys}
+    sums={k:torch.zeros(bases[k].q.shape[0],dtype=torch.float64) for k in keys if bases[k] is not None};projected_sums={k:torch.zeros(bases[k].q.shape[1],dtype=torch.float64) for k in keys if bases[k] is not None};counts={k:0 for k in keys}
     groups={k:list(modules[k].parameters()) for k in keys}
     if exchange is not None:
         for name,m in exchange.named_modules():
@@ -113,11 +115,13 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                 for i,key in enumerate(keys):
                     x=exchange.latest_inputs[exchange.keys.index(key)] if exchange is not None else g.by_name[key].feature_message.current_state
                     dx=exchange.latest_deltas[exchange.keys.index(key)] if exchange is not None else None
-                    values=accum[key];values['input_energy']+=float(x.double().square().sum());values['retained_energy']+=float(bases[key].encode(x).double().square().sum())
+                    values=accum[key];values['input_energy']+=float(x.double().square().sum())
+                    if bases[key] is not None:values['retained_energy']+=float(bases[key].encode(x).double().square().sum())
                     if exchange is not None and exchange.compression=='learned_channel':
                         codec=exchange.channel_codecs[exchange.keys.index(key)]
                         values['encoded_energy']=values.get('encoded_energy',0.)+float(codec.encode(x).double().square().sum())
                     if dx is not None:values['delta_energy']+=float(dx.double().square().sum())
+                    if bases[key] is None:continue
                     f=x.detach().movedim(1,0).reshape(x.shape[1],-1).double();q=bases[key].q.double()
                     v=f.sum(1);sums[key]+=v.cpu();projected_sums[key]+=(q.T@v).cpu();counts[key]+=f.shape[1]
                     del f,q,v
@@ -135,11 +139,14 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                 del gs,grad,loss
             release_forward_graph(g)
     result={key:cosine(gradients['cfp'][lo:hi],gradients['oct'][lo:hi]) for key,(lo,hi) in slices.items()}
-    if exchange is not None and exchange.compression!='learned_projected':
+    if exchange is not None and exchange.compression in ('fixed_svd_channel','fixed_centered_svd_channel','fixed_random_orthogonal_channel','learned_channel'):
         v=result['bridge_0_exchange.mixer.conv'];assert v['cosine'] is None or abs(v['cosine'])<1e-10,'Fixed single-bridge output-row support is not disjoint'
     for key,values in accum.items():
         den=values['input_energy'];values['retained_energy_ratio']=values['retained_energy']/den if den>0 else None
         values['delta_over_input_l2']=(values['delta_energy']/den)**.5 if den>0 else None
+        if bases[key] is None:
+            values.update(retained_energy=None,retained_energy_ratio=None,retained_variance_ratio=None,projection_basis=None,projection_role='not applicable: no fixed or channel-compression subspace')
+            continue
         mean_energy=float(sums[key].square().sum())/counts[key];retained_mean_energy=float(projected_sums[key].square().sum())/counts[key]
         variance_energy=max(0.,den-mean_energy);retained_variance=max(0.,values['retained_energy']-retained_mean_energy)
         values.update(mean_energy_fraction=mean_energy/den if den>0 else None,retained_variance_ratio=retained_variance/variance_energy if variance_energy>0 else None,centering_scope='global training channel mean; not per participant')

@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "kind": "CPU acceptance; GPU preflight pending",
+  "tests": [
+    "check_five_seed_controls.py",
+    "check_learned_channel.py",
+    "check_learning_rates.py",
+    "check_mechanism_baselines.py",
+    "check_benchmark_statistics.py",
+    "check_mechanism_report.py"
+  ],
+  "environment": "ws02 LOOK Python3.12 / PyTorch2.8.0+cu128; CUDA_VISIBLE_DEVICES empty",
+  "source_sha256": {
+    "radonbridge/bridge.py": "c75c9c3d341eb512bece9283c1c8d7cafa4834ea1b1f658abbd5d6c8597e1d58",
+    "radonbridge/model.py": "4d5ad197872ad960f718a9cc19815ca39c96da7b171926744801dc86c97a48f5",
+    "radonbridge/baselines.py": "fd67bc6b2e5f3778f8b989559ac04ce016de7fd47bffd2cbad9823ab389a4251",
+    "radonbridge/diagnostics.py": "530c94413afb28f55ec642c59e78f99ed17891b0577a327094f6a4057ec7d316",
+    "radonbridge/experiment.py": "0d8066c920139218287c7c492f3a6b7272fa95e6eb712350298f4ea85606f116",
+    "radonbridge/benchmark_statistics.py": "4f10df79def5fcf8e043250259d13034306ab5ad1f12f85a71b354460569a5cf",
+    "radonbridge/communication_analysis.py": "31461067c62808c6b7167ada368751859524eca49b539aa580e33de34c3d85f9"
+  },
+  "report_fixture_only": true,
+  "report_fixture_rows": 186,
+  "report_fixture_primary_contrasts": 31,
+  "report_fixture_public_ids_excluded": true,
+  "pdf_fixture_pages": 51,
+  "pdf_fixture_visual_review": "all51 pages inspected; plot label margins adjusted; final real report requires fresh page review",
+  "training_started": false,
+  "test_data_used": false
+}

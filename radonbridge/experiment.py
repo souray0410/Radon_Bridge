@@ -140,7 +140,9 @@ def main(args):
                 p=next(g.modules_by_name()[b+'_stage1'].parameters())
                 grad=torch.autograd.grad(root,p,retain_graph=True)[0]
                 cross[a+'_to_'+b]=float(grad.norm()); assert torch.isfinite(grad).all()
-                if all(x['mode']=='self' for x in cfg['bridges']):assert grad.abs().sum()==0
+                allowed=any(x.get('family','radon')!='radon' or (x['mode']!='self' and
+                    ('cross_edges' not in x or [b+'_stage3',a+'_stage3'] in x['cross_edges'])) for x in cfg['bridges'])
+                if not allowed:assert grad.abs().sum()==0
                 else:assert grad.abs().sum()>0
             report={'state':'complete','microbatch':batch,'step_seconds':step_times,'modules_changed':changed,
                     'cross_branch_gradients':cross,'gradient_norms':norm_records,'seconds':time.monotonic()-start,
