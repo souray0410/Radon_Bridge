@@ -116,6 +116,12 @@ def run(args):
                 except BlockingIOError:pass
             time.sleep(10)
         records,bases,prior=accept_previous(root,previous)
+        if args.prior_attempt:
+            failed=Path(args.prior_attempt).resolve()
+            assert read(failed/'queue_status.json')['state']=='needs_attention' and not (failed/'run_source.json').exists()
+            old_ledger=read(failed/'preflight/ledger.json');carried=sum(j['gpu_seconds'] for j in old_ledger['jobs'])/60
+            prior+=carried
+            write_json(root/'prior_attempt_acceptance.json',{'directory':str(failed),'ledger_sha256':sha(failed/'preflight/ledger.json'),'carried_gpu_minutes':carried,'no_formal_training_started':True,'reason':'Align fixed nested channel contractions with legacy einsum kernels; preserve failed export-identity preflight and all costs, no tolerance relaxation.'})
         p={'schema':'two_stage_ratio_convergence_v3','review_status':'approved','source_commit':commit,'accepted_source_hashes':source_hashes(),
            'prior_gpu_minutes':prior,'max_gpu_minutes':None,'gpu_time_policy':'unlimited_until_convergence','gpu_indices':[1,0],'min_free_gpu_mib':12288,'data':DATA,
            'predecessor':str(previous),'seeds':SEEDS,'rhos':RHOS,'new_training_jobs':27,'qr_control_trainings':18,'joint_width_trainings':9,'joint_width_views':27,
@@ -161,7 +167,7 @@ def run(args):
         write_json(root/'queue_status.json',{'state':'complete','pid':os.getpid(),'source_commit':commit,'separate_reports_complete':True})
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--predecessor',default=str(PREVIOUS));parser.add_argument('--deploy-repo');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--predecessor',default=str(PREVIOUS));parser.add_argument('--deploy-repo');parser.add_argument('--prior-attempt');args=parser.parse_args()
     try:run(args)
     except BlockingIOError:raise SystemExit('Duplicate queue rejected')
     except BaseException:write_json(Path(args.root)/'queue_status.json',{'state':'needs_attention','error':traceback.format_exc(),'time':time.time()});raise

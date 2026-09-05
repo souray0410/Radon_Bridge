@@ -154,9 +154,12 @@ class BridgeExchange(nn.Module):
         ranks=[max(1,math.floor(self.active_rho*shape[0])) for shape in self.shapes]
         encoded=[]
         for i,(x,r,projector) in enumerate(zip(features,ranks,self.projectors)):
-            w=(self.channel_codecs[i].encoder.weight[:r] if self.compression=='learned_channel'
-               else self.channel_bases[i].q[:,:r].T.unsqueeze(-1))
-            z=nn.functional.conv1d(x.flatten(2),w,bias=None).reshape(x.shape[0],r,*x.shape[2:])
+            if self.compression=='learned_channel':
+                w=self.channel_codecs[i].encoder.weight[:r]
+                z=nn.functional.conv1d(x.flatten(2),w,bias=None).reshape(x.shape[0],r,*x.shape[2:])
+            else:
+                q=self.channel_bases[i].q[:,:r].contiguous()
+                z=torch.einsum('cr,bc...->br...',q,x)
             encoded.append(projector(z))
         widths=[z.shape[1] for z in encoded]
         if tuple(widths)==self.mixer.widths:
@@ -171,10 +174,12 @@ class BridgeExchange(nn.Module):
             mixed=y.split(widths,dim=1)
         deltas=[]
         for i,(x,r,projector,z) in enumerate(zip(features,ranks,self.projectors,mixed)):
-            w=(self.channel_codecs[i].decoder.weight[:,:r] if self.compression=='learned_channel'
-               else self.channel_bases[i].q[:,:r].unsqueeze(-1))
-            delta=nn.functional.conv1d(projector.backproject(z).flatten(2),w,bias=None)
-            deltas.append(delta.reshape_as(x))
+            returned=projector.backproject(z)
+            if self.compression=='learned_channel':
+                delta=nn.functional.conv1d(returned.flatten(2),self.channel_codecs[i].decoder.weight[:,:r],bias=None).reshape_as(x)
+            else:
+                delta=torch.einsum('cr,br...->bc...',self.channel_bases[i].q[:,:r].contiguous(),returned)
+            deltas.append(delta)
         return deltas
 
     def forward(self, *features):
