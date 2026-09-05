@@ -206,3 +206,25 @@ class GaussianProjector(Projector):
         b,cm,_=p.shape
         x=p.reshape(b,cm//self.M,self.M*self.S)@self.return_matrix.T
         return x.reshape(b,cm//self.M,*self.shape)
+
+
+class LinearResampleProjector(Projector):
+    """Flattened linear interpolation, matched to Radon/BP row norms separately."""
+    def __init__(self, shape, M, S):
+        super().__init__(shape, M, S)
+        n=math.prod(shape); t=M*S
+        # Each input identity row is one channel. Interpolate only the last axis.
+        forward=torch.nn.functional.interpolate(torch.eye(n,dtype=torch.float64)[None],size=t,mode='linear',align_corners=False)[0].T.contiguous()
+        backward=torch.nn.functional.interpolate(torch.eye(t,dtype=torch.float64)[None],size=n,mode='linear',align_corners=False)[0].T.contiguous()
+        reference=Projector.backproject(self,torch.eye(t,dtype=torch.float64).reshape(t,M,S)).reshape(t,n).T
+        for matrix,target in [(forward,self.matrix),(backward,reference)]:
+            norms=matrix.norm(dim=1,keepdim=True);target_norms=target.norm(dim=1,keepdim=True)
+            matrix.mul_(torch.where(norms>0,target_norms/norms.clamp_min(1e-300),torch.zeros_like(norms)))
+        self.matrix.copy_(forward);self.register_buffer('return_matrix',backward)
+        self.metadata.update(projection_kind='row_norm_matched_flat_linear_resampling',return_kind='row_norm_matched_flat_linear_resampling_return',
+                             align_corners=False,spatial_order='native contiguous flatten',packing_factor=M,angles_applicable=False,
+                             matching='forward/return row L2 norms and mixer width; rank and singular values not matched')
+    def backproject(self,p):
+        b,cm,s=p.shape
+        if s!=self.S or cm%self.M:raise ValueError('Resampling packed shape mismatch')
+        return (p.reshape(b,cm//self.M,self.M*self.S)@self.return_matrix.T).reshape(b,cm//self.M,*self.shape)

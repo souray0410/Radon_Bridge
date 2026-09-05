@@ -59,7 +59,7 @@ def basis_checks(tmp):
     try:clone.load_state_dict(bad)
     except RuntimeError:pass
     else:raise AssertionError('Mismatched checkpoint basis accepted')
-    for override in [{'basis_files':None},{'basis_files':{}},{'mode':'self'},{'compression':'typo'}]:
+    for override in [{'basis_files':None},{'basis_files':{}},{'mode':'pooled'},{'compression':'typo'}]:
         try:BridgeExchange(specs,**(kw|override))
         except ValueError:pass
         else:raise AssertionError(override)

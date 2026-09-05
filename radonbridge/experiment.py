@@ -139,11 +139,15 @@ def main(args):
                 root=g.by_name[a+'_loss'].feature_message.current_state
                 p=next(g.modules_by_name()[b+'_stage1'].parameters())
                 grad=torch.autograd.grad(root,p,retain_graph=True)[0]
-                cross[a+'_to_'+b]=float(grad.norm()); assert torch.isfinite(grad).all() and grad.abs().sum()>0
+                cross[a+'_to_'+b]=float(grad.norm()); assert torch.isfinite(grad).all()
+                if all(x['mode']=='self' for x in cfg['bridges']):assert grad.abs().sum()==0
+                else:assert grad.abs().sum()>0
             report={'state':'complete','microbatch':batch,'step_seconds':step_times,'modules_changed':changed,
                     'cross_branch_gradients':cross,'gradient_norms':norm_records,'seconds':time.monotonic()-start,
                     'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
                     'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'passed':True}
+            if cfg.get('save_profile_checkpoint'):
+                torch.save({'model':g.save_state(),'configuration':cfg},out/'profile_selected.pt')
             write_json(out/'summary.json',report); return
         initial=evaluate(g,val,batch,seed,out/'initial_predictions.npz',stop=lambda:stop_requested)
         if parents:

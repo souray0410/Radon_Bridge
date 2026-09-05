@@ -4,8 +4,8 @@ from collections.abc import Mapping
 import math
 import torch
 from torch import nn
-from .svd_basis import FixedChannelBasis
-from .projector import Projector, ScrambledProjector, GaussianProjector, positive_integer
+from .svd_basis import FixedChannelBasis, BASIS_VERSION, QR_VERSION
+from .projector import Projector, ScrambledProjector, GaussianProjector, LinearResampleProjector, positive_integer
 
 @dataclass(frozen=True)
 class FeatureSpec:
@@ -52,19 +52,23 @@ class BridgeExchange(nn.Module):
         for value in ratios:
             if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 < value <= 1:
                 raise ValueError('rho must be a finite compression ratio in (0,1]')
-        if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled'):
+        if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled', 'linear_resample'):
             raise ValueError(mode)
-        if compression not in ('learned_projected','fixed_svd_channel'):
+        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel'):
             raise ValueError('Unknown compression method')
-        if compression=='fixed_svd_channel' and mode!='radon':
-            raise ValueError('Fixed SVD channel compression currently supports only Radon')
+        if compression=='fixed_svd_channel' and mode not in ('radon','self','scrambled','linear_resample'):
+            raise ValueError('Unsupported SVD mechanism')
+        if compression=='fixed_random_orthogonal_channel' and mode!='radon':
+            raise ValueError('Random orthogonal channel control supports only standard Radon')
+        if compression=='learned_projected' and mode=='linear_resample':
+            raise ValueError('Linear resampling is a fixed SVD control')
         if compression=='learned_projected' and basis_files is not None:
             raise ValueError('basis_files is only valid for fixed channel compression')
         self.compression=compression
         self.shapes = [(s.channels, *s.shape) for s in specs]
         self.lengths = [math.prod(s) for s in self.shapes]
         self.mode, self.M, self.S, self.rho = mode, M, S, rho
-        kind={'random':GaussianProjector,'scrambled':ScrambledProjector}.get(mode,Projector)
+        kind={'random':GaussianProjector,'scrambled':ScrambledProjector,'linear_resample':LinearResampleProjector}.get(mode,Projector)
         self.projectors = nn.ModuleList([] if mode == 'pooled' else [
             kind(s.shape,directions[i],S,seed=int(torch.initial_seed())+1009*i+len(s.shape)) if mode in ('random','scrambled') else kind(s.shape,directions[i],S)
             for i,s in enumerate(specs)])
@@ -77,7 +81,7 @@ class BridgeExchange(nn.Module):
             if not isinstance(basis_files,dict) or set(basis_files)!=set(self.keys):
                 raise ValueError('basis_files must match participant keys exactly')
             ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
-            self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key]) for s,rank in zip(specs,ranks)])
+            self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
             retained=[rank*m for rank,m in zip(ranks,directions)]
         self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else 3, mode == 'self')
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [
@@ -86,7 +90,9 @@ class BridgeExchange(nn.Module):
              'geometry': self.projectors[i].metadata if mode != 'pooled' else None}
             for i, (s, w) in enumerate(zip(specs, widths))]}
         self.metadata['compression']=compression
-        if compression=='fixed_svd_channel':
+        self.metadata['stored_bridge_parameters']=sum(p.numel() for p in self.parameters())
+        self.metadata['effective_bridge_parameters']=self.metadata['stored_bridge_parameters']-self.mixer.conv.weight.numel()+int(self.mixer.mask.sum())
+        if compression!='learned_projected':
             for participant,basis in zip(self.metadata['participants'],self.channel_bases):
                 participant['channel_rank']=basis.q.shape[1]
                 participant['effective_channel_ratio']=basis.q.shape[1]/basis.q.shape[0]
@@ -94,7 +100,7 @@ class BridgeExchange(nn.Module):
         self.latest_inputs = self.latest_deltas = None
 
     def export_fixed_bases(self, directory):
-        if self.compression!='fixed_svd_channel':return []
+        if self.compression=='learned_projected':return []
         artifacts=[basis.export(directory) for basis in self.channel_bases]
         for participant,artifact in zip(self.metadata['participants'],artifacts):participant['basis']=artifact
         return artifacts
@@ -104,7 +110,7 @@ class BridgeExchange(nn.Module):
             raise ValueError('Participant shapes changed')
         if len({x.shape[0] for x in features}) != 1:
             raise ValueError('Participants must share batch alignment')
-        if self.compression=='fixed_svd_channel':
+        if self.compression!='learned_projected':
             encoded=[projector(basis.encode(x)) for basis,projector,x in zip(self.channel_bases,self.projectors,features)]
             mixed=self.mixer(*encoded)
             deltas=[basis.decode(projector.backproject(p)) for basis,projector,p in zip(self.channel_bases,self.projectors,mixed)]

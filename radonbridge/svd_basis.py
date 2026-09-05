@@ -10,6 +10,7 @@ import torch
 from torch import nn
 
 BASIS_VERSION='train_channel_second_moment_eigh_v1'
+QR_VERSION='channel_random_qr_v1'
 
 
 def tensor_sha(t):return hashlib.sha256(t.detach().cpu().contiguous().numpy().tobytes()).hexdigest()
@@ -47,24 +48,48 @@ def save_basis(moment, count, directory, source_key, seed, provenance):
 def _load_basis(path, expected_sha):
     if file_sha(path)!=expected_sha:raise ValueError('SVD basis file SHA256 mismatch')
     with np.load(path,allow_pickle=False) as z:
-        q=torch.from_numpy(z['q'].copy());values=torch.from_numpy(z['eigenvalues'].copy());metadata=json.loads(str(z['metadata']))
-    if metadata['version']!=BASIS_VERSION or metadata['fit_split']!='train' or metadata['centered'] or metadata['test_used']:
+        q=torch.from_numpy(z['q'].copy());metadata=json.loads(str(z['metadata']))
+        values=torch.from_numpy(z['eigenvalues' if metadata['version']==BASIS_VERSION else 'energies'].copy())
+    if metadata['version'] not in (BASIS_VERSION,QR_VERSION) or metadata['energy_evaluation_split' if metadata['version']==QR_VERSION else 'fit_split']!='train' or metadata['centered'] or metadata['test_used']:
         raise ValueError('Basis must be the accepted training-only uncentered SVD')
     if q.dtype!=torch.float64 or q.shape!=(metadata['channels'],metadata['channels']) or not torch.isfinite(q).all() or tensor_sha(q)!=metadata['full_master_sha256']:
         raise ValueError('Invalid SVD basis tensor')
     if not torch.allclose(q.T@q,torch.eye(len(q),dtype=q.dtype),atol=1e-10,rtol=0):raise ValueError('Basis is not orthogonal')
-    if values.shape!=(len(q),) or not torch.isfinite(values).all() or (values<0).any() or (values[1:]>values[:-1]).any() or values.sum()<=0:
+    if values.shape!=(len(q),) or not torch.isfinite(values).all() or (values<0).any() or (metadata['version']==BASIS_VERSION and (values[1:]>values[:-1]).any()) or values.sum()<=0:
         raise ValueError('Invalid ordered energy spectrum')
     return q,values,metadata
 
 
+def save_random_basis(reference, directory):
+    """Data-independent QR; use the paired training moment only to report energy."""
+    _,_,original=_load_basis(reference['path'],reference['sha256'])
+    if original['version']!=BASIS_VERSION:raise ValueError('QR energy reference must be the original SVD artifact')
+    c=original['channels'];seed=original['seed'];key=original['source_key']
+    payload=json.dumps({'seed':seed,'source_key':key,'channels':c,'version':QR_VERSION},sort_keys=True,separators=(',',':'))
+    digest=hashlib.sha256(payload.encode('utf-8')).digest();basis_seed=int.from_bytes(digest[:8],'big')&((1<<63)-1)
+    generator=torch.Generator(device='cpu').manual_seed(basis_seed)
+    q,r=torch.linalg.qr(torch.randn(c,c,generator=generator,dtype=torch.float64,device='cpu'))
+    q=(q*torch.where(r.diagonal()<0,-1.,1.)).contiguous()
+    with np.load(reference['path'],allow_pickle=False) as z:moment=torch.from_numpy(z['second_moment'].copy())
+    energy=(q*(moment@q)).sum(0).clamp_min(0)
+    metadata=dict(original,version=QR_VERSION,fit_split=None,energy_evaluation_split='train',basis_construction='data_independent_gaussian_QR',
+                  ordering='QR order, no energy sorting; R diagonal nonnegative',basis_seed=basis_seed,seed_payload=payload,
+                  seed_rule='SHA256 UTF8 canonical JSON; first8 bytes big endian masked to63 bits',full_master_sha256=tensor_sha(q),
+                  energy_reference=reference,normalization='per-column q^T(FF^T/N)q; no singular-value interpretation',torch_version=torch.__version__)
+    directory=Path(directory);directory.mkdir(parents=True,exist_ok=True);path=directory/f'seed{seed}_{digest.hex()[:16]}_qr.npz'
+    if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
+    tmp=path.with_suffix(f'.{os.getpid()}.tmp')
+    with tmp.open('wb') as f:np.savez(f,q=q.numpy(),energies=energy.numpy(),second_moment=moment.numpy(),metadata=json.dumps(metadata,sort_keys=True))
+    tmp.replace(path);return {'path':str(path.resolve()),'sha256':file_sha(path)}
+
+
 class FixedChannelBasis(nn.Module):
-    def __init__(self, channels, retained, source_key, artifact):
+    def __init__(self, channels, retained, source_key, artifact, version=BASIS_VERSION):
         super().__init__()
         if not isinstance(artifact,dict) or set(artifact)!={'path','sha256'} or not 1<=retained<=channels:
             raise ValueError('Fixed SVD compression requires a path/SHA256 basis reference')
         full,values,metadata=_load_basis(artifact['path'],artifact['sha256'])
-        if metadata['source_key']!=source_key or metadata['channels']!=channels:
+        if metadata['version']!=version or metadata['source_key']!=source_key or metadata['channels']!=channels:
             raise ValueError('SVD basis source or channel count mismatch')
         self.artifact=dict(artifact);self._master=full[:,:retained].clone()
         self.register_buffer('q',self._master.clone())
