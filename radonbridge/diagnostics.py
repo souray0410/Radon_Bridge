@@ -178,9 +178,16 @@ def main(cfg,out,data_path):
             assert set(saved['model'])==set(g.modules_by_name())
             for key,module in g.modules_by_name().items():module.load_state_dict(saved['model'][key],strict=True)
             del saved
+            if cfg.get('profile_export_identity'):
+                c,o,y,ids=next(iter(loader(train,16,config['seed'],0)));g.graph.eval()
+                with torch.no_grad():logits,_=g.forward(c.cuda(),o.cuda(),y.cuda())
+                with np.load(trial/'profile_predictions.npz',allow_pickle=False) as z:
+                    assert np.array_equal(z['ids'],np.asarray(ids)) and np.array_equal(z['y'],y.numpy())
+                    for k,v in logits.items():assert np.allclose(z[k],v.softmax(1).cpu().numpy(),rtol=1e-5,atol=1e-6),'Nested/standalone MHD output mismatch'
+                release_forward_graph(g)
         results[phase]=analyze_graph(g,train,cfg['basis_files'],batch=16,probe_count=cfg.get('probe_count',16 if preflight else 128),energy_limit=cfg.get('energy_limit',16 if preflight else None))
         write_json(out/'progress.json',{'completed_phase':phase,'seconds':time.monotonic()-start})
-    write_json(out/'summary.json',{'state':'complete','passed':True,'preflight':preflight,'trial_directory':str(trial),'selected_sha256':cfg['selected_sha256'],
+    write_json(out/'summary.json',{'state':'complete','passed':True,'preflight':preflight,'profile_export_identity_verified':bool(cfg.get('profile_export_identity')),'trial_directory':str(trial),'selected_sha256':cfg['selected_sha256'],
         'phases':results,'seconds':time.monotonic()-start,'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False})
 
 if __name__=='__main__':

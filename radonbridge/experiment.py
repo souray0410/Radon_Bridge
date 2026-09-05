@@ -15,6 +15,7 @@ from .metrics import classification_metrics
 from .model import PilotGraph
 from .convergence import Plateau
 from .optimization import configure_optimizer, clip_task_gradients
+from .nested_training import widths, set_width, training_backward, aggregate_metrics
 
 
 def write_json(path, value):
@@ -32,7 +33,7 @@ def loader(data, batch, seed, epoch=None):
 
 
 @torch.no_grad()
-def evaluate(g, data, batch, seed, output=None, stop=None):
+def evaluate_one_width(g, data, batch, seed, output=None, stop=None):
     g.graph.eval(); scores={k:[] for k in g.branches}; labels=[]; ids=[]; ratios={}
     for c,o,y,keys in loader(data,batch,seed):
         if stop and stop(): raise InterruptedError('Trial stopped by controller')
@@ -48,6 +49,23 @@ def evaluate(g, data, batch, seed, output=None, stop=None):
     tasks={k:classification_metrics(labels,v) for k,v in arrays.items()}
     return {'tasks':tasks,'mean_task_macro_f1':float(np.mean([v['macro_f1'] for v in tasks.values()])),
             'delta_over_feature_l2':{k:math_sqrt(a/b) if b else 0. for k,(a,b) in ratios.items()}}
+
+
+def evaluate(g,data,batch,seed,output=None,stop=None):
+    rhos=widths(g)
+    if rhos is None:return evaluate_one_width(g,data,batch,seed,output,stop)
+    values={}
+    try:
+        for rho in rhos:
+            set_width(g,rho)
+            name='rho1_'+str(round(1/rho))
+            path=Path(output).with_name(Path(output).stem+'_'+name+'.npz') if output else None
+            values[name]=evaluate_one_width(g,data,batch,seed,path,stop)
+            if output and rho==max(rhos):
+                import shutil
+                shutil.copyfile(path,output)
+    finally:set_width(g,max(rhos))
+    return aggregate_metrics(values)
 
 
 def math_sqrt(x): return float(np.sqrt(x))
@@ -113,20 +131,21 @@ def main(args):
               'parameters':sum(p.numel() for p in g.graph.parameters()),
               'trainable_parameters':sum(p.numel() for p in g.graph.parameters() if p.requires_grad),
               'parent_checkpoints':parents,'batchnorm_policy':'train','initialization':'CFP ImageNet; OCT inflated ImageNet, not OCT-specific pretraining'}
+        if widths(g):
+            info.update(nested_widths=list(widths(g)),batchnorm_policy='per-width training batch statistics; arithmetic mean of running updates, one counter increment per participant batch',selection_policy='one checkpoint maximizing equal mean of six branch-width F1 values',optimizer_updates_per_batch=1)
         if any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
         write_json(out/'model.json',info)
         batch=cfg['microbatch']; torch.cuda.reset_peak_memory_stats()
         def progress(**kw):
             write_json(out/'progress.json',{'pid':os.getpid(),'epoch':epoch,'elapsed_seconds':time.monotonic()-start,**kw})
         if cfg.get('profile'):
-            g.graph.train(); c,o,y,_=next(iter(loader(train,batch,seed,0)))
+            g.graph.train(); c,o,y,profile_keys=next(iter(loader(train,batch,seed,0)))
             before={k:[p.detach().clone() for p in m.parameters()] for k,m in g.modules_by_name().items() if list(m.parameters())}
             norm_records=[]; step_times=[]
             for step in range(3):
                 if stop_requested: raise InterruptedError('Profile stopped')
                 opt.zero_grad(set_to_none=True); torch.cuda.synchronize(); tick=time.monotonic()
-                _,loss=g.forward(c.cuda(),o.cuda(),y.cuda()); assert torch.isfinite(loss)
-                g.backward()
+                loss=training_backward(g,c.cuda(),o.cuda(),y.cuda())
                 norms={k:float(v) for k,v in clip_task_gradients(g,5.).items()}; norm_records.append(norms)
                 opt.step(); torch.cuda.synchronize(); step_times.append(time.monotonic()-tick)
                 progress(step=step+1,train_loss=float(loss))
@@ -147,9 +166,18 @@ def main(args):
             report={'state':'complete','microbatch':batch,'step_seconds':step_times,'modules_changed':changed,
                     'cross_branch_gradients':cross,'gradient_norms':norm_records,'seconds':time.monotonic()-start,
                     'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
-                    'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'passed':True}
+                    'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'passed':True,'nested_rhos':list(widths(g)) if widths(g) else None}
             if cfg.get('save_profile_checkpoint'):
                 torch.save({'model':g.save_state(),'configuration':cfg},out/'profile_selected.pt')
+                if widths(g):
+                    from .nested_export import export_widths
+                    exports=export_widths(g.save_state(),cfg,out)
+                    g.graph.eval()
+                    with torch.no_grad():
+                        for view in exports:
+                            set_width(g,view['rho']);logits,_=g.forward(c.cuda(),o.cuda(),y.cuda())
+                            np.savez(Path(view['directory'])/'profile_predictions.npz',ids=np.asarray(profile_keys),y=y.numpy(),**{k:v.softmax(1).cpu().numpy() for k,v in logits.items()})
+                    set_width(g,max(widths(g)))
             write_json(out/'summary.json',report); return
         initial=evaluate(g,val,batch,seed,out/'initial_predictions.npz',stop=lambda:stop_requested)
         if parents:
@@ -176,9 +204,7 @@ def main(args):
             for c,o,y,_ in loader(train,batch,seed,epoch-1):
                 if stop_requested: raise InterruptedError('Trial stopped by controller')
                 n=len(y); scale=n/window_total
-                _,loss=g.forward(c.cuda(),o.cuda(),y.cuda(),loss_scale=scale)
-                if not torch.isfinite(loss): raise FloatingPointError('Nonfinite training loss')
-                g.backward()
+                loss=training_backward(g,c.cuda(),o.cuda(),y.cuda(),scale)
                 train_ce+=float(loss.detach())/scale*n; seen+=n; window_count+=n
                 if window_count==window_total:
                     clip_task_gradients(g,5.); opt.step(); opt.zero_grad(set_to_none=True)
@@ -219,6 +245,9 @@ def main(args):
         state=g.save_state()
         torch.save({'model':state,'configuration':cfg,'selection':{k:m.state() for k,m in monitors.items()}},out/'selected.pt')
         modality_checkpoints={}
+        if widths(g):
+            from .nested_export import export_widths
+            export_widths(state,cfg,out,{k:m.state() for k,m in monitors.items()})
         if independent and converged:
             for branch in g.branches:
                 path=out/(branch+'.pt')

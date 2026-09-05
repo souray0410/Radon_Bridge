@@ -56,7 +56,7 @@ class LinearMixer(nn.Module):
         return torch.split(y,self.widths,dim=1)
 
 class BridgeExchange(nn.Module):
-    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None):
+    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None):
         super().__init__()
         self.keys = [s.key for s in specs]
         if not self.keys or len(set(self.keys)) != len(self.keys):
@@ -75,8 +75,8 @@ class BridgeExchange(nn.Module):
             raise ValueError('Unknown compression method')
         if compression in ('fixed_svd_channel','fixed_centered_svd_channel') and mode not in ('radon','self','scrambled','linear_resample'):
             raise ValueError('Unsupported SVD mechanism')
-        if compression=='fixed_random_orthogonal_channel' and mode not in ('radon','linear_resample'):
-            raise ValueError('Random orthogonal channel supports Radon and linear resampling')
+        if compression=='fixed_random_orthogonal_channel' and mode not in ('radon','self','scrambled','linear_resample'):
+            raise ValueError('Unsupported random orthogonal channel mechanism')
         if compression=='learned_projected' and mode=='linear_resample':
             raise ValueError('Linear resampling is a fixed SVD control')
         if compression in ('learned_projected','learned_channel') and basis_files is not None:
@@ -123,6 +123,20 @@ class BridgeExchange(nn.Module):
                 participant['channel_rank']=basis.q.shape[1]
                 participant['effective_channel_ratio']=basis.q.shape[1]/basis.q.shape[0]
                 participant['basis']=dict(basis.metadata)
+        self.nested_rhos = None
+        self.active_rho = rho
+        if nested_rhos is not None:
+            if (mode!='radon' or cross_edges is not None or
+                compression not in ('learned_channel','fixed_svd_channel','fixed_random_orthogonal_channel')):
+                raise ValueError('Nested widths require standard channel Radon')
+            if not isinstance(nested_rhos,(list,tuple)) or not nested_rhos or any(
+                isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or not 0<v<=1 for v in nested_rhos):
+                raise ValueError('Invalid nested ratios')
+            if list(nested_rhos)!=sorted(set(nested_rhos)) or not isinstance(rho,(int,float)) or rho!=max(nested_rhos):
+                raise ValueError('Allocate maximum rho and supply increasing unique widths')
+            self.nested_rhos=tuple(nested_rhos)
+            self.metadata['nested_rhos']=list(nested_rhos)
+            self.metadata['nested_indexing']='source-major, channel-prefix, all M directions; shared maximum mixer submatrix'
         self.latest_inputs = self.latest_deltas = None
 
     def export_fixed_bases(self, directory):
@@ -131,12 +145,46 @@ class BridgeExchange(nn.Module):
         for participant,artifact in zip(self.metadata['participants'],artifacts):participant['basis']=artifact
         return artifacts
 
+    def set_rho(self,rho):
+        if self.nested_rhos is None or rho not in self.nested_rhos:
+            raise ValueError('Width is not in the declared nested set')
+        self.active_rho=rho
+
+    def nested_delta(self,features):
+        ranks=[max(1,math.floor(self.active_rho*shape[0])) for shape in self.shapes]
+        encoded=[]
+        for i,(x,r,projector) in enumerate(zip(features,ranks,self.projectors)):
+            w=(self.channel_codecs[i].encoder.weight[:r] if self.compression=='learned_channel'
+               else self.channel_bases[i].q[:,:r].T.unsqueeze(-1))
+            z=nn.functional.conv1d(x.flatten(2),w,bias=None).reshape(x.shape[0],r,*x.shape[2:])
+            encoded.append(projector(z))
+        widths=[z.shape[1] for z in encoded]
+        if tuple(widths)==self.mixer.widths:
+            mixed=self.mixer(*encoded)
+        else:
+            offsets=[0]
+            for w in self.mixer.widths:offsets.append(offsets[-1]+w)
+            ix=torch.cat([torch.arange(offset,offset+w,device=features[0].device) for offset,w in zip(offsets,widths)])
+            w=self.mixer.conv.weight.index_select(0,ix).index_select(1,ix)
+            mask=self.mixer.mask.index_select(0,ix).index_select(1,ix)
+            y=nn.functional.conv1d(torch.cat(encoded,1),w*mask,padding=1)
+            mixed=y.split(widths,dim=1)
+        deltas=[]
+        for i,(x,r,projector,z) in enumerate(zip(features,ranks,self.projectors,mixed)):
+            w=(self.channel_codecs[i].decoder.weight[:,:r] if self.compression=='learned_channel'
+               else self.channel_bases[i].q[:,:r].unsqueeze(-1))
+            delta=nn.functional.conv1d(projector.backproject(z).flatten(2),w,bias=None)
+            deltas.append(delta.reshape_as(x))
+        return deltas
+
     def forward(self, *features):
         if len(features) != len(self.shapes) or any(tuple(x.shape[1:]) != shape for x, shape in zip(features, self.shapes)):
             raise ValueError('Participant shapes changed')
         if len({x.shape[0] for x in features}) != 1:
             raise ValueError('Participants must share batch alignment')
-        if self.compression=='learned_channel':
+        if self.nested_rhos is not None:
+            deltas=self.nested_delta(features)
+        elif self.compression=='learned_channel':
             encoded=[projector(codec.encode(x)) for codec,projector,x in zip(self.channel_codecs,self.projectors,features)]
             mixed=self.mixer(*encoded)
             deltas=[codec.decode(projector.backproject(p)) for codec,projector,p in zip(self.channel_codecs,self.projectors,mixed)]
@@ -166,14 +214,14 @@ class ReturnParticipant(nn.Module):
         return packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
         if any(v is not None for v in (reduction_ratio,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
-        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges)
+        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos)
     else:
-        if any(v is not None for v in (M,S,rho,basis_files,cross_edges)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
+        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         from .baselines import MMTMExchange,AttentionExchange
         if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio)
         elif family=='cross_attention' and reduction_ratio is None:exchange=AttentionExchange(specs,attention_dimension,heads)
@@ -190,7 +238,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -211,7 +259,7 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "device": "ws02 CPU, isolated /tmp/rb_qr_nested_validation",
+  "training_data_used_for_cpu_tests": false,
+  "checks": [
+    "check_nested_supplement: QR self/scrambled MHD, strict width exports, inactive row/column zero gradients, shared-width MHD gradients match direct native autograd, one equal BN running update, learned codecs update",
+    "check_learned_channel: legacy learned-channel initialization, outputs, gradients, checkpoint and diagnostic behavior",
+    "check_five_seed_controls: fixed bases, RNG, topology, row-norm matching and zero cosine handling",
+    "check_mechanism_baselines: legacy MMTM/attention formulas, native MHD, strict load and read-only diagnostics",
+    "check_learning_rates: grouped AdamW, defaults and schedule ratios",
+    "check_scheduler: dual GPU, memory/time accounting, overwrite guard and unlimited duration",
+    "check_benchmark_statistics: original 186 results and 31 comparisons unchanged",
+    "check_qr_nested_report: synthetic full report, 213 training configurations / 231 views, separate comparison families, shared bootstrap indices and no participant identifiers"
+  ],
+  "synthetic_report_figures": 18,
+  "synthetic_figure_layout_reviewed": true,
+  "synthetic_artifacts_are_not_experiment_results": true,
+  "gpu_batch16_acceptance": "pending; enforced by locked successor before deployment and training"
+}
