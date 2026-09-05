@@ -62,7 +62,7 @@ def figures(out,lookup,stats,boots):
     fig.text(.055,.035,'All individual CFP/OCT scores, baseline gains, costs, epochs and hashes are provided in results.csv / results.json.\nThe mean of branch F1 scores is not pooled classification performance. Development-set exploration.',fontsize=10,color='#52606C')
     fig.subplots_adjust(left=.06,right=.98,top=.91,bottom=.12,hspace=.4,wspace=.3);save(fig,out,'03_centering_seeds');plt.close(fig)
     fig,axes=plt.subplots(1,3,figsize=(17,9));metrics=[('retained_energy_ratio','Raw energy retention difference'),('retained_variance_ratio','Centered variance retention difference'),('delta_over_input_l2','Residual / input norm difference')]
-    for ax,(metric,title) in zip(axes,metrics):
+    for column,(ax,(metric,title)) in enumerate(zip(axes,metrics)):
         values=np.full((12,2),np.nan)
         for i,(a,rho) in enumerate(labels):
             for j,b in enumerate(['cfp','oct']):
@@ -74,13 +74,14 @@ def figures(out,lookup,stats,boots):
                 if vals:values[i,j]=np.mean(vals)
         lim=max(.001,float(np.nanmax(abs(values)))) if np.isfinite(values).any() else .001
         im=ax.imshow(np.ma.masked_invalid(values),cmap='RdBu_r',vmin=-lim,vmax=lim,aspect='auto');ax.set(yticks=range(12),yticklabels=[f'{NAMES[a]} | {rho_label(r)}' for a,r in labels],xticks=[0,1],xticklabels=['CFP','OCT'],title=title)
+        if column>0:ax.set_yticklabels([])
         for i in range(12):
             for j in range(2):ax.text(j,i,'N/A' if not np.isfinite(values[i,j]) else f'{values[i,j]:+.3f}',ha='center',va='center',fontsize=9,bbox=dict(facecolor='white',alpha=.8,edgecolor='none',pad=.8))
         fig.colorbar(im,ax=ax,fraction=.035,pad=.025)
     fig.suptitle('R&B | paired diagnostics after joint training',x=.055,ha='left',fontsize=20,fontweight='bold')
     fig.text(.055,.905,'Centered-fit minus uncentered-fit | three-seed mean | all1264 training participants | same diagnostic code for both methods',fontsize=10)
     fig.text(.055,.035,'Raw energy and centered variance are different denominators. Selected-model ratios use each model\'s current training features.\nInitial paired models share features; fitted-basis statistics and initial/selected gradient diagnostics are retained in results.json.',fontsize=10,color='#52606C')
-    fig.subplots_adjust(left=.18,right=.93,top=.84,bottom=.13,wspace=.95);save(fig,out,'04_centering_diagnostics');plt.close(fig)
+    fig.subplots_adjust(left=.20,right=.94,top=.84,bottom=.13,wspace=.28);save(fig,out,'04_centering_diagnostics');plt.close(fig)
 
 
 def build(root,resamples=10000,make_figures=True):
