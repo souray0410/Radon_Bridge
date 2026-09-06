@@ -67,7 +67,7 @@ class PilotGraph:
             for index, cfg in enumerate(configs):
                 family=cfg.get('family','radon')
                 required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'}
-                optional={'family','compression','basis_files','cross_edges','nested_rhos'} if family=='radon' else set()
+                optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation'} if family=='radon' else set()
                 if family not in ('radon','mmtm','cross_attention') or not required<=set(cfg) or set(cfg)-required-optional:
                     raise ValueError('Invalid communication configuration for family '+str(family))
                 _, metadata = attach_to_nodes(builder, cfg['nodes'], prefix=f'bridge_{index}_', samples=samples,
