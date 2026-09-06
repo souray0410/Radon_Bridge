@@ -10,7 +10,7 @@
     {
       "requirement": "historical_archive",
       "implementation": "完整复制及SHA逐项核验",
-      "status": "完整复制及逐文件SHA核验通过；六个归档模型严格恢复、开发集预测和统计一致；旧副本尚未删除"
+      "status": "完整归档及SHA验证、六模型严格恢复通过；24个旧工作顶层条目已清理；LOOK未改动"
     },
     {
       "requirement": "default_compatibility",
@@ -20,12 +20,12 @@
     {
       "requirement": "network_provider_interface",
       "implementation": "原生构建／通信接入／MHD运行职责分开",
-      "status": "三种旧配置与异构小网络验收通过"
+      "status": "三种旧配置严格CPU等价；异构1D/3D接入；代表配置GPU前后向及诊断通过"
     },
     {
       "requirement": "kernel_and_width",
       "implementation": "kernel_size默认3，新增显式r/h一致性验证",
-      "status": "CPU通过，GPU待项目锁"
+      "status": "CPU验证及8个代表配置batch16完整GPU预检通过；8次只读诊断通过；不是最终全矩阵可行域验收"
     },
     {
       "requirement": "parallel_host",

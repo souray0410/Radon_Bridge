@@ -1,0 +1,2028 @@
+{
+  "passed": true,
+  "source_commit": "1327d97e9d554f0b82b6fde5e2cb2d33747c2f28",
+  "source_hashes": {
+    "radonbridge/__init__.py": "2266ecb6c6cc57593ed472e0699a987f2302c19fa0db890756e9aa56dad38980",
+    "radonbridge/artifacts.py": "55035523f391391c94e7315ff5238b071656cd919a01d21c9e15fa04f791e1c4",
+    "radonbridge/baselines.py": "fd67bc6b2e5f3778f8b989559ac04ce016de7fd47bffd2cbad9823ab389a4251",
+    "radonbridge/benchmark_statistics.py": "4f10df79def5fcf8e043250259d13034306ab5ad1f12f85a71b354460569a5cf",
+    "radonbridge/bridge.py": "144ed01704c738bab85906ff8e7d7bc8e3c96f6c8d04fb63077653cfdf6266bd",
+    "radonbridge/communication_analysis.py": "31461067c62808c6b7167ada368751859524eca49b539aa580e33de34c3d85f9",
+    "radonbridge/convergence.py": "a942330d54bbfd8a6f0767e70ef7493bea27dc6243982b03f8afb3898d1e36bc",
+    "radonbridge/data.py": "4e1369c03e1e93f6c70a5250ead39876773fc85f3e97f15d4a06c0d678b0ddf7",
+    "radonbridge/diagnose.py": "75949a3dab0413ca7daab1bdacaee1e1795404c4070f4b9db4bb9c6cdfe13d5f",
+    "radonbridge/diagnostics.py": "a0a23b9343dcb6040b3beef3eaf648874f3d04bd17577881ad3dd04cd001ca8e",
+    "radonbridge/experiment.py": "a09ed77aacaccb47b9f21b2a5fbde91d65caf0ccc1d5ab941ed3cd2a1b43e6c3",
+    "radonbridge/geometry_study.py": "5bac24ff79b38768ad94600f67518455c68aebb8ccdffab24a093c0578e899f6",
+    "radonbridge/graph.py": "c4347e6461cb82ae90790716d55da857f7c2de60700835610582f3645445413f",
+    "radonbridge/host_basis.py": "d72886627caa6a956984593fcf7481cdbcea036a9569e3b55ec4ce64d6d8c593",
+    "radonbridge/integration.py": "8476e5356aaaa790ae25826ec174d367224623b7dd861a9bfa6244716849f49b",
+    "radonbridge/learned_channel.py": "134030f1c6aea31a34a6304b812c1c6a3b2f1453e56dd6a43cd53b000159b770",
+    "radonbridge/legacy_bridge.py": "0f12d2619bf8a842941f56334021b62a5074196668f67fc43aae8f56e520e339",
+    "radonbridge/legacy_model.py": "93fc6240239a76d624bb50d59a3b9d5e4e67bd320a5379c88af946135dd8c659",
+    "radonbridge/legacy_projector.py": "c2cddd1717a3562559a14fa0e0f1fba5ad02d9318b8c0a83137662f118e4886f",
+    "radonbridge/metrics.py": "08256881d532af0d55ff329074b06708fbfd82ecd29fccaa8f5baae9e1b8e891",
+    "radonbridge/mhd_task.py": "ae2cc61012dd02f6358611e118ce9b0b466bd6e46f60d8751514997e5cd8211d",
+    "radonbridge/model.py": "ba5848a7a5f0a2317d843519cc117e62eee1212eed11c92747d5bf414fee2625",
+    "radonbridge/native_networks.py": "d538d27ef7b4d8c4b9bdefeb054b818b1eac5d7a73062d53a1dabf72a45be1b1",
+    "radonbridge/nested_export.py": "55bc08d1729335b2bbe8c88373a0c731ae54d092054ca6f5c7c01dcb5e181a21",
+    "radonbridge/nested_training.py": "bddb59b93254e04fc18e9debb44a738be6f4f2474b5f02176d3579fcb1a34f8e",
+    "radonbridge/network_interface.py": "0d198b7e6e05590859910fb80133d69089858888ff98b2ce863198b4ba53b383",
+    "radonbridge/optimization.py": "d2fd05299c746a9ed729713d2bfe3699002ca9a8a4c4cc5cf8156546b8c3ee5c",
+    "radonbridge/pilot.py": "0034b52ad45edff8540628c123fb8d5c1ed3e33cb867d5db2ae7e497e600747e",
+    "radonbridge/projector.py": "a2ae70bb974efef4e75cdd59a9df885b73a18f56e59fb8d5d7b68b7d99ad3016",
+    "radonbridge/protocol.py": "f3ba995e8940a3db123eca5cb94909a223606ecefea9aa0768f08fd964c377b0",
+    "radonbridge/resolution.py": "646c7d6fbf780b1962b4a089ee9978d79c268601d7146d12c5ca451e078f1b79",
+    "radonbridge/s_axis.py": "91963d5bad633c467a2f05e45adc31cb1dc66ad24d9d085108d70138382d7c08",
+    "radonbridge/separate_pilot.py": "f46b56384f12235e720ff4cede4390a85cbbdbc82b56e1c6c69bd908c9a5c339",
+    "radonbridge/svd_basis.py": "64d9285ba5eed17a61bbee30fa912c771fae01ebf6a86205e0a0c4d6c084f730",
+    "radonbridge/sweep.py": "74204e96d580cb3622889ab9d25b1db014c84d35dd6ed5887226930eb11bdc8f",
+    "radonbridge/task_fusion.py": "e0c38f475deeab09dcd6cdd89637f671172c4d9380ace56a9ee7840cee378ae6",
+    "scripts/archive_geometry_history.py": "169212bf5e99a9bafce4fec3dd8f9464b31ab6d36ae7d2d8dbc52849c7e3d291",
+    "scripts/audit_separate_pilot.py": "d30c61c0bdfe38793a7762121feb460cb08e84b3c5f8bc1446b1afa75ba69183",
+    "scripts/build_mechanism_advisor_report.py": "9bd3a35dccc8ef089ca3c0c30fed7d77f3f1761bbfba3c043a0bdfef397eaf92",
+    "scripts/collect_centered_report.py": "7924a65362328860283d284c35558e9c114a8e2b3407cc171f1e217b7425f215",
+    "scripts/collect_learned_channel_report.py": "911697224b59fa830dcb36de623b153c659c1c5336fd13fba3f50104c32bd94a",
+    "scripts/collect_mechanism_benchmark.py": "7f899437cbf39b56809a4c535df5b413304233c082c5f8e4cae5a15bca665477",
+    "scripts/collect_three_seed_report.py": "27a82aac7ffc702f8fe44317b63dbfe3eb29aafc8001c4c4bd131f07c0507985",
+    "scripts/fixed_late_fusion.py": "a15895cad0a3cff838f42170cd521c718f3ba2c7773e20483e4de481364bfb21",
+    "scripts/geometry_evidence.py": "5a35d0f21f46d9a0cfb3112c3d0c27a73d98434ef109ea86de5e7819cdd11b7d",
+    "scripts/inventory_expanded_data.py": "36b4bdb355bb592ed5883bf4ccf106a99ab097b68575eeecb4fadafd4e259373",
+    "scripts/prepare_expanded_data.py": "02a48e442d48654d79f5c04d3ee3e950b31a918eaed46c274474daada888442e",
+    "scripts/prepare_geometry_mechanism.py": "d1c1a8c8dbc34ea2d5c7ce4a57c143d73321f1d1e1f03a68abf6c435cef49439",
+    "scripts/queue_fixed_svd_study.py": "031d1861e2d5c919bec540681a6c6cd80d3e5a379606d5a4255eb21dee714562",
+    "scripts/report_centered_study.py": "9a64852c24578ec3f7d68943447f1a99ef9f6e7c6bbd29bcca18b07ab0af8aa1",
+    "scripts/report_combined_study.py": "27b878c12686f0fe3a95ef2f0af30e99eb70c3c792801d621c6dceb550315dd1",
+    "scripts/report_five_seed_study.py": "0082c4a44da08cb699d14b271a58973e73c7acea1a43e01361318b830ee96bdb",
+    "scripts/report_fixed_svd_study.py": "17ced735e6eab73d6ea7a0481e50420581796596c814b18716c9b6941aef84f0",
+    "scripts/report_learned_channel_study.py": "687fab078766e68e4277c827668ffff2a7d35f801d4030e90e5330daec29d198",
+    "scripts/report_mechanism_benchmark.py": "5b762a89073c2f6414a3925c83175c53dd3a228de8f5a73b7da9cf1d3b29a602",
+    "scripts/report_qr_nested_supplement.py": "429f0c49e2d68ff24df11c5dd8d82b89a7f643d4ee85bac9b7e06ff71eade728",
+    "scripts/report_rho_study.py": "c310ec4bea50664048a3c03947615fae46d0077b92151f364b3fa097645b6df4",
+    "scripts/report_s_axis_supplement.py": "2a47584181f1f1cf2956fe69facf02df1307dee0a5109144abe5e5c378ebe576",
+    "scripts/report_task_fusion_benchmark.py": "cd838379ab852364cc113017fd1218f27b11168de8c61fae9615446cbb6c0751",
+    "scripts/report_three_seed_study.py": "99c33f82159b0c8205a18c727f91a35e760dd6b3adccfd46bf67fb67dc99d840",
+    "scripts/run_ablation_experiment.py": "a3521447c51a62c856e8f4cf35f9876997532eb38ac9dfddc62a479bda1e1d7e",
+    "scripts/run_centered_study.py": "21007253992a4567a4c61a4e1cdacd608026dfde6e98138005b6af6293f5180f",
+    "scripts/run_configured_experiment.py": "bc849fb0b3ffc7620e2c53403725a79e2a019edf48ce981f091f46d99c2ae28e",
+    "scripts/run_five_seed_study.py": "54fa2a5973546bc6f9b1d79e5ea1efa7a6c09d9dab27f2ee14a469462b52aeb3",
+    "scripts/run_integer_experiment.py": "22d3fc42c2e53856e2da49f24d4eb946abcfbe0a03754fc0ad828ba52dbecab3",
+    "scripts/run_learned_channel_study.py": "43fc2a5fb79d7c41f4e1995c3f04d588e3f3b836550a28706cff7d29c927831d",
+    "scripts/run_mechanism_benchmark.py": "c7f7c02576038212b6a2a85aee903915ae9d78281ce18f556ee15301b8e97baa",
+    "scripts/run_qr_nested_supplement.py": "b53998685dced4e5e6d7711cf3d2bf24079f0a1df067b7c889d280c6bdd0f209",
+    "scripts/run_s_axis_supplement.py": "c98ac06e5e71df4614405ff7d5c1718d5c14c7ff73e81bfb6d4dbd9317fe6871",
+    "scripts/run_task_fusion_benchmark.py": "1d78c4c6c8527601f17a6cdde54e4ade391e187ac94c8123657434c476619a89",
+    "scripts/run_three_seed_study.py": "5559729ccdf78937f834cc44b20c6cfb187c2e428576d1ebea19ffb6a7277332",
+    "scripts/summarize_experiment.py": "ab338c9e830839223ca8c6fe859da0864f63c551c7b539703b393f824a61469d",
+    "scripts/summarize_integer_experiment.py": "43a3336ab2c404e0533f806679776f330b5ebef9bce377565c799ed503694554",
+    "scripts/validate_s_axis_low_cost.py": "4f0cf1f1bee48ca19243de4782ea6ea8c996072d1c41f25feb7ffd6e36713cd4",
+    "scripts/verify_geometry_archive.py": "d6168afc08c2fa9292aedaf7a008a2574772d359d9e0842808de2886bf00d9e6",
+    "scripts/verify_sweep_results.py": "b91d4872fd383bffc17c0a98d21c2f514e9ac05100e260a111162e40182741d0",
+    "tests/check_accumulation.py": "0ce72adbae8ba935db27016620be1353fe35f5a97c1651b3d49979d0cefd9701",
+    "tests/check_benchmark_statistics.py": "bcd0961d3d872fffadf4d5e8946d2478936f213f63bb2eaf057bf6b299157b0c",
+    "tests/check_centered_basis.py": "8f1198cf8b167a1fb9acf077c353b1adebe169a8ecd55c82e7cbd09bfd483e13",
+    "tests/check_centered_report.py": "8470935e35269264c6e67c51f8204dedf9e11f43e12f796f00218f3aadb2b20a",
+    "tests/check_convergence.py": "15055b0bb66f12db381f64fd417adef950e82090c962714cd8ef983468cdd961",
+    "tests/check_core.py": "8e349d7ddf9ec4eb33da8013c82e208fb7b2baf3bc6777797459c40d85e15b37",
+    "tests/check_expanded_backbone.py": "b2338d9f383d96baa8993b52f1f9587d7fb6351a427a5020acf2c054ad89bb12",
+    "tests/check_five_seed_controls.py": "714a08fcf03dc83628320550ef0c91d862a103238acf219820df5d829c915072",
+    "tests/check_fixed_channel_basis.py": "1213969a860d3c33f1c1fa7aecba3ad7930eab7eab9b9fbd8ef54e8bc82661a5",
+    "tests/check_formal_protocol.py": "f4c9867d9f370acc731f94c0d0569ecc371a050328e7a184218525bbf169d0f1",
+    "tests/check_full_finetune.py": "7396267d3c90ab1e823f70a512c3fde94635e6340f7d4df925672acb71c09ff0",
+    "tests/check_geometry_study.py": "e04e5d80a00c20a1499103eb216c342a1f678828265d8a51920804b31d487dcf",
+    "tests/check_inplace_topology.py": "1c24c0c35c2cf9c3638af2ee0eed993786ed07ffb8506e2082d3676779e361a9",
+    "tests/check_integer_bridge.py": "5fb012d00332cb9e098b1df7a9861851ea4b95621cfccdeb80ecfccf06019a57",
+    "tests/check_learned_channel.py": "39228a2133c7a708df2943e8060593cf49e1c971252b8cb7a516141ea090faae",
+    "tests/check_learned_channel_report.py": "f68afc61e683013d0786d8cdce4d01245d3b20d4bddb8e35fc33cbef92a0d448",
+    "tests/check_learning_rates.py": "ed24d8945d2ca18fc07da52b94f83523bca4574edbb3a52b3617ab699300cd47",
+    "tests/check_mechanism_baselines.py": "70d6b9f8a6803ac803140c5217231fc904a2db57a9a45eed46e684748209b8d2",
+    "tests/check_mechanism_report.py": "d28b74e47a19bc45eb25a235250307b1305a1e848e3b78047f248afb8c92979e",
+    "tests/check_nested_supplement.py": "03ac111a3a3ce97401f3e76b553f5d766d065ab93a79c370a9d4b45e2edfa116",
+    "tests/check_network_interface.py": "8674faa12d68be00f8d60ec8696135d16c241c988a9a5dc655d6e7adca4032ac",
+    "tests/check_optimization.py": "c8e5a726cf80ccf26cbe46c32bbc0e84f6925267ac9283619ed58985c977c31d",
+    "tests/check_participant_sampling.py": "5410f299d0d39a95dca750c4892beab2acc108f48d718e848d833d5e1b6bcf8e",
+    "tests/check_qr_nested_report.py": "d4c493f61624f118448bd774f71ec5e85ac7e080714ae73cd0235ca3354e432b",
+    "tests/check_random_projection.py": "503c39de8eb7e26bb0fa687f4d7bd1fb55f803d41f152a55108177d5b8eecb7f",
+    "tests/check_requirements.py": "64126352d83eb7497795f1a80cc32f05ab536ffe125ad12408cd4054b64892ee",
+    "tests/check_s_axis.py": "bc663f2a6f84ed2510c222d0c642dee1ccb76b7a7f80d6d78b3b426a229dca81",
+    "tests/check_s_axis_report.py": "3492d507fd5cb206a4ca35a5184db6cf2f9b2488e851ad0130efddde7ca4f8c4",
+    "tests/check_scheduler.py": "d84c91ebe31764d576add7b0761f026f19eed25b0a5a08c235725d65d77ba1a8",
+    "tests/check_sweep.py": "67e0e19aa2772f7866927f9160fb408a2686bb0490f762cc0db0e5f7f5aa6807",
+    "tests/check_task_fusion.py": "d20e5f69d3fcd85e8847de449dc8f6aec19a1ec5c52984222757aab6008553cf",
+    "tests/check_task_fusion_protocol.py": "a810d4a4e5fbadf5f43ee2341e29e21553fe67a4250f2a0380c7e3d53e4e13e1",
+    "tests/check_three_seed_study.py": "127a27813ce393e9a029b4b231ca8a9317fcf43ec95c1e47905e1cfc515de6fe",
+    "tests/check_two_stage.py": "c8f3eb4ec42e294607f70589a959396d358094fe5de09687d87420ede07feb9f"
+  },
+  "profiles": {
+    "branch_radon_M16_S32_k1_h512": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.6200465910078492,
+        0.17557222899631597,
+        0.17617003500345163
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.012776338495314121,
+        "oct_to_cfp": 0.38317376375198364
+      },
+      "gradient_norms": [
+        {
+          "cfp": 0.6383125185966492,
+          "oct": 23.381694793701172,
+          "communication": 7.415328025817871
+        },
+        {
+          "cfp": 0.47565004229545593,
+          "oct": 14.988635063171387,
+          "communication": 6.394460201263428
+        },
+        {
+          "cfp": 0.06714499741792679,
+          "oct": 0.8336430191993713,
+          "communication": 0.2740555703639984
+        }
+      ],
+      "seconds": 3.1412431100034155,
+      "peak_allocated_mib": 5714.9462890625,
+      "peak_reserved_mib": 7720.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 49.21151700546034,
+        "q25_ms": 49.168928526341915,
+        "q75_ms": 49.25944174465258,
+        "timings_ms": [
+          49.138358008349314,
+          49.31179800769314,
+          49.45366000174545,
+          49.24540800857358,
+          49.27051599952392,
+          49.12081200745888,
+          49.14517799625173,
+          49.127411999506876,
+          49.199680011952296,
+          49.19973999494687,
+          49.20216402388178,
+          49.28596899844706,
+          49.195914005395025,
+          49.28344499785453,
+          49.17822699644603,
+          49.211326986551285,
+          49.19683499610983,
+          49.215033010113984,
+          49.14868299965747,
+          49.261331994784996,
+          49.13255901192315,
+          49.22625899780542,
+          49.18550801812671,
+          49.22093098866753,
+          49.34759097523056,
+          49.129213992273435,
+          49.16592902736738,
+          49.11746599827893,
+          49.11636500037275,
+          49.08943499322049,
+          49.17792702326551,
+          49.1464700025972,
+          49.19542299467139,
+          49.18164201080799,
+          49.283745989669114,
+          49.158237990923226,
+          49.22720100148581,
+          49.26168199745007,
+          49.21703497529961,
+          49.21170702436939,
+          49.24644998391159,
+          49.240430002100766,
+          49.20394698274322,
+          49.25026500131935,
+          49.290786002529785,
+          49.44925400195643,
+          49.32971400558017,
+          49.344466999173164,
+          49.25377099425532,
+          49.223834997974336
+        ],
+        "other_processes_on_device": [],
+        "interfered": false,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "branch_linear_resample_M16_S32_k1_h512": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.5131380730017554,
+        0.1692240580159705,
+        0.16793855201103725
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.000554858532268554,
+        "oct_to_cfp": 1.3152947425842285
+      },
+      "gradient_norms": [
+        {
+          "cfp": 0.6383125185966492,
+          "oct": 23.381694793701172,
+          "communication": 0.7527235746383667
+        },
+        {
+          "cfp": 0.2869521677494049,
+          "oct": 13.36844253540039,
+          "communication": 0.5519506335258484
+        },
+        {
+          "cfp": 0.059257782995700836,
+          "oct": 1.147088646888733,
+          "communication": 0.04447057098150253
+        }
+      ],
+      "seconds": 2.9721791020128876,
+      "peak_allocated_mib": 5715.8916015625,
+      "peak_reserved_mib": 7720.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 48.18285148940049,
+        "q25_ms": 48.14755624101963,
+        "q75_ms": 48.221692268271,
+        "timings_ms": [
+          48.12207500799559,
+          48.15788901760243,
+          48.13904099864885,
+          48.21605602046475,
+          48.11498397612013,
+          48.16530999960378,
+          48.24331699637696,
+          48.10386800090782,
+          48.149006004678085,
+          48.14707298646681,
+          48.2473729935009,
+          48.174524010391906,
+          48.33574499934912,
+          48.40693200821988,
+          48.221564007690176,
+          48.13079902669415,
+          48.168934998102486,
+          48.24473900953308,
+          48.14331702073105,
+          48.18036299548112,
+          48.20922599174082,
+          48.185339983319864,
+          48.206342005869374,
+          48.225529986666515,
+          48.16564000793733,
+          48.11708797933534,
+          48.131970019312575,
+          48.13087801449001,
+          48.16303699044511,
+          48.22286599664949,
+          48.14685200108215,
+          48.22173502179794,
+          48.135035001905635,
+          48.307643010048196,
+          48.1934720010031,
+          48.169034998863935,
+          48.16221501096152,
+          48.13719799858518,
+          48.17027799435891,
+          48.2029159902595,
+          48.38986700633541,
+          48.20503998780623,
+          48.445369000546634,
+          48.199219978414476,
+          48.1854609970469,
+          48.26913500437513,
+          48.19085798226297,
+          48.312280006939545,
+          48.15962098655291,
+          48.206992010818794
+        ],
+        "other_processes_on_device": [
+          "934061, GPU-127282cd-e989-5453-7f24-2e6cdc195d9c, 310"
+        ],
+        "interfered": true,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "branch_radon_M64_S128_k5_h1024": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.6609889700193889,
+        0.21145550199435093,
+        0.21101332898251712
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.002982123987749219,
+        "oct_to_cfp": 7.1153717041015625
+      },
+      "gradient_norms": [
+        {
+          "cfp": 0.6383125185966492,
+          "oct": 23.381694793701172,
+          "communication": 10.761885643005371
+        },
+        {
+          "cfp": 5.834403038024902,
+          "oct": 38.39862060546875,
+          "communication": 11.25585651397705
+        },
+        {
+          "cfp": 0.9543875455856323,
+          "oct": 9.195268630981445,
+          "communication": 2.3706822395324707
+        }
+      ],
+      "seconds": 6.156686575995991,
+      "peak_allocated_mib": 6184.6259765625,
+      "peak_reserved_mib": 7816.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 54.62367850122973,
+        "q25_ms": 54.592472515651025,
+        "q75_ms": 54.68675849260762,
+        "timings_ms": [
+          54.59979799343273,
+          54.58329399698414,
+          54.72734000068158,
+          54.98639799770899,
+          54.60881200269796,
+          54.71145501360297,
+          54.65704400558025,
+          54.53732400201261,
+          54.52125100418925,
+          54.622141004074365,
+          54.50975400162861,
+          54.64711901731789,
+          54.6252159983851,
+          54.680058994563296,
+          54.568251012824476,
+          54.67686400515959,
+          54.611627012491226,
+          54.677734995493665,
+          54.601060022832826,
+          54.573759000049904,
+          54.61278700386174,
+          54.76120000821538,
+          54.59726499975659,
+          54.59769497974776,
+          54.71658401074819,
+          54.50083999312483,
+          54.73610298940912,
+          54.67224700259976,
+          54.62009899201803,
+          54.60866098292172,
+          54.6167440188583,
+          54.56678901100531,
+          54.688450996764004,
+          54.66931199771352,
+          54.59087502094917,
+          54.68168098013848,
+          54.715281003154814,
+          54.728069982957095,
+          54.53156598377973,
+          54.65501098660752,
+          54.578036011662334,
+          54.71159500302747,
+          54.553278983803466,
+          54.70874099410139,
+          54.680199013091624,
+          54.61509100859985,
+          54.5825120061636,
+          54.842401994392276,
+          54.681500972947106,
+          54.81832500663586
+        ],
+        "other_processes_on_device": [],
+        "interfered": false,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "branch_linear_resample_M64_S128_k5_h1024": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.5295917750045191,
+        0.18433102499693632,
+        0.1827089540020097
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.0012204282684251666,
+        "oct_to_cfp": 1.6920634508132935
+      },
+      "gradient_norms": [
+        {
+          "cfp": 0.6383125185966492,
+          "oct": 23.381694793701172,
+          "communication": 1.0012331008911133
+        },
+        {
+          "cfp": 0.4018017053604126,
+          "oct": 13.0039644241333,
+          "communication": 0.821345329284668
+        },
+        {
+          "cfp": 0.06657729297876358,
+          "oct": 0.9742826223373413,
+          "communication": 0.04460256174206734
+        }
+      ],
+      "seconds": 8.317757544020424,
+      "peak_allocated_mib": 6201.1884765625,
+      "peak_reserved_mib": 7812.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 52.809615997830406,
+        "q25_ms": 52.74576273950515,
+        "q75_ms": 52.880422248563264,
+        "timings_ms": [
+          52.7270520105958,
+          52.883547003148124,
+          52.99185900366865,
+          52.680974011309445,
+          52.84337600460276,
+          52.77910100994632,
+          52.726832014741376,
+          52.83249000785872,
+          52.7592409926001,
+          52.77772800764069,
+          52.87104798480868,
+          52.652109996415675,
+          52.77579600806348,
+          52.76204500114545,
+          52.783808001549914,
+          52.90730300475843,
+          52.85618599737063,
+          52.8042980004102,
+          52.7995610027574,
+          52.65736801084131,
+          52.782836981350556,
+          52.851409011054784,
+          52.73970100097358,
+          52.75406298460439,
+          52.69703801604919,
+          52.91998200118542,
+          52.839039999525994,
+          52.88871502852999,
+          52.90588998468593,
+          52.887983998516575,
+          52.9357350023929,
+          52.779401012230664,
+          52.89267099578865,
+          52.67443397315219,
+          52.821744000539184,
+          52.88451901287772,
+          52.7874130057171,
+          52.74299599113874,
+          52.88684199331328,
+          53.01581500680186,
+          52.903756994055584,
+          52.677939005661756,
+          52.81493399525061,
+          52.81514400849119,
+          52.82405801699497,
+          52.720871986821294,
+          52.864868979668245,
+          52.702496002893895,
+          52.742756000952795,
+          52.83995100762695
+        ],
+        "other_processes_on_device": [
+          "934061, GPU-127282cd-e989-5453-7f24-2e6cdc195d9c, 310"
+        ],
+        "interfered": true,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "fusion_radon_M16_S32_k1_h512": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.6218480469833594,
+        0.17628962401067838,
+        0.17555334101780318
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "fusion_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.023969607427716255,
+        "oct_to_cfp": 0.6366729736328125,
+        "fusion_to_cfp": 4.122621059417725,
+        "fusion_to_oct": 35.14431381225586
+      },
+      "gradient_norms": [
+        {
+          "cfp": 1.855839490890503,
+          "oct": 22.738187789916992,
+          "communication": 7.100689888000488,
+          "fusion": 3.6851017475128174
+        },
+        {
+          "cfp": 1.019544243812561,
+          "oct": 17.029748916625977,
+          "communication": 7.003583908081055,
+          "fusion": 3.2686879634857178
+        },
+        {
+          "cfp": 0.534498929977417,
+          "oct": 1.7550207376480103,
+          "communication": 0.514560878276825,
+          "fusion": 2.2901127338409424
+        }
+      ],
+      "seconds": 3.1754271859826986,
+      "peak_allocated_mib": 5719.5361328125,
+      "peak_reserved_mib": 7716.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 49.3709340080386,
+        "q25_ms": 49.3142787454417,
+        "q75_ms": 49.4128310092492,
+        "timings_ms": [
+          49.254910001764074,
+          49.2548999900464,
+          49.349422013619915,
+          49.28347302484326,
+          49.30074798176065,
+          49.41400801180862,
+          49.43183498107828,
+          49.30378301651217,
+          49.345845996867865,
+          49.44297202746384,
+          49.33616201742552,
+          49.31371798738837,
+          49.350122979376465,
+          49.370944005204365,
+          49.30760798742995,
+          49.360328004695475,
+          49.31828400003724,
+          49.38442399725318,
+          49.292796989902854,
+          49.33113299193792,
+          49.39330698107369,
+          49.373628018656746,
+          49.462651018984616,
+          49.38230098923668,
+          49.309811991406605,
+          49.48796899407171,
+          49.46058799396269,
+          49.61289602215402,
+          49.31596101960167,
+          49.34123900602572,
+          49.303031992167234,
+          49.24815901904367,
+          49.40161999547854,
+          49.285476008662954,
+          49.32171999826096,
+          49.282021005637944,
+          49.390683008823544,
+          49.320127989631146,
+          49.37092401087284,
+          49.47737298789434,
+          49.383131990907714,
+          49.418465001508594,
+          49.38983198371716,
+          49.37259599682875,
+          49.42168001434766,
+          49.46293099783361,
+          49.41978701390326,
+          49.433215986937284,
+          49.409300001570955,
+          49.389560997951776
+        ],
+        "other_processes_on_device": [],
+        "interfered": false,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "fusion_linear_resample_M16_S32_k1_h512": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.48216133602545597,
+        0.16870873601874337,
+        0.16877517601824366
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "fusion_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.0014021797105669975,
+        "oct_to_cfp": 1.6691573858261108,
+        "fusion_to_cfp": 6.025585174560547,
+        "fusion_to_oct": 62.13490676879883
+      },
+      "gradient_norms": [
+        {
+          "cfp": 1.855839490890503,
+          "oct": 22.738187789916992,
+          "communication": 0.754099428653717,
+          "fusion": 3.6851017475128174
+        },
+        {
+          "cfp": 0.9619447588920593,
+          "oct": 15.575799942016602,
+          "communication": 0.6483402252197266,
+          "fusion": 3.2188937664031982
+        },
+        {
+          "cfp": 0.5361114144325256,
+          "oct": 2.076056957244873,
+          "communication": 0.0771317258477211,
+          "fusion": 2.2426650524139404
+        }
+      ],
+      "seconds": 2.9461259199888445,
+      "peak_allocated_mib": 5720.4814453125,
+      "peak_reserved_mib": 7718.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 48.317975510144606,
+        "q25_ms": 48.2843132558628,
+        "q75_ms": 48.35625100531615,
+        "timings_ms": [
+          48.380770022049546,
+          48.27637400012463,
+          48.46784000983462,
+          48.279789014486596,
+          48.25150599936023,
+          48.28360499232076,
+          48.27477200888097,
+          48.28424600418657,
+          48.36737998994067,
+          48.22077101562172,
+          48.33877700730227,
+          48.3062689891085,
+          48.27930900501087,
+          48.27147600008175,
+          48.38722001295537,
+          48.344405979150906,
+          48.340540000936016,
+          48.28451501089148,
+          48.31896800897084,
+          48.32678899401799,
+          48.29819602309726,
+          48.25109598459676,
+          48.35116598405875,
+          48.255461995722726,
+          48.30459601362236,
+          48.29250701004639,
+          48.31863701110706,
+          48.335761995986104,
+          48.35794601240195,
+          48.54261199943721,
+          48.350435012253,
+          48.317314009182155,
+          48.29446101211943,
+          48.26231297920458,
+          48.394520999863744,
+          48.253388988086954,
+          48.311975988326594,
+          48.295090993633494,
+          48.3414710033685,
+          48.367058974690735,
+          48.423804983031005,
+          48.31483101588674,
+          48.359859007177874,
+          48.299938993295655,
+          48.33362900535576,
+          48.29275800148025,
+          48.37607199442573,
+          48.41884699999355,
+          48.34920199937187,
+          48.37105600745417
+        ],
+        "other_processes_on_device": [
+          "934061, GPU-127282cd-e989-5453-7f24-2e6cdc195d9c, 390"
+        ],
+        "interfered": true,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "fusion_radon_M64_S128_k5_h1024": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.6189961670024786,
+        0.21173587098019198,
+        0.21207696202327497
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "fusion_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.0035133948549628258,
+        "oct_to_cfp": 3.4660847187042236,
+        "fusion_to_cfp": 5.535048007965088,
+        "fusion_to_oct": 8.618821144104004
+      },
+      "gradient_norms": [
+        {
+          "cfp": 1.855839490890503,
+          "oct": 22.738187789916992,
+          "communication": 10.370834350585938,
+          "fusion": 3.6851017475128174
+        },
+        {
+          "cfp": 3.1047182083129883,
+          "oct": 38.31652069091797,
+          "communication": 10.982878684997559,
+          "fusion": 2.854404926300049
+        },
+        {
+          "cfp": 1.573249101638794,
+          "oct": 13.032615661621094,
+          "communication": 3.294287919998169,
+          "fusion": 2.3140032291412354
+        }
+      ],
+      "seconds": 6.052100347005762,
+      "peak_allocated_mib": 6189.2158203125,
+      "peak_reserved_mib": 7828.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 54.72381100116763,
+        "q25_ms": 54.683983747963794,
+        "q75_ms": 54.79328775254544,
+        "timings_ms": [
+          54.69603999517858,
+          54.79527800343931,
+          54.637221997836605,
+          54.73093199543655,
+          54.63439700542949,
+          54.681437992258,
+          54.66989101842046,
+          54.872824024641886,
+          54.68399199889973,
+          54.65006100712344,
+          54.69064199132845,
+          54.751832998590544,
+          54.707166011212394,
+          54.67752300319262,
+          54.716690006898716,
+          54.77251502452418,
+          54.667737014824525,
+          54.69867298961617,
+          54.94180801906623,
+          54.6533860033378,
+          54.662809998262674,
+          54.59545899066143,
+          54.83231402467936,
+          54.6964899986051,
+          55.30853700474836,
+          54.88620500545949,
+          54.89588901400566,
+          54.807116015581414,
+          54.90681598894298,
+          54.7533160133753,
+          54.8548579972703,
+          54.7596649848856,
+          54.710832017008215,
+          54.75586900138296,
+          54.77453698404133,
+          54.69026099308394,
+          54.62730600265786,
+          54.79950399603695,
+          54.78731699986383,
+          54.693596001015976,
+          54.65837300289422,
+          54.78468199726194,
+          54.81225301628001,
+          54.773384996224195,
+          54.7078569943551,
+          54.773766023572534,
+          54.709719988750294,
+          54.75703100091778,
+          54.683980997651815,
+          54.898873990168795
+        ],
+        "other_processes_on_device": [],
+        "interfered": false,
+        "parameters_BN_RNG_preserved": true
+      }
+    },
+    "fusion_linear_resample_M64_S128_k5_h1024": {
+      "state": "complete",
+      "microbatch": 16,
+      "step_seconds": [
+        0.4786986650142353,
+        0.1832886439806316,
+        0.18333310901653022
+      ],
+      "modules_changed": {
+        "cfp_stage1": true,
+        "oct_stage1": true,
+        "cfp_stage2": true,
+        "oct_stage2": true,
+        "cfp_stage3": true,
+        "oct_stage3": true,
+        "cfp_stage4": true,
+        "oct_stage4": true,
+        "cfp_head": true,
+        "oct_head": true,
+        "fusion_head": true,
+        "bridge_0_exchange": true
+      },
+      "cross_branch_gradients": {
+        "cfp_to_oct": 0.0015675295144319534,
+        "oct_to_cfp": 4.298530101776123,
+        "fusion_to_cfp": 5.986752033233643,
+        "fusion_to_oct": 60.5127067565918
+      },
+      "gradient_norms": [
+        {
+          "cfp": 1.855839490890503,
+          "oct": 22.738187789916992,
+          "communication": 1.002592921257019,
+          "fusion": 3.6851017475128174
+        },
+        {
+          "cfp": 0.947184145450592,
+          "oct": 15.819953918457031,
+          "communication": 0.9659340977668762,
+          "fusion": 3.2031126022338867
+        },
+        {
+          "cfp": 0.4967605173587799,
+          "oct": 1.8579356670379639,
+          "communication": 0.0880814865231514,
+          "fusion": 2.2341418266296387
+        }
+      ],
+      "seconds": 7.315368937997846,
+      "peak_allocated_mib": 6206.7783203125,
+      "peak_reserved_mib": 7818.0,
+      "passed": true,
+      "nested_rhos": null,
+      "latency": {
+        "phase": "preflight after three optimization steps",
+        "batch": 16,
+        "warmup": 10,
+        "repeats": 50,
+        "median_ms": 52.96678899321705,
+        "q25_ms": 52.92911523429211,
+        "q75_ms": 53.025906992843375,
+        "timings_ms": [
+          52.876834000926465,
+          52.9642750043422,
+          52.843735000351444,
+          52.92710900539532,
+          53.01092501031235,
+          52.96655898564495,
+          52.95729500357993,
+          52.96857198118232,
+          52.92178099625744,
+          52.85437000566162,
+          52.94060902087949,
+          53.05733400746249,
+          52.94136100565083,
+          52.958816988393664,
+          52.98224199214019,
+          52.958868007408455,
+          52.89308799547143,
+          52.999047009507194,
+          53.055441996548325,
+          52.98827099613845,
+          52.98767099156976,
+          53.023923974251375,
+          53.22700901888311,
+          52.94899200089276,
+          53.0815509846434,
+          52.93092498322949,
+          53.01267802133225,
+          53.07391000678763,
+          52.88639897480607,
+          52.906247990904376,
+          53.08658798458055,
+          53.02656799904071,
+          52.83428099937737,
+          53.06042899610475,
+          52.95430001569912,
+          52.89483102387749,
+          52.99251800170168,
+          52.96701900078915,
+          53.14157000975683,
+          52.93338900082745,
+          52.89185600122437,
+          52.97175599844195,
+          53.039588005049154,
+          52.92851198464632,
+          53.10914301662706,
+          52.93489102041349,
+          52.92334398836829,
+          52.970104006817564,
+          53.03714401088655,
+          53.0441049777437
+        ],
+        "other_processes_on_device": [],
+        "interfered": false,
+        "parameters_BN_RNG_preserved": true
+      }
+    }
+  },
+  "ledger": {
+    "jobs": [
+      {
+        "id": "branch_radon_M16_S32_k1_h512",
+        "gpu": 1,
+        "gpu_seconds": 9.549789006006904,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8152
+      },
+      {
+        "id": "branch_linear_resample_M16_S32_k1_h512",
+        "gpu": 0,
+        "gpu_seconds": 9.549580863997107,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8152
+      },
+      {
+        "id": "branch_radon_M64_S128_k5_h1024",
+        "gpu": 1,
+        "gpu_seconds": 12.711685124988435,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8248
+      },
+      {
+        "id": "branch_linear_resample_M64_S128_k5_h1024",
+        "gpu": 0,
+        "gpu_seconds": 14.818254107987741,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8244
+      },
+      {
+        "id": "fusion_radon_M16_S32_k1_h512",
+        "gpu": 1,
+        "gpu_seconds": 9.54240509698866,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8150
+      },
+      {
+        "id": "fusion_linear_resample_M16_S32_k1_h512",
+        "gpu": 0,
+        "gpu_seconds": 8.488803832995472,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8150
+      },
+      {
+        "id": "fusion_radon_M64_S128_k5_h1024",
+        "gpu": 1,
+        "gpu_seconds": 12.700786700996105,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8260
+      },
+      {
+        "id": "fusion_linear_resample_M64_S128_k5_h1024",
+        "gpu": 0,
+        "gpu_seconds": 13.750533398997504,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 8250
+      },
+      {
+        "id": "diagnostic_branch_radon_M16_S32_k1_h512",
+        "gpu": 1,
+        "gpu_seconds": 16.95822176299407,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 5696
+      },
+      {
+        "id": "diagnostic_branch_linear_resample_M16_S32_k1_h512",
+        "gpu": 0,
+        "gpu_seconds": 16.957948172988836,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 5696
+      },
+      {
+        "id": "diagnostic_branch_radon_M64_S128_k5_h1024",
+        "gpu": 1,
+        "gpu_seconds": 26.454771496995818,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 6530
+      },
+      {
+        "id": "diagnostic_branch_linear_resample_M64_S128_k5_h1024",
+        "gpu": 0,
+        "gpu_seconds": 26.454669044003822,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 6564
+      },
+      {
+        "id": "diagnostic_fusion_linear_resample_M16_S32_k1_h512",
+        "gpu": 0,
+        "gpu_seconds": 16.961885726981563,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 5696
+      },
+      {
+        "id": "diagnostic_fusion_radon_M16_S32_k1_h512",
+        "gpu": 1,
+        "gpu_seconds": 18.01780654201866,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 5696
+      },
+      {
+        "id": "diagnostic_fusion_radon_M64_S128_k5_h1024",
+        "gpu": 0,
+        "gpu_seconds": 26.454770960990572,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 6532
+      },
+      {
+        "id": "diagnostic_fusion_linear_resample_M64_S128_k5_h1024",
+        "gpu": 1,
+        "gpu_seconds": 27.509811386000365,
+        "exit_code": 0,
+        "sampled_peak_process_mib": 6566
+      }
+    ]
+  },
+  "scope": "eight representative infrastructure profiles; not a performance matrix",
+  "test_used": false,
+  "diagnostics": {
+    "diagnostic_branch_radon_M16_S32_k1_h512": {
+      "passed": true,
+      "seconds": 14.108415620983578,
+      "peak_reserved_mib": 5264.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.30582395257908473,
+              "oct_norm": 12.085244188161695,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 5380270.169045949,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7471704574583041,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.6265201290374924,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 7772615.641198473,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7706487179078995,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.6561726560851822,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 29.033805657849335,
+              "oct_norm": 0.8808729384138063,
+              "cosine": 0.034133531112021116,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 7.821952564705298,
+              "oct_norm": 12.415783313184104,
+              "cosine": -0.06756709485320402,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 72.0042530737043,
+              "oct_norm": 31.581727733852457,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7345888.052015167,
+              "retained_energy": 5377640.9263685625,
+              "delta_energy": 108882.31471272864,
+              "retained_energy_ratio": 0.7320613775067449,
+              "delta_over_input_l2": 0.1217465097518192,
+              "mean_energy_fraction": 0.319989286639425,
+              "retained_variance_ratio": 0.6085580339809873,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10769973.13675587,
+              "retained_energy": 7470371.091159773,
+              "delta_energy": 978571.8520936553,
+              "retained_energy_ratio": 0.6936295008633603,
+              "delta_over_input_l2": 0.3014317880277868,
+              "mean_energy_fraction": 0.3555960896173819,
+              "retained_variance_ratio": 0.5559446116216503,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_branch_linear_resample_M16_S32_k1_h512": {
+      "passed": true,
+      "seconds": 13.863784602988744,
+      "peak_reserved_mib": 5264.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.02095461419761881,
+              "oct_norm": 0.5806707523977978,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 5380270.169045949,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7471704574583041,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.6265201290374924,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 7772615.641198473,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7706487179078995,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.6561726560851822,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 1.8097001663757568,
+              "oct_norm": 0.22687096425433087,
+              "cosine": -0.10340394057128575,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.005380927039282883,
+              "oct_norm": 63.09147494797592,
+              "cosine": -0.16807312336999036,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.23722758390808535,
+              "oct_norm": 7.843903384839654,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7329288.334717227,
+              "retained_energy": 5379666.546289635,
+              "delta_energy": 1093.568829658538,
+              "retained_energy_ratio": 0.7339957579247275,
+              "delta_over_input_l2": 0.012214963057557109,
+              "mean_energy_fraction": 0.3211809513818537,
+              "retained_variance_ratio": 0.6104065292446932,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10896122.767092558,
+              "retained_energy": 7551274.015254148,
+              "delta_energy": 5601.540442244216,
+              "retained_energy_ratio": 0.6930239477532131,
+              "delta_over_input_l2": 0.022673457124763676,
+              "mean_energy_fraction": 0.35663353135613424,
+              "retained_variance_ratio": 0.5558040776546186,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_branch_radon_M64_S128_k5_h1024": {
+      "passed": true,
+      "seconds": 23.713623917021323,
+      "peak_reserved_mib": 6100.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.5294915539095969,
+              "oct_norm": 17.569366288801017,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 4681659.655053882,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6501528131906011,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.48325671937826487,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 6865594.878727032,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6807183238190079,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.5214100962463064,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 22.67364376886679,
+              "oct_norm": 0.4577307456250419,
+              "cosine": 0.06733743865449035,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 6.5493602432021305,
+              "oct_norm": 1.6219257246132632,
+              "cosine": 0.04696391063543115,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 76.50654236494803,
+              "oct_norm": 5.100255790749904,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7292300.383527131,
+              "retained_energy": 4659807.318643941,
+              "delta_energy": 10718950.519293288,
+              "retained_energy_ratio": 0.6390037537633757,
+              "delta_over_input_l2": 1.212394222677724,
+              "mean_energy_fraction": 0.32434551419147956,
+              "retained_variance_ratio": 0.46838479195386296,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10930032.982064923,
+              "retained_energy": 6483577.160718859,
+              "delta_energy": 157848404.35597154,
+              "retained_energy_ratio": 0.5931891670736724,
+              "delta_over_input_l2": 3.800225447620092,
+              "mean_energy_fraction": 0.36828443304573266,
+              "retained_variance_ratio": 0.41029638368853744,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_branch_linear_resample_M64_S128_k5_h1024": {
+      "passed": true,
+      "seconds": 23.972951909003314,
+      "peak_reserved_mib": 6134.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.025560470997791105,
+              "oct_norm": 0.6502592723270371,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 4681659.655053882,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6501528131906011,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.48325671937826487,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 6865594.878727032,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6807183238190079,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.5214100962463064,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 3.736572770914138,
+              "oct_norm": 0.5754344989939967,
+              "cosine": -0.0077405090130351385,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.052718405746230636,
+              "oct_norm": 58.53236625890955,
+              "cosine": -0.16886785914230976,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.576052883726918,
+              "oct_norm": 9.234872144148047,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7327114.497255493,
+              "retained_energy": 4664602.674195049,
+              "delta_energy": 69143.72181309431,
+              "retained_energy_ratio": 0.6366220530527076,
+              "delta_over_input_l2": 0.09714263673000477,
+              "mean_energy_fraction": 0.32117084992598643,
+              "retained_variance_ratio": 0.4672605272616133,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10864707.043278705,
+              "retained_energy": 6555762.333738079,
+              "delta_energy": 382031.55403265887,
+              "retained_energy_ratio": 0.6033998254737764,
+              "delta_over_input_l2": 0.18751698316292867,
+              "mean_energy_fraction": 0.35637788420753924,
+              "retained_variance_ratio": 0.42499333441156584,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_fusion_linear_resample_M16_S32_k1_h512": {
+      "passed": true,
+      "seconds": 14.395942670002114,
+      "peak_reserved_mib": 5264.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.02095461419761881,
+              "oct_norm": 0.5806707523977978,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 5380270.169045949,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7471704574583041,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.6265201290374924,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 7772615.641198473,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7706487179078995,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.6561726560851822,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 2.925171533090884,
+              "oct_norm": 0.18539472519654351,
+              "cosine": -0.003955211438559247,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.01086887530801488,
+              "oct_norm": 51.07962016267763,
+              "cosine": -0.3444334975519546,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.39245777111530955,
+              "oct_norm": 6.367209122322391,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7311389.46727404,
+              "retained_energy": 5364317.462277063,
+              "delta_energy": 1420.4560874236834,
+              "retained_energy_ratio": 0.7336932995141184,
+              "delta_over_input_l2": 0.013938432837495046,
+              "mean_energy_fraction": 0.32800917661983636,
+              "retained_variance_ratio": 0.606135777393611,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10730564.704483455,
+              "retained_energy": 7484436.0581938,
+              "delta_energy": 5541.981724955572,
+              "retained_energy_ratio": 0.6974876219763761,
+              "delta_over_input_l2": 0.02272590860815224,
+              "mean_energy_fraction": 0.35390825454819763,
+              "retained_variance_ratio": 0.5610823498166742,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_fusion_radon_M16_S32_k1_h512": {
+      "passed": true,
+      "seconds": 14.780809111980489,
+      "peak_reserved_mib": 5264.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.30582395257908473,
+              "oct_norm": 12.085244188161695,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 5380270.169045949,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7471704574583041,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.6265201290374924,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 7772615.641198473,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.7706487179078995,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.6561726560851822,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 17.660289860011993,
+              "oct_norm": 1.1583480750747313,
+              "cosine": 0.14024398009927422,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 3.145279514203759,
+              "oct_norm": 10.388887836161278,
+              "cosine": 0.12731573008547503,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 43.03957105596386,
+              "oct_norm": 28.93808877827678,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7321970.939057013,
+              "retained_energy": 5370419.632478372,
+              "delta_energy": 98494.07461101182,
+              "retained_energy_ratio": 0.7334663954798517,
+              "delta_over_input_l2": 0.11598212236761316,
+              "mean_energy_fraction": 0.32664925831933384,
+              "retained_variance_ratio": 0.606593990573211,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10669071.986214327,
+              "retained_energy": 7415864.304056171,
+              "delta_energy": 902218.5035440242,
+              "retained_energy_ratio": 0.6950805387421066,
+              "delta_over_input_l2": 0.290798754559856,
+              "mean_energy_fraction": 0.3535602938050469,
+              "retained_variance_ratio": 0.5580243236367551,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_fusion_radon_M64_S128_k5_h1024": {
+      "passed": true,
+      "seconds": 23.769719632022316,
+      "peak_reserved_mib": 6102.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.5294915539095969,
+              "oct_norm": 17.569366288801017,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 4681659.655053882,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6501528131906011,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.48325671937826487,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 6865594.878727032,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6807183238190079,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.5214100962463064,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 33.92530581476823,
+              "oct_norm": 0.5946551697625516,
+              "cosine": -0.1817693575478715,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 33.98064742701598,
+              "oct_norm": 4.21634080738134,
+              "cosine": 0.022894466443568982,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 132.66962052718387,
+              "oct_norm": 10.606458364413077,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7375104.477955358,
+              "retained_energy": 4707286.857016963,
+              "delta_energy": 5436763.25246712,
+              "retained_energy_ratio": 0.6382671419892876,
+              "delta_over_input_l2": 0.8585905860138761,
+              "mean_energy_fraction": 0.3280712782897567,
+              "retained_variance_ratio": 0.4657119987004904,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 11046512.613952449,
+              "retained_energy": 6492197.4401802905,
+              "delta_energy": 148844746.54344836,
+              "retained_energy_ratio": 0.5877146631761622,
+              "delta_over_input_l2": 3.6707445193629655,
+              "mean_energy_fraction": 0.3699262504355864,
+              "retained_variance_ratio": 0.40507481968710635,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    },
+    "diagnostic_fusion_linear_resample_M64_S128_k5_h1024": {
+      "passed": true,
+      "seconds": 25.09451227702084,
+      "peak_reserved_mib": 6136.0,
+      "test_used": false,
+      "phases": {
+        "initial": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 0.13073265513783836,
+              "oct_norm": 0.0,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.0,
+              "oct_norm": 4.97063277853465,
+              "cosine": null,
+              "undefined_reason": "zero_gradient_norm"
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.025560470997791105,
+              "oct_norm": 0.6502592723270371,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7200860.413229328,
+              "retained_energy": 4681659.655053882,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6501528131906011,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.32307446557940045,
+              "retained_variance_ratio": 0.48325671937826487,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10085808.826489713,
+              "retained_energy": 6865594.878727032,
+              "delta_energy": 0.0,
+              "retained_energy_ratio": 0.6807183238190079,
+              "delta_over_input_l2": 0.0,
+              "mean_energy_fraction": 0.33298336071430384,
+              "retained_variance_ratio": 0.5214100962463064,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        },
+        "selected": {
+          "gradient_groups": {
+            "cfp_stage3": {
+              "cfp_norm": 4.066981135667823,
+              "oct_norm": 0.46530637824937976,
+              "cosine": 0.02981667010062219,
+              "undefined_reason": null
+            },
+            "oct_stage3": {
+              "cfp_norm": 0.033430519264964285,
+              "oct_norm": 48.22332323822302,
+              "cosine": -0.23320869216623355,
+              "undefined_reason": null
+            },
+            "bridge_0_exchange.mixer.conv": {
+              "cfp_norm": 0.6131411717447851,
+              "oct_norm": 7.554234914098029,
+              "cosine": 0.0,
+              "undefined_reason": null
+            }
+          },
+          "probe_participants": 128,
+          "energy_participants": 1264,
+          "state_parameters_bn_gradients_rng_preserved": true,
+          "test_used": false,
+          "energy": {
+            "cfp_stage3": {
+              "input_energy": 7312944.723666598,
+              "retained_energy": 4672152.019408927,
+              "delta_energy": 89257.2213088833,
+              "retained_energy_ratio": 0.6388879166949839,
+              "delta_over_input_l2": 0.1104779319204955,
+              "mean_energy_fraction": 0.3274257979286526,
+              "retained_variance_ratio": 0.46556461256595144,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            },
+            "oct_stage3": {
+              "input_energy": 10696233.26445039,
+              "retained_energy": 6490583.2288834,
+              "delta_energy": 378450.86002392136,
+              "retained_energy_ratio": 0.6068101796597186,
+              "delta_over_input_l2": 0.18810022520102365,
+              "mean_energy_fraction": 0.3548030837060869,
+              "retained_variance_ratio": 0.4279893809512458,
+              "centering_scope": "global training channel mean; not per participant",
+              "projection_role": "actual channel compression"
+            }
+          }
+        }
+      }
+    }
+  }
+}

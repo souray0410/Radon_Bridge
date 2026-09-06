@@ -13,6 +13,13 @@ def main(root):
         fcntl.flock(own,fcntl.LOCK_EX|fcntl.LOCK_NB)
         assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip()
         commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+        existing=root/'infrastructure_gpu_acceptance.json'
+        if existing.exists():
+            accepted=read(existing)
+            core=lambda values:{k:v for k,v in values.items() if k.startswith('radonbridge/') or k=='scripts/run_integer_experiment.py'}
+            if accepted['passed'] and core(accepted['source_hashes'])==core(source_hashes()):
+                return  # Completed matching acceptance is immutable and never rerun.
+            raise RuntimeError('Existing failed or changed-core acceptance requires explicit review')
         status=dict(state='preparing',source_commit=commit,new_performance_training_started=False,
                     revised_matrix_status='pending scope confirmation; no best-configuration selection',pid=os.getpid())
         write(root/'preparation_status.json',status)
