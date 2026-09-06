@@ -111,3 +111,42 @@ def semantic(cfg):
 
 def fingerprint(cfg):return stable_hash(semantic(cfg))
 
+
+MECHANISM_POINTS=((32,64,3),(16,64,3),(64,64,3),(32,32,3),(32,128,3),(32,64,1),(32,64,5))
+FIXED_HOSTS=('mmtm_hidden256','attention_d256')
+
+def mechanism_catalog():
+    """Authorized mechanism subset; no performance-based configuration selection."""
+    old=catalog();points=set(MECHANISM_POINTS)
+    rows=[x for x in old['structures'] if (x['M'],x['S'],x['k']) in points]
+    rows.sort(key=lambda x:(MECHANISM_POINTS.index((x['M'],x['S'],x['k'])),x['h'],x['mode'],x['r']))
+    cells=[x for x in old['compute_cells'] if (x['M'],x['S'],x['k']) in points]
+    return dict(version='geometry_mechanism_subset_v2',execution_authorized=True,structures=rows,compute_cells=cells,
+                points=MECHANISM_POINTS,equal_parameter_positions=7*2*2*12,geometry_positions=len(rows)*12,
+                baseline_positions=108,augmentation_positions=72,direct_positions=len(rows)*12+108,
+                result_positions=len(rows)*12+180,fixed_hosts=FIXED_HOSTS,
+                augmentation_reference=dict(M=32,S=64,k=3,r=16,h=512,rho=1/16),
+                selection='No family/configuration winner selection; each model retains protocol checkpoint selection',test_used=False)
+
+def direct_rows(parents,bases):
+    rows=[];cat=mechanism_catalog()
+    for protocol in PROTOCOLS:
+        for s in cat['structures']+baseline_structures():
+            for lr,seed in itertools.product(LRS,SEEDS):
+                cfg=configuration(s,seed,lr,protocol,parents[seed],bases[seed])
+                rows.append(dict(id=f'{protocol}_{s["id"]}_lr{lr:.0e}_seed{seed}',protocol=protocol,structure=s,
+                                 seed=seed,backbone_lr=lr,configuration=cfg,fingerprint=fingerprint(cfg),
+                                 state='pending',attempts=[],directory=None,category='direct'))
+    assert len({r['fingerprint'] for r in rows})==len(rows)==cat['direct_positions']
+    return rows
+
+def augmentation_configuration(host_row,host_ref,bases,arm):
+    if arm not in ('continue','radon','linear_resample'):raise ValueError(arm)
+    cfg=copy.deepcopy(host_row['configuration'])
+    cfg.update(training_stage='host_augmentation',host_checkpoint=copy.deepcopy(host_ref))
+    if arm!='continue':
+        ref=mechanism_catalog()['augmentation_reference']
+        s=dict(ref,mode=arm)
+        b=configuration(s,host_row['seed'],host_row['backbone_lr'],host_row['protocol'],{},bases)['bridges'][0]
+        b['parallel_to']=0;cfg['bridges'].append(b)
+    return cfg

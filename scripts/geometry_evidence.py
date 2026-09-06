@@ -50,9 +50,13 @@ def accept(path,cfg,protocol,expected=None):
     with np.load(path/'selected_predictions.npz',allow_pickle=False) as z:
         assert len(z['ids'])==len(set(z['ids']))==len(z['y'])==296
         assert np.bincount(z['y'],minlength=2).tolist()==[148,148]
-        assert all(z[k].shape==(296,2) and np.isfinite(z[k]).all() for k in ('cfp','oct'))
+        assert all(z[k].shape==(296,2) and np.isfinite(z[k]).all() and np.allclose(z[k].sum(1),1,atol=1e-5) for k in ('cfp','oct'))
+        from radonbridge.metrics import classification_metrics
+        for key in ('cfp','oct')+ (('fusion',) if protocol=='fusion' else ()):
+            assert abs(classification_metrics(z['y'],z[key])['macro_f1']-s['selected']['tasks'][key]['macro_f1'])<1e-10
+        participant_order_sha256=__import__('hashlib').sha256(z['ids'].tobytes()+z['y'].tobytes()).hexdigest()
         if protocol=='fusion':assert z['fusion'].shape==(296,2)
-    return dict(directory=str(path),accepted_hashes=hashes,scores=scores(s,protocol),
+    return dict(directory=str(path),accepted_hashes=hashes,participant_order_sha256=participant_order_sha256,scores=scores(s,protocol),
                 epochs=s['epochs_ran'],best_epoch=s['selection']['joint']['best_epoch'],seconds=s['seconds'],
                 parameters=s['parameters'],peak_reserved_mib=s['peak_reserved_mib'],fingerprint=fingerprint(cfg))
 

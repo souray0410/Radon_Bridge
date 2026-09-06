@@ -1,0 +1,1 @@
+{"passed": true, "direct": 684, "total": 756, "structures": 48, "contrasts": 64, "checks": ["dedup", "path_identity", "fixed_host", "paired_weights", "infeasible_not_performance"]}
