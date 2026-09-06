@@ -58,3 +58,22 @@ with tempfile.TemporaryDirectory() as tmp:
     second=Queue(Path(tmp),'same-commit')
     assert first.p==second.p
 print(json.dumps(dict(passed=True,protocol_restart_roundtrip=True)))
+# A dispatch-only revision preserves both the scientific protocol and original lock.
+from scripts.geometry_evidence import write,read
+from radonbridge.artifacts import sha256
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp);first=Queue(root,'previous')
+    old=copy.deepcopy(first.p);old.pop('dispatch_policy');write(root/'protocol.json',old)
+    original_hash=sha256(root/'protocol.json')
+    write(root/'candidate_lock.json',dict(source_commit='previous',protocol_sha256=original_hash))
+    candidate_bytes=(root/'candidate_lock.json').read_bytes()
+    revised=Queue(root,'next',resume_from='previous')
+    assert revised.p['dispatch_policy']=='rolling_per_gpu_v1'
+    assert (root/'candidate_lock.json').read_bytes()==candidate_bytes
+    assert sha256(root/'protocol_revisions/scheduler_previous.json')==original_hash
+    Queue(root,'next')
+    corrupt=read(root/'protocol.json');corrupt['study']['result_positions']=757;write(root/'protocol.json',corrupt)
+    try:Queue(root,'bad',resume_from='next')
+    except AssertionError:pass
+    else:raise AssertionError('Scientific protocol changes must not be permitted as scheduler revisions')
+print(json.dumps(dict(passed=True,dispatch_migration_preserves_science=True)))

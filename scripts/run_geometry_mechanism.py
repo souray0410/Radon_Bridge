@@ -7,6 +7,7 @@ from radonbridge.geometry_study import (mechanism_catalog,direct_rows,augmentati
     fingerprint,stable_hash,FIXED_HOSTS)
 from scripts.geometry_evidence import read,write,dependencies,historical_index,accept,storage_check,archive_completed
 from scripts.run_integer_experiment import Controller,source_hashes
+from scripts.rolling_dispatch import RollingController
 from scripts.run_task_fusion_benchmark import live_workers
 
 DATA=str(SOURCE/'cache/full1264_296')
@@ -36,7 +37,7 @@ class Queue:
         self.p=dict(schema='two_stage_ratio_convergence_v3',review_status='approved',source_commit=commit,
                     accepted_source_hashes=source_hashes(),gpu_time_policy='unlimited_until_convergence',
                     max_gpu_minutes=None,prior_gpu_minutes=0,gpu_indices=[1,0],min_free_gpu_mib=12288,
-                    skip_legacy_summary=True,project_memory_limit_mib=10240,study=self.cat,
+                    skip_legacy_summary=True,project_memory_limit_mib=10240,study=self.cat,dispatch_policy='rolling_per_gpu_v1',
                     protocol_document_sha256=sha256('experiments/geometry_mechanism/EXECUTION.zh-CN.md'),test_used=False)
         self.p=json.loads(json.dumps(self.p))  # Compare the persisted JSON representation on every restart.
         p=root/'protocol.json'
@@ -44,15 +45,18 @@ class Queue:
             old=read(p)
             if old!=self.p:
                 assert resume_from==old['source_commit'],'Locked source/protocol differs; explicit versioned repair required'
-                assert not (root/'candidate_lock.json').exists(),'Repair migration is limited to unfinished resource preflight'
-                omit=('source_commit','accepted_source_hashes')
-                assert {k:v for k,v in old.items() if k not in omit}=={k:v for k,v in self.p.items() if k not in omit}
-                changed={k for k,v in old['accepted_source_hashes'].items() if self.p['accepted_source_hashes'].get(k)!=v}
-                assert changed<= {'scripts/run_geometry_mechanism.py','tests/check_geometry_queue.py'},changed
-                revision=root/'protocol_revisions'/('preflight_'+resume_from+'.json')
+                omit=('source_commit','accepted_source_hashes','dispatch_policy')
+                assert {k:v for k,v in old.items() if k not in omit}=={k:v for k,v in self.p.items() if k not in omit},'Scientific protocol changed'
+                changed={k for k in set(old['accepted_source_hashes'])|set(self.p['accepted_source_hashes']) if old['accepted_source_hashes'].get(k)!=self.p['accepted_source_hashes'].get(k)}
+                assert changed<= {'scripts/run_geometry_mechanism.py','scripts/rolling_dispatch.py','tests/check_geometry_queue.py','tests/check_rolling_dispatch.py'},changed
+                revision=root/'protocol_revisions'/('scheduler_'+resume_from+'.json')
                 write(revision,old)
-                write(root/'preflight_repair.json',dict(previous_commit=resume_from,current_commit=commit,
-                    previous_protocol_sha256=sha256(p),changed_files=sorted(changed),reason='Unregister retired segment exit callbacks; preserve interruption between batches; supply existing source bases to the no-communication diagnostic',training_algorithm_changed=False))
+                assert sha256(revision)==sha256(p),'Original protocol revision must be byte-identical'
+                write(root/'scheduler_revision.json',dict(previous_commit=resume_from,current_commit=commit,
+                    previous_protocol_sha256=sha256(p),changed_files=sorted(changed),
+                    candidate_lock_sha256=sha256(root/'candidate_lock.json') if (root/'candidate_lock.json').exists() else None,
+                    reason='User authorized independent GPU refill with asynchronous evidence acceptance and full archiving',
+                    training_algorithm_changed=False,scientific_protocol_changed=False,dispatch_policy=self.p['dispatch_policy']))
                 write(p,self.p)
         else:write(p,self.p)
         self.status('initializing')
@@ -163,7 +167,12 @@ class Queue:
             new_direct_training=sum(r['category']=='direct' and not r.get('reused') and r['state']!='infeasible' for r in self.rows),
             prespecified_augmentation=72,host_feasibility_checked_after_fitting=True,test_used=False)
         path=self.root/'candidate_lock.json'
-        if path.exists():assert read(path)==lock,'Candidate lock must be immutable'
+        if path.exists():
+            original=read(path);omit={'source_commit','protocol_sha256'}
+            assert {k:v for k,v in original.items() if k not in omit}=={k:v for k,v in lock.items() if k not in omit},'Candidate domain changed'
+            if original['source_commit']!=self.commit:
+                assert any(sha256(p)==original['protocol_sha256'] for p in (self.root/'protocol_revisions').glob('*.json')),'Original candidate protocol proof missing'
+            else:assert original==lock
         else:write(path,lock)
 
     def train_rows(self,rows,stage):
@@ -171,22 +180,32 @@ class Queue:
             if r['state']!='infeasible':scan_completed(r)
         self.save()
         pending=[r for r in rows if r['state']=='pending']
-        for pos in range(0,len(pending),2):
-            batch=pending[pos:pos+2]
-            # Persist attempt paths BEFORE dispatch. execute reserves this unique batch here.
+        if pending:
             storage_check(self.root,32*1024**3)
-            segment=self.root/'batches'/f'{stage}_{time.time_ns()}';segment.mkdir(parents=True);self.segment=segment
+            segment=self.root/'batches'/f'{stage}_rolling_{time.time_ns()}';segment.mkdir(parents=True);self.segment=segment
             write(segment/'protocol.json',self.p)
-            for r in batch:
-                r['directory']=str(segment/r['id']);r['attempts'].append(r['directory'])
-            self.save();self.status(stage,active_ids=[r['id'] for r in batch],new_performance_training_started=True)
-            c=Controller(SimpleNamespace(output=str(segment),protocol=str(segment/'protocol.json'),phase='run',data=DATA))
+            lookup={r['id']:r for r in pending}
+            def before_start(job,gpu,path):
+                storage_check(self.root,32*1024**3)
+                r=lookup[job['id']];r['directory']=str(path);r['attempts'].append(str(path));self.save()
+            def finish_background(job,path):
+                result=accept(path,job['config'],lookup[job['id']]['protocol'])
+                target,marker=archive_completed(path)
+                return dict(result=result,target=str(target),original=str(path),marker=str(marker))
+            def publish(job,value):
+                r=lookup[job['id']];r.update(value['result'],directory=value['target'],state='accepted')
+                self.save()  # Persist verified archive location before retiring its work copy.
+                shutil.rmtree(value['original'])
+            def progress(state,**extra):
+                self.status(stage,scheduler_state=state,new_performance_training_started=True,**extra)
+            c=RollingController(SimpleNamespace(output=str(segment),protocol=str(segment/'protocol.json'),phase='run',data=DATA),
+                before_start=before_start,finish_background=finish_background,publish_result=publish,on_status=progress,
+                pause_file=self.root/'drain.request')
             try:
-                c.run_jobs([dict(id=r['id'],config=r['configuration']) for r in batch]);c.status('complete')
+                c.run_jobs([dict(id=r['id'],config=r['configuration']) for r in pending]);c.status('complete')
             finally:
                 c.shutdown();atexit.unregister(c.shutdown)
                 signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
-            for r in batch:assert scan_completed(r)
             self.save();self.archive(segment)
             self.status(stage,new_performance_training_started=True)
         # Complete read-only initial/selected diagnostics, including resumed accepted trials.
@@ -205,6 +224,7 @@ class Queue:
     def augment(self):
         hosts=[r for r in self.rows if r['category']=='direct' and r['structure']['id'] in FIXED_HOSTS]
         assert len(hosts)==24
+        all_groups=[]
         for host in hosts:
             if host['state']!='accepted':raise RuntimeError('Fixed host unavailable; no replacement selected: '+host['id'])
             ref=dict(path=str(resolve(host['directory'])/'selected.pt'),sha256=host['accepted_hashes']['selected.pt'])
@@ -238,7 +258,8 @@ class Queue:
                 assert dr['diagnostic']['passed']
                 r['preflight']=dict(profile=result['profile'],diagnostic_sha256=sha256(ds/'diagnostic/summary.json'))
                 self.save();self.archive(ds);self.archive(segment)
-            self.train_rows(group,'host_augmentation')
+            all_groups.extend(group)
+        self.train_rows(all_groups,'host_augmentation')
 
     def run(self):
         self.initialize();self.preflight()
