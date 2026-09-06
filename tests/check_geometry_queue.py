@@ -32,3 +32,23 @@ assert sum(not d['estimable'] for d in defs)==2  # Low-budget k5 arithmetic infe
 rows[0]['state']='infeasible'
 assert sum(not d['estimable'] for d in definitions(rows,cat))>2
 print(json.dumps(dict(passed=True,direct=684,total=756,structures=48,contrasts=64,checks=['dedup','path_identity','fixed_host','paired_weights','infeasible_not_performance'])))
+
+# Regression: completed/failed segment controllers must not run exit callbacks
+# after full archiving has retired their working directories.
+import tempfile,signal
+from pathlib import Path
+from unittest.mock import patch,Mock
+from scripts.run_geometry_mechanism import Queue
+for fail in (False,True):
+    with tempfile.TemporaryDirectory() as tmp:
+        q=Queue.__new__(Queue);q.root=Path(tmp);q.p={};q.commit='test';q.status=Mock()
+        c=Mock();c.run_jobs.side_effect=RuntimeError('injected') if fail else None
+        c.run_jobs.return_value={'job':{'passed':True}}
+        oldterm=signal.getsignal(signal.SIGTERM);oldint=signal.getsignal(signal.SIGINT)
+        with patch('scripts.run_geometry_mechanism.Controller',return_value=c),patch('scripts.run_geometry_mechanism.storage_check'),patch('scripts.run_geometry_mechanism.atexit.unregister') as unregister:
+            try:q.execute([], 'preflight','fixture')
+            except RuntimeError:assert fail
+            else:assert not fail
+            c.shutdown.assert_called_once();unregister.assert_called_once_with(c.shutdown)
+        signal.signal(signal.SIGTERM,oldterm);signal.signal(signal.SIGINT,oldint)
+print(json.dumps(dict(passed=True,exit_callback_regression=True)))

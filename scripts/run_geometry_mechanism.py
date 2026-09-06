@@ -1,5 +1,5 @@
 """Immutable, restartable dual-GPU mechanism queue; no winner selection."""
-import argparse,copy,fcntl,json,os,shutil,subprocess,time,traceback
+import argparse,atexit,copy,fcntl,json,os,shutil,signal,subprocess,time,traceback
 from pathlib import Path
 from types import SimpleNamespace
 from radonbridge.artifacts import SOURCE,ARCHIVE,STUDY,resolve,sha256
@@ -31,7 +31,7 @@ def scan_completed(row):
     return False
 
 class Queue:
-    def __init__(self,root,commit):
+    def __init__(self,root,commit,resume_from=None):
         self.root=root;self.commit=commit;self.cat=mechanism_catalog();self.rows=[];self.segment=None
         self.p=dict(schema='two_stage_ratio_convergence_v3',review_status='approved',source_commit=commit,
                     accepted_source_hashes=source_hashes(),gpu_time_policy='unlimited_until_convergence',
@@ -39,7 +39,20 @@ class Queue:
                     skip_legacy_summary=True,project_memory_limit_mib=10240,study=self.cat,
                     protocol_document_sha256=sha256('experiments/geometry_mechanism/EXECUTION.zh-CN.md'),test_used=False)
         p=root/'protocol.json'
-        if p.exists():assert read(p)==self.p,'Locked source/protocol differs; explicit versioned repair required'
+        if p.exists():
+            old=read(p)
+            if old!=self.p:
+                assert resume_from==old['source_commit'],'Locked source/protocol differs; explicit versioned repair required'
+                assert not (root/'candidate_lock.json').exists(),'Repair migration is limited to unfinished resource preflight'
+                omit=('source_commit','accepted_source_hashes')
+                assert {k:v for k,v in old.items() if k not in omit}=={k:v for k,v in self.p.items() if k not in omit}
+                changed={k for k,v in old['accepted_source_hashes'].items() if self.p['accepted_source_hashes'].get(k)!=v}
+                assert changed<= {'scripts/run_geometry_mechanism.py','tests/check_geometry_queue.py'},changed
+                revision=root/'protocol_revisions'/('preflight_'+resume_from+'.json')
+                write(revision,old)
+                write(root/'preflight_repair.json',dict(previous_commit=resume_from,current_commit=commit,
+                    previous_protocol_sha256=sha256(p),changed_files=sorted(changed),reason='Unregister retired segment exit callbacks; preserve interruption between batches; supply existing source bases to the no-communication diagnostic',training_algorithm_changed=False))
+                write(p,self.p)
         else:write(p,self.p)
         self.status('initializing')
 
@@ -68,7 +81,9 @@ class Queue:
         c=Controller(SimpleNamespace(output=str(segment),protocol=str(segment/'protocol.json'),phase=phase,data=DATA));c.commit=self.commit
         try:
             result=c.run_jobs(jobs,allow_oom=allow_oom);c.status('complete')
-        finally:c.shutdown()
+        finally:
+            c.shutdown();atexit.unregister(c.shutdown)
+            signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
         return segment,result
 
     def archive(self,segment):
@@ -125,7 +140,7 @@ class Queue:
                     assert s['peak_reserved_mib']<=10240
                     # New nonlinear sizes also undergo the complete read-only diagnostic.
                     if job['config']['save_profile_checkpoint']:
-                        d=dict(trial_directory=str(segment/key),basis_files={},selected_file='profile_selected.pt',
+                        d=dict(trial_directory=str(segment/key),basis_files=self.bases[job['config']['seed']],selected_file='profile_selected.pt',
                                selected_sha256=sha256(segment/key/'profile_selected.pt'),preflight=True,probe_count=128,energy_limit=1264)
                         ds,dr=self.execute([dict(id='diagnostic',diagnostic=True,config=d)],'preflight','diagnostic_preflight',True)
                         if not dr['diagnostic'].get('passed'):s=dict(state='oom',diagnostic=dr['diagnostic'])
@@ -167,7 +182,9 @@ class Queue:
             c=Controller(SimpleNamespace(output=str(segment),protocol=str(segment/'protocol.json'),phase='run',data=DATA))
             try:
                 c.run_jobs([dict(id=r['id'],config=r['configuration']) for r in batch]);c.status('complete')
-            finally:c.shutdown()
+            finally:
+                c.shutdown();atexit.unregister(c.shutdown)
+                signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
             for r in batch:assert scan_completed(r)
             self.save();self.archive(segment)
             self.status(stage,new_performance_training_started=True)
@@ -235,7 +252,10 @@ class Queue:
         self.status('complete',report_complete=True)
 
 
-def main(root):
+def interrupted(*_):
+    raise InterruptedError("controller_signal")
+
+def main(root,resume_from=None):
     root=Path(root);root.mkdir(parents=True,exist_ok=True)
     with (root/'queue.lock').open('a') as own,(SOURCE/'.active.lock').open('a') as project:
         fcntl.flock(own,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -243,11 +263,12 @@ def main(root):
         assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip()
         fcntl.flock(project,fcntl.LOCK_EX|fcntl.LOCK_NB)
         assert not live_workers(SOURCE),'Existing project workers must finish or be reconciled'
-        q=Queue(root,commit)
+        signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
+        q=Queue(root,commit,resume_from)
         try:q.run()
         except BaseException as e:
             q.status('interrupted' if isinstance(e,(InterruptedError,KeyboardInterrupt)) else 'needs_attention',
                      error=repr(e),traceback=traceback.format_exc());raise
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',default=str(SOURCE/'runs'/STUDY));a=p.parse_args();main(a.root)
+    p=argparse.ArgumentParser();p.add_argument('--root',default=str(SOURCE/'runs'/STUDY));p.add_argument('--resume-from-commit');a=p.parse_args();main(a.root,a.resume_from_commit)
