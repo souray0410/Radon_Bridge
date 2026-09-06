@@ -90,7 +90,8 @@ def main(args):
     torch.set_num_threads(3); torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False; torch.backends.cudnn.deterministic=True
     torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
-    cfg=json.loads(Path(args.config).read_text()); out=Path(args.output); out.mkdir(parents=True,exist_ok=True)
+    from .artifacts import relocate
+    cfg=relocate(json.loads(Path(args.config).read_text())); out=Path(args.output); out.mkdir(parents=True,exist_ok=True)
     if (out/'summary.json').exists(): raise RuntimeError('Completed trial must not be overwritten')
     seed=cfg['seed']; np.random.seed(seed); torch.manual_seed(seed)
     stop_requested=False
@@ -107,7 +108,7 @@ def main(args):
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
         g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda',task_fusion=cfg.get('task_fusion'))
-        if g.task_fusion is not None and (cfg.get('selection_metric') != 'fusion_macro_f1' or cfg.get('training_stage') != 'communication'):
+        if g.task_fusion is not None and (cfg.get('selection_metric') != 'fusion_macro_f1' or cfg.get('training_stage') not in ('communication','host_augmentation')):
             raise ValueError('Task fusion requires explicit fusion selection and communication stage')
         basis_artifacts=[]
         for group in g.communication_groups:
@@ -127,6 +128,16 @@ def main(args):
                     raise ValueError('Not a matching independently trained modality checkpoint')
                 g.load_native_state(saved['model'],branch=branch)
                 parents[branch]=parent
+        elif cfg.get('training_stage')=='host_augmentation':
+            from .artifacts import sha256
+            parent=cfg['host_checkpoint']; checkpoint=Path(parent['path'])
+            if sha256(checkpoint)!=parent['sha256']: raise ValueError('Host checkpoint SHA mismatch')
+            saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+            original=saved['configuration']
+            for key in ('seed','backbone_lr','task_fusion','selection_metric'):
+                if original.get(key)!=cfg.get(key): raise ValueError('Host protocol mismatch: '+key)
+            if original['bridges']!=cfg['bridges'][:1]: raise ValueError('Complete host adapter must be preserved')
+            g.load_complete_state(saved['model'],allow_new_bridge=len(cfg['bridges'])==2)
         elif cfg.get('training_stage')=='independent' and cfg['bridges']:
             raise ValueError('Independent pretraining cannot contain a bridge')
         opt=configure_optimizer(g,recipe)
@@ -195,7 +206,7 @@ def main(args):
                             set_width(g,view['rho']);logits,_=g.forward(c.cuda(),o.cuda(),y.cuda())
                             np.savez(Path(view['directory'])/'profile_predictions.npz',ids=np.asarray(profile_keys),y=y.numpy(),**{k:v.softmax(1).cpu().numpy() for k,v in logits.items()})
                     set_width(g,max(widths(g)))
-            if g.task_fusion is not None:
+            if g.task_fusion is not None or cfg.get('measure_latency'):
                 import subprocess
                 g.graph.eval()
                 before_state=g.save_state();rng=torch.random.get_rng_state().clone();cuda_rng=torch.cuda.get_rng_state().clone()
@@ -214,6 +225,11 @@ def main(args):
                 report['latency']=dict(phase='preflight after three optimization steps',batch=16,warmup=10,repeats=50,median_ms=float(np.median(timings)),q25_ms=float(np.quantile(timings,.25)),q75_ms=float(np.quantile(timings,.75)),timings_ms=timings,other_processes_on_device=other,interfered=bool(other),parameters_BN_RNG_preserved=True)
             write_json(out/'summary.json',report); return
         initial=evaluate(g,val,batch,seed,out/'initial_predictions.npz',stop=lambda:stop_requested)
+        if cfg.get('training_stage')=='host_augmentation':
+            with np.load(Path(cfg['host_checkpoint']['path']).parent/'selected_predictions.npz',allow_pickle=False) as previous, np.load(out/'initial_predictions.npz',allow_pickle=False) as current:
+                assert np.array_equal(previous['ids'],current['ids']) and np.array_equal(previous['y'],current['y'])
+                assert all(np.allclose(previous[k],current[k],rtol=1e-5,atol=1e-6) for k in g.output_names)
+            write_json(out/'checkpoint_acceptance.json',{'strict_host_load':True,'initial_predictions_match':True,'optimizer_reset_for_all_arms':True})
         if parents:
             for branch,parent in parents.items():
                 with np.load(Path(parent['path']).parent/'selected_predictions.npz',allow_pickle=False) as previous, np.load(out/'initial_predictions.npz',allow_pickle=False) as current:

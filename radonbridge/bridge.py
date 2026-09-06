@@ -72,7 +72,7 @@ class LinearMixer(nn.Module):
         return torch.split(y,self.widths,dim=1)
 
 class BridgeExchange(nn.Module):
-    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None):
+    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
         super().__init__()
         self.keys = [s.key for s in specs]
         if not self.keys or len(set(self.keys)) != len(self.keys):
@@ -102,6 +102,19 @@ class BridgeExchange(nn.Module):
             validate_permutation(s_axis_permutation,S)
             if mode!='radon' or compression not in ('fixed_svd_channel','fixed_random_orthogonal_channel') or nested_rhos is not None or cross_edges is not None:
                 raise ValueError('S-axis control requires independent-width bidirectional fixed SVD/QR Radon')
+        positive_integer(kernel_size, 'kernel_size', 1)
+        if kernel_size % 2 != 1: raise ValueError('kernel_size must be odd')
+        if mode == 'pooled' and kernel_size != 3: raise ValueError('Legacy pooled kernel is fixed at one')
+        if nested_rhos is not None and kernel_size != 3: raise ValueError('Joint-width legacy protocol uses kernel three')
+        if r is not None or h is not None:
+            if compression != 'fixed_svd_channel' or r is None or h is None:
+                raise ValueError('Explicit r/h requires fixed SVD and both fields')
+            ranks_requested = participant_values(r, self.keys, 'r')
+            widths_requested = participant_values(h, self.keys, 'h')
+            for spec, m, ratio, rank, width in zip(specs, directions, ratios, ranks_requested, widths_requested):
+                positive_integer(rank, 'r', 1); positive_integer(width, 'h', 1)
+                if rank > spec.channels or width != rank*m or ratio != rank/spec.channels:
+                    raise ValueError('Inconsistent r, h, M, rho, C')
         self.compression=compression
         self.shapes = [(s.channels, *s.shape) for s in specs]
         self.lengths = [math.prod(s) for s in self.shapes]
@@ -126,13 +139,14 @@ class BridgeExchange(nn.Module):
             ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
             self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else CENTERED_VERSION if compression=='fixed_centered_svd_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
             retained=[rank*m for rank,m in zip(ranks,directions)]
-        self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else 3, mode == 'self',self.keys,cross_edges,s_axis_permutation)
+        self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else kernel_size, mode == 'self',self.keys,cross_edges,s_axis_permutation)
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [
             {'key': s.key, 'channels': s.channels, 'shape': list(s.shape), 'M': directions[i], 'rho': ratios[i], 'projected_channels': w,
              'retained_channels': retained[i], 'achieved_width_ratio': retained[i]/w,
              'geometry': self.projectors[i].metadata if mode != 'pooled' else None}
             for i, (s, w) in enumerate(zip(specs, widths))]}
         self.metadata['compression']=compression
+        self.metadata['kernel_size']=self.mixer.conv.kernel_size[0]
         if s_axis_permutation is not None:
             from .s_axis import permutation_metadata
             self.metadata['s_axis_control']=permutation_metadata(s_axis_permutation)
@@ -233,6 +247,8 @@ class BridgeExchange(nn.Module):
         # Diagnostics retain detached views, not the training autograd graph.
         self.latest_inputs = tuple(x.detach() for x in features)
         self.latest_deltas = tuple(x.detach() for x in deltas)
+        if getattr(self, 'delta_only', False):
+            return torch.cat([delta.flatten(1) for delta in deltas], dim=1)
         return torch.cat([(x+delta).flatten(1) for x, delta in zip(features, deltas)], dim=1)
 
 class ReturnParticipant(nn.Module):
@@ -243,14 +259,15 @@ class ReturnParticipant(nn.Module):
         return packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
         if any(v is not None for v in (reduction_ratio,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
-        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation)
+        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
     else:
-        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
+        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
+        if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
         from .baselines import MMTMExchange,AttentionExchange
         if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio)
         elif family=='cross_attention' and reduction_ratio is None:exchange=AttentionExchange(specs,attention_dimension,heads)
@@ -267,7 +284,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -288,9 +305,44 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,
                 deferred_native_edges=[old[i][0] for i in sorted(delayed)])
     return result,meta
+
+
+class ParallelResidualSum(nn.Module):
+    def forward(self, host_output, new_delta):
+        return host_output + new_delta
+
+
+def attach_parallel_to_nodes(builder, configs, samples):
+    """Keep the host's state keys and route both exchanges from pre-write Nodes."""
+    host, addition = configs
+    _, host_meta = attach_to_nodes(builder, host['nodes'], prefix='bridge_0_', samples=samples,
+                                   **{k:v for k,v in host.items() if k!='nodes'})
+    host_steps = list(builder.steps)
+    names = host['nodes']
+    specs = [FeatureSpec(n, samples[n].shape[1], tuple(samples[n].shape[2:])) for n in names]
+    inputs = {n:builder.by_name[n].id for n in names}
+    _, new_meta = attach_group(builder.node, builder.edge, specs, inputs, 'bridge_1_',
+                               **{k:v for k,v in addition.items() if k not in ('nodes','parallel_to')})
+    modules={e.name:e.edge_operations[0].function for e in builder.edges}
+    modules['bridge_1_exchange'].delta_only=True
+    new_steps = builder.steps[len(host_steps):]
+    packet=builder.node('bridge_parallel_output')
+    builder.edge('bridge_parallel_merge',ParallelResidualSum(),
+                 [host_meta['communication_node'],new_meta['communication_node']],[packet])
+    merge_step=builder.steps[-1]
+    exchange_id=next(e.id for e in builder.edges if e.name=='bridge_0_exchange')
+    insertion=next(i for i,row in enumerate(host_steps) if row[0]==exchange_id)+1
+    # The old return edges stay named identically and still write original Node IDs.
+    reordered=host_steps[:insertion]+[new_steps[0],merge_step]+host_steps[insertion:]
+    return_ids={e.id for e in builder.edges if e.name.startswith('bridge_0_') and e.name.endswith('_return')}
+    builder.steps[:]=[(eid,[packet] if eid in return_ids else heads,tails) for eid,heads,tails in reordered]
+    for meta in (host_meta,new_meta):
+        meta.update(topology='parallel_prewrite_residual',native_node_ids=inputs,
+                    formula='X + delta_host(X) + delta_new(X)')
+    return [host_meta,new_meta]

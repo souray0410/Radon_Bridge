@@ -8,6 +8,7 @@ import time
 import numpy as np
 import torch
 from torch import nn
+from .artifacts import resolve
 
 BASIS_VERSION='train_channel_second_moment_eigh_v1'
 QR_VERSION='channel_random_qr_v1'
@@ -76,6 +77,7 @@ def save_centered_basis(moment, channel_sum, count, directory, source_key, seed,
 
 @lru_cache(maxsize=64)
 def _load_basis(path, expected_sha):
+    path=resolve(path)
     if file_sha(path)!=expected_sha:raise ValueError('SVD basis file SHA256 mismatch')
     with np.load(path,allow_pickle=False) as z:
         q=torch.from_numpy(z['q'].copy());metadata=json.loads(str(z['metadata']))

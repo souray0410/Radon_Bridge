@@ -82,7 +82,10 @@ class Controller:
         if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
         path.mkdir()
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),CUBLAS_WORKSPACE_CONFIG=':4096:8')
-        if job.get('analysis'):
+        if job.get('host_basis'):
+            write_json(path/'configuration.json',job['config'])
+            cmd=[sys.executable,'-m','radonbridge.host_basis','--config',str(path/'configuration.json'),'--output',str(path),'--data',self.args.data]
+        elif job.get('analysis'):
             write_json(path/'configuration.json',job['config'])
             cmd=[sys.executable,'-m','radonbridge.communication_analysis','--config',str(path/'configuration.json'),'--output',str(path),'--data',self.args.data]
         elif job.get('diagnostic'):
@@ -153,7 +156,7 @@ class Controller:
             state='budget_complete' if self.stop_reason=='budget' else 'interrupted'
             self.status(state,reason=self.stop_reason)
             raise InterruptedError(self.stop_reason)
-        if self.args.phase=='run':
+        if self.args.phase=='run' and not self.protocol.get('skip_legacy_summary',False):
             subprocess.run([sys.executable,'scripts/summarize_integer_experiment.py','--root',str(self.root)],check=True)
         return results
 

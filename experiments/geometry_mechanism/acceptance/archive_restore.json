@@ -1,0 +1,12 @@
+{
+  "state": "verified",
+  "regular_files": 11526,
+  "symlinks": 43,
+  "regular_file_bytes": 448175502622,
+  "archive_manifest_sha256": "7ba12cda72e550d6649e3f350bd83b76c09e61c2bdf592f72f8dfabdd9e3364c",
+  "strict_restore_models": 6,
+  "all_restore_predictions_and_statistics_match": true,
+  "old_work_copies_deleted": false,
+  "test_used": false,
+  "raw_UKB_included": false
+}

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "test": "check_fixed_channel_basis.py",
+      "exit_code": 0,
+      "output": "{\"basis\": {\"orthogonal\": true, \"nested_ranks\": [16, 32, 64], \"rng_unchanged\": true, \"energy_order_matches_svd\": true, \"shared_basis_across_ranks\": true, \"commutes_2d_3d\": true, \"only_mixer_trainable\": true, \"checkpoint_verified\": true}, \"topology\": {\"dimensions\": [2, 3], \"repeated_distinct_configs\": false, \"participant_sampling\": false, \"native_topology_preserved\": true, \"zero_bridge_exact\": true, \"mhd_gradient_relative_error\": 0.0, \"cross_branch_gradient\": 0.0016461790048846474, \"linearity_error\": 1.0970430518468006e-16}, \"checkpoint_optimizer\": {\"native_checkpoint_predictions_exact\": true, \"optimizer_exhaustive\": true, \"all_modules_update\": true, \"basis_unchanged\": true, \"batchnorm_updates\": true, \"cross_task_gradient\": 0.011407146230340004}, \"passed\": true}\n",
+      "stderr": ""
+    },
+    {
+      "test": "check_task_fusion.py",
+      "exit_code": 0,
+      "output": "{\"passed\": true, \"formula\": true, \"participant_bag_identity\": true, \"shared_classifier_initialization\": true, \"random_state_preserved\": true, \"native_outputs_and_nodes_preserved\": true, \"MHD_native_gradients\": true, \"BN_and_optimizer\": true, \"checkpoint_reload\": true, \"fusion_selection_separate\": true}\n",
+      "stderr": ""
+    },
+    {
+      "test": "check_mechanism_baselines.py",
+      "exit_code": 0,
+      "output": "{\"passed\": true, \"baseline_formulas\": true, \"native_MHD_gradients\": true, \"directed_masks\": true, \"legacy_default_strict_load\": true, \"native_identity_and_BN\": true, \"baseline_read_only_diagnostics\": true}\n",
+      "stderr": ""
+    }
+  ]
+}

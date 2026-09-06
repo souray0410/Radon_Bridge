@@ -1,0 +1,51 @@
+{
+  "study": "2026_09_06_14_05_08",
+  "new_performance_training_started": false,
+  "items": [
+    {
+      "requirement": "study_objective",
+      "implementation": "机制和适用条件优先，取消开发集最优选型",
+      "status": "用户最新明确修正"
+    },
+    {
+      "requirement": "historical_archive",
+      "implementation": "完整复制及SHA逐项核验",
+      "status": "完整复制及逐文件SHA核验通过；六个归档模型严格恢复、开发集预测和统计一致；旧副本尚未删除"
+    },
+    {
+      "requirement": "default_compatibility",
+      "implementation": "旧路径模块／输出／梯度／Node IDs",
+      "status": "CPU验收通过"
+    },
+    {
+      "requirement": "network_provider_interface",
+      "implementation": "原生构建／通信接入／MHD运行职责分开",
+      "status": "三种旧配置与异构小网络验收通过"
+    },
+    {
+      "requirement": "kernel_and_width",
+      "implementation": "kernel_size默认3，新增显式r/h一致性验证",
+      "status": "CPU通过，GPU待项目锁"
+    },
+    {
+      "requirement": "parallel_host",
+      "implementation": "原生同输入并行残差和完整宿主加载",
+      "status": "CPU通过，真实宿主GPU待验收"
+    },
+    {
+      "requirement": "two_protocols",
+      "implementation": "分支与融合loss/selection保持独立",
+      "status": "原协议兼容性验证"
+    },
+    {
+      "requirement": "training_matrix",
+      "implementation": "修订为问题驱动，最终数量未锁定",
+      "status": "等待确认，不派发新性能训练"
+    },
+    {
+      "requirement": "external_evidence",
+      "implementation": "原始数据、标签、任务／网络扩展",
+      "status": "另立后续协议"
+    }
+  ]
+}

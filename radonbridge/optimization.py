@@ -36,6 +36,8 @@ def clip_task_gradients(g, max_norm=5.):
     seen = set()
     for name, module in g.modules_by_name().items():
         key = 'communication' if name.startswith('bridge_') else 'fusion' if name.startswith('fusion_') else next((k for k in g.branches if name.startswith(k + '_')), None)
+        if key == 'communication' and getattr(g,'separate_communication_clipping',False):
+            key='_'.join(name.split('_')[:2]); groups.setdefault(key,[])
         if key is None:
             continue
         for p in module.parameters():

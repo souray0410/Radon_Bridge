@@ -1,108 +1,17 @@
-"""Complete independent task networks with configurable in-place bridge groups."""
-import torch
-from torch import nn
-from .legacy_model import pretrained_backbones, FlattenEyes, EyePool, Loss, MeanLoss
-from .bridge import attach_to_nodes
-from .graph import MHDBuilder
+"""Legacy CFP/OCT calling convention backed by the reusable MHD task runtime."""
+from .native_networks import build_cfp_oct, TaskLoss
+from .mhd_task import MHDTaskGraph
 
-
-class TaskLoss(nn.Module):
-    def __init__(self):
-        super().__init__(); self.scale = 1.
-    def forward(self, *losses):
-        return torch.stack(losses).sum()*self.scale
-
-
-class PilotGraph:
+class PilotGraph(MHDTaskGraph):
     def __init__(self, *, bridge_configs=(), seed=3407, device='cpu', backbone='resnet18', task_fusion=None):
-        self.head_mode, self.branches = 'separate', ('cfp', 'oct')
-        torch.manual_seed(seed)
-        builder = self.builder = MHDBuilder()
-        self.nodes, self.edges, self.steps, self.by_name = builder.nodes, builder.edges, builder.steps, builder.by_name
-        node, edge = builder.node, builder.edge
-        inputs = {k: node(k) for k in (*self.branches, 'target')}
-        backbones = pretrained_backbones(backbone)
-        heads = {k: nn.Linear(512, 2) for k in self.branches}
-        features = {}
-        for k in self.branches:
-            features[k] = node(k+'_eye_input')
-            edge(k+'_flatten_eyes', FlattenEyes(), [inputs[k]], [features[k]])
-        for stage in range(1, 5):
-            for k in self.branches:
-                out = node(f'{k}_stage{stage}')
-                edge(f'{k}_stage{stage}', backbones[k][stage-1], [features[k]], [out])
-                features[k] = out
-        losses = []
-        for k in self.branches:
-            pool = node(k+'_participant'); edge(k+'_pool', EyePool(), [features[k]], [pool])
-            logits = node(k+'_logits'); edge(k+'_head', heads[k], [pool], [logits])
-            loss = node(k+'_loss'); edge(k+'_criterion', Loss(), [logits, inputs['target']], [loss]); losses.append(loss)
-        self.task_fusion = task_fusion
-        if task_fusion is not None:
-            from .task_fusion import TaskFusionHead
-            if set(task_fusion) != {'pooling', 'hidden_dimension', 'attention_dimension'}:
-                raise ValueError('Explicit task fusion pooling and dimensions required')
-            fused = node('fusion_logits')
-            edge('fusion_head', TaskFusionHead(seed=seed, **task_fusion),
-                 [features[k] for k in self.branches], [fused])
-            fused_loss = node('fusion_loss')
-            edge('fusion_criterion', Loss(), [fused, inputs['target']], [fused_loss])
-            losses.append(fused_loss)
-        loss = node('loss'); edge('task_loss_sum', TaskLoss(), losses, [loss])
-        self.output_names = (*self.branches, 'fusion') if task_fusion is not None else self.branches
-        self.communication_groups = []
-        configs = list(bridge_configs)
-        if task_fusion is not None and any('nested_rhos' in c for c in configs):
-            raise ValueError('Task fusion benchmark does not support joint-width training')
-        if configs:
-            modules = list(self.modules_by_name().values())
-            training = {m: m.training for module in modules for m in module.modules()}
-            for m in training: m.training = False
-            try:
-                with torch.no_grad():
-                    samples = builder.native_forward({'cfp': torch.zeros(1,2,3,224,224),
-                        'oct': torch.zeros(1,2,1,32,96,96), 'target': torch.zeros(1,dtype=torch.long)})
-            finally:
-                for m, value in training.items(): m.training = value
-            for index, cfg in enumerate(configs):
-                family=cfg.get('family','radon')
-                required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'}
-                optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation'} if family=='radon' else set()
-                if family not in ('radon','mmtm','cross_attention') or not required<=set(cfg) or set(cfg)-required-optional:
-                    raise ValueError('Invalid communication configuration for family '+str(family))
-                _, metadata = attach_to_nodes(builder, cfg['nodes'], prefix=f'bridge_{index}_', samples=samples,
-                                               **{k:v for k,v in cfg.items() if k!='nodes'})
-                self.communication_groups.append(metadata)
-            del samples
-        self.graph = builder.compile(device).float()
-        self.forward_levels, self.backward_levels = builder.forward_levels, builder.backward_levels
+        native=build_cfp_oct(seed=seed,backbone=backbone,task_fusion=task_fusion)
+        super().__init__(native,bridge_configs=bridge_configs,device=device)
 
     def set_inputs(self, cfp, oct_, target):
-        self.builder.set_inputs(dict(zip(('cfp','oct','target'), (cfp,oct_,target))))
+        self.builder.set_inputs(dict(zip(('cfp','oct','target'),(cfp,oct_,target))))
 
     def forward(self, cfp, oct_, target, loss_scale=1.):
-        self.modules_by_name()['task_loss_sum'].scale = loss_scale
-        self.set_inputs(cfp,oct_,target)
-        self.graph.forward(levels=self.forward_levels)
-        return {k:self.by_name[k+'_logits'].feature_message.current_state for k in self.output_names}, self.by_name['loss'].feature_message.current_state
-
-    def backward(self):
-        self.graph.backward(levels=self.backward_levels)
-
-    def modules_by_name(self):
-        return {e.name:e.edge_operations[0].function for e in self.edges}
-
-    def save_state(self):
-        return {k:{n:v.detach().cpu().clone() for n,v in m.state_dict().items()} for k,m in self.modules_by_name().items()}
-
-    def load_native_state(self, state, branch=None):
-        modules={k:m for k,m in self.modules_by_name().items() if not k.startswith(('bridge_', 'fusion_'))}
-        if branch is not None:
-            modules={k:m for k,m in modules.items() if k.startswith(branch+'_')}
-        if set(state) != set(modules):
-            raise ValueError(f'Checkpoint native module mismatch: missing={set(modules)-set(state)}, extra={set(state)-set(modules)}')
-        for key,module in modules.items():module.load_state_dict(state[key],strict=True)
+        return self.forward_inputs(dict(zip(('cfp','oct','target'),(cfp,oct_,target))),loss_scale=loss_scale)
 
     def native_forward(self, cfp, oct_, target):
-        values = self.builder.native_forward(dict(zip(('cfp','oct','target'), (cfp,oct_,target))))
-        return {k:values[k+'_logits'] for k in self.output_names}, values['loss']
+        return self.native_forward_inputs(dict(zip(('cfp','oct','target'),(cfp,oct_,target))))

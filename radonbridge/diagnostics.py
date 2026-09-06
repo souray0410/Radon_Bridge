@@ -81,8 +81,8 @@ def learned_rowspace(codec,device):
     return SimpleNamespace(q=q,encode=lambda x:torch.einsum('cr,bc...->br...',q.to(x),x),metadata=metadata)
 
 
-def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
-    device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get('bridge_0_exchange')
+def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None,exchange_name="bridge_0_exchange"):
+    device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get(exchange_name)
     keys=['cfp_stage3','oct_stage3'];bases={}
     for key in keys:
         if exchange is not None and getattr(exchange,'family','radon')!='radon':
@@ -98,7 +98,7 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
     if exchange is not None:
         for name,m in exchange.named_modules():
             ps=list(m.parameters(recurse=False))
-            if ps:groups['bridge_0_exchange.'+name]=ps
+            if ps:groups[exchange_name+'.'+name]=ps
     flat=[];slices={};start=0
     for key,ps in groups.items():
         flat.extend(ps);count=sum(p.numel() for p in ps);slices[key]=(start,start+count);start+=count
@@ -139,8 +139,8 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None):
                 del gs,grad,loss
             release_forward_graph(g)
     result={key:cosine(gradients['cfp'][lo:hi],gradients['oct'][lo:hi]) for key,(lo,hi) in slices.items()}
-    if exchange is not None and exchange.compression in ('fixed_svd_channel','fixed_centered_svd_channel','fixed_random_orthogonal_channel','learned_channel'):
-        v=result['bridge_0_exchange.mixer.conv'];assert v['cosine'] is None or abs(v['cosine'])<1e-10,'Fixed single-bridge output-row support is not disjoint'
+    if not getattr(g,'separate_communication_clipping',False) and exchange is not None and exchange.compression in ('fixed_svd_channel','fixed_centered_svd_channel','fixed_random_orthogonal_channel','learned_channel'):
+        v=result[exchange_name+'.mixer.conv'];assert v['cosine'] is None or abs(v['cosine'])<1e-10,'Fixed single-bridge output-row support is not disjoint'
     for key,values in accum.items():
         den=values['input_energy'];values['retained_energy_ratio']=values['retained_energy']/den if den>0 else None
         values['delta_over_input_l2']=(values['delta_energy']/den)**.5 if den>0 else None
@@ -166,9 +166,15 @@ def main(cfg,out,data_path):
     torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     if (out/'summary.json').exists():raise RuntimeError('Diagnostic already exists')
-    trial=Path(cfg['trial_directory']);config=json.loads((trial/'configuration.json').read_text());train=PairedDataset(data_path,'train',224);assert len(train)==1264
-    g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda')
-    for branch,parent in config['parent_checkpoints'].items():
+    from .artifacts import relocate
+    cfg=relocate(cfg)
+    trial=Path(cfg['trial_directory']);config=relocate(json.loads((trial/'configuration.json').read_text()));train=PairedDataset(data_path,'train',224);assert len(train)==1264
+    g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda',task_fusion=config.get('task_fusion'))
+    if config.get('training_stage')=='host_augmentation':
+        parent=config['host_checkpoint'];assert file_sha(parent['path'])==parent['sha256']
+        saved=torch.load(parent['path'],map_location='cpu',weights_only=False)
+        g.load_complete_state(saved['model'],allow_new_bridge=len(config['bridges'])==2)
+    for branch,parent in ({} if config.get('training_stage')=='host_augmentation' else config['parent_checkpoints']).items():
         assert file_sha(parent['path'])==parent['sha256'];saved=torch.load(parent['path'],map_location='cpu',weights_only=False);g.load_native_state(saved['model'],branch)
     results={};preflight=cfg.get('preflight',False)
     for phase in ['initial','selected']:
@@ -186,6 +192,8 @@ def main(cfg,out,data_path):
                     for k,v in logits.items():assert np.allclose(z[k],v.softmax(1).cpu().numpy(),rtol=1e-5,atol=1e-6),'Nested/standalone MHD output mismatch'
                 release_forward_graph(g)
         results[phase]=analyze_graph(g,train,cfg['basis_files'],batch=16,probe_count=cfg.get('probe_count',16 if preflight else 128),energy_limit=cfg.get('energy_limit',16 if preflight else None))
+        if getattr(g,'separate_communication_clipping',False):
+            results[phase+'_new_bridge']=analyze_graph(g,train,cfg['basis_files'],batch=16,probe_count=cfg.get('probe_count',16 if preflight else 128),energy_limit=cfg.get('energy_limit',16 if preflight else None),exchange_name='bridge_1_exchange')
         write_json(out/'progress.json',{'completed_phase':phase,'seconds':time.monotonic()-start})
     write_json(out/'summary.json',{'state':'complete','passed':True,'preflight':preflight,'profile_export_identity_verified':bool(cfg.get('profile_export_identity')),'trial_directory':str(trial),'selected_sha256':cfg['selected_sha256'],
         'phases':results,'seconds':time.monotonic()-start,'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False})
