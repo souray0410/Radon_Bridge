@@ -1,0 +1,8 @@
+{
+  "state": "waiting_for_54_and_report",
+  "pid": 848260,
+  "source_commit": "18c804a06bac6199880037346ae3c39902100cf8",
+  "predecessor": "/data/mengh/RadonBridge/runs/2026_09_06_08_37_46",
+  "total": 18,
+  "completed": 0
+}
