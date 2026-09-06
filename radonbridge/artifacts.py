@@ -6,6 +6,7 @@ from pathlib import Path
 STUDY = '2026_09_06_14_05_08'
 SOURCE = Path('/data/mengh/RadonBridge')
 ARCHIVE = Path('/backup/mengh/RadonBridge/archive') / STUDY
+ARCHIVE_ENTRY = Path('/data/mengh/backup_extra/RadonBridge/archive') / STUDY
 
 def resolve(path):
     p = Path(path)

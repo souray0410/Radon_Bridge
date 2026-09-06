@@ -75,6 +75,12 @@ def historical_index(wanted):
 
 def storage_check(work,peak_bytes,archive_peak_bytes=0):
     floor=100*1024**3
+    if Path(work).stat().st_dev==ARCHIVE.stat().st_dev:
+        # Symlink aliases never constitute additional capacity.
+        available=shutil.disk_usage(ARCHIVE).free
+        required=floor+peak_bytes+archive_peak_bytes
+        if available<required:raise RuntimeError('storage_needs_attention: shared filesystem capacity')
+        return dict(shared_filesystem=True,free=available,required=required)
     status=dict(work_free=shutil.disk_usage(work).free,archive_free=shutil.disk_usage(ARCHIVE).free,
                 work_required=floor+peak_bytes,archive_required=floor+archive_peak_bytes)
     if status['work_free']<status['work_required'] or status['archive_free']<status['archive_required']:
