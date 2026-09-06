@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-09-06T10:35:06.277978+00:00",
+  "fusion_training_complete": 54,
+  "s_axis_training_complete": 18,
+  "s_axis_diagnostics_complete": 18,
+  "all_platform": true,
+  "failures": 0,
+  "selected_prediction_checkpoint_configuration_summary_hashes_verified": true,
+  "aggregate_artifact_hashes_verified": true,
+  "all_21_png_figures_inspected": true,
+  "peak_project_process_mib": {
+    "task_fusion": 8532,
+    "s_axis": 8558
+  },
+  "new_gpu_minutes": 423.9723981788319,
+  "cumulative_gpu_minutes": 1984.5922987274344,
+  "test_used": false,
+  "participant_level_predictions_exported": false,
+  "source_commits": {
+    "task_fusion": "0ea02b43d2a10b903c759b739271ee8b35b705be",
+    "s_axis": "18c804a06bac6199880037346ae3c39902100cf8"
+  }
+}

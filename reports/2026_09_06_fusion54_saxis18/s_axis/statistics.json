@@ -1,0 +1,133 @@
+{
+  "primary_count": 3,
+  "max_abs_t_critical95": 2.3220218487871134,
+  "contrasts": [
+    {
+      "id": "SVD_ordered_minus_S_permuted",
+      "difference_pp": 1.0122096676918377,
+      "ci95_pp": [
+        -0.253086999463698,
+        2.26674263767869
+      ],
+      "simultaneous_ci95_pp": [
+        -0.48579766566227023,
+        2.5102170010459455
+      ],
+      "bootstrap_sd_pp": 0.6451305934681787,
+      "zero_variance": false,
+      "classification": "unresolved"
+    },
+    {
+      "id": "QR_ordered_minus_S_permuted",
+      "difference_pp": 0.6945836200372248,
+      "ci95_pp": [
+        -0.5217663873453932,
+        1.9183459507305136
+      ],
+      "simultaneous_ci95_pp": [
+        -0.7456859289658571,
+        2.1348531690403068
+      ],
+      "bootstrap_sd_pp": 0.6202652872346544,
+      "zero_variance": false,
+      "classification": "unresolved"
+    },
+    {
+      "id": "basis_order_interaction",
+      "difference_pp": 0.3176260476546364,
+      "ci95_pp": [
+        -1.2525252546911776,
+        1.9165405957770478
+      ],
+      "simultaneous_ci95_pp": [
+        -1.5528835627448276,
+        2.1881356580541005
+      ],
+      "bootstrap_sd_pp": 0.8055521145834642,
+      "zero_variance": false,
+      "classification": "unresolved"
+    }
+  ],
+  "resamples": 10000,
+  "participants": 296,
+  "indices_sha256": "3fd23b3b74391d1b97442fc7feaf855da44bca234c510274c57ce3fcc11f1e93",
+  "permutation": {
+    "permutation": [
+      45,
+      7,
+      37,
+      59,
+      36,
+      25,
+      55,
+      46,
+      51,
+      8,
+      0,
+      2,
+      28,
+      12,
+      35,
+      14,
+      43,
+      3,
+      63,
+      38,
+      5,
+      19,
+      26,
+      52,
+      22,
+      16,
+      30,
+      49,
+      17,
+      42,
+      15,
+      60,
+      24,
+      33,
+      34,
+      11,
+      31,
+      10,
+      53,
+      21,
+      27,
+      61,
+      32,
+      58,
+      48,
+      13,
+      4,
+      23,
+      50,
+      41,
+      57,
+      44,
+      54,
+      18,
+      62,
+      40,
+      1,
+      6,
+      47,
+      56,
+      9,
+      20,
+      39,
+      29
+    ],
+    "sha256": "732ff57edf7252d4ce1a742b5433e2e05408c1fac28d0cf09adbd2bd398250d8",
+    "sha_encoding": "UTF-8 compact JSON integer array",
+    "convention": "z[..., permutation] -> Conv1d -> y[..., argsort(permutation)]",
+    "shared_across": "all sources, channels, training seeds, bases and rho",
+    "boundary_note": "Zero-padding boundary locations are permuted along with adjacency; not isolated from boundary effects.",
+    "version": "radon_bridge_s_axis_adjacency_v1",
+    "seed": 6779677816523615098,
+    "seed_key": "radon_bridge_s_axis_adjacency_v1|S=64",
+    "generator": "NumPy PCG64; independent generator; no rejection sampling",
+    "original_adjacent_pairs_remaining": 1
+  },
+  "interpretation": "Conditional on selected development models and one fixed permutation. Equal seed/width/branch weights; not independent participants."
+}
