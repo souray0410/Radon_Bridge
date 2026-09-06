@@ -34,7 +34,7 @@ def loader(data, batch, seed, epoch=None):
 
 @torch.no_grad()
 def evaluate_one_width(g, data, batch, seed, output=None, stop=None):
-    g.graph.eval(); scores={k:[] for k in g.branches}; labels=[]; ids=[]; ratios={}
+    g.graph.eval(); scores={k:[] for k in g.output_names}; labels=[]; ids=[]; ratios={}
     for c,o,y,keys in loader(data,batch,seed):
         if stop and stop(): raise InterruptedError('Trial stopped by controller')
         logits,_=g.forward(c.cuda(),o.cuda(),y.cuda())
@@ -47,7 +47,7 @@ def evaluate_one_width(g, data, batch, seed, output=None, stop=None):
     arrays={k:np.concatenate(v) for k,v in scores.items()}
     if output: np.savez(output, ids=np.asarray(ids), y=np.asarray(labels), **arrays)
     tasks={k:classification_metrics(labels,v) for k,v in arrays.items()}
-    return {'tasks':tasks,'mean_task_macro_f1':float(np.mean([v['macro_f1'] for v in tasks.values()])),
+    return {'tasks':tasks,'mean_task_macro_f1':float(np.mean([tasks[k]['macro_f1'] for k in g.branches])),
             'delta_over_feature_l2':{k:math_sqrt(a/b) if b else 0. for k,(a,b) in ratios.items()}}
 
 
@@ -68,13 +68,17 @@ def evaluate(g,data,batch,seed,output=None,stop=None):
     return aggregate_metrics(values)
 
 
+def selection_score(metrics,cfg):
+    return metrics['tasks']['fusion']['macro_f1'] if cfg.get('selection_metric') == 'fusion_macro_f1' else metrics['mean_task_macro_f1']
+
+
 def math_sqrt(x): return float(np.sqrt(x))
 
 
 def parameter_hash(g):
     h=hashlib.sha256()
     for name,module in sorted(g.modules_by_name().items()):
-        if name.startswith('bridge_'):continue
+        if name.startswith(('bridge_', 'fusion_')):continue
         h.update(name.encode())
         for key,p in sorted(module.state_dict().items()):
             h.update(key.encode()); h.update(p.detach().cpu().numpy().tobytes())
@@ -102,7 +106,9 @@ def main(args):
             'weight_decay':.01,'training_regime':'full_finetune'}
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
-        g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda')
+        g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda',task_fusion=cfg.get('task_fusion'))
+        if g.task_fusion is not None and (cfg.get('selection_metric') != 'fusion_macro_f1' or cfg.get('training_stage') != 'communication'):
+            raise ValueError('Task fusion requires explicit fusion selection and communication stage')
         basis_artifacts=[]
         for group in g.communication_groups:
             module=g.modules_by_name()[group['exchange_edge_name']]
@@ -130,7 +136,10 @@ def main(args):
               'initial_learning_rates':initial_learning_rates,
               'parameters':sum(p.numel() for p in g.graph.parameters()),
               'trainable_parameters':sum(p.numel() for p in g.graph.parameters() if p.requires_grad),
+              'communication_parameters':sum(p.numel() for n,m in g.modules_by_name().items() if n.startswith('bridge_') for p in m.parameters()),
               'parent_checkpoints':parents,'batchnorm_policy':'train','initialization':'CFP ImageNet; OCT inflated ImageNet, not OCT-specific pretraining'}
+        if g.task_fusion is not None:
+            info.update(selection_policy='fusion macro-F1',loss_policy='CE_CFP + CE_OCT + CE_fusion',task_fusion=cfg['task_fusion'],fusion_parameters=sum(p.numel() for p in g.modules_by_name()['fusion_head'].parameters()))
         if widths(g):
             info.update(nested_widths=list(widths(g)),batchnorm_policy='per-width training batch statistics; arithmetic mean of running updates, one counter increment per participant batch',selection_policy='one checkpoint maximizing equal mean of six branch-width F1 values',optimizer_updates_per_batch=1)
         if any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
@@ -157,12 +166,20 @@ def main(args):
             for a,b in [('cfp','oct'),('oct','cfp')]:
                 root=g.by_name[a+'_loss'].feature_message.current_state
                 p=next(g.modules_by_name()[b+'_stage1'].parameters())
-                grad=torch.autograd.grad(root,p,retain_graph=True)[0]
+                grad=torch.autograd.grad(root,p,retain_graph=True,allow_unused=True)[0]
+                if grad is None: grad=torch.zeros_like(p)
                 cross[a+'_to_'+b]=float(grad.norm()); assert torch.isfinite(grad).all()
                 allowed=any(x.get('family','radon')!='radon' or (x['mode']!='self' and
                     ('cross_edges' not in x or [b+'_stage3',a+'_stage3'] in x['cross_edges'])) for x in cfg['bridges'])
                 if not allowed:assert grad.abs().sum()==0
                 else:assert grad.abs().sum()>0
+            if g.task_fusion is not None:
+                fusion_root=g.by_name['fusion_loss'].feature_message.current_state
+                for branch in g.branches:
+                    p=next(g.modules_by_name()[branch+'_stage1'].parameters())
+                    grad=torch.autograd.grad(fusion_root,p,retain_graph=True)[0]
+                    assert torch.isfinite(grad).all() and grad.norm()>0
+                    cross['fusion_to_'+branch]=float(grad.norm())
             report={'state':'complete','microbatch':batch,'step_seconds':step_times,'modules_changed':changed,
                     'cross_branch_gradients':cross,'gradient_norms':norm_records,'seconds':time.monotonic()-start,
                     'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
@@ -178,6 +195,23 @@ def main(args):
                             set_width(g,view['rho']);logits,_=g.forward(c.cuda(),o.cuda(),y.cuda())
                             np.savez(Path(view['directory'])/'profile_predictions.npz',ids=np.asarray(profile_keys),y=y.numpy(),**{k:v.softmax(1).cpu().numpy() for k,v in logits.items()})
                     set_width(g,max(widths(g)))
+            if g.task_fusion is not None:
+                import subprocess
+                g.graph.eval()
+                before_state=g.save_state();rng=torch.random.get_rng_state().clone();cuda_rng=torch.cuda.get_rng_state().clone()
+                context=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,gpu_uuid,used_memory','--format=csv,noheader,nounits'],text=True)
+                gpu_uuids=subprocess.check_output(['nvidia-smi','--query-gpu=index,uuid','--format=csv,noheader'],text=True)
+                timings=[];latency_batch=(c.cuda(),o.cuda(),y.cuda())
+                with torch.no_grad():
+                    for index in range(60):
+                        torch.cuda.synchronize();tick=time.monotonic();g.forward(*latency_batch);torch.cuda.synchronize()
+                        if index>=10:timings.append(1000*(time.monotonic()-tick))
+                assert all(torch.equal(v,g.modules_by_name()[n].state_dict()[k].cpu()) for n,d in before_state.items() for k,v in d.items())
+                assert torch.equal(rng,torch.random.get_rng_state()) and torch.equal(cuda_rng,torch.cuda.get_rng_state())
+                visible=int(os.environ['CUDA_VISIBLE_DEVICES'])
+                uuid=next(line.split(',')[1].strip() for line in gpu_uuids.splitlines() if int(line.split(',')[0])==visible)
+                other=[line for line in context.splitlines() if uuid in line and int(line.split(',')[0])!=os.getpid()]
+                report['latency']=dict(phase='preflight after three optimization steps',batch=16,warmup=10,repeats=50,median_ms=float(np.median(timings)),q25_ms=float(np.quantile(timings,.25)),q75_ms=float(np.quantile(timings,.75)),timings_ms=timings,other_processes_on_device=other,interfered=bool(other),parameters_BN_RNG_preserved=True)
             write_json(out/'summary.json',report); return
         initial=evaluate(g,val,batch,seed,out/'initial_predictions.npz',stop=lambda:stop_requested)
         if parents:
@@ -194,7 +228,7 @@ def main(args):
         selected_states={}
         for key,monitor in monitors.items():
             if not independent:
-                monitor.update(initial['mean_task_macro_f1'],0)
+                monitor.update(selection_score(initial,cfg),0)
                 selected_states[key]=g.save_state()
         converged=False; epoch_times=[]
         for epoch in range(1,policy['max_epochs']+1):
@@ -214,7 +248,7 @@ def main(args):
             metrics=evaluate(g,val,batch,seed,stop=lambda:stop_requested)
             flags={}
             for key,monitor in monitors.items():
-                score=metrics['tasks'][key]['macro_f1'] if independent else metrics['mean_task_macro_f1']
+                score=metrics['tasks'][key]['macro_f1'] if independent else selection_score(metrics,cfg)
                 flags[key]=monitor.update(score,epoch)
                 if flags[key]['improved']:
                     selected_states[key]={name:{k:v.detach().cpu().clone() for k,v in module.state_dict().items()}

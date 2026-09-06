@@ -32,9 +32,10 @@ def clip_task_gradients(g, max_norm=5.):
         raise ValueError('Per-task clipping requires separate task paths')
     groups = {k: [] for k in g.branches}
     groups['communication'] = []
+    if getattr(g, 'task_fusion', None) is not None: groups['fusion'] = []
     seen = set()
     for name, module in g.modules_by_name().items():
-        key = 'communication' if name.startswith('bridge_') else next((k for k in g.branches if name.startswith(k + '_')), None)
+        key = 'communication' if name.startswith('bridge_') else 'fusion' if name.startswith('fusion_') else next((k for k in g.branches if name.startswith(k + '_')), None)
         if key is None:
             continue
         for p in module.parameters():

@@ -14,7 +14,7 @@ class TaskLoss(nn.Module):
 
 
 class PilotGraph:
-    def __init__(self, *, bridge_configs=(), seed=3407, device='cpu', backbone='resnet18'):
+    def __init__(self, *, bridge_configs=(), seed=3407, device='cpu', backbone='resnet18', task_fusion=None):
         self.head_mode, self.branches = 'separate', ('cfp', 'oct')
         torch.manual_seed(seed)
         builder = self.builder = MHDBuilder()
@@ -37,9 +37,23 @@ class PilotGraph:
             pool = node(k+'_participant'); edge(k+'_pool', EyePool(), [features[k]], [pool])
             logits = node(k+'_logits'); edge(k+'_head', heads[k], [pool], [logits])
             loss = node(k+'_loss'); edge(k+'_criterion', Loss(), [logits, inputs['target']], [loss]); losses.append(loss)
+        self.task_fusion = task_fusion
+        if task_fusion is not None:
+            from .task_fusion import TaskFusionHead
+            if set(task_fusion) != {'pooling', 'hidden_dimension', 'attention_dimension'}:
+                raise ValueError('Explicit task fusion pooling and dimensions required')
+            fused = node('fusion_logits')
+            edge('fusion_head', TaskFusionHead(seed=seed, **task_fusion),
+                 [features[k] for k in self.branches], [fused])
+            fused_loss = node('fusion_loss')
+            edge('fusion_criterion', Loss(), [fused, inputs['target']], [fused_loss])
+            losses.append(fused_loss)
         loss = node('loss'); edge('task_loss_sum', TaskLoss(), losses, [loss])
+        self.output_names = (*self.branches, 'fusion') if task_fusion is not None else self.branches
         self.communication_groups = []
         configs = list(bridge_configs)
+        if task_fusion is not None and any('nested_rhos' in c for c in configs):
+            raise ValueError('Task fusion benchmark does not support joint-width training')
         if configs:
             modules = list(self.modules_by_name().values())
             training = {m: m.training for module in modules for m in module.modules()}
@@ -70,7 +84,7 @@ class PilotGraph:
         self.modules_by_name()['task_loss_sum'].scale = loss_scale
         self.set_inputs(cfp,oct_,target)
         self.graph.forward(levels=self.forward_levels)
-        return {k:self.by_name[k+'_logits'].feature_message.current_state for k in self.branches}, self.by_name['loss'].feature_message.current_state
+        return {k:self.by_name[k+'_logits'].feature_message.current_state for k in self.output_names}, self.by_name['loss'].feature_message.current_state
 
     def backward(self):
         self.graph.backward(levels=self.backward_levels)
@@ -82,7 +96,7 @@ class PilotGraph:
         return {k:{n:v.detach().cpu().clone() for n,v in m.state_dict().items()} for k,m in self.modules_by_name().items()}
 
     def load_native_state(self, state, branch=None):
-        modules={k:m for k,m in self.modules_by_name().items() if not k.startswith('bridge_')}
+        modules={k:m for k,m in self.modules_by_name().items() if not k.startswith(('bridge_', 'fusion_'))}
         if branch is not None:
             modules={k:m for k,m in modules.items() if k.startswith(branch+'_')}
         if set(state) != set(modules):
@@ -91,4 +105,4 @@ class PilotGraph:
 
     def native_forward(self, cfp, oct_, target):
         values = self.builder.native_forward(dict(zip(('cfp','oct','target'), (cfp,oct_,target))))
-        return {k:values[k+'_logits'] for k in self.branches}, values['loss']
+        return {k:values[k+'_logits'] for k in self.output_names}, values['loss']

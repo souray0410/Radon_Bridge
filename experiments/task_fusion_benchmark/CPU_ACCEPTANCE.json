@@ -1,0 +1,19 @@
+{
+  "cpu_checks": {
+    "check_task_fusion.py": "passed: formulas, participant grouping, RNG, native predictions, MHD/direct gradients, BN, optimizer, checkpoint reload, selection",
+    "check_mechanism_baselines.py": "passed: legacy formulas, strict load, native predictions, BN, diagnostics",
+    "check_task_fusion_protocol.py": "passed: 54-task matrix, 36 primary contrasts, paired bootstrap, zero variance, 16 synthetic-only figures"
+  },
+  "gpu_acceptance": "pending; required before deployment and training",
+  "fixture_figures": "synthetic only; not research results; representative layout visually checked",
+  "files": {
+    "radonbridge/task_fusion.py": "e0c38f475deeab09dcd6cdd89637f671172c4d9380ace56a9ee7840cee378ae6",
+    "radonbridge/model.py": "77ea1bee10b9dee430819b73813da420bec12832539ab5947828e8b447fedca7",
+    "radonbridge/optimization.py": "30bf34e3a19b0b178acf52a46c6fe7f439aa772651a6e70a7c0acd064675c35a",
+    "radonbridge/experiment.py": "88e3486abf0e90efbf03ff8e1ae0e86422c910ae4ac3edb88f0e432d86cc894c",
+    "scripts/run_task_fusion_benchmark.py": "1d78c4c6c8527601f17a6cdde54e4ade391e187ac94c8123657434c476619a89",
+    "scripts/report_task_fusion_benchmark.py": "cd838379ab852364cc113017fd1218f27b11168de8c61fae9615446cbb6c0751",
+    "tests/check_task_fusion.py": "d20e5f69d3fcd85e8847de449dc8f6aec19a1ec5c52984222757aab6008553cf",
+    "tests/check_task_fusion_protocol.py": "a810d4a4e5fbadf5f43ee2341e29e21553fe67a4250f2a0380c7e3d53e4e13e1"
+  }
+}
