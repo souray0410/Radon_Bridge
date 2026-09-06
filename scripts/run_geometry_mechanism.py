@@ -38,6 +38,7 @@ class Queue:
                     max_gpu_minutes=None,prior_gpu_minutes=0,gpu_indices=[1,0],min_free_gpu_mib=12288,
                     skip_legacy_summary=True,project_memory_limit_mib=10240,study=self.cat,
                     protocol_document_sha256=sha256('experiments/geometry_mechanism/EXECUTION.zh-CN.md'),test_used=False)
+        self.p=json.loads(json.dumps(self.p))  # Compare the persisted JSON representation on every restart.
         p=root/'protocol.json'
         if p.exists():
             old=read(p)

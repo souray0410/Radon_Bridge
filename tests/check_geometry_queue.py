@@ -52,3 +52,9 @@ for fail in (False,True):
             c.shutdown.assert_called_once();unregister.assert_called_once_with(c.shutdown)
         signal.signal(signal.SIGTERM,oldterm);signal.signal(signal.SIGINT,oldint)
 print(json.dumps(dict(passed=True,exit_callback_regression=True)))
+# A serialized immutable protocol must be identical after restart (tuple/list normalization).
+with tempfile.TemporaryDirectory() as tmp:
+    first=Queue(Path(tmp),'same-commit')
+    second=Queue(Path(tmp),'same-commit')
+    assert first.p==second.p
+print(json.dumps(dict(passed=True,protocol_restart_roundtrip=True)))
