@@ -60,6 +60,25 @@ def csv_write(path,rows):
         for row in rows:w.writerow({k:json.dumps(v,sort_keys=True) if isinstance(v,(dict,list)) else v for k,v in row.items()})
 
 
+def communication_parameter_count(model):
+    """Read both metadata generations without editing historical evidence."""
+    groups = model['groups']
+    counts = []
+    for g in groups:
+        if 'stored_bridge_parameters' in g:
+            counts.append(g['stored_bridge_parameters'])
+        else:
+            # Legacy fixed-SVD bridges contain only a bias-free dense mixer.
+            assert g['compression'] == 'fixed_svd_channel'
+            width = sum(p['retained_channels'] for p in g['participants'])
+            counts.append(g.get('kernel_size', 3) * width ** 2)
+    derived = sum(counts)
+    if 'communication_parameters' in model:
+        assert model['communication_parameters'] == derived, 'Inconsistent communication parameter counts'
+        return model['communication_parameters'], 'model.communication_parameters; checked against groups'
+    return derived, 'legacy groups; fixed-SVD fallback k * sum(h_i)^2, historical default k=3'
+
+
 def build(root):
     root=Path(root);manifest=read(root/'manifest.json');rows=manifest['rows'];cat=manifest['catalog']
     out=root/'report';out.mkdir(exist_ok=True)
@@ -83,7 +102,8 @@ def build(root):
             item['primary_macro_f1']=item['learned_fusion_macro_f1'] if r['protocol']=='fusion' else item['branch_mean_macro_f1']
         if (directory/'model.json').exists():
             model=read(directory/'model.json')
-            model_metadata.append(dict(id=r['id'],parameters=model['parameters'],communication_parameters=model['communication_parameters'],
+            count, provenance = communication_parameter_count(model)
+            model_metadata.append(dict(id=r['id'],parameters=model['parameters'],communication_parameters=count,communication_parameters_source=provenance,
                 trainable_parameters=model['trainable_parameters'],groups=model['groups']))
         tables.append(item)
     assert ids is not None and len(ids)==296
