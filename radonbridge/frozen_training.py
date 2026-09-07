@@ -11,15 +11,17 @@ def validate_frozen_config(cfg):
     assert cfg['bridge_lr']==1e-4 and cfg['microbatch']==cfg['effective_batch']==16
     assert len(cfg['bridges'])==1
     b=cfg['bridges'][0]
-    assert b.get('compression')=='fixed_svd_channel' and b['mode'] in ('radon','linear_resample')
-    assert (b['M'],b['S'],b['kernel_size'],b['r'],b['h'])==(32,64,3,16,512)
+    assert b.get('compression') in ('fixed_svd_channel','fixed_random_orthogonal_channel')
+    assert b['mode'] in ('radon','linear_resample','self')
+    assert (b['M'],b['S'],b['kernel_size'])==(32,64,3)
+    assert b['r'] in (16,32,64) and b['h']==32*b['r'] and b['rho']==b['r']/256
     return True
 
 
 def bridge_only_optimizer(g,recipe):
     assert g.task_fusion is None and len(g.communication_groups)==1
     ex=g.modules_by_name()['bridge_0_exchange']
-    assert ex.compression=='fixed_svd_channel'
+    assert ex.compression in ('fixed_svd_channel','fixed_random_orthogonal_channel')
     groups=[]
     for name,module in g.modules_by_name().items():
         enabled=name.startswith('bridge_')
@@ -61,9 +63,14 @@ def frozen_profile(g,opt,train,batch,seed,progress):
     g.forward(c,o,y[:2]);cross={}
     for branch,source in [('cfp',o),('oct',c)]:
         loss=g.by_name[branch+'_loss'].feature_message.current_state
-        grad=torch.autograd.grad(loss,source,retain_graph=True)[0]
-        assert torch.isfinite(grad).all() and grad.norm()>0
-        cross[branch]=float(grad.norm())
+        grad=torch.autograd.grad(loss,source,retain_graph=True,allow_unused=True)[0]
+        norm=0. if grad is None else float(grad.norm())
+        assert grad is None or torch.isfinite(grad).all()
+        self_only=all(group['mode']=='self' for group in g.communication_groups)
+        assert norm==0. if self_only else norm>0.
+        cross[branch]=norm
+    if self_only:
+        assert torch.count_nonzero(ex.mixer.conv.weight.detach()*(1-ex.mixer.mask))==0
     assert parameter_hash(g)==before
     return dict(state='complete',passed=True,microbatch=batch,optimizer_updates=3,
                 native_parameters_and_buffers_unchanged=True,fixed_bridge_buffers_unchanged=True,
