@@ -1,0 +1,40 @@
+{
+  "state": "verified_inputs_only_test_evaluation_still_sealed",
+  "counts": {
+    "train": 1264,
+    "validation": 296,
+    "test": 290
+  },
+  "all_1560_train_development_reconstructions_pixel_identical": true,
+  "test_participants": 290,
+  "test_oct_shape": [
+    2,
+    1,
+    32,
+    96,
+    96
+  ],
+  "test_cfp_shape": [
+    2,
+    3,
+    224,
+    224
+  ],
+  "sampling": "existing full-span 32 ordered B-scans; same read_cfp crop/pad/resize",
+  "native_shapes": {
+    "512x650": 3688,
+    "512x480": 12
+  },
+  "labels_sha256": "eae604091a1094ed70ff4edbcf6e59d00b57b5be124fb4ac5f76ece1beac0d8d",
+  "transfer_manifest_sha256": "536902a7cc8a7bcf87e160f27958cbee1caf3e4f403fe36007dc234a8140d5c9",
+  "cache_manifest_sha256": "7592033959b737e3ca15691ec41aa4806fa1a9ca9b29a98bd45e32f400e3630f",
+  "selected_sha256": "576b2359a121f1a58d7504bbae632da8f56eedcfaadc1b5a47e6311a1f9edc26",
+  "implementation_sha256": "797bcbda4d03e69bf658b49c22acdedf1a669ff1080aba151e42d64e0d63860d",
+  "data_implementation_sha256": "4e1369c03e1e93f6c70a5250ead39876773fc85f3e97f15d4a06c0d678b0ddf7",
+  "model_inference": false,
+  "performance_metrics_computed": false,
+  "model_selection": false,
+  "training": false,
+  "updated_at": 1788785225.208364,
+  "elapsed_seconds": 608.6440072059631
+}
