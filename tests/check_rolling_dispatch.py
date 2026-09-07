@@ -46,11 +46,11 @@ def scenario(kind):
         c.before_start=before;c.finish_background=finish;c.publish_result=lambda job,value:c.published.append(value)
         def gpu_memory(*_,**__):
             if kind=='drain' and clock.now>=.5:c.pause_file.touch()
-            if kind=='memory' and clock.now>=.5:return '100, 10241\n99999, 25000\n'
-            return '99999, 25000\n' # Unrelated workload must never be terminated.
+            if kind=='memory' and clock.now>=.5:return '100, GPU-1, 10241\n99999, GPU-0, 25000\n'
+            return '99999, GPU-0, 25000\n' # Unrelated workload must never be terminated.
         jobs=[dict(id='A',duration=1,config={'seed':1}),dict(id='B',duration=6,config={'seed':2}),dict(id='C',duration=1,config={'seed':3}),dict(id='D',duration=1,config={'seed':4})]
         caught=None
-        with patch('scripts.rolling_dispatch.time',clock),patch('scripts.rolling_dispatch.devices',return_value={0:{'free':16000},1:{'free':16000}}),patch('scripts.rolling_dispatch.subprocess.check_output',side_effect=gpu_memory):
+        with patch('scripts.rolling_dispatch.time',clock),patch('scripts.rolling_dispatch.devices',return_value={0:{'free':16000,'uuid':'GPU-0'},1:{'free':16000,'uuid':'GPU-1'}}),patch('scripts.rolling_dispatch.subprocess.check_output',side_effect=gpu_memory):
             try:c.run_jobs(jobs)
             except (RuntimeError,InterruptedError) as exc:caught=exc
         if kind=='refill':

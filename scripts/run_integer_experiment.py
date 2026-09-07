@@ -35,8 +35,10 @@ class Controller:
             self.limit=float('inf')
         else:
             self.limit=min(float(self.protocol['max_gpu_minutes']),240-float(self.protocol['prior_gpu_minutes']))
-        self.gpus=self.protocol.get('gpu_indices',[0,1])
-        if not self.gpus or len(set(self.gpus))!=len(self.gpus) or any(g not in [0,1] for g in self.gpus):raise ValueError('Invalid allowed GPU list')
+        from scripts.gpu_allocation import Allocation,DEFAULT_PATH,validate
+        self.gpus=validate(self.protocol.get('gpu_indices',[0,1]))
+        self.allocation=Allocation(os.environ.get('RB_GPU_ALLOCATION_FILE',str(DEFAULT_PATH)),self.gpus,required=bool(os.environ.get('RB_GPU_ALLOCATION_FILE')))
+        self.allocation_status={}
         self.ledger=read_json(self.root/'ledger.json') if (self.root/'ledger.json').exists() else {'jobs':[]}
         self.active={}; self.peak={}; self.phase=args.phase; self.stop=False; self.stop_reason=None
         self.commit=None
@@ -75,9 +77,12 @@ class Controller:
             'source_commit':self.commit,'new_gpu_minutes':self.used(),'prior_gpu_minutes':self.protocol['prior_gpu_minutes'],
             'cumulative_gpu_minutes':self.protocol['prior_gpu_minutes']+self.used(),'budget_gpu_minutes':self.limit if math.isfinite(self.limit) else None,
             'active':[{'id':k,'pid':v['process'].pid,'gpu':v['gpu']} for k,v in self.active.items()],
-            'finished_jobs':len(self.ledger['jobs']),'updated_at':time.time(),**kw})
+            'finished_jobs':len(self.ledger['jobs']),'updated_at':time.time(),**getattr(self,'allocation_status',{}),**kw})
 
     def start(self,job,gpu):
+        if len(self.active)>=4:
+            from scripts.geometry_evidence import storage_check
+            storage_check(self.root,8*(len(self.active)+1+len(getattr(self,'archivals',{})))*1024**3)
         path=self.root/job['id']
         if path.exists():raise RuntimeError(f'Refuse to overwrite {path}')
         path.mkdir()
@@ -117,6 +122,8 @@ class Controller:
     def run_jobs(self,jobs,allow_oom=False):
         queue=list(jobs); results={}; failed=False
         while queue or self.active:
+            from scripts.gpu_allocation import refresh_controller
+            info=devices();allowed=refresh_controller(self,info)
             if not self.stop and self.used()+(20*len(self.active)+2)/60>=self.limit:
                 self.stop=True; self.stop_reason='budget'
             if self.stop:
@@ -126,17 +133,24 @@ class Controller:
                         active['process'].terminate();active['stop_at']=time.monotonic()
                     elif time.monotonic()-active['stop_at']>20:active['process'].kill()
             elif not failed:
-                info=devices(); occupied={v['gpu'] for v in self.active.values()}
-                for gpu in self.gpus:
-                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=self.protocol.get('min_free_gpu_mib',10240) and queue[0].get('gpu',gpu)==gpu:
-                        self.start(queue.pop(0),gpu)
+                occupied={v['gpu'] for v in self.active.values()}
+                # Existing project workers also reserve their card, even if not
+                # launched by this controller. Unrelated LOOK workers do not.
+                from scripts.gpu_allocation import memory_snapshot
+                raw=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,gpu_uuid,used_memory','--format=csv,noheader,nounits'],text=True)
+                _,_,project_on=memory_snapshot(raw,self.active,info)
+                for gpu in allowed:
+                    if project_on.get(gpu):continue
+                    if queue and gpu in info and gpu not in occupied and info[gpu]['free']>=self.protocol.get('min_free_gpu_mib',10240):
+                        index=next((i for i,j in enumerate(queue) if j.get('gpu',gpu)==gpu),None)
+                        if index is not None:self.start(queue.pop(index),gpu)
             # Own workers are the only CUDA processes started by this locked controller.
-            usage=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,used_memory','--format=csv,noheader,nounits'],text=True)
-            memory={int(r.split(',')[0]):int(r.split(',')[1]) for r in usage.splitlines() if r.strip()}
-            per_gpu={}
+            usage=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,gpu_uuid,used_memory','--format=csv,noheader,nounits'],text=True)
+            from scripts.gpu_allocation import memory_snapshot
+            memory,per_gpu,_=memory_snapshot(usage,self.active,info)
             for key,v in self.active.items():
                 used=memory.get(v['process'].pid,0);self.peak[key]=max(self.peak.get(key,0),used)
-                per_gpu[v['gpu']]=per_gpu.get(v['gpu'],0)+used
+            if hasattr(self,'allocation_status'):self.allocation_status['project_memory_mib_by_gpu']=per_gpu
             if any(v>10240 for v in per_gpu.values()):
                 self.stop=True; self.stop_reason='memory_limit'
                 self.status('stopping',reason='Project GPU memory exceeds 10 GiB')
@@ -155,7 +169,7 @@ class Controller:
                     if allow_oom and error['state']=='oom':results[key]=error
                     elif self.stop_reason in ('budget','controller_signal'):pass
                     else:failed=True;queue.clear();self.stop=True
-            self.status('running' if not self.stop else 'stopping',queued=[j['id'] for j in queue])
+            self.status('stopping' if self.stop else 'paused_dispatch' if queue and not allowed else 'running',queued=[j['id'] for j in queue])
             if queue or self.active:time.sleep(1)
         if failed:raise RuntimeError('Worker failed; see failure.json and worker.log')
         if self.stop:

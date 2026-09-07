@@ -9,7 +9,7 @@ from scripts.run_integer_experiment import source_hashes
 from scripts.run_task_fusion_benchmark import live_workers
 
 class Depth(Queue):
-    def __init__(self,root,commit,predecessor):
+    def __init__(self,root,commit,predecessor,resume_from=None):
         self.root=root;self.commit=commit;self.segment=None;self.rows=[];self.predecessor=predecessor
         self.cat=dict(version=VERSION,result_positions=96,reference_views=18,
                       planned_new_training=96,test_used=False)
@@ -17,6 +17,9 @@ class Depth(Queue):
         self.p.update(source_commit=commit,accepted_source_hashes=source_hashes(),study=self.cat,
             scope='authorized_multidepth96',predecessor_manifest_sha256=sha256(predecessor/'manifest.json'),
             protocol_document_sha256=sha256('experiments/geometry_mechanism/MULTIDEPTH.zh-CN.md'))
+        if (root/'protocol.json').exists():
+            from scripts.runtime_revision import revise
+            revise(root,self.p,resume_from)
         self.locked_json('protocol.json',self.p)
         self.parents,self.bases=dependencies()
         p=root/'manifest.json'
@@ -24,7 +27,12 @@ class Depth(Queue):
 
     def locked_json(self,name,value):
         p=self.root/name
-        if p.exists():assert read(p)==value,'Immutable depth evidence changed: '+name
+        if p.exists():
+            old=read(p)
+            if name=='candidate_lock.json' and old!=value:
+                assert {k:v for k,v in old.items() if k!='protocol_sha256'}=={k:v for k,v in value.items() if k!='protocol_sha256'}
+                assert any(sha256(v)==old['protocol_sha256'] for v in (self.root/'protocol_revisions').glob('*.json'))
+            else:assert old==value,'Immutable depth evidence changed: '+name
         else:write(p,value)
 
     def prepare_bases(self):
@@ -113,7 +121,7 @@ class Depth(Queue):
         write(self.root/'training_summary.json',dict(state='complete' if complete else 'needs_attention',
             accepted=sum(r['state']=='accepted' for r in self.rows),infeasible=sum(r['state']=='infeasible' for r in self.rows),test_used=False))
 
-def main(root,predecessor):
+def main(root,predecessor,resume_from=None):
     root=Path(root);predecessor=Path(predecessor);root.mkdir(parents=True,exist_ok=True)
     with (root/'queue.lock').open('a') as own:
         fcntl.flock(own,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -137,11 +145,11 @@ def main(root,predecessor):
                 rows=read(predecessor/'manifest.json')['rows'];assert len(rows)==72
                 for r in rows:assert r['state']=='accepted' and scan_completed(r)
                 assert read(predecessor/'training_summary.json')['state']=='complete'
-                q=Depth(root,commit,predecessor);q.run()
+                q=Depth(root,commit,predecessor,resume_from);q.run()
         except BaseException as e:
             write(root/'queue_status.json',dict(state='interrupted' if isinstance(e,(InterruptedError,KeyboardInterrupt)) else 'needs_attention',
                 pid=os.getpid(),source_commit=commit,updated_at=time.time(),error=repr(e),traceback=traceback.format_exc(),test_used=False));raise
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',default=str(SOURCE/'runs'/STUDY/'multidepth96'))
-    p.add_argument('--predecessor',default=str(SOURCE/'runs'/STUDY/'pretest_completion_v2'));a=p.parse_args();main(a.root,a.predecessor)
+    p.add_argument('--predecessor',default=str(SOURCE/'runs'/STUDY/'pretest_completion_v2'));p.add_argument('--resume-from');a=p.parse_args();main(a.root,a.predecessor,a.resume_from)

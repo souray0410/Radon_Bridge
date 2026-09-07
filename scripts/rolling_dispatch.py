@@ -19,7 +19,7 @@ class RollingController(Controller):
         super().status(state,**kw)
         if self.on_status:
             self.on_status(state,active=[dict(id=k,pid=v['process'].pid,gpu=v['gpu']) for k,v in self.active.items()],
-                           queued_count=self.pending_count,archivals_pending=len(self.archivals),**kw)
+                           queued_count=self.pending_count,archivals_pending=len(self.archivals),**getattr(self,'allocation_status',{}),**kw)
 
     def start(self,job,gpu):
         self.before_start(job,gpu,self.root/job['id'])
@@ -32,6 +32,8 @@ class RollingController(Controller):
         results={};error=None;drain=False
         with ThreadPoolExecutor(max_workers=1,thread_name_prefix='rb_evidence') as pool:
             while pending or self.active or self.archivals:
+                from scripts.gpu_allocation import refresh_controller
+                info=devices();allowed=refresh_controller(self,info)
                 # Only the main thread mutates result indices or retires work copies.
                 for future,key in list(self.archivals.items()):
                     if not future.done():continue
@@ -46,12 +48,12 @@ class RollingController(Controller):
                         if v['stop_at'] is None:v['process'].terminate();v['stop_at']=time.monotonic()
                         elif time.monotonic()-v['stop_at']>20:v['process'].kill()
                 # Check own process memory before launching another independent job.
-                raw=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,used_memory','--format=csv,noheader,nounits'],text=True)
-                memory={int(x.split(',')[0]):int(x.split(',')[1]) for x in raw.splitlines() if x.strip()}
-                per_gpu={}
+                raw=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,gpu_uuid,used_memory','--format=csv,noheader,nounits'],text=True)
+                from scripts.gpu_allocation import memory_snapshot
+                memory,per_gpu,project_on=memory_snapshot(raw,self.active,info)
                 for key,v in self.active.items():
                     used=memory.get(v['process'].pid,0);self.peak[key]=max(self.peak.get(key,0),used)
-                    per_gpu[v['gpu']]=per_gpu.get(v['gpu'],0)+used
+                if hasattr(self,'allocation_status'):self.allocation_status['project_memory_mib_by_gpu']=per_gpu
                 if any(x>10240 for x in per_gpu.values()):self.stop=True;self.stop_reason='memory_limit'
                 if self.used()+(20*len(self.active)+2)/60>=self.limit:self.stop=True;self.stop_reason='budget'
                 for key,v in list(self.active.items()):
@@ -74,13 +76,17 @@ class RollingController(Controller):
                 # A completed worker frees its GPU immediately, even while its peer
                 # still trains and evidence copy/hash checks run on the CPU.
                 if pending and not self.stop and error is None and not drain and len(self.archivals)<self.max_archivals:
-                    info=devices();occupied={v['gpu'] for v in self.active.values()}
-                    for gpu in self.gpus:
-                        if pending and len(self.archivals)+len(self.active)<self.max_archivals and gpu not in occupied and gpu in info and info[gpu]['free']>=self.protocol.get('min_free_gpu_mib',12288) and pending[0].get('gpu',gpu)==gpu:
-                            try:self.start(pending[0],gpu);pending.pop(0)
+                    occupied={v['gpu'] for v in self.active.values()}
+                    capacity=max(self.max_archivals,len(allowed))
+                    for gpu in allowed:
+                        if project_on.get(gpu):continue
+                        if pending and len(self.archivals)+len(self.active)<capacity and gpu not in occupied and gpu in info and info[gpu]['free']>=self.protocol.get('min_free_gpu_mib',12288):
+                            index=next((i for i,j in enumerate(pending) if j.get('gpu',gpu)==gpu),None)
+                            if index is None:continue
+                            try:self.start(pending[index],gpu);pending.pop(index)
                             except Exception as exc:error=exc;pending.clear();break
                 self.pending_count=len(pending)
-                state='stopping' if self.stop else 'draining_failure' if error is not None else 'draining' if drain else 'running'
+                state='stopping' if self.stop else 'draining_failure' if error is not None else 'draining' if drain else 'paused_dispatch' if pending and not allowed else 'running'
                 self.status(state,error=repr(error) if error is not None else None)
                 if pending or self.active or self.archivals:time.sleep(1)
         if error is not None:raise error

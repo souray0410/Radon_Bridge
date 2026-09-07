@@ -11,7 +11,7 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 processes=[]
 class Process:
     def __init__(self,cmd,**kw):
-        self.pid=1000+len(processes);processes.append(self);self.returncode=None;self.ticks=0
+        self.pid=1000+len(processes);self.gpu=int(kw['env']['CUDA_VISIBLE_DEVICES']);processes.append(self);self.returncode=None;self.ticks=0
         directory=Path(cmd[cmd.index('--output')+1]);m.write_json(directory/'summary.json',{'passed':True})
     def poll(self):
         self.ticks+=1
@@ -25,9 +25,9 @@ with tempfile.TemporaryDirectory() as tmp:
     c=m.Controller.__new__(m.Controller);c.root=Path(tmp);c.args=SimpleNamespace(phase='preflight',data='/unused')
     c.gpus=[0,1];c.protocol={'prior_gpu_minutes':13.341};c.limit=60;c.ledger={'jobs':[]};c.active={};c.peak={}
     c.phase='test';c.stop=False;c.stop_reason=None;c.commit=None
-    with patch.object(m,'devices',return_value={0:{'free':20000},1:{'free':20000}}), \
+    with patch.object(m,'devices',return_value={0:{'free':20000,'uuid':'GPU-0'},1:{'free':20000,'uuid':'GPU-1'}}), \
          patch.object(m.subprocess,'Popen',Process), \
-         patch.object(m.subprocess,'check_output',side_effect=lambda *a,**k:'\n'.join(f'{p.pid}, 5000' for p in processes)), \
+         patch.object(m.subprocess,'check_output',side_effect=lambda *a,**k:'\n'.join(f'{p.pid}, GPU-{p.gpu}, 5000' for p in processes if p.returncode is None)), \
          patch.object(m.time,'sleep',lambda _:None):
         jobs=[m.job(str(i),m.config(1,3e-5)) for i in range(2)]
         result=c.run_jobs(jobs)
