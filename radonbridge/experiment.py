@@ -160,6 +160,8 @@ def main(args):
                         backbone_lr_applicable=False,head_lr_applicable=False)
         elif any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
         write_json(out/'model.json',info)
+        from .depth_study import apply_clipping
+        apply_clipping(g,cfg)
         batch=cfg['microbatch']; torch.cuda.reset_peak_memory_stats()
         def progress(**kw):
             write_json(out/'progress.json',{'pid':os.getpid(),'epoch':epoch,'elapsed_seconds':time.monotonic()-start,**kw})

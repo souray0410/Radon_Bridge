@@ -83,7 +83,7 @@ def learned_rowspace(codec,device):
 
 def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None,exchange_name="bridge_0_exchange"):
     device=next(g.graph.parameters()).device;modules=g.modules_by_name();exchange=modules.get(exchange_name)
-    keys=['cfp_stage3','oct_stage3'];bases={}
+    keys=list(exchange.keys) if exchange is not None else ['cfp_stage3','oct_stage3'];bases={}
     for key in keys:
         if exchange is not None and getattr(exchange,'family','radon')!='radon':
             bases[key]=None
@@ -139,7 +139,7 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None,e
                 del gs,grad,loss
             release_forward_graph(g)
     result={key:cosine(gradients['cfp'][lo:hi],gradients['oct'][lo:hi]) for key,(lo,hi) in slices.items()}
-    if not getattr(g,'separate_communication_clipping',False) and exchange is not None and exchange.compression in ('fixed_svd_channel','fixed_centered_svd_channel','fixed_random_orthogonal_channel','learned_channel'):
+    if len(g.communication_groups)==1 and exchange is not None and exchange.compression in ('fixed_svd_channel','fixed_centered_svd_channel','fixed_random_orthogonal_channel','learned_channel'):
         v=result[exchange_name+'.mixer.conv'];assert v['cosine'] is None or abs(v['cosine'])<1e-10,'Fixed single-bridge output-row support is not disjoint'
     for key,values in accum.items():
         den=values['input_energy'];values['retained_energy_ratio']=values['retained_energy']/den if den>0 else None

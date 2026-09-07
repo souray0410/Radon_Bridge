@@ -194,7 +194,7 @@ def fit_training_bases(config, output, data):
     provenance={'parent_checkpoints':config['parent_checkpoints'],'initial_native_sha256':initial,
                 'participant_ids_sha256':hashlib.sha256(json.dumps(ids,separators=(',',':')).encode()).hexdigest(),
                 'participants':len(ids),'source_commit':config['source_commit'],'data_audit_sha256':file_sha(Path(data)/'audit.json'),
-                'batchnorm':'eval; unchanged','fit_domain':'native stage3 channel features; all eyes and spatial positions equally weighted'}
+                'batchnorm':'eval; unchanged','fit_domain':config.get('fit_domain','native stage3 channel features; all eyes and spatial positions equally weighted')}
     if centered:
         for key,moment in moments.items():
             ref=config['uncentered_basis_files'][key];_,_,meta=_load_basis(ref['path'],ref['sha256'])

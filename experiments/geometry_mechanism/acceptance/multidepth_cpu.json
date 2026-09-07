@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "environment": "ws02 LOOK venv, isolated /tmp/radonbridge-depth-check",
+  "tests": ["check_depth_study.py", "check_depth_report.py", "check_mechanism_baselines.py", "check_pretest_completion.py", "check_rolling_dispatch.py"],
+  "new_training_planned": 96,
+  "communication_views": 108,
+  "live_matching_stage3_references": 12,
+  "live_no_communication_references": 6,
+  "primary_comparisons": 22,
+  "secondary_comparisons": 38,
+  "actual_triple_MHD_Radon_and_resampling": true,
+  "MHD_native_gradient_parity_and_strict_reload": true,
+  "zero_initialization_and_node_identity": true,
+  "eight_switch_states_and_layer_specific_diagnostics": true,
+  "state_parameters_bn_gradients_rng_preserved": true,
+  "independent_bridge_gradient_clipping": true,
+  "legacy_single_bridge_and_baselines_compatible": true,
+  "synthetic_shared_participant_bootstrap": 10000,
+  "missing_cells_not_reweighted": true,
+  "participant_ids_not_in_report": true,
+  "gpu_acceptance": "pending; mandatory after current72 releases project lock, before new performance training",
+  "test_used": false
+}
