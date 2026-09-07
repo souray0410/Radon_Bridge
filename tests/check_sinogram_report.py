@@ -33,7 +33,8 @@ with tempfile.TemporaryDirectory(prefix='synthetic-atlas-test-') as tmp:
    jobs.append(dict(job_id=jid,display=dict(seed=seed,arm=arm,r=r,stages=stages),model=dict(model_view_id=jid,checkpoint_sha256='synthetic'),source_reference='synthetic'))
  write(lock/'candidate_lock.json',dict(synthetic=True));write(lock/'jobs.json',jobs);(lock/'protocol.zh-CN.md').write_text('Synthetic fixture')
  write(run/'all/accepted_jobs.json',accepted)
- def save(fig,out,name):
+ def save(fig,out,name,pad_inches=.1):
+  assert pad_inches==(.4 if name=='05_oct_spherical_directions' else .1)
   count.append(name);assert fig.axes;plt.close(fig)
  with patch.object(report,'save',save),patch.object(report,'private_figures') as private,patch.object(report,'synthetic'):
   report.report(lock,run);assert private.call_count==1
