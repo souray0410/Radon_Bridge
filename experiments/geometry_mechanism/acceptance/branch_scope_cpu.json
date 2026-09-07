@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "environment": "ws02 existing experiment Python; isolated worktree",
+  "direct_positions": 342,
+  "augmentation_positions": 36,
+  "total_positions": 378,
+  "comparison_definitions": 32,
+  "checks": [
+    "branch configuration fingerprints preserved",
+    "fusion protocol and terminal fusion head rejected",
+    "12 fixed hosts and 36 unchanged augmentation configurations",
+    "28 direct and 4 augmentation comparison weights",
+    "one existing branch comparison arithmetic infeasible",
+    "source snapshot SHA tampering rejected",
+    "protocol restart JSON roundtrip",
+    "original 684/756 matrix and 64 contrast regression",
+    "original controller callback and dispatch migration regression"
+  ],
+  "training_core_changed": false,
+  "test_used": false
+}

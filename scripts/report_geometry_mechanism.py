@@ -2,7 +2,7 @@
 import argparse,csv,hashlib,json
 from pathlib import Path
 import numpy as np
-from radonbridge.artifacts import resolve,sha256,ARCHIVE
+from radonbridge.artifacts import resolve,sha256,ARCHIVE,SOURCE,STUDY
 from radonbridge.geometry_study import MECHANISM_POINTS,HS,KS,SEEDS,LRS,PROTOCOLS,FIXED_HOSTS,baseline_structures
 from radonbridge.metrics import classification_metrics
 from scripts.geometry_evidence import read,write
@@ -25,28 +25,31 @@ def definitions(rows,cat):
         defs.append(dict(id=name,protocol=protocol,family=family,pairs=pairs,
                          estimable=bool(pairs) and not missing,missing=missing,weights=w))
     sid=lambda mode,M,S,k,r:f'{mode}_M{M}_S{S}_k{k}_r{r}'
-    for p in PROTOCOLS:
+    protocols=cat.get('protocols',PROTOCOLS)
+    direct_family='direct56' if len(protocols)==2 else 'direct28'
+    augmentation_family='augmentation8' if len(protocols)==2 else 'augmentation4'
+    for p in protocols:
         for h in HS:
             for k in KS:
                 pairs=[(sid('radon',M,S,k,h//M),sid('linear_resample',M,S,k,h//M)) for M,S,kk in MECHANISM_POINTS if kk==k]
-                add(f'{p}_equal_parameters_h{h}_k{k}',p,pairs,'direct56')
+                add(f'{p}_equal_parameters_h{h}_k{k}',p,pairs,direct_family)
         for h in HS:
             cells=[c for c in cat['compute_cells'] if c['budget_h']==h]
             pairs=[(c['radon_id'],c['compute_ordinary_id']) for c in cells if 'compute_ordinary_id' in c]
-            add(f'{p}_equal_compute_budget{h}',p,pairs,'direct56')
+            add(f'{p}_equal_compute_budget{h}',p,pairs,direct_family)
             for ka,kb in ((3,1),(5,3)):
                 a=next(c for c in cells if (c['M'],c['S'],c['k'])==(32,64,ka))
                 b=next(c for c in cells if (c['M'],c['S'],c['k'])==(32,64,kb))
                 pairs=[(a['radon_id'],b['radon_id'])] if 'radon_id' in a and 'radon_id' in b else []
-                add(f'{p}_equal_compute_budget{h}_k{ka}_minus_k{kb}',p,pairs,'direct56')
+                add(f'{p}_equal_compute_budget{h}_k{ka}_minus_k{kb}',p,pairs,direct_family)
         for h in HS:
             for baseline in baseline_structures()[1:]:
-                add(f'{p}_reference_h{h}_minus_{baseline["id"]}',p,[(sid('radon',32,64,3,h//32),baseline['id'])],'direct56')
+                add(f'{p}_reference_h{h}_minus_{baseline["id"]}',p,[(sid('radon',32,64,3,h//32),baseline['id'])],direct_family)
         for host in FIXED_HOSTS:
             for arm in ('continue','linear_resample'):
-                add(f'{p}_{host}_augmentation_radon_minus_{arm}',p,[(host+'_plus_radon',host+'_plus_'+arm)],'augmentation8')
-    assert sum(x['family']=='direct56' for x in defs)==56
-    assert sum(x['family']=='augmentation8' for x in defs)==8
+                add(f'{p}_{host}_augmentation_radon_minus_{arm}',p,[(host+'_plus_radon',host+'_plus_'+arm)],augmentation_family)
+    assert sum(x['family']==direct_family for x in defs)==28*len(protocols)
+    assert sum(x['family']==augmentation_family for x in defs)==4*len(protocols)
     return defs
 
 
@@ -94,7 +97,7 @@ def build(root):
     bprimary=np.stack([(boot[:,i,0]+boot[:,i,1])/2 if r['protocol']=='branch' else boot[:,i,2] for i,r in enumerate(rows)],axis=1)
     results=[]
     from radonbridge.benchmark_statistics import classify
-    for family in ('direct56','augmentation8'):
+    for family in dict.fromkeys(d['family'] for d in defs):
         valid=[d for d in defs if d['family']==family and d['estimable']]
         if valid:
             weights=np.stack([d['weights'] for d in valid]);observed=weights@primary;draws=bprimary@weights.T
@@ -113,7 +116,7 @@ def build(root):
           interpretation='Conditional on fitted models and development-selected checkpoints; no independent test evidence'))
     write(out/'model_costs.json',model_metadata)
     aggregates=[]
-    for protocol in PROTOCOLS:
+    for protocol in cat.get('protocols',PROTOCOLS):
         for sid in dict.fromkeys(r['structure']['id'] for r in rows):
             for lr in LRS:
                 group=[t for t in tables if t['protocol']==protocol and t['structure_id']==sid and t['backbone_lr']==lr and t['state']=='accepted']
@@ -127,7 +130,7 @@ def build(root):
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     plt.rcParams.update({'svg.fonttype':'none','pdf.fonttype':42,'axes.spines.top':False,'axes.spines.right':False})
-    for protocol in PROTOCOLS:
+    for protocol in cat.get('protocols',PROTOCOLS):
         fig,axes=plt.subplots(1,3,figsize=(16,8))
         for ax,axis,levels in zip(axes,('M','S','k'),((16,32,64),(32,64,128),(1,3,5))):
             for h in HS:
@@ -147,14 +150,19 @@ def build(root):
         for ext in ('png','pdf','svg'):fig.savefig(out/f'{protocol}_geometry.{ext}',dpi=180)
         plt.close(fig)
     ledger=[]
-    for base in (root/'batches',ARCHIVE/'current/batches'):
+    archive_batches=ARCHIVE/'current'/root.relative_to(SOURCE/'runs'/STUDY)/'batches'
+    for base in (root/'batches',archive_batches):
         if base.exists():
             for path in base.glob('*/ledger.json'):ledger.extend(read(path)['jobs'])
     write(out/'accounting.json',dict(gpu_minutes=sum(x['gpu_seconds'] for x in ledger)/60,entries=ledger,
-          includes_training_fitting_preflight_diagnostics=True))
+          includes_training_fitting_preflight_diagnostics=True,
+          scope='This execution directory only; inherited evidence is accounted separately',
+          inherited_source_manifest=(str(root/'source_snapshot/manifest.json') if (root/'source_snapshot/manifest.json').exists() else None),
+          inherited_training_gpu_minutes=(sum(r['seconds'] for r in rows if r['category']=='direct' and r['state']=='accepted')/60 if cat.get('protocols')==['branch'] else None),
+          inherited_shared_preflight_and_diagnostic_accounting='See source snapshot and original full ledgers; do not charge withdrawn fusion training to branch-only execution'))
     report=['# R&B（Radon Bridge）：机制基准结果','',
        f'共{len(rows)}个结果位置，已验收{sum(r["state"]=="accepted" for r in rows)}项；其余技术不可行单列。',
-       '分支与融合协议分别报告；图中误差条是种子和学习率共同波动，不能当作泛化误差。',
+       ('仅分支协议；用户在部分融合结果已揭示后撤销融合协议，其结果保留于历史记录。28项直接与4项增强比较沿用原分支对比定义，比较族缩小属于事后范围修订，不是原56/8项校正或确认性证据。' if cat.get('protocols')==['branch'] else '分支与融合协议分别报告；')+'图中误差条是种子和学习率共同波动，不能当作泛化误差。',
        '全部结果来自296人开发集，参与过历史任务筛选。尚未读取独立test，不能据此宣称临床有效或普遍优于其他方法。','',
        '## 主张与反例','',
        '|预定比较|差值 pp|同时95%区间|判定|','|---|---:|---|---|']

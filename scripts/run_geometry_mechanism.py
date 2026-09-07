@@ -223,7 +223,7 @@ class Queue:
 
     def augment(self):
         hosts=[r for r in self.rows if r['category']=='direct' and r['structure']['id'] in FIXED_HOSTS]
-        assert len(hosts)==24
+        assert len(hosts)==12*len({r['protocol'] for r in self.rows if r['category']=='direct'})
         all_groups=[]
         for host in hosts:
             if host['state']!='accepted':raise RuntimeError('Fixed host unavailable; no replacement selected: '+host['id'])
@@ -279,6 +279,7 @@ def interrupted(*_):
 
 def main(root,resume_from=None):
     root=Path(root);root.mkdir(parents=True,exist_ok=True)
+    assert not (root/'scope_withdrawal.json').exists(),'This two-protocol queue was withdrawn; use its recorded branch-only successor'
     with (root/'queue.lock').open('a') as own,(SOURCE/'.active.lock').open('a') as project:
         fcntl.flock(own,fcntl.LOCK_EX|fcntl.LOCK_NB)
         commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
