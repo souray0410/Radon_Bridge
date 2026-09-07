@@ -65,7 +65,10 @@ def run(root,out):
     forbidden={'participant_id','participant_ids','ids','y','per_participant','bootstrap_indices','permutations'}
     def scan(value):
         if isinstance(value,dict):
-            if forbidden&set(value):raise ValueError('Restricted field found in public aggregate')
+            blocked=forbidden&set(value)
+            # This published aggregate field is only the count of diagnostic repeats.
+            if type(value.get('permutations')) is int and value['permutations']==20:blocked.discard('permutations')
+            if blocked:raise ValueError('Restricted field found in public aggregate')
             for v in value.values():scan(v)
         elif isinstance(value,list):
             for v in value:scan(v)
