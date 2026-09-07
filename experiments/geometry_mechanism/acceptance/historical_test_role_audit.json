@@ -1,0 +1,21 @@
+{
+  "state": "hold_test_unsealing_pending_lineage_review",
+  "target_test_participants": 290,
+  "target_labels_sha256": "eae604091a1094ed70ff4edbcf6e59d00b57b5be124fb4ac5f76ece1beac0d8d",
+  "completed_historical_runs_checked": 22,
+  "unique_overlap_by_historical_role": {
+    "train": 104,
+    "validation": 14,
+    "test": 28
+  },
+  "unique_prior_train_or_development_participants": 118,
+  "scope": "/data/mengh/LOOK/2026_09_03_08_30_00/runs/backbones",
+  "audit_exhaustive": false,
+  "checkpoint_weight_inheritance_checked": false,
+  "research_selection_influence_resolved": false,
+  "test_inference": false,
+  "test_performance_read": false,
+  "participant_identifiers_exported": false,
+  "interpretation": "Prior related-study exposure established by matched label SHA and completed training records. Direct R&B weight leakage is not established. Hold independent-test claims and unsealing until lineage and research-use review; do not automatically exclude participants or change the split.",
+  "updated_at": 1788796903.148227
+}
