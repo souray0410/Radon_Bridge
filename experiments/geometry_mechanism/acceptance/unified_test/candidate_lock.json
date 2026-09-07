@@ -1,0 +1,62 @@
+{
+  "state": "candidate_test_lock_awaiting_implementation_preflight",
+  "model_views": 777,
+  "component_checkpoints": 24,
+  "pairing_checkpoints": 54,
+  "jobs": 855,
+  "statistical_model_and_component_views": 849,
+  "pairing_evaluation_states_per_checkpoint": 64,
+  "paired_original_reused": true,
+  "unique_comparisons": 1580,
+  "primary_comparisons": 121,
+  "primary_aliases": 121,
+  "primary_family_counts": {
+    "direct28": 28,
+    "augmentation4": 4,
+    "mechanism31": 31,
+    "qr_mechanism3": 3,
+    "joint_width3": 3,
+    "s_axis3": 3,
+    "allocation8": 8,
+    "frozen9": 9,
+    "depth22": 22,
+    "frozen2": 2,
+    "component8": 8
+  },
+  "inventory_sha256": "2fe19303a34938254ab382bc7941a7ecd87835fad048bbdb596566114b9cc4dd",
+  "lineage_status": {
+    "path": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/current_lineage_audit_v1/status.json",
+    "sha256": "df0aa6b6b8b6ec72c2733a25ab64a1f5370032805bd06e9c1553bce73f0e82e9"
+  },
+  "replay_status": {
+    "path": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/unified_development_replay_2026_09_07_18_17_46/status.json",
+    "sha256": "aed4e7bca393b8a05b447aab34f6611e28fe884078a29776411031709b99bea0"
+  },
+  "replay_directory": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/unified_development_replay_2026_09_07_18_17_46",
+  "data_directory": "/backup/mengh/UKB/RadonBridge_2026_09_06_14_05_08/prepared_test32",
+  "development_data_directory": "/backup/mengh/RadonBridge/archive/2026_09_06_14_05_08/history/cache/full1264_296",
+  "files": {
+    "jobs.json": "d2849a7c23d5994f79c1096420aaebc41ba3a7a7eed8a045131f55bf648957b0",
+    "model_views.json": "2f480ddd05b8723ac7514ac17ff45e261a66e2a964f6f6aa06004793aa041ae8",
+    "comparisons.json": "e41f50f9488bd0cddf7f9250e747922eabefcc317905798469439f18e5d532ce",
+    "model_reference_mapping.json": "1bbaa00540cb92ade36ee1039f3c23ccc5b7b4223f766d2161ad209242a725f5",
+    "source_manifests.json": "57e3798fdff5b4b58ae4ddd627c11480ac6bb3f99d78589f137d60b11aff6a5b",
+    "data_acceptance.json": "f744fdd895a6be4b409c78625289a23bc92d9ca0d6d8faea9be8e5f6177901a8",
+    "test_permutations.npz": "43d9c489241f931f7c3df4f51fd48db778263e23949ac9a0a2caa54181128cdc",
+    "diagnostic_acceptance.json": "b60c141f3fff9bd27754f316701dad585cffa9cd193dc0396097035d374c6182"
+  },
+  "statistics": {
+    "resamples": 10000,
+    "seed": 202609072,
+    "shared_participant_indices": true,
+    "primary": "mean of branch macro-F1",
+    "max_abs_t": "center bootstrap minus observed, scale by bootstrap sample SD; ordinary/family/global intervals",
+    "zero_sd_tolerance_pp": 1e-10,
+    "practical_margin_pp": 1.0,
+    "no_test_selection": true
+  },
+  "scientific_scope": "Current unified UKB cohort; historical LOOK overlap retained; not all-history untouched test or external clinical validation",
+  "test_performance_read": false,
+  "test_inference_permitted": false,
+  "created_at": 1788813072.9559596
+}

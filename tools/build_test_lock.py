@@ -95,6 +95,15 @@ def build(root, inventory, replay, lineage, data, out):
                 d.get('primary',True), {k:v for k,v in d.items() if k not in ('weights','id','family','primary')})
 
     branch = source(root/'branch_only/manifest.json')
+    diagnostics=[]
+    for sub in ('branch_only','pretest_completion_v2','multidepth96'):
+        for row in source(root/sub/'manifest.json')['rows']:
+            d=row.get('diagnostic') or row.get('depth_diagnostic')
+            if not d:continue  # Reused references and frozen-training arms follow their recorded scope.
+            p=resolve(d['directory'])/'summary.json';digest=d.get('sha256',d.get('summary_sha256'))
+            assert sha256(p)==digest
+            summary=source(p);assert summary['passed']
+            diagnostics.append(dict(reference=row['id'],path=str(p),sha256=digest))
     from scripts.report_geometry_mechanism import definitions as geometry_defs
     dense(geometry_defs(branch['rows'],branch['catalog']), branch['rows'])
     history = source(ARCHIVE/'history/runs/2026_09_05_22_42_53/manifest.json')['rows']
@@ -183,6 +192,7 @@ def build(root, inventory, replay, lineage, data, out):
     write(out/'jobs.json',jobs); write(out/'model_views.json',list(views.values()));write(out/'comparisons.json',list(unique.values()))
     write(out/'model_reference_mapping.json',refs);write(out/'source_manifests.json',sources)
     write(out/'data_acceptance.json',prep)
+    write(out/'diagnostic_acceptance.json',diagnostics)
     payload=dict(state='candidate_test_lock_awaiting_implementation_preflight',model_views=777,component_checkpoints=24,
         pairing_checkpoints=54,jobs=len(jobs),statistical_model_and_component_views=len(views),
         pairing_evaluation_states_per_checkpoint=64,paired_original_reused=True,
@@ -193,7 +203,7 @@ def build(root, inventory, replay, lineage, data, out):
         replay_status=dict(path=str(replay/'status.json'),sha256=sha256(replay/'status.json')),
         replay_directory=str(replay),data_directory=str(data),development_data_directory=str(ARCHIVE/'history/cache/full1264_296'),
         files={name:sha256(out/name) for name in ('jobs.json','model_views.json','comparisons.json','model_reference_mapping.json',
-                                               'source_manifests.json','data_acceptance.json','test_permutations.npz')},
+                                               'source_manifests.json','data_acceptance.json','test_permutations.npz','diagnostic_acceptance.json')},
         statistics=dict(resamples=10000,seed=202609072,shared_participant_indices=True,primary='mean of branch macro-F1',
             max_abs_t='center bootstrap minus observed, scale by bootstrap sample SD; ordinary/family/global intervals',
             zero_sd_tolerance_pp=1e-10,practical_margin_pp=1.,no_test_selection=True),
