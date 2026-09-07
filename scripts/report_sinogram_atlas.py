@@ -22,9 +22,9 @@ plt.rcParams.update({'font.family':'DejaVu Sans','font.size':10,'axes.spines.top
     'svg.fonttype':'none','pdf.fonttype':42})
 
 
-def save(fig,out,name):
-    out.mkdir(parents=True,exist_ok=True);fig.savefig(out/(name+'.png'),dpi=160,bbox_inches='tight')
-    for ext in ('svg','pdf'):fig.savefig(out/(name+'.'+ext),bbox_inches='tight')
+def save(fig,out,name,pad_inches=.1):
+    out.mkdir(parents=True,exist_ok=True);fig.savefig(out/(name+'.png'),dpi=160,bbox_inches='tight',pad_inches=pad_inches)
+    for ext in ('svg','pdf'):fig.savefig(out/(name+'.'+ext),bbox_inches='tight',pad_inches=pad_inches)
     plt.close(fig)
 
 
@@ -160,7 +160,8 @@ def report(lock,run):
         ax.set(xlabel='Normal component 0',ylabel='Normal component 1',zlabel='Normal component 2',title=split)
         ax.set_box_aspect((1,1,1));fig.colorbar(q,ax=ax,shrink=.6,label='Direction RMS')
     fig.suptitle('R&B | OCT directions occupy a sphere, not a single angle axis',fontsize=17)
-    save(fig,plots,'05_oct_spherical_directions')
+    # Matplotlib's projected 3D axis labels can extend beyond its tight bbox.
+    save(fig,plots,'05_oct_spherical_directions',pad_inches=.4)
     # Seed-level points are shown separately, and SD is over three models, not participants.
     def metricplot(name,sets,labels):
         metrics=('channel_energy_retained','total_relative','self_cross_cosine')
