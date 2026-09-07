@@ -107,8 +107,8 @@ class BridgeExchange(nn.Module):
         if mode == 'pooled' and kernel_size != 3: raise ValueError('Legacy pooled kernel is fixed at one')
         if nested_rhos is not None and kernel_size != 3: raise ValueError('Joint-width legacy protocol uses kernel three')
         if r is not None or h is not None:
-            if compression != 'fixed_svd_channel' or r is None or h is None:
-                raise ValueError('Explicit r/h requires fixed SVD and both fields')
+            if compression not in ('fixed_svd_channel', 'fixed_random_orthogonal_channel') or r is None or h is None:
+                raise ValueError('Explicit r/h requires fixed SVD/QR and both fields')
             ranks_requested = participant_values(r, self.keys, 'r')
             widths_requested = participant_values(h, self.keys, 'h')
             for spec, m, ratio, rank, width in zip(specs, directions, ratios, ranks_requested, widths_requested):
