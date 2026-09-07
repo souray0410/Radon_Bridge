@@ -2,6 +2,9 @@
 import torch
 
 def configure_optimizer(g, protocol, warm=False):
+    if protocol.get('training_regime')=='bridge_only':
+        from .frozen_training import bridge_only_optimizer
+        return bridge_only_optimizer(g,protocol)
     stages = protocol['warmup_adapt_stages' if warm else 'adapt_stages']
     if not isinstance(stages, list) or any(s not in (1, 2, 3, 4) for s in stages):
         raise ValueError('Explicit trainable backbone stages required')

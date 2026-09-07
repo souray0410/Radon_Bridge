@@ -175,7 +175,7 @@ class Queue:
             else:assert original==lock
         else:write(path,lock)
 
-    def train_rows(self,rows,stage):
+    def train_rows(self,rows,stage,diagnostics=True):
         for r in rows:
             if r['state']!='infeasible':scan_completed(r)
         self.save()
@@ -208,6 +208,7 @@ class Queue:
                 signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
             self.save();self.archive(segment)
             self.status(stage,new_performance_training_started=True)
+        if not diagnostics:return
         # Complete read-only initial/selected diagnostics, including resumed accepted trials.
         for r in rows:
             if r['state']!='accepted' or r.get('reused') or r.get('diagnostic'):continue

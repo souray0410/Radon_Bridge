@@ -16,6 +16,7 @@ from .model import PilotGraph
 from .convergence import Plateau
 from .optimization import configure_optimizer, clip_task_gradients
 from .nested_training import widths, set_width, training_backward, aggregate_metrics
+from .frozen_training import validate_frozen_config, training_mode, frozen_profile
 
 
 def write_json(path, value):
@@ -102,9 +103,10 @@ def main(args):
     train=PairedDataset(args.data,'train',224); val=PairedDataset(args.data,'validation',224)
     assert len(train)==1264 and len(val)==296
     assert not ({r['participant_id'] for r in train.rows}&{r['participant_id'] for r in val.rows})
+    frozen=validate_frozen_config(cfg)
     recipe={'adapt_stages':[1,2,3,4],'backbone_lr':cfg['backbone_lr'],
             'head_lr':cfg.get('head_lr',1e-4),'bridge_lr':cfg.get('bridge_lr',1e-4),
-            'weight_decay':.01,'training_regime':'full_finetune'}
+            'weight_decay':.01,'training_regime':'bridge_only' if frozen else 'full_finetune'}
     g=None; opt=None; epoch=0; start=time.monotonic()
     try:
         g=PilotGraph(bridge_configs=cfg['bridges'],seed=seed,device='cuda',task_fusion=cfg.get('task_fusion'))
@@ -153,12 +155,19 @@ def main(args):
             info.update(selection_policy='fusion macro-F1',loss_policy='CE_CFP + CE_OCT + CE_fusion',task_fusion=cfg['task_fusion'],fusion_parameters=sum(p.numel() for p in g.modules_by_name()['fusion_head'].parameters()))
         if widths(g):
             info.update(nested_widths=list(widths(g)),batchnorm_policy='per-width training batch statistics; arithmetic mean of running updates, one counter increment per participant batch',selection_policy='one checkpoint maximizing equal mean of six branch-width F1 values',optimizer_updates_per_batch=1)
-        if any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
+        if frozen:
+            info.update(training_regime='bridge_only',batchnorm_policy='native eval; parameters and buffers fixed',
+                        backbone_lr_applicable=False,head_lr_applicable=False)
+        elif any(not p.requires_grad for p in g.graph.parameters()): raise AssertionError('Unexpected frozen parameter')
         write_json(out/'model.json',info)
         batch=cfg['microbatch']; torch.cuda.reset_peak_memory_stats()
         def progress(**kw):
             write_json(out/'progress.json',{'pid':os.getpid(),'epoch':epoch,'elapsed_seconds':time.monotonic()-start,**kw})
         if cfg.get('profile'):
+            if frozen:
+                report=frozen_profile(g,opt,train,batch,seed,progress)
+                report.update(seconds=time.monotonic()-start,configuration=cfg)
+                write_json(out/'summary.json',report);return
             g.graph.train(); c,o,y,profile_keys=next(iter(loader(train,batch,seed,0)))
             before={k:[p.detach().clone() for p in m.parameters()] for k,m in g.modules_by_name().items() if list(m.parameters())}
             norm_records=[]; step_times=[]
@@ -249,7 +258,7 @@ def main(args):
         converged=False; epoch_times=[]
         for epoch in range(1,policy['max_epochs']+1):
             epoch_start=time.monotonic()
-            g.graph.train(); opt.zero_grad(set_to_none=True); seen=0; window_count=0; window_total=min(16,len(train))
+            training_mode(g,frozen); opt.zero_grad(set_to_none=True); seen=0; window_count=0; window_total=min(16,len(train))
             train_ce=0.; steps=0
             for c,o,y,_ in loader(train,batch,seed,epoch-1):
                 if stop_requested: raise InterruptedError('Trial stopped by controller')
@@ -261,6 +270,7 @@ def main(args):
                     steps+=1; window_count=0; window_total=min(16,len(train)-seen)
                 if steps%8==0: progress(samples=seen,train_ce=train_ce/seen)
             assert seen==len(train) and window_count==0
+            if frozen:assert parameter_hash(g)==initial_hash,'Frozen native parameters or BN buffers changed'
             metrics=evaluate(g,val,batch,seed,stop=lambda:stop_requested)
             flags={}
             for key,monitor in monitors.items():
@@ -293,6 +303,7 @@ def main(args):
             for name,module in g.modules_by_name().items():module.load_state_dict(selected_states['joint'][name],strict=True)
         selected=evaluate(g,val,batch,seed,out/'selected_predictions.npz',stop=lambda:stop_requested)
         state=g.save_state()
+        if frozen:assert parameter_hash(g)==initial_hash,'Selected frozen native state changed'
         torch.save({'model':state,'configuration':cfg,'selection':{k:m.state() for k,m in monitors.items()}},out/'selected.pt')
         modality_checkpoints={}
         if widths(g):
@@ -315,6 +326,8 @@ def main(args):
                 'parameters':info['parameters'],'trainable_parameters':info['trainable_parameters'],
                 'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
                 'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False}
+        if frozen:report.update(training_regime='bridge_only',native_parameters_and_buffers_unchanged=True,
+                                selected_native_sha256=parameter_hash(g),optimizer_parameter_groups=list(initial_learning_rates))
         write_json(out/'summary.json',report)
     except Exception as exc:
         oom=isinstance(exc,torch.cuda.OutOfMemoryError)
