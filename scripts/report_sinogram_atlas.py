@@ -59,7 +59,7 @@ def spatial(ax,a,title,vmax=None,signed=False):
     ax.set_title(textwrap.fill(title,48)+f'\nclipped {np.mean(np.abs(a[np.isfinite(a)])>vmax)*100:.1f}%',fontsize=9)
     ax.set_xlabel('Native feature-grid index');ax.set_ylabel('Native feature-grid index')
     if is3d:
-        ax.set_xticks([]);ax.set_xlabel('Three central feature-grid views, separated by gaps')
+        ax.set_xticks([]);ax.set_xlabel('Central planes: axes 0 / 1 / 2')
     return im
 
 
