@@ -1,0 +1,13 @@
+seed,mode,full_finetune_backbone_lr,frozen_mean_f1_percent,full_finetune_mean_f1_percent,interpretation
+3416,radon,3e-05,67.19228483934366,68.40756714828515,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3416,radon,6e-05,67.19228483934366,69.39330461740671,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3417,radon,3e-05,64.60536190890012,64.01759598107981,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3417,radon,6e-05,64.60536190890012,68.37723195711132,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3418,radon,3e-05,67.71382689049413,67.07266079508727,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3418,radon,6e-05,67.71382689049413,68.73391167944075,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3416,linear_resample,3e-05,66.0129168939376,66.0129168939376,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3416,linear_resample,6e-05,66.0129168939376,66.0129168939376,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3417,linear_resample,3e-05,64.01759598107981,64.01759598107981,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3417,linear_resample,6e-05,64.01759598107981,64.01759598107981,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3418,linear_resample,3e-05,65.03277157257689,65.03277157257689,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN
+3418,linear_resample,6e-05,65.03277157257689,65.50592851050541,Descriptive training-regime comparison; frozen mode has no backbone/head LR and fixes native BN

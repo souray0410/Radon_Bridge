@@ -1,0 +1,147 @@
+{
+  "participants": 296,
+  "resamples": 10000,
+  "indices_sha256": "b50ded981cd2ed1a2e9eccf276fc1b6e3210a6f395181202d72af50eeb73dd20",
+  "comparisons": [
+    {
+      "id": "frozen_radon_minus_linear_resample",
+      "family": "frozen2",
+      "difference_pp": 1.4827297303812124,
+      "ci95_pp": [
+        -0.7218598307314467,
+        3.6784282161793183
+      ],
+      "simultaneous_ci95_pp": [
+        -0.7206801718148301,
+        3.686139632577255
+      ],
+      "classification": "unresolved"
+    },
+    {
+      "id": "frozen_radon_minus_parent",
+      "family": "frozen2",
+      "difference_pp": 1.4827297303812124,
+      "ci95_pp": [
+        -0.7218598307314467,
+        3.6784282161793183
+      ],
+      "simultaneous_ci95_pp": [
+        -0.7206801718148301,
+        3.686139632577255
+      ],
+      "classification": "unresolved"
+    },
+    {
+      "id": "mmtm_hidden256_radon_both_on_minus_host_only",
+      "family": "component8",
+      "difference_pp": 19.46201837362276,
+      "ci95_pp": [
+        16.618505195380013,
+        22.257174130669217
+      ],
+      "simultaneous_ci95_pp": [
+        15.642695903885837,
+        23.281340843359686
+      ],
+      "classification": "supports_substantive_improvement"
+    },
+    {
+      "id": "mmtm_hidden256_radon_both_on_minus_new_only",
+      "family": "component8",
+      "difference_pp": -0.1019742280187188,
+      "ci95_pp": [
+        -0.6835678434397562,
+        0.5031162177302115
+      ],
+      "simultaneous_ci95_pp": [
+        -0.9108890366210554,
+        0.7069405805836178
+      ],
+      "classification": "supports_practical_similarity"
+    },
+    {
+      "id": "mmtm_hidden256_linear_resample_both_on_minus_host_only",
+      "family": "component8",
+      "difference_pp": 0.5487723299483065,
+      "ci95_pp": [
+        0.19888147164220302,
+        0.9129031268177608
+      ],
+      "simultaneous_ci95_pp": [
+        0.0662870959472524,
+        1.0312575639493606
+      ],
+      "classification": "unresolved"
+    },
+    {
+      "id": "mmtm_hidden256_linear_resample_both_on_minus_new_only",
+      "family": "component8",
+      "difference_pp": 0.0,
+      "ci95_pp": [
+        -2.9462537487001965e-15,
+        2.973633274765458e-15
+      ],
+      "simultaneous_ci95_pp": null,
+      "classification": "undefined_zero_variance"
+    },
+    {
+      "id": "attention_d256_radon_both_on_minus_host_only",
+      "family": "component8",
+      "difference_pp": 20.466996796312863,
+      "ci95_pp": [
+        17.71042174780493,
+        23.10909590715648
+      ],
+      "simultaneous_ci95_pp": [
+        16.772233180391705,
+        24.16176041223402
+      ],
+      "classification": "supports_substantive_improvement"
+    },
+    {
+      "id": "attention_d256_radon_both_on_minus_new_only",
+      "family": "component8",
+      "difference_pp": 5.698701366799263,
+      "ci95_pp": [
+        4.3471244996873,
+        7.032245314487316
+      ],
+      "simultaneous_ci95_pp": [
+        3.881403108728714,
+        7.515999624869812
+      ],
+      "classification": "supports_substantive_improvement"
+    },
+    {
+      "id": "attention_d256_linear_resample_both_on_minus_host_only",
+      "family": "component8",
+      "difference_pp": 0.632659575081604,
+      "ci95_pp": [
+        -0.14245652483397092,
+        1.4123427950375902
+      ],
+      "simultaneous_ci95_pp": [
+        -0.4288854987861168,
+        1.6942046489493248
+      ],
+      "classification": "unresolved"
+    },
+    {
+      "id": "attention_d256_linear_resample_both_on_minus_new_only",
+      "family": "component8",
+      "difference_pp": 4.105864891941529,
+      "ci95_pp": [
+        2.771830258589079,
+        5.48590921830935
+      ],
+      "simultaneous_ci95_pp": [
+        2.2475827403555386,
+        5.96414704352752
+      ],
+      "classification": "supports_substantive_improvement"
+    }
+  ],
+  "exploratory": true,
+  "test_used": false,
+  "interpretation": "Frozen-training and checkpoint-intervention families are separate; intervals condition on selected development checkpoints"
+}
