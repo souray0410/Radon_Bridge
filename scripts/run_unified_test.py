@@ -88,7 +88,7 @@ def queue(jobs,split,args,commit,stop):
                     j=pending.pop(0);directory=root/'jobs'/j['job_id']/f'attempt_{time.time_ns()}'
                     directory.mkdir(parents=True,mode=0o700);write(directory/'record.json',j);log=(directory/'worker.log').open('w')
                     env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),RB_EVALUATION_COMMIT=commit,CUBLAS_WORKSPACE_CONFIG=':4096:8')
-                    p=subprocess.Popen([sys.executable,'-m','radonbridge.unified_evaluation','--record',str(directory/'record.json'),
+                    p=subprocess.Popen([sys.executable,'-m',getattr(args,'worker_module','radonbridge.unified_evaluation'),'--record',str(directory/'record.json'),
                         '--lock',str(args.lock),'--output',str(directory),'--split',split],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
                     active[j['job_id']]=dict(process=p,gpu=gpu,log=log,directory=directory,started=time.monotonic())
             if time.monotonic()-last>5:status('needs_attention_draining' if failed else 'running' if active else 'waiting_for_resources');last=time.monotonic()
