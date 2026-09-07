@@ -1,0 +1,19 @@
+{
+  "candidate_lock_sha256": "d0eb47e8740edb5eff66db60df27e98628cf21c762494dd4548c31a8740ff3c8",
+  "accepted_jobs_sha256": "d86fe0b23d1406920507efd6c40c52f41b7d28b3b07ef94e2aaa9e1c6df2b963",
+  "checkpoints": 21,
+  "training_tasks": 0,
+  "post_hoc_descriptive": true,
+  "primary_hypotheses_unchanged": true,
+  "private_examples_exported": false,
+  "public_aggregation": "full-cohort participant means, two eyes; no participant rows, images, predictions or identifiers",
+  "color_limits": "corresponding train maps, shared across splits; clipping printed; seed metrics show mean and sample SD",
+  "figure_limitations": [
+    "feature-grid units, not physical mm",
+    "SVD signs/channels not matched across seeds",
+    "no claim of semantic alignment",
+    "mixed packet need not be a valid Radon transform",
+    "ordinary backprojection is not an inverse",
+    "class association is not lesion localization"
+  ]
+}

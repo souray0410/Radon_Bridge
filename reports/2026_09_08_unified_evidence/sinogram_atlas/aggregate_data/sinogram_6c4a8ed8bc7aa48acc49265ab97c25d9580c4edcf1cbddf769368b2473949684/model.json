@@ -1,0 +1,13 @@
+{
+  "display": {
+    "arm": "svd_radon",
+    "seed": 3418,
+    "r": 64,
+    "stages": [
+      3
+    ]
+  },
+  "model_view_id": "6c4a8ed8bc7aa48acc49265ab97c25d9580c4edcf1cbddf769368b2473949684",
+  "checkpoint_sha256": "f351726da0cedea6ac27d54dde2add4a300a7169dd8a27a9dbb89ed38467cb5d",
+  "source_reference": "history_final213:seed3418_svd_radon_rho1_4"
+}

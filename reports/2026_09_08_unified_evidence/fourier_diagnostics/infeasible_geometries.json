@@ -1,0 +1,10 @@
+[
+  {
+    "stage": 2,
+    "source": "oct",
+    "M": 32,
+    "S": 128,
+    "shape": "(16, 12, 12)",
+    "reason": "Dense reference geometry budget exceeded"
+  }
+]

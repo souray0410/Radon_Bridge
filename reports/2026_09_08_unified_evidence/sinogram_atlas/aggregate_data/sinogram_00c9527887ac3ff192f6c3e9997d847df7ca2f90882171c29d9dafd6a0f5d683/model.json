@@ -1,0 +1,13 @@
+{
+  "display": {
+    "arm": "svd_resample",
+    "seed": 3418,
+    "r": 16,
+    "stages": [
+      3
+    ]
+  },
+  "model_view_id": "00c9527887ac3ff192f6c3e9997d847df7ca2f90882171c29d9dafd6a0f5d683",
+  "checkpoint_sha256": "37ce3f51a43355f18024f5d25c45406b4b6726f693ab7e170a4a4f6b3e23708d",
+  "source_reference": "history_final213:seed3418_svd_resample_rho1_16"
+}

@@ -1,0 +1,15 @@
+{
+  "display": {
+    "arm": "svd_multidepth",
+    "seed": 3418,
+    "r": 16,
+    "stages": [
+      2,
+      3,
+      4
+    ]
+  },
+  "model_view_id": "c7b95df32b933afd7dcb318fe00cf6822d0e19d8bd336086905e680ecdb0da5e",
+  "checkpoint_sha256": "a0f4bb80f483ec7e1515c446f1cc443db49379965b58f2eee1dc83303a7ce9dd",
+  "source_reference": "multidepth96:depth_radon_stages234_r16_lr6e-05_seed3418"
+}

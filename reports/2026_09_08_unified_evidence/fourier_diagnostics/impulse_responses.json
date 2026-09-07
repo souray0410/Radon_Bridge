@@ -1,0 +1,242 @@
+[
+  {
+    "stage": 2,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(28, 28)",
+    "offset": 0,
+    "input_index": [
+      14,
+      14
+    ],
+    "peak_index": [
+      14,
+      14
+    ],
+    "maximum": 0.16895878270236764,
+    "l2_norm": 0.37554141978838296,
+    "energy_radius_about_peak": 0.38214617243189536
+  },
+  {
+    "stage": 2,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(28, 28)",
+    "offset": 1,
+    "input_index": [
+      15,
+      14
+    ],
+    "peak_index": [
+      15,
+      14
+    ],
+    "maximum": 0.17670223328193863,
+    "l2_norm": 0.3787480668083355,
+    "energy_radius_about_peak": 0.37904002093573924
+  },
+  {
+    "stage": 2,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(16, 12, 12)",
+    "offset": 0,
+    "input_index": [
+      8,
+      6,
+      6
+    ],
+    "peak_index": [
+      8,
+      6,
+      6
+    ],
+    "maximum": 0.08519110571495,
+    "l2_norm": 0.48565978699354834,
+    "energy_radius_about_peak": 0.6364818911507811
+  },
+  {
+    "stage": 2,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(16, 12, 12)",
+    "offset": 1,
+    "input_index": [
+      9,
+      6,
+      6
+    ],
+    "peak_index": [
+      9,
+      6,
+      6
+    ],
+    "maximum": 0.08517129367237006,
+    "l2_norm": 0.4832196484037399,
+    "energy_radius_about_peak": 0.6406332346005928
+  },
+  {
+    "stage": 3,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(14, 14)",
+    "offset": 0,
+    "input_index": [
+      7,
+      7
+    ],
+    "peak_index": [
+      7,
+      7
+    ],
+    "maximum": 0.39902814121389585,
+    "l2_norm": 0.7148149522119609,
+    "energy_radius_about_peak": 0.4036118780735549
+  },
+  {
+    "stage": 3,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(14, 14)",
+    "offset": 1,
+    "input_index": [
+      8,
+      7
+    ],
+    "peak_index": [
+      8,
+      7
+    ],
+    "maximum": 0.3978070947158284,
+    "l2_norm": 0.7120186671060224,
+    "energy_radius_about_peak": 0.40282483948304293
+  },
+  {
+    "stage": 3,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(8, 6, 6)",
+    "offset": 0,
+    "input_index": [
+      4,
+      3,
+      3
+    ],
+    "peak_index": [
+      4,
+      3,
+      3
+    ],
+    "maximum": 0.3597135641536654,
+    "l2_norm": 1.3029307747363927,
+    "energy_radius_about_peak": 0.6434118058282012
+  },
+  {
+    "stage": 3,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(8, 6, 6)",
+    "offset": 1,
+    "input_index": [
+      5,
+      3,
+      3
+    ],
+    "peak_index": [
+      5,
+      3,
+      3
+    ],
+    "maximum": 0.35679634882619665,
+    "l2_norm": 1.2804104544067165,
+    "energy_radius_about_peak": 0.6560232837411509
+  },
+  {
+    "stage": 4,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(7, 7)",
+    "offset": 0,
+    "input_index": [
+      3,
+      3
+    ],
+    "peak_index": [
+      3,
+      3
+    ],
+    "maximum": 0.8866437982341956,
+    "l2_norm": 1.3448674449500972,
+    "energy_radius_about_peak": 0.4322877359276253
+  },
+  {
+    "stage": 4,
+    "source": "cfp",
+    "M": 32,
+    "S": 64,
+    "shape": "(7, 7)",
+    "offset": 1,
+    "input_index": [
+      4,
+      3
+    ],
+    "peak_index": [
+      4,
+      3
+    ],
+    "maximum": 0.8449372554354466,
+    "l2_norm": 1.3140601447528326,
+    "energy_radius_about_peak": 0.4410875328319146
+  },
+  {
+    "stage": 4,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(4, 3, 3)",
+    "offset": 0,
+    "input_index": [
+      2,
+      1,
+      1
+    ],
+    "peak_index": [
+      2,
+      1,
+      1
+    ],
+    "maximum": 1.4397307202109308,
+    "l2_norm": 3.473491920513483,
+    "energy_radius_about_peak": 0.6660286895045191
+  },
+  {
+    "stage": 4,
+    "source": "oct",
+    "M": 32,
+    "S": 64,
+    "shape": "(4, 3, 3)",
+    "offset": 1,
+    "input_index": [
+      3,
+      1,
+      1
+    ],
+    "peak_index": [
+      3,
+      1,
+      1
+    ],
+    "maximum": 1.4814617297858164,
+    "l2_norm": 3.2056856468871375,
+    "energy_radius_about_peak": 0.7326784484817571
+  }
+]

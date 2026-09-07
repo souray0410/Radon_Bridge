@@ -1,0 +1,902 @@
+{
+  "source_audits": {
+    "unified_test": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/unified_test_2026_09_07_20_32_56",
+      "status_sha256": "35e895a2ae88ba2ba23109af4b79f03bf7495d9417c3e615cac2160ecc857a1c",
+      "original_report_manifest_sha256": "860caac1cf670f938133a8b8dfaf26dacade8a03578bb425b89cfd894878a080"
+    },
+    "sinogram_atlas": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_atlas_2026_09_07_22_15_34",
+      "status_sha256": "f4691de94182688f03dd27e3ed1f5ebedeaafd08c9d6c9cc52f75102e5ad0bdc",
+      "original_report_manifest_sha256": "279b6bc9008a56e8df1c504e3136b4996588a710aedc360c845f98cbb07df838"
+    },
+    "fourier_diagnostics": {
+      "directory": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/fourier_diagnostics_2026_09_07_22_34_26",
+      "status_sha256": "36845b52aff9cca0b40caadfbcf6975877f999da80bcc99fd22d3c4c6ea6f05e",
+      "original_report_manifest_sha256": "8f556d773327a2a4f2a7db637dd4a307794b2305ad4810e0efacfbf07d02d1d5"
+    }
+  },
+  "accepted_counts": {
+    "unified_test": {
+      "accepted": 855,
+      "verified_output_files": 1005
+    },
+    "sinogram_atlas": {
+      "accepted": 21,
+      "verified_output_files": 6285
+    }
+  },
+  "public_figures": [
+    {
+      "source": "unified_test",
+      "file": "test_primary_01.pdf",
+      "pdf_sha256": "2bc7487221f6cdb9a7b530c1e6ca36beb08632201d61264e21bfc1f7dbed2a4c",
+      "png_sha256": "fcc42842036fe5d1101fc846c77f8686d75c345ac5190aa4877077911ccb4d5f",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_02.pdf",
+      "pdf_sha256": "41f4cc0318b9fca1f05ef858e8b4b5aeabc2de959216c7352a578151c741f873",
+      "png_sha256": "f6ef9a1a00d40c7eb798ccea5e63361da64755875c5f4dceb10e88b9735704ca",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_03.pdf",
+      "pdf_sha256": "02bae153f0949b2d138f8f5c01aaa5911753ab3f16e040d23385f499534b448c",
+      "png_sha256": "35c08f1499dd8a8316966ea22523840dc20c1e3cb0bda678dc24c30280bcdb9d",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_04.pdf",
+      "pdf_sha256": "016c921cb93e74cecdd9b921f5516c064bcca2a462b6f1193c83a9c96108e009",
+      "png_sha256": "dac6fbe15291bc4d470ff5ae1b34181084d71abe12792881f6aebbfd7c9bb2e6",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_05.pdf",
+      "pdf_sha256": "4ad80e2fd4521d2c2e50a34f5ef8b61a06e3d4b0924ff65c1dd94a26794ccf97",
+      "png_sha256": "cb0762be8dd28f7374ebf658fc8737552cb159d4181549ef05b3b4fbf4d6af5c",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_06.pdf",
+      "pdf_sha256": "2b5a6b571124ccf23eb1e13c0ea267c6d77a3f6f2693dec0115a73ea5177b26b",
+      "png_sha256": "7c15d6991737f1d82b1a3c1cd734ad24811182b54fd0e0d55896bdf35379f55f",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_07.pdf",
+      "pdf_sha256": "327fd26ffb79fa9b807d36c362f7586725f9f4f7b858fe53a9d0c70f59453218",
+      "png_sha256": "a5b91c8baa769294409f8d4b3a0884cafe3357aa87c32676956c46593b5e0a13",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "unified_test",
+      "file": "test_primary_08.pdf",
+      "pdf_sha256": "7875e064ab25707d822fe12b4d0351b018ba3ca9978e3afcd44f65c77ce0ad14",
+      "png_sha256": "e9b60b35f8e735ba4c4153a801defbf66c27a67138e1f9c279197d850cfb2fac",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/01_synthetic_2d.pdf",
+      "pdf_sha256": "88d9a077c814bf9e3514db5c000ebae0e0a861d58276e40d689458569a10e66a",
+      "png_sha256": "715c63f60434b0d6f43af9d1396aba9d6037d32c8dd7070d559f952f02b73b5e",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/01_synthetic_3d.pdf",
+      "pdf_sha256": "c352e58b9cd80cb4aa4dd8d4df5b6dee3d4287c3d5941ac5872c3adcd5b48329",
+      "png_sha256": "d9cb2678314086aa4958af34ea1991759c13c698ef35692cb51bd065449780b9",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/02_projected_flow_cfp_stage3.pdf",
+      "pdf_sha256": "d23f444ecec65f69e0fefdf514b327eb87ee58b68506a445ac21030f3479dfdf",
+      "png_sha256": "90182174e4e0a65be263200ef9f1685a3abb5b619faa37eb412d21b877abe050",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/02_projected_flow_oct_stage3.pdf",
+      "pdf_sha256": "3ea64d1114221fac4b46ada7de2ffaae6476da4333953d5952ebb9a0ec50d74d",
+      "png_sha256": "39001d2e5ad138dedee818b3605c47a81b29d4f2e04bae79aa946627157693e4",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/03_return_maps_cfp_stage3.pdf",
+      "pdf_sha256": "095cb1b38e97c4049fef4deda95624f90287ebc122a4d189037055826c5119eb",
+      "png_sha256": "2b5b9e02d0ce653861cb1744fca398be8a5fbdb8303677156a2f551e2d4c821e",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/03_return_maps_oct_stage3.pdf",
+      "pdf_sha256": "752595d6331d367afd0a6340b3f071c2c7d9c17c1e9a23a9f295bc27996e1744",
+      "png_sha256": "a83a52095135a1ac00d2cbb3d8fc7823f016ac8f243ab6b1d17edeced34e3cc3",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/04_label_difference_cfp_stage3.pdf",
+      "pdf_sha256": "8a90118fc26fb0b869c13c703c2a724e2bb80c15a2b3709c89a6fa41fafbcf3c",
+      "png_sha256": "226325f3c66757e5c979d8e7943dbc0953523ca5bd769b51117c6be85972f9b8",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/04_label_difference_oct_stage3.pdf",
+      "pdf_sha256": "89fc03a68bb378cce4e9ce22c7985e233eec441f44110af0451633adce3ad0f0",
+      "png_sha256": "8f5e2fb074c21c2ac2417407a8a986b72658ada9024a0fdd22eedc092af67f25",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/05_oct_spherical_directions.pdf",
+      "pdf_sha256": "53521479ffb9f54c4eee1fca865f5ac41643c686bc7b0c2132a57ddb9c20ce1f",
+      "png_sha256": "66c8b3f45f64dd18486ba3a87dab7224eb00e2c17aed858d838006047544f7e0",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/06_width_robustness.pdf",
+      "pdf_sha256": "63b1f8f28cd8c7fd18770ca9676a3fd83c55d5aed49d35f11c809bc41e29b588",
+      "png_sha256": "5b5f6d9fd3936586e67b8a42e223a0aeda0bdd6123a9538495b4a936eb1cd6bd",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/07_basis_and_ordinary_communication.pdf",
+      "pdf_sha256": "62ffca3e7a18bf0c306d9fc061cc761c5bcaaf483e3ff7a298b4cd98e2c7c1da",
+      "png_sha256": "d3896d26b62fc9cad593a160470bf5fc9627e19c31016306801392bb76aa7e25",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/08_s_axis_spectra.pdf",
+      "pdf_sha256": "562ad95e42f53ee7c047acac82379d93bc5412d6547214623d1fec277ca23349",
+      "png_sha256": "9854ef0a62bd07c92d6dc776bbfbd57cc4f962529bb646ff1927bb835d205d6d",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/09_multidepth_returns.pdf",
+      "pdf_sha256": "e97543d9849c0ef846554d280e5f412c681810c54dce715b869d8064ad46b277",
+      "png_sha256": "cfc09e1f540dafd424489848abe703cbb4f9131db4e24f61b86aa2f5f351078c",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "sinogram_atlas",
+      "file": "figures/10_initial_selected_inputs.pdf",
+      "pdf_sha256": "cddb760651ccba79b80c18068262767253825eb32548a6cc45a9c540f940f1d0",
+      "png_sha256": "19e98f3103a3f991737fe72c3b3b31ad0bb5b1fbce471256e3be0aa05a448df9",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_cfp_stage2.pdf",
+      "pdf_sha256": "4fd39ba640124cae68b0bc208f83723b383f55b0accb75f76b4bbe2d5b974260",
+      "png_sha256": "a5429c6eff696e7a90be25ce835c0b028551633a83438b291fef3393fae28b52",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_cfp_stage3.pdf",
+      "pdf_sha256": "ae41e66dbe16a1f224ce56956a220d8cbf46c82cab8c30ad8c58228d3c7ae80b",
+      "png_sha256": "926780e51a09defcc34c7c7a6e12d92c1d0a9bfca5e41759c93021e56d3efab1",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_cfp_stage4.pdf",
+      "pdf_sha256": "8b8d1b517c5cd65c4456d667b7b5e49c094457e7032fd64910382430619ef850",
+      "png_sha256": "8f5cd249b11378d26b48a80ccb7cf876364679183236798f0bfb4972ad137cd8",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_oct_stage2.pdf",
+      "pdf_sha256": "9be32e9f9b9dde181fee18d3b2ac21d23f5aab4ae221d1ac08c8e9f8c0043d06",
+      "png_sha256": "f19acaa711e0b18d1838540c374be73ce70a5850c932e20af9a8b2891efab351",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_oct_stage3.pdf",
+      "pdf_sha256": "e559021e7172501d001bfb088dfe8b75037d29f4c4b81b6b570fa5814505a8ad",
+      "png_sha256": "d580b4ed99ee1b05638aa2bc2a1b2591108323bb3f5fca042bca4c453d3c2473",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/BA_oct_stage4.pdf",
+      "pdf_sha256": "1968467553d7daa773c4a5a8b650fcf98feee42d38adeeec47afa25ed2295bd8",
+      "png_sha256": "f3cbcad41d2f56898283a82f0fd3132be0536f42feb5ffeb9aa7e564b0b765bd",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/fourier_feature_probes.pdf",
+      "pdf_sha256": "fec8118333b44014c60179152b896c6c7ba8320087f7359f81c6760292f4ccd2",
+      "png_sha256": "26bcf3583cfce45f94c1ba80af867c70319ee773797cc79dc51a5a87400830ac",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/fourier_synthetic_errors.pdf",
+      "pdf_sha256": "ff144d1d1f0939cb547046f7270a06b62109194d85bed093a741d0458ff0539a",
+      "png_sha256": "b16c3a89a7188fee89ba0245fe6ea6c89b187b6cba8dd0b614733a898075c25f",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    },
+    {
+      "source": "fourier_diagnostics",
+      "file": "figures/kernel_frequency_gains.pdf",
+      "pdf_sha256": "392b6290713bb129d9ebc1ccc86b8f8016c6610bdd7a86d58e40d3ee9781faf4",
+      "png_sha256": "419bff2c2e3dfe60153d0c0c04a0e41914b582bdfa35d0f0bbe60227604b8a26",
+      "page_count": 1,
+      "text_within_page": true,
+      "raster_nonblank": true
+    }
+  ],
+  "private_figures": {
+    "count": 48,
+    "files": [
+      {
+        "file": "cfp_stage3_test_case1_native.pdf",
+        "pdf_sha256": "e4bc2125acf3ebf94071919531a09d452975f205a0cd3eac91c194ba2697cf1b",
+        "png_sha256": "966a1882a9a99601b5273f11203648f3850be10abf61ebf9a44dba0a7f0d639c",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case1_packets.pdf",
+        "pdf_sha256": "7bfd03b298ba52222177382439397d241014e925f4a45e2d3022553bbd187437",
+        "png_sha256": "4188c4b1404d3087ad93154f0d74636baf17504f794aaddf3d79f55518a57532",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case2_native.pdf",
+        "pdf_sha256": "dc25e41926417eec4861b4f865a9463b37cd0662373c50df7570435126ce7a33",
+        "png_sha256": "5678258eb68f27dc412f78d86bdfcea4b2964b91b8c796f4aad5e54de601a416",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case2_packets.pdf",
+        "pdf_sha256": "d32753372ddcb5d109ed7037609b4e26d0958f515e07a9dc22be826ef021f70d",
+        "png_sha256": "4be332a65191a477fb7658f331064c048c9bbf8e60d204228ac9ecfdd99ab541",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case3_native.pdf",
+        "pdf_sha256": "dfe42b85221d037e69dabbe5a07a828597af51b36508374119303cf39d7177de",
+        "png_sha256": "519b5eeccbc7f2200bf8ac000d8d1a1caf852a62d7541669ce532d52196da6be",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case3_packets.pdf",
+        "pdf_sha256": "f1f668c22ca7c197a2f5e2a6b463f8e6882efbfaba6114bafac5cc2bb32e86c2",
+        "png_sha256": "88deadf1eb7cc50000721db990e7e787b47151840e0178c50b548c71a908b2a0",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case4_native.pdf",
+        "pdf_sha256": "5e79f9e62ee27a30a5b681341eee4fd0c355077f3fc38c9e19056b254b9582cc",
+        "png_sha256": "e21162bc699c2eb0d2b0c00feafe11926fd1148477c63690e46c43e37a0e65eb",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_test_case4_packets.pdf",
+        "pdf_sha256": "fb77258fca96cf83ce99f3c397257c823b7c1b89f34ce1954eec9506f295123d",
+        "png_sha256": "4b1403bec6ea369920b5f95fb0e295244872a794e32b3de28dab906c15dbf096",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case1_native.pdf",
+        "pdf_sha256": "42cb4ca6b04321daa933e28f06702a1563e395c7ebbb71d79c293548432745b3",
+        "png_sha256": "8f3225313b3ff4d5fce3e880cc3c2f0f681d7e54e91bff84057971106071b881",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case1_packets.pdf",
+        "pdf_sha256": "897b4ba280052068a1eb126032a0afd13246c936ca824f10aa9515a313200912",
+        "png_sha256": "a35d608e153562c51745548a102b7e076f64e8b95e6c9dee93573609810ba796",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case2_native.pdf",
+        "pdf_sha256": "16ffca01a8eb73715403661e785e0cd5f6780923c6c247c895de0cfac9c6d2ea",
+        "png_sha256": "164f6beec77d0baa293830ad684a4653ee05a129d58b9fc5e29531ee7b86b0f9",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case2_packets.pdf",
+        "pdf_sha256": "f4a6bc6a9d7751fce26a22fcbd913db8b32da5df4c5d44cc0c15e1c295f11410",
+        "png_sha256": "f46c4f5409f29f7ed512a3b3ca175db5ee58fed8cea8e3939128649f284dddf9",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case3_native.pdf",
+        "pdf_sha256": "a7354084905b3c7a2805196804297bb9ab10cd8d79532617219a40a3de6b4d94",
+        "png_sha256": "69c7fd33c195345735f275cb28ffd3164222178ab245694a84a03ce300cfefa4",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case3_packets.pdf",
+        "pdf_sha256": "3aa79ad86b54442ba3389a27e7d2c9224178768b7673acac2d9a48b5856132a9",
+        "png_sha256": "adb3b12772340cce7c38a794b41c08ac1f8612240beaeee8fd760d9508296712",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case4_native.pdf",
+        "pdf_sha256": "dce2422ac75e8b029aae582c67d8869b747677969ad0e67ceadcfab77af5ef7c",
+        "png_sha256": "b23aa56943afcfee55c08780f250e3ecba49b9ee0f622effd33e6f4c2cdbd402",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_train_case4_packets.pdf",
+        "pdf_sha256": "d920001a6c2e6ffeb051d3d1d3f3cd874c8beb9636381f5269ab1f49e01e4972",
+        "png_sha256": "5371cffb0e6dc7c5e4835744bb6b02e2b776475f82e1578c7ced97315e0d9101",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case1_native.pdf",
+        "pdf_sha256": "0b2d2da1000b2eac3fe29559643cbd483f2ae1e75ead25c2911a2871ef58339c",
+        "png_sha256": "471d280b67c3ec936b660fd4db62ce03e263b326a892772f823d047d3069aef2",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case1_packets.pdf",
+        "pdf_sha256": "fbb01709d61fcb7f5265526cd236c9ab2d0cc751221a96c4b2180946045637a0",
+        "png_sha256": "273877f7a2ee3075083d1c16e8f35dd41c759b93ba46012e9421c856480c1905",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case2_native.pdf",
+        "pdf_sha256": "a4fe3f01098a03d9eb17cfaa7a31ce8c9c8a78a188b9c572241ff8e3f3a6b79d",
+        "png_sha256": "de210818aa55e2228a734308be5ad5f1a239dad658899a3c53168eee96fc51cc",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case2_packets.pdf",
+        "pdf_sha256": "16830cdac4013ec519996a9fe22193fe81c5a441e7b14bc7f5bd3768df648f79",
+        "png_sha256": "613fbd6d6609248e3a51a37c4f7e8f6d2406b6f6ef9e32116ebefd520f04ba3e",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case3_native.pdf",
+        "pdf_sha256": "db8b861082cd19fd0f31e0fbe22e797f66605f7f9676117c998264e320c67c99",
+        "png_sha256": "854e631b513af92e5871415c21d97e68448c43f03c5b9075b1c07e2e2d07a49a",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case3_packets.pdf",
+        "pdf_sha256": "6be3a93b87a8dcb75abbc55e14434fd5987bc8f940d8d5a6ee59fb18d85cab18",
+        "png_sha256": "24b2b7d4318fff3e075afdf20b41da63c948bfc8e537f19ab9eb8f7499d5c027",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case4_native.pdf",
+        "pdf_sha256": "4638c150501167d454d1e61063ddcf2820d039f59d8a81195579742704d56c18",
+        "png_sha256": "a851a0fa3afe74639a89f0b38b76b2a66509354aa465ab2fef6bfc68917a805d",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "cfp_stage3_validation_case4_packets.pdf",
+        "pdf_sha256": "928e72426998b0a42f05d10746f971bcede87ae4bb0b64f5ae17cdcabe4255d2",
+        "png_sha256": "c0e67ed93567c9af4d2a50276b337246a6c33da515485241f1acb70d5539688e",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case1_native.pdf",
+        "pdf_sha256": "7dbca08215c456cdd1c701f4886a6495fd7041f47716a6a57aa8ddae8197d570",
+        "png_sha256": "544c053d88f17dcc66b74d6401df33096bb28b4d76566748fd3a00a653900668",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case1_packets.pdf",
+        "pdf_sha256": "e01cccc4b6a96f18bfce45f03a02f7f1c0e306f739011057ad8f6f2b7d575e62",
+        "png_sha256": "d2b241ad13bdfc4457fe2cec6cfbda82346842aab530096d13756a9f894f49ef",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case2_native.pdf",
+        "pdf_sha256": "3efd563cd1b44c57907c69902be63e4dcbcf9b7edf57d2feafa7482d355a998a",
+        "png_sha256": "13b98e686946b286526e4b0ce46a8a5ea619c9dd7ed1e28fb410aef3f583c2d0",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case2_packets.pdf",
+        "pdf_sha256": "482810f36a49bff62c4a2fa3fdb04198d4095defb520811665c5b89cc4374d3d",
+        "png_sha256": "afef02e1493464e0b47cc9995669c6d556ba81151c56a7723a6434f8f49915d0",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case3_native.pdf",
+        "pdf_sha256": "b8edc42a1b496e937f593daf70cc7e3afc95c0c2e6c0e93fe9f764adeef30d14",
+        "png_sha256": "5ce166e00c81a503529d0d1b3b761ace8188be0cac2c1c6366d85e0a27741968",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case3_packets.pdf",
+        "pdf_sha256": "cb95730c230d9ca010dd1a51a7238edd969e202b63354191750cc1246da564ed",
+        "png_sha256": "83765a7b8859a8d321631a2e74a979b5f409eabc236e96583b5176383fd021e5",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case4_native.pdf",
+        "pdf_sha256": "92a46cb7b3431c01cdd7b3d1d181a8442207d042afba8e7ccc7a7dd2ba0dcab3",
+        "png_sha256": "aa3b2a151774a579346ee9ca66055fb7f0e3637e2a58ff19fb9803c44f8adfb3",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_test_case4_packets.pdf",
+        "pdf_sha256": "a10d9a5d091e1391e596811f4830f2346c2ac2592f40634300c0275e752a4761",
+        "png_sha256": "0659675b477988d5dd3fd5234d4ddb3b6cb3756e9d7168623e9104d60075148d",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case1_native.pdf",
+        "pdf_sha256": "8ad8463766a26b8ba0c79fc6d39cc62d636f4e51105e3d7b525ddf4a9906097d",
+        "png_sha256": "b5252dbb3021718ad52811ecf30fc7a1bfe384b061d6023c146495047f1af994",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case1_packets.pdf",
+        "pdf_sha256": "00c0bb13f24bb328c4602dc9a56ef5f931df61b4ab7ea0b12d4f65eb3bd49b76",
+        "png_sha256": "5c70f480d01050a50e0e74e50a0cb0169f0f02a5adba3194017c1f0f7c5c1693",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case2_native.pdf",
+        "pdf_sha256": "abd6309730776fdae256cfaad91ad61f5dbfb371fadc0c5690b86a829c028504",
+        "png_sha256": "ada9039fdcc53a0db4abd54302106e46b332592373a3916b64393eb734024b66",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case2_packets.pdf",
+        "pdf_sha256": "7eefdfcc450a8313a37e69386814dfe37ed7c2ded1dafa6253093c7187dfc6a5",
+        "png_sha256": "f4b46de6d46cf6854adad82d00a5f42412384af8292083118de3729c6c6467d0",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case3_native.pdf",
+        "pdf_sha256": "be9d7d6406c4722b81d7d7d0c54bf0725ad882ae84fe74847b3a0c9796a3c2a6",
+        "png_sha256": "7940f43a8763657c9be1494b028ce2143288206eae3f4a10b6c6aa73df5f5119",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case3_packets.pdf",
+        "pdf_sha256": "d4501c5e47b7596f8039d8c5a5596709ca0fe6da0e00768187b16991d7be9217",
+        "png_sha256": "c7e82c23c16a387d2991c418af69426636779a739bdea12e8c328d3fa0f7dc5a",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case4_native.pdf",
+        "pdf_sha256": "38fbdbdbe13b1daaf11bb1b008f8e542a0a1997a79762bec9565eff8ada12766",
+        "png_sha256": "92b32ec9f70c4d2e9d0d58c99fd355136d701211940ddb8dc27961d46efd601c",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_train_case4_packets.pdf",
+        "pdf_sha256": "bb28ac40f38e7794deaf9111973d12c487f053ad1ceaf50ac9c5e5dcfde471cc",
+        "png_sha256": "6f349c8f7ff9674fb864d5c260474276ca1e3fb5135ea6cc92b3978cee2902d9",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case1_native.pdf",
+        "pdf_sha256": "9c045ec3e420f80d66d359c6500a1616c05654b063ce3aa286552eddca3c67d8",
+        "png_sha256": "9e005a046e5d65d3476ae422d1ae15ef408095af6385d48edbf7b579d8df715c",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case1_packets.pdf",
+        "pdf_sha256": "2d4de31e6d662686f858c8e53f5b6c550492a695a782634704891c9961997229",
+        "png_sha256": "15e9650c16921628ea95d53e3067db55849c97315f1984346d308d806a85c9e1",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case2_native.pdf",
+        "pdf_sha256": "2ea2b6746be6e6e6b8941cefd7b2861d2537859575b04f11202bf896dbd236c2",
+        "png_sha256": "cd37699dd8d753d198e71d1f4008f1b6b7f0a4c5ba9a503d5102e31f3e550648",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case2_packets.pdf",
+        "pdf_sha256": "7a18a3ebc179bf6852a88713a116539dc665a2c7aca2a8887f57395b64aee035",
+        "png_sha256": "d405d84cb12e687f8f76e683cf6c3f41fad2e9922537c257ac7601ee83ad80a8",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case3_native.pdf",
+        "pdf_sha256": "2e588ab0064f58366d20c14059d4d2d17182c3b1356330872d860928a7d8a76f",
+        "png_sha256": "9683ccc3f9df41efc184d7bb2df5a0ef865e783d2d343ec5eb431b54bd0ccf33",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case3_packets.pdf",
+        "pdf_sha256": "eb2ba35f24697642085b264f5281dd2116467a8217e3731e5157374d4cc72bde",
+        "png_sha256": "d148bfd4b94d1bf4ea10a5a1a96e0734b156c3e1b4e79fc6641354f3e7f7b5a9",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case4_native.pdf",
+        "pdf_sha256": "92d1aaf0b777e6dcbf116b569cc69ba6807950247be1788c4fc2a749ef1613a7",
+        "png_sha256": "9e082484b971fccf3c5068244d31383d584f48fe60ab4295e0474ac8ee5ed5a7",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      },
+      {
+        "file": "oct_stage3_validation_case4_packets.pdf",
+        "pdf_sha256": "6714e61939ddc3ac0c0fb2db6fb19e30d7560615fe001621d7f07397ed551004",
+        "png_sha256": "f16d6a50b114a2e012e21ce075dd0b55968fbafba632f68f36289dbf65e3e662",
+        "page_count": 1,
+        "text_within_page": true,
+        "raster_nonblank": true
+      }
+    ],
+    "review": "Automated PDF text-bounds, required panel labels and raster integrity on ws02; private pixels not exported"
+  },
+  "public_visual_review": {
+    "state": "complete",
+    "method": "Model inspected all 8 aggregate contact sheets covering 31 public figures; PDF text bounds and raster integrity also verified. Scientific interpretation reviewed separately.",
+    "sheets": {
+      "visual_review/public_01.png": "84430c2375e1c0fb53b349f321145055875d9a6b32b8133ffc87e5c504488987",
+      "visual_review/public_02.png": "4730193a90fb0bf7c40b9ac9b88641f291452301b39ad350527e05a3eef1b4ef",
+      "visual_review/public_03.png": "5a8b240a95f13ffff4918f1be93c11c93ae593d49dc029ebb908bbfe81599a31",
+      "visual_review/public_04.png": "d22ce6158ce30a1853edee0b3fece2b3e99803f74a540e8a30a0f11ffbf51d4d",
+      "visual_review/public_05.png": "96104c99312e63a121e00510168086b8fada72569c1a4d1c24860e3b6b29e0fe",
+      "visual_review/public_06.png": "4de5b62fb4ddac442e4c8333d256af021b0aab61e511aee043c4fca4eb06a6d2",
+      "visual_review/public_07.png": "50b4c7b0a96da2e9011b01d03d9502d643ad83900cab9e6c17b0a3ef218af660",
+      "visual_review/public_08.png": "1548f95687b769e7cba103d88cf7dc4edc8b9f57c526ee9434ef695d08442040"
+    },
+    "findings": "No remaining clipping, overlapping panels, blank plots or missing plot legends requiring correction at contact-sheet review. Full-resolution/vector figures retained."
+  },
+  "restricted_files_copied": false,
+  "aggregate_conversion": [
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_00c9527887ac3ff192f6c3e9997d847df7ca2f90882171c29d9dafd6a0f5d683/aggregates.json",
+      "original_sha256": "7a85bf3ea484bbb979c79699a118f8aa493ed3b83bdb37e9c08a9b415022f064",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_00c9527887ac3ff192f6c3e9997d847df7ca2f90882171c29d9dafd6a0f5d683/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_00c9527887ac3ff192f6c3e9997d847df7ca2f90882171c29d9dafd6a0f5d683/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_029757dfd7148ff75e362f3b6156402594d243f7740efcba3f91eabe8873e27b/aggregates.json",
+      "original_sha256": "353953a30742f919a4390443354182b76f38c7f7d6cf979fe0dabca396293e43",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_029757dfd7148ff75e362f3b6156402594d243f7740efcba3f91eabe8873e27b/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_029757dfd7148ff75e362f3b6156402594d243f7740efcba3f91eabe8873e27b/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_1dbc6762e6f18dd4d362fe11ef1f08e571ae863d22c0ace7f1784e11edd3c130/aggregates.json",
+      "original_sha256": "e8672e686bb84573dc42db3893b277ab41d5486a421dfbe82ba4471c8b93decd",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_1dbc6762e6f18dd4d362fe11ef1f08e571ae863d22c0ace7f1784e11edd3c130/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_1dbc6762e6f18dd4d362fe11ef1f08e571ae863d22c0ace7f1784e11edd3c130/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_240835677c86725334a1c22d1b068afe38987bbaa73f0c067c3b3f2417fcc556/aggregates.json",
+      "original_sha256": "52fc119ad839d67cfd008dc360f4be4cfbf955d0a8790aa786dfd84966b065bc",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_240835677c86725334a1c22d1b068afe38987bbaa73f0c067c3b3f2417fcc556/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_240835677c86725334a1c22d1b068afe38987bbaa73f0c067c3b3f2417fcc556/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_3c1fccafc539b03952b2ba3b9f5e7592cb535bd5172348f57a5b74cd75522f8c/aggregates.json",
+      "original_sha256": "33b1a1be259eeade54cb10bb735acb6957c63adf08c87b263995d6d46318e343",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_3c1fccafc539b03952b2ba3b9f5e7592cb535bd5172348f57a5b74cd75522f8c/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_3c1fccafc539b03952b2ba3b9f5e7592cb535bd5172348f57a5b74cd75522f8c/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_610f30db419443a4dbccbfbfe17162d40ab9ed5c7a3b9105cd000f2d98aa912b/aggregates.json",
+      "original_sha256": "49f6736070a03dc66ed4ce021e2f27812d336c11a153f48180402044dd358536",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_610f30db419443a4dbccbfbfe17162d40ab9ed5c7a3b9105cd000f2d98aa912b/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_610f30db419443a4dbccbfbfe17162d40ab9ed5c7a3b9105cd000f2d98aa912b/aggregates.npz",
+      "arrays": 1404,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_6c4a8ed8bc7aa48acc49265ab97c25d9580c4edcf1cbddf769368b2473949684/aggregates.json",
+      "original_sha256": "8545785b5c452fc8fad557f5983aac7a9202b125f16c4118256b7601f96ba4df",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_6c4a8ed8bc7aa48acc49265ab97c25d9580c4edcf1cbddf769368b2473949684/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_6c4a8ed8bc7aa48acc49265ab97c25d9580c4edcf1cbddf769368b2473949684/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_726d1228d98e15947a81e62b1c0ee11b0259aa19ea4e7a6ee154d9f195e9b3b5/aggregates.json",
+      "original_sha256": "cdce61a6c91a07c74ca75078b6a8936f30f932624e418ba52623c39a72de01ad",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_726d1228d98e15947a81e62b1c0ee11b0259aa19ea4e7a6ee154d9f195e9b3b5/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_726d1228d98e15947a81e62b1c0ee11b0259aa19ea4e7a6ee154d9f195e9b3b5/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_8da64814791277430e4532b43189d5c0d5f743676fd52d120e0232a13ec76826/aggregates.json",
+      "original_sha256": "90b7f6b35171ad7a6d031791f6211d747176cf01db7d4b6835f7672ea61f2e45",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_8da64814791277430e4532b43189d5c0d5f743676fd52d120e0232a13ec76826/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_8da64814791277430e4532b43189d5c0d5f743676fd52d120e0232a13ec76826/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_9a9380344a72262a218e75f597159186afb7508a0c4a7dc851fddb8cd33f1c0f/aggregates.json",
+      "original_sha256": "26e52418e0de52d2192a7cf4cd6accdf80ec1466ef32ae986bd7bf2ee2846474",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_9a9380344a72262a218e75f597159186afb7508a0c4a7dc851fddb8cd33f1c0f/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_9a9380344a72262a218e75f597159186afb7508a0c4a7dc851fddb8cd33f1c0f/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_a9d99c075c2a05aa74cbce3b3669411c14a23b24ec372a56ba995b1836d4cce5/aggregates.json",
+      "original_sha256": "14e86bd4d6eb0dcce9d478fcf98210f75102bcafa2a17f34384c116ab106169f",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_a9d99c075c2a05aa74cbce3b3669411c14a23b24ec372a56ba995b1836d4cce5/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_a9d99c075c2a05aa74cbce3b3669411c14a23b24ec372a56ba995b1836d4cce5/aggregates.npz",
+      "arrays": 936,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_b96e4c6e312c8d0643bbae9ac8b4e3eceb8e72ba5986539b6ab4917879baebff/aggregates.json",
+      "original_sha256": "7185bbd09f63446fcb7d81434eb3ceb90a7953a4402d7a4793dd45f7e880abf7",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_b96e4c6e312c8d0643bbae9ac8b4e3eceb8e72ba5986539b6ab4917879baebff/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_b96e4c6e312c8d0643bbae9ac8b4e3eceb8e72ba5986539b6ab4917879baebff/aggregates.npz",
+      "arrays": 1404,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_baaac63aa6a12d9fca6cd835f8a7ef531d9c9ae44adacbc304b93df57a6e7818/aggregates.json",
+      "original_sha256": "ef30ca8822cc242b40134a4e98d749280e2aa300be8567ec1b2062dc58c62888",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_baaac63aa6a12d9fca6cd835f8a7ef531d9c9ae44adacbc304b93df57a6e7818/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_baaac63aa6a12d9fca6cd835f8a7ef531d9c9ae44adacbc304b93df57a6e7818/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_c7aa19f7d079e82d4f16cf231f5e3af5a48fc0d0b79e59e2e89df0bdc04fe0f1/aggregates.json",
+      "original_sha256": "78ce65da097934f169f9ffa6464b2ed41b951865a1754495298e0059766ab4a9",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_c7aa19f7d079e82d4f16cf231f5e3af5a48fc0d0b79e59e2e89df0bdc04fe0f1/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_c7aa19f7d079e82d4f16cf231f5e3af5a48fc0d0b79e59e2e89df0bdc04fe0f1/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_c7b95df32b933afd7dcb318fe00cf6822d0e19d8bd336086905e680ecdb0da5e/aggregates.json",
+      "original_sha256": "8d5099260758c310eb81d6d11888dd004cb90cde652d8687a2d897b5bcd034dc",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_c7b95df32b933afd7dcb318fe00cf6822d0e19d8bd336086905e680ecdb0da5e/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_c7b95df32b933afd7dcb318fe00cf6822d0e19d8bd336086905e680ecdb0da5e/aggregates.npz",
+      "arrays": 1404,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_c8b796b153dd03c179fdc675b6904a376fcbd5a9e500d01b7d7a63968b5a213b/aggregates.json",
+      "original_sha256": "477b5e592f5cba67150dd248729ef4f9b4bb0e4438df707fe9a6d2f80f3e549c",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_c8b796b153dd03c179fdc675b6904a376fcbd5a9e500d01b7d7a63968b5a213b/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_c8b796b153dd03c179fdc675b6904a376fcbd5a9e500d01b7d7a63968b5a213b/aggregates.npz",
+      "arrays": 936,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_df5a0ace93a10e050c6928c7402597a664a570f2f39f07f7257cbb28d2d5a57a/aggregates.json",
+      "original_sha256": "de6bc977d70777a5f806504c737373c687bdcf050107005bd7d2b0a14b76eeba",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_df5a0ace93a10e050c6928c7402597a664a570f2f39f07f7257cbb28d2d5a57a/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_df5a0ace93a10e050c6928c7402597a664a570f2f39f07f7257cbb28d2d5a57a/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_e9e9ba7db0e8cd56c9039584435c560e6a78e6580a573ce6e38bfae060855cda/aggregates.json",
+      "original_sha256": "04e7e329ef9591aadaae05c16cbe50d7d284a9a8db86f7eb173e2b0e3f48204e",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_e9e9ba7db0e8cd56c9039584435c560e6a78e6580a573ce6e38bfae060855cda/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_e9e9ba7db0e8cd56c9039584435c560e6a78e6580a573ce6e38bfae060855cda/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_ebc675997c1454051cdf8b8981d2e67f29dffee8a7f0fe955f48bd1fe41a4ca5/aggregates.json",
+      "original_sha256": "36dacc8677084cc1295ebe8b85a30dc25b7c56a73e13b23a7b16af8f40908762",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_ebc675997c1454051cdf8b8981d2e67f29dffee8a7f0fe955f48bd1fe41a4ca5/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_ebc675997c1454051cdf8b8981d2e67f29dffee8a7f0fe955f48bd1fe41a4ca5/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_ebf9a1d571fae5f98159b8e3d42c9b1980ce3ae4f9e333bfb33d911b38341d2e/aggregates.json",
+      "original_sha256": "6481fbb8bb8f028cd6f5c99f042a3f0191331b0c19499206168c4d179be521ac",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_ebf9a1d571fae5f98159b8e3d42c9b1980ce3ae4f9e333bfb33d911b38341d2e/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_ebf9a1d571fae5f98159b8e3d42c9b1980ce3ae4f9e333bfb33d911b38341d2e/aggregates.npz",
+      "arrays": 468,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    },
+    {
+      "original": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/sinogram_report_revision_26c84e2/report/aggregate_data/sinogram_fb941c4503828fe9b99bd0f6f8df15f527ba05e73327010eb8f1155f7d9db028/aggregates.json",
+      "original_sha256": "dd6d926c15c96efa08217b6b29f3f3fac1005afb766af4034d3b4b3a44ee20b0",
+      "gzip": "sinogram_atlas/aggregate_data/sinogram_fb941c4503828fe9b99bd0f6f8df15f527ba05e73327010eb8f1155f7d9db028/aggregates.json.gz",
+      "npz": "sinogram_atlas/aggregate_data/sinogram_fb941c4503828fe9b99bd0f6f8df15f527ba05e73327010eb8f1155f7d9db028/aggregates.npz",
+      "arrays": 936,
+      "rule": "NPZ float64 parsed JSON arrays; gzip decompresses byte-exact original JSON"
+    }
+  ],
+  "presentation_revision": {
+    "source_commit": "26c84e2",
+    "changes": [
+      "Shortened native 3D montage xlabel",
+      "Increased sphere figure export padding to 0.4 inch"
+    ],
+    "unchanged": [
+      "models",
+      "data",
+      "case selection",
+      "scales",
+      "numerical summaries",
+      "test comparisons"
+    ]
+  },
+  "delivery_source_commit": "3da1f543e9ed4a80cc1e7995329199500deb964c"
+}

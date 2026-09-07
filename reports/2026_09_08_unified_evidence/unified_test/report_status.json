@@ -1,0 +1,10 @@
+{
+  "state": "complete",
+  "test_used": true,
+  "models": 777,
+  "component_checkpoints": 24,
+  "pairing_checkpoints": 54,
+  "figure_visual_review": "pending_local_delivery",
+  "report_directory": "/data/mengh/RadonBridge/runs/2026_09_06_14_05_08/unified_test_2026_09_07_20_32_56/report",
+  "updated_at": 1788818851.1313655
+}
