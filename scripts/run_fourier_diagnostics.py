@@ -175,7 +175,9 @@ def run(a):
             if s['state']!='accepted':raise ValueError('Unaccepted atlas')
             for file,digest in s['prediction_files'].items():
                 if sha256(Path(entry['summary_path']).parent/file)!=digest:raise ValueError('Atlas output changed')
-        os.umask(0o077);torch.set_num_threads(3);start=time.monotonic();out=a.output/'report';out.mkdir(mode=0o700)
+        os.umask(0o077);torch.set_num_threads(3);start=time.monotonic();out=a.output/'report'
+        if out.exists():out=a.output/f'report_attempt_{time.time_ns()}'
+        out.mkdir(mode=0o700)
         write(a.output/'status.json',dict(state='running',controller_pid=os.getpid(),source_commit=commit,updated_at=time.time()))
         geometry_count=synthetic(out);features(jobs,accepted,out);weights(jobs,out)
         shutil.copyfile('experiments/geometry_mechanism/FOURIER_DIAGNOSTICS.zh-CN.md',out/'protocol.zh-CN.md')
