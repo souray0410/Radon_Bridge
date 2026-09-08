@@ -1,0 +1,921 @@
+{
+  "main": [
+    "R&B：开发与测试完整匹配解读",
+    "阅读约定：development、validation、test是什么",
+    "符号与误差线：同一套读图规则",
+    "实验范围和完整对应关系",
+    "绝对性能：开发与test逐项并排",
+    "同一参考模型：开发与test的绝对成绩",
+    "读图 01：同一参考模型：开发与test的绝对成绩",
+    "压缩方式与三档ρ：开发/test完整对应",
+    "读图 02：压缩方式与三档ρ：开发/test完整对应",
+    "概率指标也必须成对看",
+    "扩展前核查：已排除与尚未确定",
+    "配对主要比较：直接比较：等参数/等计算与非线性基线",
+    "读图 03：定义、两集合结果与增益变化",
+    "配对主要比较：直接比较：等参数/等计算与非线性基线",
+    "读图 04：定义、两集合结果与增益变化",
+    "配对主要比较：直接比较：等参数/等计算与非线性基线",
+    "读图 05：定义、两集合结果与增益变化",
+    "配对主要比较：直接比较：等参数/等计算与非线性基线",
+    "读图 06：定义、两集合结果与增益变化",
+    "配对主要比较：直接比较：等参数/等计算与非线性基线",
+    "读图 07：定义、两集合结果与增益变化",
+    "配对主要比较：宿主增强：训练收益",
+    "读图 08：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 09：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 10：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 11：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 12：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 13：定义、两集合结果与增益变化",
+    "配对主要比较：基与几何、通信方向及历史基线",
+    "读图 14：定义、两集合结果与增益变化",
+    "配对主要比较：QR机制：自身与空间打乱",
+    "读图 15：定义、两集合结果与增益变化",
+    "配对主要比较：多宽度联合训练",
+    "读图 16：定义、两集合结果与增益变化",
+    "配对主要比较：S轴邻接",
+    "读图 17：定义、两集合结果与增益变化",
+    "配对主要比较：固定通道秩的方向分配",
+    "读图 18：定义、两集合结果与增益变化",
+    "配对主要比较：固定通道秩的方向分配",
+    "读图 19：定义、两集合结果与增益变化",
+    "配对主要比较：冻结网络的完整机制对照",
+    "读图 20：定义、两集合结果与增益变化",
+    "配对主要比较：冻结网络的完整机制对照",
+    "读图 21：定义、两集合结果与增益变化",
+    "配对主要比较：桥数量与位置",
+    "读图 22：定义、两集合结果与增益变化",
+    "配对主要比较：桥数量与位置",
+    "读图 23：定义、两集合结果与增益变化",
+    "配对主要比较：桥数量与位置",
+    "读图 24：定义、两集合结果与增益变化",
+    "配对主要比较：桥数量与位置",
+    "读图 25：定义、两集合结果与增益变化",
+    "配对主要比较：原冻结参考组",
+    "读图 26：定义、两集合结果与增益变化",
+    "配对主要比较：宿主开关：同一模型的功能依赖",
+    "读图 27：定义、两集合结果与增益变化",
+    "配对主要比较：宿主开关：同一模型的功能依赖",
+    "读图 28：定义、两集合结果与增益变化",
+    "正确配对与关闭/打乱：54个模型开发/test对应",
+    "读图 29：正确配对与关闭/打乱：54个模型开发/test对应",
+    "Radon图谱：01_synthetic_2d",
+    "读图 30：Radon图谱：01_synthetic_2d",
+    "Radon图谱：01_synthetic_3d",
+    "读图 31：Radon图谱：01_synthetic_3d",
+    "Radon图谱：02_projected_flow_cfp_stage3 / 上：输入与自身",
+    "Radon图谱：02_projected_flow_cfp_stage3 / 下：跨来源与总返回",
+    "读图 32：Radon图谱：02_projected_flow_cfp_stage3",
+    "Radon图谱：02_projected_flow_oct_stage3 / 上：输入与自身",
+    "Radon图谱：02_projected_flow_oct_stage3 / 下：跨来源与总返回",
+    "读图 33：Radon图谱：02_projected_flow_oct_stage3",
+    "Radon图谱：03_return_maps_cfp_stage3 / 上：输入与自身",
+    "Radon图谱：03_return_maps_cfp_stage3 / 下：跨来源与总返回",
+    "读图 34：Radon图谱：03_return_maps_cfp_stage3",
+    "Radon图谱：03_return_maps_oct_stage3 / 上：输入与自身",
+    "Radon图谱：03_return_maps_oct_stage3 / 下：跨来源与总返回",
+    "读图 35：Radon图谱：03_return_maps_oct_stage3",
+    "Radon图谱：04_label_difference_cfp_stage3",
+    "读图 36：Radon图谱：04_label_difference_cfp_stage3",
+    "Radon图谱：04_label_difference_oct_stage3",
+    "读图 37：Radon图谱：04_label_difference_oct_stage3",
+    "Radon图谱：05_oct_spherical_directions",
+    "读图 38：Radon图谱：05_oct_spherical_directions",
+    "Radon图谱：06_width_robustness",
+    "读图 39：Radon图谱：06_width_robustness",
+    "Radon图谱：07_basis_and_ordinary_communication",
+    "读图 40：Radon图谱：07_basis_and_ordinary_communication",
+    "Radon图谱：08_s_axis_spectra",
+    "读图 41：Radon图谱：08_s_axis_spectra",
+    "Radon图谱：09_multidepth_returns",
+    "读图 42：Radon图谱：09_multidepth_returns",
+    "Radon图谱：10_initial_selected_inputs",
+    "读图 43：Radon图谱：10_initial_selected_inputs",
+    "傅里叶与返回算子：BA_cfp_stage2",
+    "读图 44：傅里叶与返回算子：BA_cfp_stage2",
+    "傅里叶与返回算子：BA_cfp_stage3",
+    "读图 45：傅里叶与返回算子：BA_cfp_stage3",
+    "傅里叶与返回算子：BA_cfp_stage4",
+    "读图 46：傅里叶与返回算子：BA_cfp_stage4",
+    "傅里叶与返回算子：BA_oct_stage2",
+    "读图 47：傅里叶与返回算子：BA_oct_stage2",
+    "傅里叶与返回算子：BA_oct_stage3",
+    "读图 48：傅里叶与返回算子：BA_oct_stage3",
+    "傅里叶与返回算子：BA_oct_stage4",
+    "读图 49：傅里叶与返回算子：BA_oct_stage4",
+    "傅里叶与返回算子：fourier_feature_probes",
+    "读图 50：傅里叶与返回算子：fourier_feature_probes",
+    "傅里叶与返回算子：fourier_synthetic_errors",
+    "读图 51：傅里叶与返回算子：fourier_synthetic_errors",
+    "傅里叶与返回算子：kernel_frequency_gains",
+    "读图 52：傅里叶与返回算子：kernel_frequency_gains",
+    "开发发现是否延续到test：逐项判断，不混同证据",
+    "带入扩展研究的结论与限制"
+  ],
+  "appendix": [
+    "R&B：804条研究引用的完整开发/test配对附表",
+    "完整配对附表：R0001–R0012",
+    "完整配对附表：R0013–R0024",
+    "完整配对附表：R0025–R0036",
+    "完整配对附表：R0037–R0048",
+    "完整配对附表：R0049–R0060",
+    "完整配对附表：R0061–R0072",
+    "完整配对附表：R0073–R0084",
+    "完整配对附表：R0085–R0096",
+    "完整配对附表：R0097–R0108",
+    "完整配对附表：R0109–R0120",
+    "完整配对附表：R0121–R0132",
+    "完整配对附表：R0133–R0144",
+    "完整配对附表：R0145–R0156",
+    "完整配对附表：R0157–R0168",
+    "完整配对附表：R0169–R0180",
+    "完整配对附表：R0181–R0192",
+    "完整配对附表：R0193–R0204",
+    "完整配对附表：R0205–R0216",
+    "完整配对附表：R0217–R0228",
+    "完整配对附表：R0229–R0240",
+    "完整配对附表：R0241–R0252",
+    "完整配对附表：R0253–R0264",
+    "完整配对附表：R0265–R0276",
+    "完整配对附表：R0277–R0288",
+    "完整配对附表：R0289–R0300",
+    "完整配对附表：R0301–R0312",
+    "完整配对附表：R0313–R0324",
+    "完整配对附表：R0325–R0336",
+    "完整配对附表：R0337–R0348",
+    "完整配对附表：R0349–R0360",
+    "完整配对附表：R0361–R0372",
+    "完整配对附表：R0373–R0384",
+    "完整配对附表：R0385–R0396",
+    "完整配对附表：R0397–R0408",
+    "完整配对附表：R0409–R0420",
+    "完整配对附表：R0421–R0432",
+    "完整配对附表：R0433–R0444",
+    "完整配对附表：R0445–R0456",
+    "完整配对附表：R0457–R0468",
+    "完整配对附表：R0469–R0480",
+    "完整配对附表：R0481–R0492",
+    "完整配对附表：R0493–R0504",
+    "完整配对附表：R0505–R0516",
+    "完整配对附表：R0517–R0528",
+    "完整配对附表：R0529–R0540",
+    "完整配对附表：R0541–R0552",
+    "完整配对附表：R0553–R0564",
+    "完整配对附表：R0565–R0576",
+    "完整配对附表：R0577–R0588",
+    "完整配对附表：R0589–R0600",
+    "完整配对附表：R0601–R0612",
+    "完整配对附表：R0613–R0624",
+    "完整配对附表：R0625–R0636",
+    "完整配对附表：R0637–R0648",
+    "完整配对附表：R0649–R0660",
+    "完整配对附表：R0661–R0672",
+    "完整配对附表：R0673–R0684",
+    "完整配对附表：R0685–R0696",
+    "完整配对附表：R0697–R0708",
+    "完整配对附表：R0709–R0720",
+    "完整配对附表：R0721–R0732",
+    "完整配对附表：R0733–R0744",
+    "完整配对附表：R0745–R0756",
+    "完整配对附表：R0757–R0768",
+    "完整配对附表：R0769–R0780",
+    "完整配对附表：R0781–R0792",
+    "完整配对附表：R0793–R0804"
+  ],
+  "guides": [
+    {
+      "number": 1,
+      "title": "同一参考模型：开发与test的绝对成绩",
+      "page": 7,
+      "source": "all_references_development_test.csv / current direct references",
+      "explanations": {
+        "横纵轴与单位": "横轴为macro-F1百分数；纵轴为相同配置。三个面板分别为CFP、OCT、两分支平均。",
+        "点线、颜色与样本": "橙点=development；绿点=test。每点先对每个模型算指标，再对3种子×2学习率平均，无误差线。",
+        "怎样代表更好": "在同一面板中越向右，该指标越高；两点相距大仅表示数据集成绩差，不直接说明统计显著。",
+        "具体比较": "每行保持模型配置不变。R&B和普通通信使用相同r/h；MMTM和注意力另列自身规模，不称等宽。",
+        "观察与结论": "R&B两个参考宽度在两集合都高于无通信均值；多种方法从开发到test下降，不能只归咎R&B。",
+        "不能推出什么": "均值高于某基线不代表所有种子都更好；test下降也不能单凭图归因于人口学或预处理。"
+      }
+    },
+    {
+      "number": 2,
+      "title": "压缩方式与三档ρ：开发/test完整对应",
+      "page": 9,
+      "source": "history_final213 / matched 3 seeds and LR6e-5",
+      "explanations": {
+        "横纵轴与单位": "横轴为ρ及实际h（r仅适用于通道压缩版本，CM压缩不另设r）；纵轴为F1百分数。上排开发、下排test；三列分别CFP、OCT、平均。",
+        "点线、颜色与样本": "颜色区分五种压缩方法；折线连接三档预设ρ；误差线是3个种子的样本SD，统一历史LR6e-5。",
+        "怎样代表更好": "同集合、同面板内F1越高越好；SD较小仅表示这三个模型波动较小，不是普遍稳定性保证。",
+        "具体比较": "每种方法都覆盖相同三档ρ。Learned CM压缩通道×方向，Learned channel压缩原生通道，结构有差异。",
+        "观察与结论": "没有跨所有宽度/集合的统一赢家；QR当前三档test分支平均均值递增，SVD部分档位先升后降。",
+        "不能推出什么": "不能按test曲线重新挑ρ或基；ρ增大同时增加宽度/参数，不能解释成单纯多保留能量。"
+      }
+    },
+    {
+      "number": 3,
+      "title": "直接比较：等参数/等计算与非线性基线",
+      "page": 13,
+      "source": "locked primary contrast IDs branch_equal_parameters_h512_k1,branch_equal_parameters_h512_k3,branch_equal_parameters_h512_k5,branch_equal_parameters_h1024_k1,branch_equal_parameters_h1024_k3,branch_equal_parameters_h1024_k5",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 4,
+      "title": "直接比较：等参数/等计算与非线性基线",
+      "page": 15,
+      "source": "locked primary contrast IDs branch_equal_compute_budget512,branch_equal_compute_budget512_k3_minus_k1,branch_equal_compute_budget512_k5_minus_k3,branch_equal_compute_budget1024,branch_equal_compute_budget1024_k3_minus_k1,branch_equal_compute_budget1024_k5_minus_k3",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 5,
+      "title": "直接比较：等参数/等计算与非线性基线",
+      "page": 17,
+      "source": "locked primary contrast IDs branch_reference_h512_minus_mmtm_hidden128,branch_reference_h512_minus_mmtm_hidden256,branch_reference_h512_minus_mmtm_hidden512,branch_reference_h512_minus_mmtm_hidden1024,branch_reference_h512_minus_attention_d128,branch_reference_h512_minus_attention_d256",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 6,
+      "title": "直接比较：等参数/等计算与非线性基线",
+      "page": 19,
+      "source": "locked primary contrast IDs branch_reference_h512_minus_attention_d512,branch_reference_h512_minus_attention_d1024,branch_reference_h1024_minus_mmtm_hidden128,branch_reference_h1024_minus_mmtm_hidden256,branch_reference_h1024_minus_mmtm_hidden512,branch_reference_h1024_minus_mmtm_hidden1024",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 7,
+      "title": "直接比较：等参数/等计算与非线性基线",
+      "page": 21,
+      "source": "locked primary contrast IDs branch_reference_h1024_minus_attention_d128,branch_reference_h1024_minus_attention_d256,branch_reference_h1024_minus_attention_d512,branch_reference_h1024_minus_attention_d1024",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 8,
+      "title": "宿主增强：训练收益",
+      "page": 23,
+      "source": "locked primary contrast IDs branch_mmtm_hidden256_augmentation_radon_minus_continue,branch_mmtm_hidden256_augmentation_radon_minus_linear_resample,branch_attention_d256_augmentation_radon_minus_continue,branch_attention_d256_augmentation_radon_minus_linear_resample",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 9,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 25,
+      "source": "locked primary contrast IDs svd_geometry,qr_geometry,basis_geometry_interaction,svd_oct_to_cfp_contribution,svd_cfp_to_oct_contribution,qr_oct_to_cfp_contribution",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 10,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 27,
+      "source": "locked primary contrast IDs qr_cfp_to_oct_contribution,svd_rho1_16_minus_mmtm_r4,svd_rho1_16_minus_mmtm_r8,svd_rho1_16_minus_attention_d128,svd_rho1_16_minus_attention_d256,svd_rho1_8_minus_mmtm_r4",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 11,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 29,
+      "source": "locked primary contrast IDs svd_rho1_8_minus_mmtm_r8,svd_rho1_8_minus_attention_d128,svd_rho1_8_minus_attention_d256,svd_rho1_4_minus_mmtm_r4,svd_rho1_4_minus_mmtm_r8,svd_rho1_4_minus_attention_d128",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 12,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 31,
+      "source": "locked primary contrast IDs svd_rho1_4_minus_attention_d256,qr_rho1_16_minus_mmtm_r4,qr_rho1_16_minus_mmtm_r8,qr_rho1_16_minus_attention_d128,qr_rho1_16_minus_attention_d256,qr_rho1_8_minus_mmtm_r4",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 13,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 33,
+      "source": "locked primary contrast IDs qr_rho1_8_minus_mmtm_r8,qr_rho1_8_minus_attention_d128,qr_rho1_8_minus_attention_d256,qr_rho1_4_minus_mmtm_r4,qr_rho1_4_minus_mmtm_r8,qr_rho1_4_minus_attention_d128",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 14,
+      "title": "基与几何、通信方向及历史基线",
+      "page": 35,
+      "source": "locked primary contrast IDs qr_rho1_4_minus_attention_d256",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 15,
+      "title": "QR机制：自身与空间打乱",
+      "page": 37,
+      "source": "locked primary contrast IDs qr_radon_minus_self,qr_radon_minus_scrambled,basis_spatial_interaction",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 16,
+      "title": "多宽度联合训练",
+      "page": 39,
+      "source": "locked primary contrast IDs nested_learned_channel_joint_minus_independent,nested_svd_joint_minus_independent,nested_qr_joint_minus_independent",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 17,
+      "title": "S轴邻接",
+      "page": 41,
+      "source": "locked primary contrast IDs svd_ordered_minus_permuted,qr_ordered_minus_permuted,basis_S_axis_interaction",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 18,
+      "title": "固定通道秩的方向分配",
+      "page": 43,
+      "source": "locked primary contrast IDs fixed_r16_geometry_M32_minus_M16,fixed_r16_geometry_M64_minus_M16,fixed_r32_geometry_M32_minus_M16,fixed_r32_geometry_M64_minus_M16,radon_rank32_minus_rank16,linear_resample_rank32_minus_rank16",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 19,
+      "title": "固定通道秩的方向分配",
+      "page": 45,
+      "source": "locked primary contrast IDs geometry_rank_interaction,M64_M16_by_rank_interaction",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 20,
+      "title": "冻结网络的完整机制对照",
+      "page": 47,
+      "source": "locked primary contrast IDs frozen_svd_radon_minus_linear_resample,frozen_svd_radon_minus_self,frozen_svd_radon_minus_parent,frozen_qr_radon_minus_linear_resample,frozen_qr_radon_minus_self,frozen_qr_radon_minus_parent",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 21,
+      "title": "冻结网络的完整机制对照",
+      "page": 49,
+      "source": "locked primary contrast IDs frozen_basis_geometry_interaction,svd_full_minus_frozen_geometry,qr_full_minus_frozen_geometry",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 22,
+      "title": "桥数量与位置",
+      "page": 51,
+      "source": "locked primary contrast IDs radon_stage2_presence,radon_stage3_presence,radon_stage4_presence,radon_count2_minus_count1,radon_count3_minus_count2,radon_count2_minus_single_rank23",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 23,
+      "title": "桥数量与位置",
+      "page": 53,
+      "source": "locked primary contrast IDs radon_count3_minus_single_rank28,linear_resample_stage2_presence,linear_resample_stage3_presence,linear_resample_stage4_presence,linear_resample_count2_minus_count1,linear_resample_count3_minus_count2",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 24,
+      "title": "桥数量与位置",
+      "page": 55,
+      "source": "locked primary contrast IDs linear_resample_count2_minus_single_rank23,linear_resample_count3_minus_single_rank28,geometry_count1,geometry_count2,geometry_count3,geometry_count2_minus_count1",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 25,
+      "title": "桥数量与位置",
+      "page": 57,
+      "source": "locked primary contrast IDs geometry_count3_minus_count2,geometry_stage2_presence,geometry_stage3_presence,geometry_stage4_presence",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 26,
+      "title": "原冻结参考组",
+      "page": 59,
+      "source": "locked primary contrast IDs frozen_radon_minus_linear_resample,frozen_radon_minus_parent",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 27,
+      "title": "宿主开关：同一模型的功能依赖",
+      "page": 61,
+      "source": "locked primary contrast IDs mmtm_hidden256_radon_both_on_minus_host_only,mmtm_hidden256_radon_both_on_minus_new_only,mmtm_hidden256_linear_resample_both_on_minus_host_only,mmtm_hidden256_linear_resample_both_on_minus_new_only,attention_d256_radon_both_on_minus_host_only,attention_d256_radon_both_on_minus_new_only",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 28,
+      "title": "宿主开关：同一模型的功能依赖",
+      "page": 63,
+      "source": "locked primary contrast IDs attention_d256_linear_resample_both_on_minus_host_only,attention_d256_linear_resample_both_on_minus_new_only",
+      "explanations": {
+        "横纵轴与单位": "横轴为已定义差值pp；纵轴C编号逐项对应本页定义。",
+        "点线颜色": "橙色development、绿色test；点为均值差，线为全局同时95%区间。",
+        "怎样更好": "正值表示左项指标更高；交互只表明增益差。",
+        "比较范围": "严格沿用每项锁定权重，历史LR6e-5组不混入本轮两LR均值。",
+        "结论": "读取本页开发、test、变化三列；区间跨0不等于无效。",
+        "限制": "两数据集参与者不同；模型/种子不是额外独立参与者。"
+      }
+    },
+    {
+      "number": 29,
+      "title": "正确配对与关闭/打乱：54个模型开发/test对应",
+      "page": 65,
+      "source": "historical prior186 pairing + unified test pairing; 54 checkpoint SHAs matched",
+      "explanations": {
+        "横纵轴与单位": "横轴为正确配对F1减扰动F1，单位pp；纵轴依次为两方向关闭、全关闭、两方向打乱、全打乱。",
+        "点线、颜色与样本": "橙=开发，绿=test。先在每个模型内平均20次打乱，再等权平均54个模型；没有把20次置换当20倍样本。",
+        "怎样代表更好": "向右表示当前模型更依赖正确配对或对应通路；不是新增模块的训练收益。",
+        "具体比较": "开发与test通过同一选中检查点SHA匹配；原始配对F1与804项表逐项核对。三个面板保留两分支差异。",
+        "观察与结论": "两集合均可直接比较平均功能依赖；原始数据保留逐模型结果，平均依赖不能排除反例和结构性零效应。",
+        "不能推出什么": "没有新显著性检验；全部54项包括单向模型，未启用通路出现零效应是结构事实，不能称无效训练。"
+      }
+    },
+    {
+      "number": 30,
+      "title": "Radon图谱：01_synthetic_2d",
+      "page": 67,
+      "source": "sinogram_atlas/figures/01_synthetic_2d.png",
+      "explanations": {
+        "横纵轴与单位": "左/右图是原生特征网格坐标；中图横轴为有符号距离s。二维纵轴是法向角度，三维纵轴是EEM方向编号。",
+        "点线、颜色与样本": "左为合成高斯点，中为实际离散投影，右为普通反投影。色条表示幅值；二维虚线为s=n·x0。",
+        "怎样代表更好": "本图不评价分类。投影轨迹与理论位置相符是几何核查；返回更亮不代表分类更好。",
+        "具体比较": "观察同一合成输入经过投影和普通返回之后，位置/形状如何改变。",
+        "观察与结论": "二维点呈正弦轨迹；三维是球面方向的投影表。返回点会扩散，说明普通反投影不是精确逆。",
+        "不能推出什么": "合成点结果不证明真实病变可定位；三维编号相邻不代表方向在球面相邻。"
+      }
+    },
+    {
+      "number": 31,
+      "title": "Radon图谱：01_synthetic_3d",
+      "page": 69,
+      "source": "sinogram_atlas/figures/01_synthetic_3d.png",
+      "explanations": {
+        "横纵轴与单位": "左/右图是原生特征网格坐标；中图横轴为有符号距离s。二维纵轴是法向角度，三维纵轴是EEM方向编号。",
+        "点线、颜色与样本": "左为合成高斯点，中为实际离散投影，右为普通反投影。色条表示幅值；二维虚线为s=n·x0。",
+        "怎样代表更好": "本图不评价分类。投影轨迹与理论位置相符是几何核查；返回更亮不代表分类更好。",
+        "具体比较": "观察同一合成输入经过投影和普通返回之后，位置/形状如何改变。",
+        "观察与结论": "二维点呈正弦轨迹；三维是球面方向的投影表。返回点会扩散，说明普通反投影不是精确逆。",
+        "不能推出什么": "合成点结果不证明真实病变可定位；三维编号相邻不代表方向在球面相邻。"
+      }
+    },
+    {
+      "number": 32,
+      "title": "Radon图谱：02_projected_flow_cfp_stage3",
+      "page": 72,
+      "source": "sinogram_atlas/figures/02_projected_flow_cfp_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "每小图横轴是投影轴有符号距离；CFP纵轴是角度，OCT纵轴是方向编号。四行：输入投影、自身消息、跨来源消息、总消息。",
+        "点线、颜色与样本": "三列依次train、validation、test。色条为RMS幅值；每行按训练图定色限，clipped是超出色限的比例。 原四行拆成前两页上/下各两行，保留全部原坐标和色条。",
+        "怎样代表更好": "没有“越亮越好”：亮表示该位置的聚合幅度更大。不同算子阶段的幅度不是同一分类指标。",
+        "具体比较": "同一来源、同一行横向比较三集合；纵向看桥如何把输入改成自身和跨来源消息。",
+        "观察与结论": "可观察非零跨来源消息以及各集合模式；总消息可能相长或相消，RMS不能把自身与跨来源直接相加。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 固定SVD r16/h512；跨种子按平方能量汇总，不声称通道语义一一对应。"
+      }
+    },
+    {
+      "number": 33,
+      "title": "Radon图谱：02_projected_flow_oct_stage3",
+      "page": 75,
+      "source": "sinogram_atlas/figures/02_projected_flow_oct_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "每小图横轴是投影轴有符号距离；CFP纵轴是角度，OCT纵轴是方向编号。四行：输入投影、自身消息、跨来源消息、总消息。",
+        "点线、颜色与样本": "三列依次train、validation、test。色条为RMS幅值；每行按训练图定色限，clipped是超出色限的比例。 原四行拆成前两页上/下各两行，保留全部原坐标和色条。",
+        "怎样代表更好": "没有“越亮越好”：亮表示该位置的聚合幅度更大。不同算子阶段的幅度不是同一分类指标。",
+        "具体比较": "同一来源、同一行横向比较三集合；纵向看桥如何把输入改成自身和跨来源消息。",
+        "观察与结论": "可观察非零跨来源消息以及各集合模式；总消息可能相长或相消，RMS不能把自身与跨来源直接相加。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 固定SVD r16/h512；跨种子按平方能量汇总，不声称通道语义一一对应。"
+      }
+    },
+    {
+      "number": 34,
+      "title": "Radon图谱：03_return_maps_cfp_stage3",
+      "page": 78,
+      "source": "sinogram_atlas/figures/03_return_maps_cfp_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "坐标是原生特征网格索引。CFP为二维图；OCT将三个中央正交截面并排，间隔不代表连续空间。",
+        "点线、颜色与样本": "三列train/validation/test；四行输入、自身返回、跨来源返回、总返回。色条为RMS，每行共享训练色限。 原四行拆成前两页上/下各两行，保留全部原坐标和色条。",
+        "怎样代表更好": "残差幅度大只是修改更强，不等于性能提升；幅度小也不等于无作用。",
+        "具体比较": "同一行横向看集合间返回模式，比较输入与总返回在何处具有较大能量。",
+        "观察与结论": "能看到桥怎样把消息写回原生特征空间；它是残差修改的数值描述，而非图像重建质量评测。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 后续主干仍会非线性处理；不能从亮区推出解剖病灶或因果机制。"
+      }
+    },
+    {
+      "number": 35,
+      "title": "Radon图谱：03_return_maps_oct_stage3",
+      "page": 81,
+      "source": "sinogram_atlas/figures/03_return_maps_oct_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "坐标是原生特征网格索引。CFP为二维图；OCT将三个中央正交截面并排，间隔不代表连续空间。",
+        "点线、颜色与样本": "三列train/validation/test；四行输入、自身返回、跨来源返回、总返回。色条为RMS，每行共享训练色限。 原四行拆成前两页上/下各两行，保留全部原坐标和色条。",
+        "怎样代表更好": "残差幅度大只是修改更强，不等于性能提升；幅度小也不等于无作用。",
+        "具体比较": "同一行横向看集合间返回模式，比较输入与总返回在何处具有较大能量。",
+        "观察与结论": "能看到桥怎样把消息写回原生特征空间；它是残差修改的数值描述，而非图像重建质量评测。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 后续主干仍会非线性处理；不能从亮区推出解剖病灶或因果机制。"
+      }
+    },
+    {
+      "number": 36,
+      "title": "Radon图谱：04_label_difference_cfp_stage3",
+      "page": 83,
+      "source": "sinogram_atlas/figures/04_label_difference_cfp_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "横轴是有符号距离；CFP纵轴为角度，OCT为EEM方向编号。两行分别为输入投影和跨来源消息。",
+        "点线、颜色与样本": "三列train/validation/test；色条为病例组RMS减对照组RMS，正负色表示差异方向，白色接近0。",
+        "怎样代表更好": "更红/更蓝只表示组差更大，不代表诊断性能更好；色差没有对应的显著性检验。",
+        "具体比较": "在同一固定模型组中比较两类记录表型的聚合幅度，观察这种描述性模式跨集合是否相似。",
+        "观察与结论": "显示特征与标签的聚合关联；即使模式相似，也不能单独证明桥提取了临床可解释的病理特征。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 固定训练色限，不按test单独增强颜色；不从此图设阈值或筛选患者。"
+      }
+    },
+    {
+      "number": 37,
+      "title": "Radon图谱：04_label_difference_oct_stage3",
+      "page": 85,
+      "source": "sinogram_atlas/figures/04_label_difference_oct_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "横轴是有符号距离；CFP纵轴为角度，OCT为EEM方向编号。两行分别为输入投影和跨来源消息。",
+        "点线、颜色与样本": "三列train/validation/test；色条为病例组RMS减对照组RMS，正负色表示差异方向，白色接近0。",
+        "怎样代表更好": "更红/更蓝只表示组差更大，不代表诊断性能更好；色差没有对应的显著性检验。",
+        "具体比较": "在同一固定模型组中比较两类记录表型的聚合幅度，观察这种描述性模式跨集合是否相似。",
+        "观察与结论": "显示特征与标签的聚合关联；即使模式相似，也不能单独证明桥提取了临床可解释的病理特征。",
+        "不能推出什么": "公开图为聚合特征统计，不是患者原图或病灶定位。没有新增训练或按test挑样本。 固定训练色限，不按test单独增强颜色；不从此图设阈值或筛选患者。"
+      }
+    },
+    {
+      "number": 38,
+      "title": "Radon图谱：05_oct_spherical_directions",
+      "page": 87,
+      "source": "sinogram_atlas/figures/05_oct_spherical_directions.png",
+      "explanations": {
+        "横纵轴与单位": "三维坐标轴是单位法向量的三个分量，不是患者空间位置；点的编号对应32个EEM方向。",
+        "点线、颜色与样本": "三面板为train、validation、test。颜色是每方向投影RMS，统一训练色限。",
+        "怎样代表更好": "没有优劣排序；颜色越亮仅表示沿该法向的投影幅度较大。",
+        "具体比较": "对照热图中的方向编号与球面上的真实方向，防止把三维方向误读成一条角度轴。",
+        "观察与结论": "OCT方向分布在球面代表域；二维正弦图的单一角度解读不能直接套到三维。",
+        "不能推出什么": "颜色不能证明某个投影角度诊断最重要；共同格式也不保证CFP/OCT物理对齐。"
+      }
+    },
+    {
+      "number": 39,
+      "title": "Radon图谱：06_width_robustness",
+      "page": 89,
+      "source": "sinogram_atlas/figures/06_width_robustness.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为三档ρ及r/h；三列纵轴依次为通道能量保留率、残差/输入范数、自身与跨来源余弦；两行为CFP/OCT。",
+        "点线、颜色与样本": "蓝=train，橙=validation，绿=test。点为种子值，连线为3种子均值，误差线为样本SD。",
+        "怎样代表更好": "保留率高只表示能量保留多；残差比无统一好坏；余弦正/负表示同向/相消，不是F1。",
+        "具体比较": "在同一来源和同一指标列比较宽度或方法；不用不同列的数值大小互相排名。",
+        "观察与结论": "可以分清“保留多少能量”和“修改多强”，也看到种子差异；这些都应与匹配性能图共同解释。",
+        "不能推出什么": "能量不是判别信息，残差大不证明有效。均值±SD可能超出指标合法范围，仅是对称波动描述。"
+      }
+    },
+    {
+      "number": 40,
+      "title": "Radon图谱：07_basis_and_ordinary_communication",
+      "page": 91,
+      "source": "sinogram_atlas/figures/07_basis_and_ordinary_communication.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为SVD Radon、QR Radon、SVD普通重采样（均r16/h512）；三列纵轴依次为通道能量保留率、残差/输入范数、自身与跨来源余弦；两行为CFP/OCT。",
+        "点线、颜色与样本": "蓝=train，橙=validation，绿=test。点为种子值，连线为3种子均值，误差线为样本SD。",
+        "怎样代表更好": "保留率高只表示能量保留多；残差比无统一好坏；余弦正/负表示同向/相消，不是F1。",
+        "具体比较": "在同一来源和同一指标列比较宽度或方法；不用不同列的数值大小互相排名。",
+        "观察与结论": "可以分清“保留多少能量”和“修改多强”，也看到种子差异；这些都应与匹配性能图共同解释。",
+        "不能推出什么": "能量不是判别信息，残差大不证明有效。均值±SD可能超出指标合法范围，仅是对称波动描述。"
+      }
+    },
+    {
+      "number": 41,
+      "title": "Radon图谱：08_s_axis_spectra",
+      "page": 93,
+      "source": "sinogram_atlas/figures/08_s_axis_spectra.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为每S采样点的周期数0–0.5；纵轴是该频点占投影域包总能量的比例。",
+        "点线、颜色与样本": "两行CFP/OCT；四列投影、自身、跨来源、总消息；蓝/橙/绿依次train/validation/test，包含直流0频。",
+        "怎样代表更好": "低频或高频能量更多都不自动代表更好；它是信号能量分布，不是分类曲线。",
+        "具体比较": "比较桥前后频谱，以及同阶段跨数据集合的频谱形状。",
+        "观察与结论": "可观察能量是否集中于低频、消息是否改变频率分布；输入谱和卷积核响应是两个不同对象。",
+        "不能推出什么": "单位不是mm或Hz；两模态相同归一化频率不意味着相同物理尺度。不能据低频占优证明几何不可替代。"
+      }
+    },
+    {
+      "number": 42,
+      "title": "Radon图谱：09_multidepth_returns",
+      "page": 95,
+      "source": "sinogram_atlas/figures/09_multidepth_returns.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为桥接stage；纵轴为先逐参与者求||ΔX||/||X||再平均的相对残差，无物理单位。",
+        "点线、颜色与样本": "两行CFP/OCT；三列单桥、双桥、三桥；蓝/橙/绿为三集合，误差线为3种子SD。",
+        "怎样代表更好": "残差越大表示该处改动越强，不等于多桥性能更好；请结合多桥差值区间。",
+        "具体比较": "每桥r16/h512，比较不同位置的修改强度；后续桥输入已包含前面桥的作用。",
+        "观察与结论": "呈现深度不同导致的残差尺度差异；不能把所有桥看成作用在同一份未经修改的特征上。",
+        "不能推出什么": "本图不是严格容量匹配的性能比较，也不是把每桥贡献简单相加的证据。"
+      }
+    },
+    {
+      "number": 43,
+      "title": "Radon图谱：10_initial_selected_inputs",
+      "page": 97,
+      "source": "sinogram_atlas/figures/10_initial_selected_inputs.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为距离/投影支持半径，归一化到[-1,1]；纵轴是按方向聚合的输入投影RMS。",
+        "点线、颜色与样本": "两行CFP/OCT、三列train/validation/test；灰线为从同父模型构造的零桥初始，彩线为开发选中模型。",
+        "怎样代表更好": "曲线变大不等于性能更好；本图看原生表示是否随联合训练改变。",
+        "具体比较": "同一集合内比较初始和选中状态，跨集合比较形状；初始不是额外训练出的另一基线。",
+        "观察与结论": "初始桥消息为零，但原生输入并不为零；联合训练后输入表示可变，固定SVD基未必仍能量最优。",
+        "不能推出什么": "不能把表示变化直接解释为跨来源净收益，或把零桥输入幅度误认为桥的贡献。"
+      }
+    },
+    {
+      "number": 44,
+      "title": "傅里叶与返回算子：BA_cfp_stage2",
+      "page": 99,
+      "source": "fourier_diagnostics/figures/BA_cfp_stage2.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 45,
+      "title": "傅里叶与返回算子：BA_cfp_stage3",
+      "page": 101,
+      "source": "fourier_diagnostics/figures/BA_cfp_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 46,
+      "title": "傅里叶与返回算子：BA_cfp_stage4",
+      "page": 103,
+      "source": "fourier_diagnostics/figures/BA_cfp_stage4.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 47,
+      "title": "傅里叶与返回算子：BA_oct_stage2",
+      "page": 105,
+      "source": "fourier_diagnostics/figures/BA_oct_stage2.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 48,
+      "title": "傅里叶与返回算子：BA_oct_stage3",
+      "page": 107,
+      "source": "fourier_diagnostics/figures/BA_oct_stage3.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 49,
+      "title": "傅里叶与返回算子：BA_oct_stage4",
+      "page": 109,
+      "source": "fourier_diagnostics/figures/BA_oct_stage4.png",
+      "explanations": {
+        "横纵轴与单位": "坐标为原生特征网格索引；OCT显示三个中央正交截面，中间空隙不是空间连续部分。",
+        "点线、颜色与样本": "左列固定单位脉冲，右列同脉冲经过投影A和普通返回B；两行为中心/偏移位置。色条表示返回幅度。",
+        "怎样代表更好": "若讨论重建，接近输入位置/形状更像逆；本图只展示算子性质，不给分类优劣评分。",
+        "具体比较": "在相同stage几何下，对比BA与单位映射；不同stage色条不能忽略后直接比亮度。",
+        "观察与结论": "返回脉冲展宽且有位置/边界差异，BA并非恒等；R&B学习的是残差通信，不是直接无损重建。",
+        "不能推出什么": "这是合成算子实验，无train/val/test区分；不是患者诊断，也不是已学Conv1d后的完整模型。"
+      }
+    },
+    {
+      "number": 50,
+      "title": "傅里叶与返回算子：fourier_feature_probes",
+      "page": 111,
+      "source": "fourier_diagnostics/figures/fourier_feature_probes.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为公共保守Nyquist上限的比例；纵轴为误差幅度除以全频带参考RMS。",
+        "点线、颜色与样本": "两行CFP/OCT、三列train/validation/test；灰=构造初始，彩色=选中；线和带为3种子均值/SD。",
+        "怎样代表更好": "较低仅意味着与指定插值场频谱的数值误差较小，不等价于诊断表现更好。",
+        "具体比较": "每集合固定16人、双眼、前3通道，对比初始和选中状态；不是全部1264/296/290人的频谱统计。",
+        "观察与结论": "实际特征上的数值偏差可直接检查；分母使用全频带RMS，避免单个频点接近零时相对误差爆炸。",
+        "不能推出什么": "三维超平面Radon的一维傅里叶对应三维频谱径向直线；共同归一化频率不表示物理配准。"
+      }
+    },
+    {
+      "number": 51,
+      "title": "傅里叶与返回算子：fourier_synthetic_errors",
+      "page": 113,
+      "source": "fourier_diagnostics/figures/fourier_synthetic_errors.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为S采样数；纵轴为投影的一维傅里叶结果与插值场解析频谱参考的相对L2误差。",
+        "点线、颜色与样本": "六面板为CFP/OCT的stage2/3/4，颜色为三种预定合成场；缺口是原算子容量限制不可行。",
+        "怎样代表更好": "数值误差越小表示此离散几何更接近指定数学参考；不代表分类F1更高。",
+        "具体比较": "用相同定义比较S改变后的积分/边界离散误差；不是训练实验，也无开发/test性能。",
+        "观察与结论": "量化有限采样误差与结构差异；误差不一定简单单调，不能把切片定理当成离散实现绝对精确。",
+        "不能推出什么": "21个可行、1个不可行配置均保留；切片定理是已有数学性质，不能当作R&B独有创新或效果证据。"
+      }
+    },
+    {
+      "number": 52,
+      "title": "傅里叶与返回算子：kernel_frequency_gains",
+      "page": 115,
+      "source": "fourier_diagnostics/figures/kernel_frequency_gains.png",
+      "explanations": {
+        "横纵轴与单位": "横轴为cycles/S sample；纵轴为每通道对的RMS矩阵增益。四面板分别为两个自身块和两个跨来源块。",
+        "点线、颜色与样本": "三条颜色线对应r16/h512、r32/h1024、r64/h2048；线/带为3种子均值和SD，基于已选卷积权重。",
+        "怎样代表更好": "增益越高只表示核更强地响应该频率；没有“越高越好”，它不等于实际信号功率。",
+        "具体比较": "在同一方向块内比较宽度下的频率响应；输出行=接收来源，输入列=发送来源。",
+        "观察与结论": "部分核偏重低频；普通通信也可能出现相似形状，因此频率偏好不证明Radon几何独有优势。",
+        "不能推出什么": "它不是标量ramp滤波器，也不是完整BAK算子的奇异谱；核固定后无train/val/test三套不同权重。"
+      }
+    }
+  ]
+}

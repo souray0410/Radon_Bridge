@@ -1,0 +1,28 @@
+{
+  "classification": "audit implementation attempts only; historical training/evaluation results untouched",
+  "attempts": [
+    {
+      "phase": "aggregate",
+      "v1": "Stopped on a legacy summary lacking initial_learning_rates; no completed audit accepted.",
+      "v2": "Accepted; uses recorded epoch1 group rates as explicit fallback, all66 verified."
+    },
+    {
+      "phase": "mmtm_probe",
+      "import_precheck": "Configured bundled MHD V4 path before launching probes.",
+      "v1": "Three gate probes saved; representative full-autograd diagnostic hit 8.5 GiB allocator cap (process reported 8.91 GiB). No optimizer or checkpoint writes. Attempt retained; not accepted as complete.",
+      "v2": "Computes bridge derivatives with native parameter gradients disabled and restored; same batch16 and same CE derivative wrt bridge. Checkpoint state restored in finally. All24 accepted, peak reserved3124MiB."
+    },
+    {
+      "phase": "cohort_lineage",
+      "v1": "Strict string comparison flagged declared profile rename and false/False serialization.",
+      "v2": "Explicitly verified documented transformations; accepted.",
+      "v3": "Adds successful assertion that all925 eligible glaucoma cases were included; accepted and used in final report."
+    }
+  ],
+  "no_training_protocol_changes": true,
+  "no_test_model_selection": true,
+  "original_report_and_primary_comparisons_unchanged": true,
+  "future_runtime_gpu_indices": [
+    0
+  ]
+}

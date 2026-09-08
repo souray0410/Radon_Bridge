@@ -1,0 +1,20 @@
+{
+  "state": "passed",
+  "source_base_commit": "ec7d5fe3fe05db97a597605943e00dee24b8ea1f",
+  "models_audited": 66,
+  "mmtm_audited": 24,
+  "old_report_configurations_reconciled": 11,
+  "all_configured_learning_rates_verified": true,
+  "all_mmtm_632_optimizer_steps": true,
+  "all_mmtm_epoch0_and_8_epoch_plateau": true,
+  "all_mmtm_gate_probes_unsaturated": true,
+  "four_gradient_probes_match_zero_initialization_and_nonzero_stopping_gradients": true,
+  "all_mmtm_parameters_BN_gradients_RNG_preserved": true,
+  "cached_content_duplicates": 0,
+  "public_aggregates_only": true,
+  "script_sha256": {
+    "scripts/audit_expansion_readiness.py": "83e0bb5245711370acedaad5c1af716d0b71b13982ef0038366abcf2e081de8c",
+    "scripts/audit_cohort_lineage.py": "8a3ebebfd4fc1fb190c7f01f366219d7d402ee35331278f7f38cf2b39045db98",
+    "scripts/audit_mmtm_train_probes.py": "070ab42d20b70d95bb538924c907ebff5bebfeb18233a6615aeabfed31c217b4"
+  }
+}

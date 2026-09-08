@@ -1,0 +1,24 @@
+{
+  "state": "accepted",
+  "main_pages": 117,
+  "appendix_pages": 68,
+  "rendered_all_pages": true,
+  "contact_sheets_all_pages_visually_reviewed": true,
+  "font": "Embedded Arial Unicode plus figure source fonts",
+  "dense_four_row_figures_split_into_two_pages": 4,
+  "vector_source_figures_embedded": true,
+  "all_804_rows_exactly_match_source": true,
+  "all_4824_rounded_F1_cells_in_PDF_match_source": true,
+  "all_121_comparisons_and_CIs_exactly_match_existing_statistics": true,
+  "all_three_statistical_JSONs_byte_identical": true,
+  "paired_diagnostics_matched_checkpoints": 54,
+  "original_paired_F1_matches_each_split": true,
+  "graph_guides": 52,
+  "new_training": false,
+  "new_development_or_test_inference": false,
+  "new_bootstrap": false,
+  "artifact_sha256": {
+    "RB_Matched_Development_Test_Guided_Report.pdf": "39328c860be870bebc49fbcd5d5791e4822072bdc7fc1c625eb211207803a3ea",
+    "RB_All_804_Matched_Results.pdf": "d89ed92ef7e1bbf8fcebb601e0412b93f3069c64d28578f7e202ee0c8e73aa43"
+  }
+}

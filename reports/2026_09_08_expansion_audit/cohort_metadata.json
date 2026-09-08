@@ -1,0 +1,265 @@
+{
+  "test": {
+    "participants": 290,
+    "labels": {
+      "0": 145,
+      "1": 145
+    },
+    "age": {
+      "n": 290,
+      "mean": 61.11724137931034,
+      "sd": 6.264640649509434,
+      "median": 62.0,
+      "q25": 57.0,
+      "q75": 66.0
+    },
+    "missing_age": 0,
+    "sex": {
+      "1": 172,
+      "0": 118,
+      "categories_below_10_combined": 0
+    },
+    "assessment_centre": {
+      "11024": 90,
+      "11014": 48,
+      "11016": 18,
+      "11021": 60,
+      "11020": 46,
+      "11018": 28,
+      "categories_below_10_combined": 0
+    },
+    "instance": {
+      "1": 90,
+      "0": 200,
+      "categories_below_10_combined": 0
+    },
+    "candidate_status": {
+      "prevalent_case": 145,
+      "strict_control": 145,
+      "categories_below_10_combined": 0
+    },
+    "reference_standard_type": {
+      "record_derived_clinical_phenotype": 290,
+      "categories_below_10_combined": 0
+    },
+    "reference_source": {
+      "UKB self-report, HES/ICD, diagnosis timing, and procedure records": 290,
+      "categories_below_10_combined": 0
+    },
+    "phenotype_profile": {
+      "ukb_record_glaucoma_all_evidence_binary_bilateral": 290,
+      "categories_below_10_combined": 0
+    },
+    "task_profile": {
+      "glaucoma_all_evidence": 290,
+      "categories_below_10_combined": 0
+    },
+    "assessment_year": {
+      "2012": 42,
+      "2013": 48,
+      "2010": 197,
+      "categories_below_10_combined": 3
+    },
+    "case_age": {
+      "n": 145,
+      "mean": 61.11724137931034,
+      "sd": 6.275507337033776,
+      "median": 62.0,
+      "q25": 57.0,
+      "q75": 66.0
+    },
+    "control_age": {
+      "n": 145,
+      "mean": 61.11724137931034,
+      "sd": 6.275507337033775,
+      "median": 62.0,
+      "q25": 57.0,
+      "q75": 66.0
+    },
+    "case_evidence_tokens": {
+      "20002": 101,
+      "6148": 128,
+      "glaucoma_treatment": 34,
+      "20004": 14,
+      "41270": 14,
+      "categories_below_10_combined": 0
+    },
+    "incident_targets_nonempty": 66,
+    "undated_targets_nonempty": 0
+  },
+  "train": {
+    "participants": 1264,
+    "labels": {
+      "0": 632,
+      "1": 632
+    },
+    "age": {
+      "n": 1264,
+      "mean": 62.13607594936709,
+      "sd": 6.566584169999313,
+      "median": 63.0,
+      "q25": 59.0,
+      "q75": 67.0
+    },
+    "missing_age": 0,
+    "sex": {
+      "1": 696,
+      "0": 568,
+      "categories_below_10_combined": 0
+    },
+    "assessment_centre": {
+      "11021": 244,
+      "11020": 196,
+      "11024": 388,
+      "11016": 82,
+      "11014": 190,
+      "11018": 162,
+      "categories_below_10_combined": 2
+    },
+    "instance": {
+      "0": 876,
+      "1": 388,
+      "categories_below_10_combined": 0
+    },
+    "candidate_status": {
+      "strict_control": 632,
+      "prevalent_case": 632,
+      "categories_below_10_combined": 0
+    },
+    "reference_standard_type": {
+      "record_derived_clinical_phenotype": 1264,
+      "categories_below_10_combined": 0
+    },
+    "reference_source": {
+      "UKB self-report, HES/ICD, diagnosis timing, and procedure records": 1264,
+      "categories_below_10_combined": 0
+    },
+    "phenotype_profile": {
+      "ukb_record_glaucoma_all_evidence_binary_bilateral": 1264,
+      "categories_below_10_combined": 0
+    },
+    "task_profile": {
+      "glaucoma_all_evidence": 1264,
+      "categories_below_10_combined": 0
+    },
+    "assessment_year": {
+      "2010": 874,
+      "2013": 230,
+      "2012": 158,
+      "categories_below_10_combined": 2
+    },
+    "case_age": {
+      "n": 632,
+      "mean": 62.13607594936709,
+      "sd": 6.569185312573104,
+      "median": 63.0,
+      "q25": 59.0,
+      "q75": 67.0
+    },
+    "control_age": {
+      "n": 632,
+      "mean": 62.13607594936709,
+      "sd": 6.569185312573104,
+      "median": 63.0,
+      "q25": 59.0,
+      "q75": 67.0
+    },
+    "case_evidence_tokens": {
+      "6148": 554,
+      "20002": 443,
+      "20004": 31,
+      "41270": 57,
+      "glaucoma_treatment": 116,
+      "categories_below_10_combined": 0
+    },
+    "incident_targets_nonempty": 301,
+    "undated_targets_nonempty": 0
+  },
+  "validation": {
+    "participants": 296,
+    "labels": {
+      "0": 148,
+      "1": 148
+    },
+    "age": {
+      "n": 296,
+      "mean": 61.95945945945946,
+      "sd": 6.498895216023979,
+      "median": 64.0,
+      "q25": 58.75,
+      "q75": 67.0
+    },
+    "missing_age": 0,
+    "sex": {
+      "0": 138,
+      "1": 158,
+      "categories_below_10_combined": 0
+    },
+    "assessment_centre": {
+      "11020": 44,
+      "11021": 64,
+      "11024": 74,
+      "11018": 42,
+      "11014": 48,
+      "11016": 22,
+      "categories_below_10_combined": 2
+    },
+    "instance": {
+      "0": 222,
+      "1": 74,
+      "categories_below_10_combined": 0
+    },
+    "candidate_status": {
+      "strict_control": 148,
+      "prevalent_case": 148,
+      "categories_below_10_combined": 0
+    },
+    "reference_standard_type": {
+      "record_derived_clinical_phenotype": 296,
+      "categories_below_10_combined": 0
+    },
+    "reference_source": {
+      "UKB self-report, HES/ICD, diagnosis timing, and procedure records": 296,
+      "categories_below_10_combined": 0
+    },
+    "phenotype_profile": {
+      "ukb_record_glaucoma_all_evidence_binary_bilateral": 296,
+      "categories_below_10_combined": 0
+    },
+    "task_profile": {
+      "glaucoma_all_evidence": 296,
+      "categories_below_10_combined": 0
+    },
+    "assessment_year": {
+      "2010": 220,
+      "2013": 39,
+      "2012": 35,
+      "categories_below_10_combined": 2
+    },
+    "case_age": {
+      "n": 148,
+      "mean": 61.95945945945946,
+      "sd": 6.509938376437364,
+      "median": 64.0,
+      "q25": 58.75,
+      "q75": 67.0
+    },
+    "control_age": {
+      "n": 148,
+      "mean": 61.95945945945946,
+      "sd": 6.509938376437364,
+      "median": 64.0,
+      "q25": 58.75,
+      "q75": 67.0
+    },
+    "case_evidence_tokens": {
+      "20002": 101,
+      "6148": 132,
+      "41270": 18,
+      "glaucoma_treatment": 32,
+      "categories_below_10_combined": 5
+    },
+    "incident_targets_nonempty": 70,
+    "undated_targets_nonempty": 0
+  }
+}

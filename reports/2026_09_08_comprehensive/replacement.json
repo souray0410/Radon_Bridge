@@ -1,0 +1,8 @@
+{
+  "state": "replaced",
+  "reason": "user requested full matched development/test figures and removal of old report",
+  "removed_pdf_sha256": "7aaa2a334e06df1b76f5fc39ff208579e4acc2d5d65f7b6d4c19a2515c2f4b34",
+  "replacement": "../2026_09_08_matched/",
+  "new_report_accepted": true,
+  "underlying_evidence_preserved": true
+}
