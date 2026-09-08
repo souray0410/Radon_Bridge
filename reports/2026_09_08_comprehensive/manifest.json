@@ -1,0 +1,29 @@
+{
+  "schema": "public_report_manifest_v1",
+  "files": {
+    "RB_Comprehensive_Report_2026_09_08.pdf": {
+      "bytes": 5435171,
+      "sha256": "7aaa2a334e06df1b76f5fc39ff208579e4acc2d5d65f7b6d4c19a2515c2f4b34"
+    },
+    "README.zh-CN.md": {
+      "bytes": 310,
+      "sha256": "ad8a4d4c9bb39c27a551e49c3dccd196bc09a0f212e58aada71ca8a17cda0f06"
+    },
+    "direct_comparison_summary.csv": {
+      "bytes": 1858,
+      "sha256": "8ab6192bd5c49173042f6644493b1e2db22a674906bc55e87a066fb78817ed38"
+    },
+    "report_provenance.json": {
+      "bytes": 7639,
+      "sha256": "caa16a0a091cb627b4b8c6d51f478f2f4dc505bf25079653c2ca3fbcb2ffe648"
+    },
+    "visual_qa.json": {
+      "bytes": 4991,
+      "sha256": "4c47908c31030dea308d2d6111583128accc060935cb1f24e9e7ca4d3ededc10"
+    },
+    "综合解读.zh-CN.md": {
+      "bytes": 6338,
+      "sha256": "af9593d5c197cfde8de95133dbdb22a783abe6e9ee32fe4a1b15155ffb8bc3ee"
+    }
+  }
+}

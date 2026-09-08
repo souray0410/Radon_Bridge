@@ -1,0 +1,274 @@
+{
+  "source_commit": "2f9c6c67748fe166b784cd5f947536c1623c07e1",
+  "source_manifest_sha256": "a0d04f3e5f48abe85b3622948d2c48d56f8c99db7eb00896c779f974395aa583",
+  "report_sha256": "7aaa2a334e06df1b76f5fc39ff208579e4acc2d5d65f7b6d4c19a2515c2f4b34",
+  "pages": 47,
+  "primary_comparisons_unchanged": true,
+  "figures": [
+    "unified_test/test_primary_01.pdf",
+    "unified_test/test_primary_02.pdf",
+    "unified_test/test_primary_03.pdf",
+    "unified_test/test_primary_04.pdf",
+    "unified_test/test_primary_05.pdf",
+    "unified_test/test_primary_06.pdf",
+    "unified_test/test_primary_07.pdf",
+    "unified_test/test_primary_08.pdf",
+    "sinogram_atlas/figures/01_synthetic_2d.pdf",
+    "sinogram_atlas/figures/01_synthetic_3d.pdf",
+    "sinogram_atlas/figures/02_projected_flow_cfp_stage3.pdf",
+    "sinogram_atlas/figures/02_projected_flow_oct_stage3.pdf",
+    "sinogram_atlas/figures/03_return_maps_cfp_stage3.pdf",
+    "sinogram_atlas/figures/03_return_maps_oct_stage3.pdf",
+    "sinogram_atlas/figures/04_label_difference_cfp_stage3.pdf",
+    "sinogram_atlas/figures/04_label_difference_oct_stage3.pdf",
+    "sinogram_atlas/figures/05_oct_spherical_directions.pdf",
+    "sinogram_atlas/figures/06_width_robustness.pdf",
+    "sinogram_atlas/figures/07_basis_and_ordinary_communication.pdf",
+    "sinogram_atlas/figures/08_s_axis_spectra.pdf",
+    "sinogram_atlas/figures/09_multidepth_returns.pdf",
+    "sinogram_atlas/figures/10_initial_selected_inputs.pdf",
+    "fourier_diagnostics/figures/BA_cfp_stage2.pdf",
+    "fourier_diagnostics/figures/BA_cfp_stage3.pdf",
+    "fourier_diagnostics/figures/BA_cfp_stage4.pdf",
+    "fourier_diagnostics/figures/BA_oct_stage2.pdf",
+    "fourier_diagnostics/figures/BA_oct_stage3.pdf",
+    "fourier_diagnostics/figures/BA_oct_stage4.pdf",
+    "fourier_diagnostics/figures/fourier_feature_probes.pdf",
+    "fourier_diagnostics/figures/fourier_synthetic_errors.pdf",
+    "fourier_diagnostics/figures/kernel_frequency_gains.pdf"
+  ],
+  "direct_summary": [
+    {
+      "method": "No communication",
+      "configuration": "no_communication",
+      "n": 6,
+      "dev_mean": 65.02558889684214,
+      "cfp": 59.089611750853244,
+      "oct": 57.16589531568103,
+      "mean": 58.12775353326713,
+      "fusion": 59.6569638877663,
+      "parameters": 44338564
+    },
+    {
+      "method": "Ordinary r16 / h512",
+      "configuration": "linear_resample_M32_S64_k3_r16",
+      "n": 6,
+      "dev_mean": 65.09995430551953,
+      "cfp": 59.49801865652575,
+      "oct": 57.24653232275888,
+      "mean": 58.37227548964232,
+      "fusion": 59.77655944204269,
+      "parameters": 47484292
+    },
+    {
+      "method": "R&B r16 / h512",
+      "configuration": "radon_M32_S64_k3_r16",
+      "n": 6,
+      "dev_mean": 67.6670453630685,
+      "cfp": 60.610220046689214,
+      "oct": 60.855606961908684,
+      "mean": 60.73291350429895,
+      "fusion": 62.33209711801222,
+      "parameters": 47484292
+    },
+    {
+      "method": "Ordinary r32 / h1024",
+      "configuration": "linear_resample_M32_S64_k3_r32",
+      "n": 6,
+      "dev_mean": 65.57005736000357,
+      "cfp": 59.230761611759085,
+      "oct": 58.18167206525208,
+      "mean": 58.70621683850559,
+      "fusion": 60.585379811009176,
+      "parameters": 56921476
+    },
+    {
+      "method": "R&B r32 / h1024",
+      "configuration": "radon_M32_S64_k3_r32",
+      "n": 6,
+      "dev_mean": 68.24171752506084,
+      "cfp": 62.80780482453585,
+      "oct": 60.65697820388678,
+      "mean": 61.732391514211315,
+      "fusion": 61.82090230390818,
+      "parameters": 56921476
+    },
+    {
+      "method": "MMTM hidden128",
+      "configuration": "mmtm_hidden128",
+      "n": 6,
+      "dev_mean": 65.02109481586477,
+      "cfp": 58.914589976129115,
+      "oct": 57.53580518564307,
+      "mean": 58.22519758088609,
+      "fusion": 59.49064797138146,
+      "parameters": 44470276
+    },
+    {
+      "method": "MMTM hidden256",
+      "configuration": "mmtm_hidden256",
+      "n": 6,
+      "dev_mean": 65.02109481586477,
+      "cfp": 58.914589976129115,
+      "oct": 57.53580518564307,
+      "mean": 58.22519758088609,
+      "fusion": 59.49064797138146,
+      "parameters": 44601476
+    },
+    {
+      "method": "MMTM hidden512",
+      "configuration": "mmtm_hidden512",
+      "n": 6,
+      "dev_mean": 65.02109481586477,
+      "cfp": 58.914589976129115,
+      "oct": 57.53580518564307,
+      "mean": 58.22519758088609,
+      "fusion": 59.49064797138146,
+      "parameters": 44863876
+    },
+    {
+      "method": "MMTM hidden1024",
+      "configuration": "mmtm_hidden1024",
+      "n": 6,
+      "dev_mean": 65.02109481586477,
+      "cfp": 58.914589976129115,
+      "oct": 57.53580518564307,
+      "mean": 58.22519758088609,
+      "fusion": 59.49064797138146,
+      "parameters": 45388676
+    },
+    {
+      "method": "Attention d128",
+      "configuration": "attention_d128",
+      "n": 6,
+      "dev_mean": 65.41189326851612,
+      "cfp": 59.63499048152849,
+      "oct": 57.203051708130005,
+      "mean": 58.41902109482925,
+      "fusion": 60.084088249655295,
+      "parameters": 44603012
+    },
+    {
+      "method": "Attention d256",
+      "configuration": "attention_d256",
+      "n": 6,
+      "dev_mean": 65.46904217000645,
+      "cfp": 59.5037690120213,
+      "oct": 58.580624900847376,
+      "mean": 59.042196956434346,
+      "fusion": 60.0807441734143,
+      "parameters": 44865924
+    },
+    {
+      "method": "Attention d512",
+      "configuration": "attention_d512",
+      "n": 6,
+      "dev_mean": 66.15989806531277,
+      "cfp": 59.80553981190312,
+      "oct": 59.10001139107166,
+      "mean": 59.45277560148738,
+      "fusion": 60.77782425059738,
+      "parameters": 45391748
+    },
+    {
+      "method": "Attention d1024",
+      "configuration": "attention_d1024",
+      "n": 6,
+      "dev_mean": 66.18398252554013,
+      "cfp": 61.196387065504986,
+      "oct": 60.435545763911435,
+      "mean": 60.815966414708214,
+      "fusion": 60.580206505025615,
+      "parameters": 46443396
+    }
+  ],
+  "historical_summary": [
+    [
+      "Learned CM projection",
+      "60.12 (1.39)",
+      "59.28 (1.84)",
+      "60.20 (2.19)"
+    ],
+    [
+      "Learned channel projection",
+      "60.26 (1.63)",
+      "61.57 (0.87)",
+      "60.44 (0.82)"
+    ],
+    [
+      "Uncentered SVD + Radon",
+      "61.14 (4.07)",
+      "61.53 (0.95)",
+      "59.53 (0.35)"
+    ],
+    [
+      "Centered SVD + Radon",
+      "61.25 (1.85)",
+      "62.08 (1.66)",
+      "60.27 (0.86)"
+    ],
+    [
+      "Random QR + Radon",
+      "59.15 (1.65)",
+      "60.18 (1.01)",
+      "60.97 (0.46)"
+    ],
+    [
+      "SVD + ordinary",
+      "58.52 (0.87)",
+      "58.76 (0.59)",
+      "60.52 (0.65)"
+    ],
+    [
+      "SVD + self-only",
+      "58.23 (0.82)",
+      "58.23 (0.82)",
+      "58.23 (0.82)"
+    ],
+    [
+      "SVD + scrambled",
+      "60.76 (0.97)",
+      "62.28 (2.58)",
+      "60.96 (1.69)"
+    ],
+    [
+      "QR + scrambled",
+      "59.23 (0.33)",
+      "61.44 (0.31)",
+      "61.99 (1.58)"
+    ]
+  ],
+  "pairing_summary": [
+    [
+      "Disable OCT -> CFP",
+      "2.75",
+      "[-1.50, 14.50]"
+    ],
+    [
+      "Disable CFP -> OCT",
+      "5.05",
+      "[0.00, 14.88]"
+    ],
+    [
+      "Disable all cross-source blocks",
+      "7.81",
+      "[0.00, 27.18]"
+    ],
+    [
+      "Shuffle OCT -> CFP",
+      "0.72",
+      "[-0.73, 3.23]"
+    ],
+    [
+      "Shuffle CFP -> OCT",
+      "1.25",
+      "[-0.25, 4.64]"
+    ],
+    [
+      "Shuffle both directions",
+      "1.98",
+      "[-0.98, 5.87]"
+    ]
+  ],
+  "methods": "Read-only arithmetic means of existing metrics. No new training, model selection, bootstrap or hypothesis test. All source file hashes verified."
+}
