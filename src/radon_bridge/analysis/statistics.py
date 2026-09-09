@@ -5,9 +5,9 @@ participants. All contrasts and secondary fusion metrics share the same draws.
 """
 import hashlib
 import numpy as np
-from scripts.report_five_seed_study import f1
-from scripts.run_three_seed_study import SEEDS,RHOS,key
-from scripts.run_mechanism_benchmark import BASELINES
+from radon_bridge.evaluation.metrics import batched_macro_f1 as f1
+from radon_bridge.studies.benchmark import SEEDS,RHOS,key
+from radon_bridge.studies.benchmark import BASELINES
 
 
 def classify(ci,margin=1.):

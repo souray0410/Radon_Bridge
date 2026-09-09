@@ -11,3 +11,13 @@ def classification_metrics(y,probabilities):
             "class_support":[int(np.sum(y==k)) for k in labels],"log_loss":float(log_loss(y,p,labels=labels))}
     if p.shape[1]==2 and len(np.unique(y))==2:result["auroc"]=float(roc_auc_score(y,p[:,1]))
     return result
+
+
+def batched_macro_f1(y, pred):
+    """Binary macro-F1 over the last axis, with a fixed two-class label set."""
+    values = []
+    for c in [0, 1]:
+        tp = ((pred == c) & (y == c)).sum(-1)
+        den = (pred == c).sum(-1) + (y == c).sum(-1)
+        values.append(np.divide(2 * tp, den, out=np.zeros_like(tp, dtype=float), where=den != 0))
+    return sum(values) / 2
