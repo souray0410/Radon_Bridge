@@ -1,14 +1,18 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "radon_bridge"
-version = "0.2.0"
-description = "Householder Radon communication through explicit MHD V4 graphs"
-requires-python = ">=3.10"
-dependencies = ["torch>=2.8", "torchvision>=0.23", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
+version = "2026.9.9.dev0"
+description = "Radon_Bridge research application using a fixed MHD API"
+requires-python = ">=3.10,<3.14"
+dependencies = ["mhd-project==0.5.0.dev0", "torch>=2.8", "torchvision>=0.23", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
 
-[tool.setuptools]
-packages = ["radon_bridge", "radonbridge", "V4"]
-package-dir = {"radon_bridge" = "radon_bridge", "radonbridge" = "radonbridge", "V4" = "third_party/MHD_Project/V4"}
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["radon_bridge*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = "-ra -p no:cacheprovider"
