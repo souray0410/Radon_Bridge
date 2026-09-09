@@ -25,7 +25,7 @@ MHD_Project固定至核查时main的`f3f5228d1cddfd35c93e61184cdc65419b8c7712`�
 
 ## Ibex环境与检查
 
-Python 3.11；torch2.8.0、torchvision0.23.0与既有实验主版本相同，其余依赖在安装验收后保存实际版本清单。环境位于`.../home/mengh/environments/radon_bridge_2026_09_09_10_30_34`。不复制ws02的虚拟环境。
+Python 3.11；torch2.8.0、torchvision0.23.0与既有实验主版本相同，其余依赖在安装验收后保存实际版本清单。环境位于`.../home/mengh/environments/radon_bridge_2026_09_09_10_30_34`。不复制ws02的虚拟环境。实际安装与收尾步骤分别保存在`environment_bootstrap.sh`、`environment_finalize.sh`；后者清除模块系统的PYTHONPATH干扰、安装本项目、检查依赖并保存环境预检记录。正在运行的操作脚本按原文件继续，不在运行中改写。
 
 ```bash
 python -m radon_bridge --workspace experiments/2026_09_09_10_30_34/ibex_workspace.json --check-framework
