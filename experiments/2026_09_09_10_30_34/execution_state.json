@@ -1,0 +1,14 @@
+{
+  "state": "preparing_ibex_no_training_authorized",
+  "gpu_request": {
+    "account": "pi-mengy",
+    "model": "a100",
+    "count": 2,
+    "walltime": "2-00:00:00",
+    "submission": "paused_by_user"
+  },
+  "new_experiment_protocol": "not_locked",
+  "image_transfer": "in_progress",
+  "complete_labels": "awaiting_source_location",
+  "historical_test": "not_for_new_selection"
+}

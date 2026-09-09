@@ -1,0 +1,88 @@
+{
+  "eem_2d_gap_degrees": {
+    "2": 4.051745630372866e-07,
+    "3": 1.5793796153933792e-07,
+    "4": 1.0330907238598869e-07,
+    "8": 3.3755655573143366e-07,
+    "16": 4.0048001979968096e-07
+  },
+  "topology": [
+    {
+      "dimensions": [
+        2,
+        3
+      ],
+      "repeated_distinct_configs": false,
+      "participant_sampling": false,
+      "native_topology_preserved": true,
+      "zero_bridge_exact": true,
+      "mhd_gradient_relative_error": 0.0,
+      "cross_branch_gradient": 0.001264032951951701,
+      "linearity_error": 9.849026459864771e-17
+    },
+    {
+      "dimensions": [
+        2,
+        3,
+        4
+      ],
+      "repeated_distinct_configs": false,
+      "participant_sampling": false,
+      "native_topology_preserved": true,
+      "zero_bridge_exact": true,
+      "mhd_gradient_relative_error": 0.0,
+      "cross_branch_gradient": 0.0008615400601650622,
+      "linearity_error": 1.2840640074783142e-16
+    },
+    {
+      "dimensions": [
+        2,
+        2,
+        3,
+        4
+      ],
+      "repeated_distinct_configs": true,
+      "participant_sampling": false,
+      "native_topology_preserved": true,
+      "zero_bridge_exact": true,
+      "mhd_gradient_relative_error": 0.0,
+      "cross_branch_gradient": 0.0026859984607101864,
+      "linearity_error": 1.7591533143357238e-16
+    },
+    {
+      "dimensions": [
+        2,
+        3
+      ],
+      "repeated_distinct_configs": false,
+      "participant_sampling": true,
+      "native_topology_preserved": true,
+      "zero_bridge_exact": true,
+      "mhd_gradient_relative_error": 0.0,
+      "cross_branch_gradient": 0.0013519564333239157,
+      "linearity_error": 9.022085148703301e-17
+    }
+  ],
+  "geometry": [
+    {
+      "dimension": 2,
+      "device": "cpu",
+      "forward_relative_error": 1.5770404795836782e-16,
+      "direct_bp_relative_error": 6.75747810492572e-16
+    },
+    {
+      "dimension": 3,
+      "device": "cpu",
+      "forward_relative_error": 2.1235331652293748e-16,
+      "direct_bp_relative_error": 4.895440465434732e-16
+    },
+    {
+      "dimension": 4,
+      "device": "cpu",
+      "forward_relative_error": 3.588710875145901e-16,
+      "direct_bp_relative_error": 6.008493144396772e-16
+    }
+  ],
+  "seconds": 0.6372010560007766,
+  "passed": true
+}

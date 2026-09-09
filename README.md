@@ -1,6 +1,14 @@
-# R&B — Radon Bridge
+# Radon_Bridge — Radon Bridge（R&B）
 
 两条完整ResNet18分别处理CFP与OCT，保留各自主干、任务头、CE损失和预测。先独立监督训练至开发集平台期，再恢复各自最佳检查点，通过MHD V4的中间节点接入线性R&B，进行全参数联合训练，BN正常更新。
+
+三项目共用[工作目录约定](workspace/README.zh-CN.md)。
+
+## 当前工作入口：2026_09_09_10_30_34（Ibex准备）
+
+仓库及项目目录统一为`Radon_Bridge`，新Python包为`radon_bridge`。新时间戳的[目录、依赖、兼容与Slurm说明](experiments/2026_09_09_10_30_34/README.zh-CN.md)是后续扩展入口。Ibex本轮代码位于`/ibex/project/c2377/souray/home/mengh/Radon_Bridge/2026_09_09_10_30_34`；输出位于对应`data/mengh/Radon_Bridge/runs/2026_09_09_10_30_34`。全量影像迁移在继续，GPU申请暂停，新实验协议尚未锁定。
+
+旧`radonbridge`导入及ws02旧路径保留兼容，历史结果不改写。依赖固定为核验时最新MHD_Project提交，继续使用其与旧版一致的V4接口；不声称已迁移V5。
 
 ## 当前报告：开发与test完整匹配（2026-09-08）
 

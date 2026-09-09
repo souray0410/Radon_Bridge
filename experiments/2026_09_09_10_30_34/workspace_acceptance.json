@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "path_cases": 6,
+  "peer_repositories": 2,
+  "sha256": {
+    "README.zh-CN.md": "228e90e888bde9eb8ab590e7fc780d284120eac13d2635d6adb15c23b15a9065",
+    "registry.json": "2d7d102d9e80fe90358c00ec4ac55b3a99e6270006f155d5d245efb4bd231a50",
+    "paths.py": "dc9b9dd40ee0b2f91fff117d7135b9f9d1e9fd9c62a5901d9bef3ace4104588e",
+    "check.py": "e4af39437f0715985b619484ff67353c906df740c322a785a6c7a4b98276d1d9"
+  }
+}

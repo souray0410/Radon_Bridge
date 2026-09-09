@@ -3,12 +3,12 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "radonbridge"
-version = "0.1.0"
+name = "radon_bridge"
+version = "0.2.0"
 description = "Householder Radon communication through explicit MHD V4 graphs"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.8", "torchvision>=0.23", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
 
 [tool.setuptools]
-packages = ["radonbridge", "V4"]
-package-dir = {"radonbridge" = "radonbridge", "V4" = "third_party/MHD_Project/V4"}
+packages = ["radon_bridge", "radonbridge", "V4"]
+package-dir = {"radon_bridge" = "radon_bridge", "radonbridge" = "radonbridge", "V4" = "third_party/MHD_Project/V4"}
