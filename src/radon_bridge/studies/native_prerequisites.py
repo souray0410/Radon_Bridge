@@ -37,7 +37,10 @@ def collect(queues):
                 continue
             if spec.get("test_used") is not False or spec["model"]["spatial_dims"] != (2 if spec["track"] == "cfp_2d" else 3):
                 raise ValueError("Only explicit test-sealed CFP2D/OCT3D candidates are allowed")
-            if spec.get("eligible_for_formal_selection") is False:
+            # This is a finite screening catalog, never formal model promotion.
+            # Preserve pilot flags; accepted replications and full project replay
+            # provide a separate downstream qualification record.
+            if spec.get("eligible_for_formal_selection") is False and spec.get("scope") != "expanded_cohort_native_screening":
                 continue
             identity = {k: spec[k] for k in ("train_manifest_sha256", "development_manifest_sha256",
                         "cache_receipt_sha256", "aggregation")}
