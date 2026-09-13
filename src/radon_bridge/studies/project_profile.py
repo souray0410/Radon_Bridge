@@ -1,5 +1,6 @@
 """Actual complete-graph update, validation, checkpoint/reload and resource admission."""
 import copy
+import os
 from pathlib import Path
 import time
 import torch
@@ -75,6 +76,9 @@ def profile(spec,output,device):
     from radon_bridge.data.observed_pair import collate_observed
     from radon_bridge.runtime.state import stable_hash
     out=Path(output);out.mkdir(parents=True,exist_ok=True)
+    if device.type=='cuda' and os.environ.get('RADON_PROBE_MAX_BYTES'):
+        total=torch.cuda.get_device_properties(device).total_memory
+        torch.cuda.set_per_process_memory_fraction(int(os.environ['RADON_PROBE_MAX_BYTES'])/total,device)
     parents,shapes,train,fit,dev=prepare(spec,out,device,lambda:False)
     indices=[i for i,n in enumerate(train.counts) if n==2][:spec['training']['microbatch']]
     if len(indices)!=spec['training']['microbatch']:raise ValueError('Maximum-eye fixture unavailable')
