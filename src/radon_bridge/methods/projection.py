@@ -9,6 +9,26 @@ import math
 import numpy as np
 import torch
 from torch import nn
+from contextlib import contextmanager
+from contextvars import ContextVar
+
+_DENSE_ELEMENT_BUDGET = ContextVar('radon_dense_element_budget', default=8_000_000)
+
+
+@contextmanager
+def geometry_budget(elements):
+    """Explicit resource-only bound; legacy callers retain their original limit.
+
+    The quadrature is unchanged. Large-cohort callers must separately pass full
+    GPU/host memory admission. At most 128M float64 entries per CPU operator.
+    """
+    if type(elements) is not int or not 1 <= elements <= 128_000_000:
+        raise ValueError('Unsupported dense geometry allocation budget')
+    token = _DENSE_ELEMENT_BUDGET.set(elements)
+    try:
+        yield
+    finally:
+        _DENSE_ELEMENT_BUDGET.reset(token)
 
 EEM_VERSION = 'antipodal_riesz2_projected_backtracking_v1'
 
@@ -98,12 +118,21 @@ def geometry(shape, S, spacing=None):
     return h, radius, s, t
 
 
-@lru_cache(maxsize=24)
 def raw_operator(shape, M, S, spacing=None):
+    # Check before cache lookup: a previous enlarged-budget caller must not make
+    # a legacy caller bypass its allocation policy.
+    _, _, _, t = geometry(shape, S, spacing)
+    if M*S*math.prod(shape) > _DENSE_ELEMENT_BUDGET.get() or S*len(t)**(len(shape)-1) > 2_000_000:
+        raise ValueError('Dense reference geometry budget exceeded')
+    return _raw_operator_cached(shape, M, S, spacing)
+
+
+@lru_cache(maxsize=4)
+def _raw_operator_cached(shape, M, S, spacing=None):
     directions, _ = eem_directions(len(shape), M)
     h, radius, s, t = geometry(shape, S, spacing)
     d = len(shape); N = math.prod(shape)
-    if M*S*N > 8_000_000 or S*len(t)**(d-1) > 2_000_000:
+    if M*S*N > _DENSE_ELEMENT_BUDGET.get() or S*len(t)**(d-1) > 2_000_000:
         raise ValueError('Dense reference geometry budget exceeded')
     canonical = np.stack(np.meshgrid(s, *([t]*(d-1)), indexing='ij'), -1).reshape(-1, d)
     rows = np.repeat(np.arange(S), len(t)**(d-1))

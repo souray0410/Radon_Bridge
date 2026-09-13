@@ -1,0 +1,8 @@
+{
+  "plateau": true,
+  "read_only": true,
+  "resume": true,
+  "scope": "synthetic_training_and_diagnostic_runtime_not_scientific_results",
+  "status": "accepted",
+  "test_access": false
+}

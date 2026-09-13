@@ -2,26 +2,43 @@
   "schema": "radon_bridge_research_design_v1",
   "created_date": "2026-09-13",
   "cycle": "2026_09_10_11_11_31",
-  "state": "design_ready_execution_not_connected",
+  "state": "implemented_requires_parent_replay_and_runtime_resource_acceptance",
   "document": "docs/automatic_research.zh-CN.md",
   "test_access": false,
   "queue_created": false,
   "protocol": "two_branch",
   "selection": "development_mean_branch_macro_f1",
   "learned_terminal_fusion": false,
-  "first_pair": {"cfp": "resnet50_2d", "oct": "resnet50_3d", "exact_parent_catalog_locked": false},
-  "diseases": ["glaucoma", "cataract", "macular_degeneration"],
-  "seeds": [3416, 3417, 3418],
-  "first_stage_arms": ["continue_without_communication", "svd_radon", "svd_linear_resample", "svd_self", "mmtm_hidden256", "cross_attention_d256_heads4"],
+  "first_pair": {
+    "cfp": "resnet50_2d",
+    "oct": "resnet50_3d",
+    "exact_parent_catalog_locked": false
+  },
+  "diseases": [
+    "glaucoma",
+    "cataract",
+    "macular_degeneration"
+  ],
+  "seeds": [
+    3416,
+    3417,
+    3418
+  ],
+  "first_stage_arms": [
+    "continue_without_communication",
+    "svd_radon",
+    "svd_linear_resample",
+    "svd_self",
+    "mmtm_hidden256",
+    "cross_attention_d256_heads4"
+  ],
   "planned_first_stage_positions": 54,
   "registered_training_tasks": 0,
   "remaining_implementation": [
-    "native_training_artifact_materialization_and_full_development_replay",
-    "finite_catalog_nomination_replication_controller",
-    "large_cohort_native_pair_graph_and_project_runner",
-    "shared_dispatch_feed_and_resource_acceptance",
-    "matched_statistics_reporting_and_test_gate"
+    "new_non_resnet_3d_architecture_qualification",
+    "independent_test_exposure_audit_and_locked_evaluation"
   ],
   "later_templates_require_pre_result_lock": true,
-  "existing_workers_modified": false
+  "existing_workers_modified": false,
+  "planned_reference_model_positions": 201
 }
