@@ -6,11 +6,16 @@ from radon_bridge.runtime.state import atomic_write_json,file_sha256
 
 
 def move(batch,device):
-    return {k:v.to(device) if isinstance(v,torch.Tensor) else v for k,v in batch.items()}
+    if isinstance(batch,torch.Tensor):return batch.to(device)
+    if isinstance(batch,dict):return {k:move(v,device) for k,v in batch.items()}
+    return batch
 
 
 @torch.no_grad()
 def evaluate(model,loader,device,output=None,should_pause=lambda:False):
+    if hasattr(model,'source_keys'):
+        from radon_bridge.evaluation.group_native import evaluate as group_evaluate
+        return group_evaluate(model,loader,device,output,should_pause)
     from expanded.native import metrics
     mode=model.training;model.eval();p={'cfp':[],'oct':[]};ids=[];labels=[]
     try:
@@ -37,7 +42,7 @@ def replay_matches(path,other):
     with np.load(path,allow_pickle=False) as a,np.load(other,allow_pickle=False) as b:
         if set(a.files)!=set(b.files):raise ValueError('Prediction format changed')
         for k in a.files:
-            exact=k in ('participant_ids','labels')
+            exact=k in ('participant_ids','labels') or k.startswith('labels__')
             if exact and not np.array_equal(a[k],b[k]):raise ValueError('Prediction identity/order changed')
             if not exact and (not np.allclose(a[k],b[k],atol=1e-5,rtol=1e-4) or not np.array_equal(a[k].argmax(1),b[k].argmax(1))):
                 raise ValueError('Selected prediction numerical replay failed')

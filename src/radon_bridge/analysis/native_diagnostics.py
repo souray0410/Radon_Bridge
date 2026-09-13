@@ -151,7 +151,7 @@ def diagnose(spec,root,parents,shapes,bases,train,dev,device,paused):
                 host_states={}
                 for state,disabled in [('both_on',()),('host_only',(1,)),('new_only',(0,)),('both_off',(0,1))]:
                     hooks=[modules[f'bridge_{i}_exchange'].register_forward_hook(
-                        lambda module,inputs,output:torch.cat([x.flatten(1) for x in inputs],1)) for i in disabled]
+                        lambda module,inputs,output:torch.zeros_like(output) if getattr(module,'delta_only',False) else torch.cat([x.flatten(1) for x in inputs],1)) for i in disabled]
                     try:
                         host_states[state]=evaluate(model,DataLoader(dev,batch_size=1,shuffle=False,collate_fn=collate_observed,num_workers=0,generator=torch.Generator().manual_seed(0)),device,out/(name+'_'+state+'.npz'),paused)
                     finally:

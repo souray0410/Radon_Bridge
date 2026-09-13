@@ -3,7 +3,7 @@ import torch
 from radon_bridge.methods.operator import attach_to_nodes, attach_parallel_to_nodes
 
 def attach_communications(native,configs):
-    builder=native.builder;configs=list(configs)
+    builder=native.builder;configs=[dict(c) for c in configs]
     if not configs:return [],False
     if native.metadata.get('task_fusion') is not None and any('nested_rhos' in c for c in configs):
         raise ValueError('Task fusion protocol does not support joint-width training')
@@ -12,10 +12,13 @@ def attach_communications(native,configs):
         raise ValueError('Parallel addition requires one intact nonlinear host and one Radon-family addition on identical nodes')
     for c in configs:
         family=c.get('family','radon')
-        required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'}
-        optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation','kernel_size','r','h','parallel_to'} if family=='radon' else set()
+        required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'}
+        optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation','kernel_size','r','h','parallel_to'} if family=='radon' else {'reduction_ratio','hidden_dimension'} if family=='mmtm' else set()
         if family not in ('radon','mmtm','cross_attention') or not required<=set(c) or set(c)-required-optional:
             raise ValueError('Invalid communication configuration for '+str(family))
+    for c in configs:
+        axes=native.metadata.get('channel_axes',{})
+        if any(axes.get(n,1)!=1 for n in c['nodes']):c['channel_axes']={n:axes.get(n,1) for n in c['nodes']}
     modules=[e.edge_operations[0].function for e in builder.edges]
     training={m:m.training for module in modules for m in module.modules()}
     try:

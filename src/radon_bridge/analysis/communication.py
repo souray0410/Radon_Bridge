@@ -41,9 +41,12 @@ def block_messages(mixer,features,overrides):
         for src in range(len(features)):
             x=features[src] if (dst,src) not in overrides else overrides[(dst,src)]
             if x is None:continue
+            if hasattr(mixer,'s_axis_permutation'):x=x.index_select(-1,mixer.s_axis_permutation)
             w=weight[offsets[dst]:offsets[dst+1],offsets[src]:offsets[src+1]]
             v=F.conv1d(x,w,padding=mixer.conv.kernel_size[0]//2)
             total=v if total is None else total+v
+        if total is None:raise ValueError('Every destination must retain at least one term')
+        if hasattr(mixer,'s_axis_inverse'):total=total.index_select(-1,mixer.s_axis_inverse)
         outputs.append(total)
     return tuple(outputs)
 

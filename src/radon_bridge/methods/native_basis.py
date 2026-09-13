@@ -20,7 +20,7 @@ def fit(model,dataset,stages,out,identity,seed,device,should_pause=lambda:False)
             for ref in bases.values():
                 if file_sha256(Path(ref['path']))!=ref['sha256']:raise ValueError('Basis artifact changed')
         return receipt['bases']
-    names=[f'{source}_stage{stage}' for stage in stages for source in ('cfp','oct')]
+    names=[f'{source}_stage{stage}' for stage in stages for source in getattr(model,'source_keys',('cfp','oct'))]
     offset=0;moments={};sums={};counts={}
     if (out/'last.pt').exists():
         state=torch.load(out/'last.pt',map_location='cpu',weights_only=False)
@@ -29,7 +29,7 @@ def fit(model,dataset,stages,out,identity,seed,device,should_pause=lambda:False)
     before=cpu_tree(model.state_dict());mode=model.training;model.eval()
     def checkpoint():atomic_save(out/'last.pt',dict(identity=identity,names=names,offset=offset,moments=moments,sums=sums,counts=counts))
     try:
-        loader=DataLoader(Subset(dataset,range(offset,len(dataset))),batch_size=1,shuffle=False,num_workers=0,collate_fn=collate_observed,generator=torch.Generator().manual_seed(seed))
+        loader=DataLoader(Subset(dataset,range(offset,len(dataset))),batch_size=1,shuffle=False,num_workers=0,collate_fn=getattr(dataset,'collate_fn',collate_observed),generator=torch.Generator().manual_seed(seed))
         with torch.no_grad():
             for batch in loader:
                 if should_pause():checkpoint();raise InterruptedError('Pause basis at participant boundary')
@@ -39,11 +39,13 @@ def fit(model,dataset,stages,out,identity,seed,device,should_pause=lambda:False)
                     for key,x in zip(m.keys,m.latest_inputs)}
                 for name in names:
                     x=prewrite[name] if name in prewrite else model.task.by_name[name].feature_message.current_state
+                    axis=model.task.definition.metadata.get('channel_axes',{}).get(name,1)
+                    if name not in prewrite and axis!=1:x=x.movedim(axis,1)
                     c=x.shape[1];v=x.movedim(1,-1).reshape(-1,c)
                     if name not in moments:moments[name]=torch.zeros(c,c,dtype=torch.float64);sums[name]=torch.zeros(c,dtype=torch.float64);counts[name]=0
                     for block in v.split(4096):
                         block=block.double();moments[name]+=(block.T@block).cpu();sums[name]+=block.sum(0).cpu();counts[name]+=len(block)
-                offset+=len(batch['label'])
+                offset+=len(batch['participant_id'])
                 if offset%128==0:checkpoint()
         checkpoint()
         if any(not torch.equal(v.cpu(),before[k]) for k,v in model.state_dict().items()):raise ValueError('Basis fitting modified native state')

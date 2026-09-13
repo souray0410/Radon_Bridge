@@ -14,7 +14,7 @@ class NativeExchange(nn.Module):
     def __init__(self,specs,family):
         super().__init__()
         self.keys=[s.key for s in specs]
-        if len(specs)!=2 or len(set(self.keys))!=2:raise ValueError('This baseline requires two distinct sources')
+        if len(specs)<2 or len(set(self.keys))!=len(specs):raise ValueError('At least two distinct sources required')
         self.shapes=[(s.channels,*s.shape) for s in specs]
         self.lengths=[math.prod(s) for s in self.shapes]
         self.family=family;self.compression=None
@@ -40,9 +40,14 @@ class NativeExchange(nn.Module):
 
 
 class MMTMExchange(NativeExchange):
-    def __init__(self,specs,reduction_ratio):
-        super().__init__(specs,'mmtm');positive_integer(reduction_ratio,'reduction_ratio',1)
-        hidden=int(2*sum(s.channels for s in specs)/reduction_ratio)
+    def __init__(self,specs,reduction_ratio=None,hidden_dimension=None):
+        super().__init__(specs,'mmtm')
+        if (reduction_ratio is None)==(hidden_dimension is None):raise ValueError('Specify exactly one hidden width or reduction ratio')
+        if hidden_dimension is not None:
+            positive_integer(hidden_dimension,'hidden_dimension',1);hidden=hidden_dimension
+        else:
+            positive_integer(reduction_ratio,'reduction_ratio',1)
+            hidden=int(2*sum(s.channels for s in specs)/reduction_ratio)
         if hidden<1:raise ValueError('MMTM hidden dimension must be positive')
         self.squeeze=nn.Linear(sum(s.channels for s in specs),hidden)
         self.excite=nn.ModuleList([nn.Linear(hidden,s.channels) for s in specs])
@@ -83,9 +88,10 @@ class AttentionExchange(NativeExchange):
         positive_integer(attention_dimension,'attention_dimension',1);positive_integer(heads,'heads',1)
         if attention_dimension%heads:raise ValueError('Attention dimension must divide into heads')
         self.norms=nn.ModuleList([nn.LayerNorm(s.channels) for s in specs])
-        self.directions=nn.ModuleList([AttentionDirection(specs[1-i].channels,specs[i].channels,attention_dimension,heads) for i in range(2)])
+        self.pairs=[(j,i) for i in range(len(specs)) for j in range(len(specs)) if i!=j]
+        self.directions=nn.ModuleList([AttentionDirection(specs[j].channels,specs[i].channels,attention_dimension,heads) for j,i in self.pairs])
         self.metadata.update(attention_dimension=attention_dimension,heads=heads,pre_layernorm=True,
-            direction_order=[[self.keys[1-i],self.keys[i]] for i in range(2)],
+            direction_order=[[self.keys[j],self.keys[i]] for j,i in self.pairs], incoming_reduction='mean',
             projection_bias=True,dropout=0.,feed_forward=False,explicit_position_encoding=False,
             adaptation='full spatial tokens; simultaneous bidirectional attention; zero output projections')
         self.finish_metadata()
@@ -93,5 +99,7 @@ class AttentionExchange(NativeExchange):
     def forward(self,*features):
         self.check(features)
         tokens=[norm(x.flatten(2).transpose(1,2)) for norm,x in zip(self.norms,features)]
-        deltas=[layer(tokens[i],tokens[1-i]).transpose(1,2).reshape_as(features[i]) for i,layer in enumerate(self.directions)]
+        incoming=[[] for _ in features]
+        for (j,i),layer in zip(self.pairs,self.directions):incoming[i].append(layer(tokens[i],tokens[j]))
+        deltas=[(sum(rows)/len(rows)).transpose(1,2).reshape_as(features[i]) for i,rows in enumerate(incoming)]
         return self.packet(features,deltas)

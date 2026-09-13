@@ -17,10 +17,17 @@ TRACKS = ("cfp_2d", "oct_volume_3d")
 DISEASES = ("cataract", "glaucoma", "macular_degeneration")
 
 
-def collect(queues):
+def collect(queues, *, complete=False):
     """Read exact candidate specs, retaining true 2D/3D pairs and excluding unrelated tasks."""
     candidates = {}
     data_identities = {}
+    models=set(MODELS)
+    registered=None
+    if complete:
+        from radon_bridge.studies.complete_matrix import MODELS as routes
+        models={name for route in routes.values() for name in route.values()}
+        registered=sorted({f'{d}/{name}/{"cfp_2d" if modality=="cfp" else "oct_volume_3d"}'
+            for d in DISEASES for route in routes.values() for modality,name in route.items()})
     for queue in queues:
         q = json.loads(Path(queue).read_text())
         for task in q.get("tasks", []):
@@ -30,7 +37,7 @@ def collect(queues):
             if file_sha256(spec_path) != task["spec_sha256"]:
                 raise ValueError("Candidate spec changed")
             spec = json.loads(spec_path.read_text())
-            if (spec.get("model", {}).get("name") not in MODELS or
+            if (spec.get("model", {}).get("name") not in models or
                     spec.get("track") not in TRACKS or
                     spec.get("disease") not in DISEASES or
                     spec.get("training", {}).get("seed") != 3416):
@@ -57,13 +64,18 @@ def collect(queues):
             candidates[run] = row
     if not candidates:
         raise ValueError("No applicable native candidates")
-    return dict(schema="radon_bridge_native_screen_v1", created_at=utc_now(),
+    result=dict(schema="radon_bridge_native_screen_v1", created_at=utc_now(),
                 screening_seed=3416, replication_seeds=[3416, 3417, 3418],
                 selection="development_macro_f1_then_auroc_then_spec_sha256",
                 test_access=False, data_identities=data_identities,
                 source_queues=[dict(path=str(Path(q).resolve()),
                     sha256=file_sha256(Path(q))) for q in queues],
                 candidates=sorted(candidates.values(), key=lambda r: r["run_dir"]))
+    if complete:
+        available={f"{r['disease']}/{r['model']}/{r['track']}" for r in result['candidates']}
+        if available!=set(registered):raise ValueError('The complete parent catalog must cover all 18 declared routes')
+        result['registered_groups']=registered
+    return result
 
 
 def audit(catalog, verify_completion):
@@ -74,7 +86,8 @@ def audit(catalog, verify_completion):
     """
     if catalog.get("schema") != "radon_bridge_native_screen_v1" or catalog.get("test_access") is not False:
         raise ValueError("Unknown or unsealed screen")
-    groups = {f"{d}/{m}/{t}": [] for d in DISEASES for m in MODELS for t in TRACKS}
+    groups = {key:[] for key in catalog.get('registered_groups',
+        [f"{d}/{m}/{t}" for d in DISEASES for m in MODELS for t in TRACKS])}
     for row in catalog["candidates"]:
         group = groups[f"{row['disease']}/{row['model']}/{row['track']}"]
         entry = dict(row)
@@ -123,7 +136,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--queue", action="append", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--complete",action='store_true')
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=False)
-    atomic_write_json(collect(args.queue), output / "catalog.json")
+    atomic_write_json(collect(args.queue,complete=args.complete), output / "catalog.json")

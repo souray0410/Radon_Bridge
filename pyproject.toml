@@ -9,6 +9,9 @@ description = "Radon_Bridge research application using a fixed MHD API"
 requires-python = ">=3.11,<3.14"
 dependencies = ["mhd-framework==4", "torch>=2.8", "torchvision>=0.23", "numpy", "pandas", "Pillow", "scikit-learn", "scipy"]
 
+[project.optional-dependencies]
+ukb-complete = ["monai==1.5.1", "einops==0.8.1", "psutil>=5.9"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["radon_bridge*"]

@@ -37,6 +37,9 @@ def verify_arm(root,identity):
 
 
 def validate_spec(spec):
+    if spec.get('schema')=='radon_group_case_v1':
+        from radon_bridge.studies.group_case import validate_spec as validate_group
+        return validate_group(spec)
     if spec.get('schema')!='radon_project_case_v1' or spec.get('test_access') is not False:raise ValueError('Unknown/sealed project case')
     if spec['arms']!=arms(spec['disease'],spec['model']['name']) or spec['seed'] not in (3416,3417,3418):raise ValueError('Finite scientific matrix changed')
     validate(spec['training'])
@@ -51,7 +54,7 @@ def validate_spec(spec):
 
 def verify_case(root,spec):
     root=Path(root);r=read(root/'accepted.json')
-    if r.get('schema')!='radon_project_case_v1' or r.get('state')!='accepted' or r.get('identity')!=stable_hash(spec) or r.get('test_access') is not False:raise ValueError('Case identity not accepted')
+    if r.get('schema')!=spec['schema'] or r.get('state')!='accepted' or r.get('identity')!=stable_hash(spec) or r.get('test_access') is not False:raise ValueError('Case identity not accepted')
     if len(r['arms'])!=len(spec['arms']):raise ValueError('Missing matched arms')
     for name,identity in r['arms'].items():verify_arm(root/'arms'/name,identity)
     for n,digest in r['files'].items():
@@ -67,6 +70,9 @@ def verify_case(root,spec):
 
 
 def prepare(spec,out,device,should_pause):
+    if spec.get('schema')=='radon_group_case_v1':
+        from radon_bridge.studies.group_case import prepare as prepare_group
+        return prepare_group(spec,out,device,should_pause)
     from mhd_framework.models import create_model
     from expanded.native import Inputs,collate
     validate_spec(spec);parents={};ps={}
@@ -93,6 +99,16 @@ def prepare(spec,out,device,should_pause):
 
 def execute(spec,output,device='cuda:0'):
     out=Path(output);out.mkdir(parents=True,exist_ok=True);stopped=False;device=torch.device(device)
+    builder = build
+    if spec.get('schema')=='radon_group_case_v1':
+        from radon_bridge.studies.group_build import build as group_builder
+        def builder(parents, shapes, arm, bases, seed, device):
+            model=group_builder(parents,shapes,spec['sources'],arm,bases,seed,device='cpu')
+            if spec.get('device_placement'):
+                from radon_bridge.models.placement import place
+                return place(model, **spec['device_placement'])
+            return model.to(device)
+
     def stop(*_):
         nonlocal stopped
         stopped=True
@@ -111,10 +127,11 @@ def execute(spec,output,device='cuda:0'):
         try:
             status('parent_replay');parents,shapes,train_data,fit_data,dev=prepare(spec,out,device,paused)
             status('train_only_basis')
-            baseline=build(parents,shapes,spec['arms'][0],{},spec['seed'],device)
+            baseline=builder(parents,shapes,spec['arms'][0],{},spec['seed'],device)
             stages=sorted({s for a in spec['arms'] for s in a['stages']})
             bases=fit(baseline,fit_data,stages,out/'bases',identity,spec['seed'],device,paused)
-            loader=lambda ds:DataLoader(ds,batch_size=spec['training']['microbatch'],collate_fn=collate_observed,shuffle=False,num_workers=0,generator=torch.Generator().manual_seed(spec['seed']))
+            collate_case=getattr(train_data,'collate_fn',collate_observed)
+            loader=lambda ds:DataLoader(ds,batch_size=spec['training']['microbatch'],collate_fn=collate_case,shuffle=False,num_workers=0,generator=torch.Generator().manual_seed(spec['seed']))
             if not (out/'parent_predictions.npz').exists():evaluate(baseline,loader(dev),device,out/'parent_predictions.npz',paused)
             del baseline;gc.collect()
             accepted={}
@@ -127,7 +144,7 @@ def execute(spec,output,device='cuda:0'):
                     host_path=out/'arms'/arm['host']/'best.pt'
                     host_identity=stable_hash(dict(case=identity,host=arm['host'],best_sha256=file_sha256(host_path)))
                     if not (out/'host_bases'/arm['host']/'accepted.json').exists():
-                        host_model=build(parents,shapes,host_arm,bases,spec['seed'],device)
+                        host_model=builder(parents,shapes,host_arm,bases,spec['seed'],device)
                         host_model.load_state_dict(torch.load(host_path,map_location='cpu',weights_only=False)['model'],strict=True)
                         active_bases=fit(host_model,fit_data,[3],out/'host_bases'/arm['host'],host_identity,spec['seed'],device,paused)
                         del host_model;gc.collect()
@@ -139,7 +156,7 @@ def execute(spec,output,device='cuda:0'):
                 accepted[name]=arm_identity
                 if (arm_root/'accepted.json').exists():verify_arm(arm_root,arm_identity);continue
                 status('training_'+name)
-                model=build(parents,shapes,arm,active_bases,spec['seed'],device)
+                model=builder(parents,shapes,arm,active_bases,spec['seed'],device)
                 if arm.get('host'):
                     host=torch.load(out/'arms'/arm['host']/'best.pt',map_location='cpu',weights_only=False)
                     state=model.state_dict();missing=set(state)-set(host['model'])
@@ -154,7 +171,7 @@ def execute(spec,output,device='cuda:0'):
                 from radon_bridge.studies.project_profile import profile_model
                 full_eyes=[i for i,n in enumerate(train_data.counts) if n==2][:spec['training']['microbatch']]
                 if len(full_eyes)!=spec['training']['microbatch']:raise ValueError('No maximum-eye resource fixture')
-                resource_batch=collate_observed([train_data[i] for i in full_eyes])
+                resource_batch=collate_case([train_data[i] for i in full_eyes])
                 # A resource fixture updates a copy of the current model state,
                 # then exactly restores weights, BN and RNG before formal work.
                 profile_model(model,resource_batch,spec['training'],arm_identity,
@@ -164,13 +181,19 @@ def execute(spec,output,device='cuda:0'):
                 if result.get('state')!='accepted':
                     atomic_write_json(dict(state=result['state'],stage=name,updated_at=time.time(),test_access=False),out/'status.json');return result
             status('read_only_diagnostics')
-            from radon_bridge.analysis.native_diagnostics import diagnose
+            if spec.get('schema')=='radon_group_case_v1':
+                from radon_bridge.analysis.group_diagnostics import diagnose
+            else:
+                from radon_bridge.analysis.native_diagnostics import diagnose
             diagnose(spec,out,parents,shapes,bases,fit_data,dev,device,paused)
             status('matched_statistics')
-            from radon_bridge.analysis.project_report import report_case
+            if spec.get('schema')=='radon_group_case_v1':
+                from radon_bridge.analysis.group_report import report_case
+            else:
+                from radon_bridge.analysis.project_report import report_case
             report_case(spec,out)
             paths=['spec.json','bases/accepted.json','parent_predictions.npz','diagnostics/accepted.json','report/paired_statistics.json','report/metrics.csv']
-            receipt=dict(schema='radon_project_case_v1',state='accepted',identity=identity,arms=accepted,test_access=False,
+            receipt=dict(schema=spec['schema'],state='accepted',identity=identity,arms=accepted,test_access=False,
                 files={p:file_sha256(out/p) for p in paths})
             atomic_write_json(receipt,out/'accepted.json');verify_case(out,spec)
             atomic_write_json(dict(state='completed',updated_at=time.time(),test_access=False),out/'status.json');return receipt

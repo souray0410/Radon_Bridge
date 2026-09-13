@@ -50,7 +50,7 @@ def save(path, *, model, optimizer, scheduler, identity, progress, node_ids=None
         raise ValueError('Checkpoint requires cleared gradients at an optimizer boundary')
     state={'schema':'optimizer_boundary_v1','identity':identity,'model':cpu_tree(model.state_dict()),
            'optimizer':cpu_tree(optimizer.state_dict()),'scheduler':cpu_tree(scheduler.state_dict()),
-           'progress':cpu_tree(progress),'rng':capture_rng(),'node_ids':node_ids,'world_size':1}
+           'progress':cpu_tree(progress),'rng':capture_rng(),'node_ids':node_ids,'world_size':1,'device_placement':getattr(model,'device_placement',None)}
     atomic_save(path,state)
     return state
 
@@ -61,6 +61,7 @@ def load(path, *, model, optimizer, scheduler, identity, node_ids=None):
     if state['schema']!='optimizer_boundary_v1' or state['identity']!=identity or state['world_size']!=1:
         raise ValueError('Checkpoint identity/world-size mismatch')
     if state['node_ids']!=node_ids:raise ValueError('MHD Node IDs changed')
+    if state.get('device_placement')!=getattr(model,'device_placement',None):raise ValueError('Model placement changed on resume')
     model.load_state_dict(state['model'],strict=True);optimizer.load_state_dict(state['optimizer'])
     scheduler.load_state_dict(state['scheduler']);restore_rng(state['rng'])
     return state['progress']

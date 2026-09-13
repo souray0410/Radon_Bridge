@@ -50,7 +50,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
         nonlocal start
         now=time.monotonic();progress['seconds']+=now-start;start=now
         save(out/'last.pt',model=model,optimizer=opt,scheduler=sch,identity=identity,progress=progress,node_ids=nodes)
-    def loader(ds):return DataLoader(ds,batch_size=cfg['microbatch'],shuffle=False,collate_fn=collate_observed,num_workers=cfg['num_workers'],generator=torch.Generator().manual_seed(seed))
+    def loader(ds):return DataLoader(ds,batch_size=cfg['microbatch'],shuffle=False,collate_fn=getattr(train,'collate_fn',collate_observed),num_workers=cfg['num_workers'],generator=torch.Generator().manual_seed(seed))
     frozen={k:v.detach().cpu().clone() for name,m in model.task.modules_by_name().items() if not name.startswith('bridge_') for k,v in ((name+':'+key,val) for key,val in m.state_dict().items())} if model.frozen else None
     def check_frozen():
         if frozen is not None:
@@ -70,9 +70,9 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
                 if should_pause():checkpoint();status('paused');return {'state':'paused'}
                 block=order[progress['offset']:progress['offset']+cfg['effective_batch']]
                 for batch in loader(Subset(train,block)):
-                    _,loss=model(move(batch,device),len(batch['label'])/len(block))
+                    _,loss=model(move(batch,device),len(batch['participant_id'])/len(block))
                     if not torch.isfinite(loss):raise ValueError('Nonfinite branch loss')
-                    model.backward();progress['epoch_loss']+=float(loss.detach())*len(block);progress['epoch_seen']+=len(batch['label'])
+                    model.backward();progress['epoch_loss']+=float(loss.detach())*len(block);progress['epoch_seen']+=len(batch['participant_id'])
                 model.clip(cfg['clip']);opt.step();opt.zero_grad(set_to_none=True);check_frozen()
                 progress['offset']+=len(block);progress['updates']+=1;launch_updates+=1;status('training')
                 if progress['updates']%100==0:checkpoint()

@@ -253,30 +253,36 @@ class BridgeExchange(nn.Module):
 
 class ReturnParticipant(nn.Module):
     """Parameter-free routing back to an existing native Node."""
-    def __init__(self, start, length, shape):
-        super().__init__(); self.start=start; self.length=length; self.shape=tuple(shape)
+    def __init__(self, start, length, shape, stride=None):
+        super().__init__(); self.start=start; self.length=length; self.shape=tuple(shape);self.stride=stride
     def forward(self, packet):
-        return packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
+        result=packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
+        if self.stride is not None:
+            result=torch.empty_strided(result.shape,self.stride,dtype=result.dtype,device=result.device).copy_(result)
+        return result
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,channel_axes=None,input_strides=None):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
-        if any(v is not None for v in (reduction_ratio,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
+        if any(v is not None for v in (reduction_ratio,hidden_dimension,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
         exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
     else:
         if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
         from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange
-        if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio)
-        elif family=='cross_attention' and reduction_ratio is None:exchange=AttentionExchange(specs,attention_dimension,heads)
+        if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio,hidden_dimension)
+        elif family=='cross_attention' and reduction_ratio is None and hidden_dimension is None:exchange=AttentionExchange(specs,attention_dimension,heads)
         else:raise ValueError('Unknown family or incompatible configuration')
+    if channel_axes and any(channel_axes.get(k,1)!=1 for k in exchange.keys):
+        from radon_bridge.methods.layout import NativeLayoutExchange
+        exchange=NativeLayoutExchange(exchange,channel_axes)
     packet = node(prefix+'communication')
     edge(prefix+'exchange', exchange, [inputs[s.key] for s in specs], [packet])
     start = 0
     for spec, shape, length in zip(specs, exchange.shapes, exchange.lengths):
-        edge(prefix+spec.key+'_return', ReturnParticipant(start, length, shape), [packet], [inputs[spec.key]],
+        edge(prefix+spec.key+'_return', ReturnParticipant(start, length, shape,(input_strides or {}).get(spec.key)), [packet], [inputs[spec.key]],
              level_group=prefix+'return_level')
         start += length
     meta = dict(exchange.metadata, topology='level_inplace', communication_node=packet,
@@ -284,7 +290,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,channel_axes=None,input_strides=None):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -293,6 +299,8 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
         feature = samples[name] if samples is not None else native.feature_message.current_state
         if not isinstance(feature, torch.Tensor) or feature.ndim < 3:
             raise ValueError('Expected [batch,channels,*spatial]')
+        axis=(channel_axes or {}).get(name,1)
+        feature=feature.movedim(axis,1) if axis!=1 else feature
         specs.append(FeatureSpec(name, feature.shape[1], tuple(feature.shape[2:])))
         inputs[name] = native.id
     old=list(builder.steps)
@@ -305,7 +313,7 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,hidden_dimension=hidden_dimension,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,channel_axes=channel_axes,input_strides={n:tuple(samples[n].stride()) for n in node_names} if channel_axes else input_strides)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,
@@ -325,7 +333,8 @@ def attach_parallel_to_nodes(builder, configs, samples):
                                    **{k:v for k,v in host.items() if k!='nodes'})
     host_steps = list(builder.steps)
     names = host['nodes']
-    specs = [FeatureSpec(n, samples[n].shape[1], tuple(samples[n].shape[2:])) for n in names]
+    canonical={n:samples[n].movedim(host.get('channel_axes',{}).get(n,1),1) for n in names}
+    specs = [FeatureSpec(n, canonical[n].shape[1], tuple(canonical[n].shape[2:])) for n in names]
     inputs = {n:builder.by_name[n].id for n in names}
     _, new_meta = attach_group(builder.node, builder.edge, specs, inputs, 'bridge_1_',
                                **{k:v for k,v in addition.items() if k not in ('nodes','parallel_to')})
