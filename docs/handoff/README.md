@@ -55,3 +55,9 @@ GitHub干净环境代码检查后，在Ibex的实际allocation做完整输入/�
 ## 2026-09-14 名称与框架对应更新
 
 训练仓库已从 `Model_Training` 更名为 `MHD_Models`，仍为私有仓库并保留完整历史。新引用使用 `souray0410/MHD_Models`；旧源码目录、运行ID、检查点和框架锁不因改名重写。详细规则见 [MHD_Models版本与发布契约](https://github.com/souray0410/MHD_Models/blob/main/docs/framework_compatibility.md)。本条只更新名称与依赖说明，不刷新上文训练进度，也不表示新科学代码已部署。
+
+
+## 2026-09-14 执行衔接修复（上线前核验）
+
+临时共享提交锁竞争改为明确的`waiting_submission_lock`，只在获取flock的位置捕获；真正的fork/Slurm查询失败仍报错，不将所有BlockingIOError隐藏。原工作队列可追加独立、按SHA核验的native feed；同run同spec的多研究引用去重，保持原领取和科学身份。控制器与GPU worker分开验收和部署，旧健康训练不热改。
+完整协议的73项父候选与旧14项筛选范围分开登记；新增独立父模型准备控制器，不把92526逻辑位置当成执行任务。复制重复种子之前可按绑定队列复用已有run，仅允许recipe_selection（选入该研究的出处）不同；任何训练、数据、预处理、框架、初始化或种子差异均不复用，原spec不改写。复用仍须完整接受与项目重放。完整方法case编译、真实完整输入验收、多卡及统计接通仍是后续门槛，不因父准备控制器上线而宣称完成。
