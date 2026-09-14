@@ -32,6 +32,10 @@ def configurations(parents, shapes, sources, arm, bases, seed):
         if arm['family'] == 'cross_attention':
             configs.append(dict(nodes=names, family='cross_attention', attention_dimension=arm.get('attention_dimension',256), heads=arm.get('heads',4)))
             continue
+        if arm.get('compression') == 'factorized_projected':
+            from radon_bridge.studies.factorized_transfer import configuration
+            configs.append(configuration(names, channels, arm))
+            continue
         r, M, S = arm['r'], arm['M'], arm['S']
         if any(r > c for c in channels.values()): raise ValueError('Channel rank exceeds available channels')
         config = dict(nodes=names, M=M, S=S, rho={n:r/c for n,c in channels.items()},

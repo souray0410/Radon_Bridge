@@ -24,6 +24,9 @@ def bridges_for(parents,shapes,arm,bases,seed):
             if int(ratio)!=ratio:raise ValueError('MMTM hidden256 cannot be exactly represented')
             config=dict(nodes=names,family='mmtm',reduction_ratio=int(ratio))
         elif arm['family']=='cross_attention':config=dict(nodes=names,family='cross_attention',attention_dimension=256,heads=4)
+        elif arm.get('compression')=='factorized_projected':
+            from radon_bridge.studies.factorized_transfer import configuration
+            config=configuration(names,cs,arm)
         else:
             r=arm['r'];M=arm['M'];S=arm['S']
             if any(r>c for c in cs.values()):raise ValueError('Channel rank exceeds source channels')
