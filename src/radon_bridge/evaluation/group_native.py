@@ -7,7 +7,7 @@ from radon_bridge.evaluation.paired_native import move
 
 @torch.no_grad()
 def evaluate(model, loader, device, output=None, should_pause=lambda: False):
-    from expanded.native import metrics
+    from radon_bridge.evaluation.metrics import binary_metrics as metrics
     mode = model.training; model.eval(); p = {k: [] for k in model.source_keys}; y = {k: [] for k in p}; ids = []
     try:
         for batch in loader:

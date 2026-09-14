@@ -2,6 +2,20 @@
 import numpy as np
 from sklearn.metrics import f1_score,precision_score,recall_score,confusion_matrix,roc_auc_score,log_loss
 
+def binary_metrics(y, probabilities):
+    """Preserve the native UKB binary metric schema without a training-repo import."""
+    from sklearn.metrics import average_precision_score, brier_score_loss
+    y = np.asarray(y)
+    p = np.asarray(probabilities)
+    return {
+        "macro_f1": float(f1_score(y, p.argmax(1), labels=[0, 1], average="macro", zero_division=0)),
+        "auroc": float(roc_auc_score(y, p[:, 1])),
+        "positive_average_precision": float(average_precision_score(y, p[:, 1])),
+        "nll": float(log_loss(y, p, labels=[0, 1])),
+        "brier": float(brier_score_loss(y, p[:, 1])),
+        "confusion_matrix": confusion_matrix(y, p.argmax(1), labels=[0, 1]).tolist(),
+    }
+
 def classification_metrics(y,probabilities):
     y=np.asarray(y);p=np.asarray(probabilities);labels=np.arange(p.shape[1]);pred=p.argmax(1)
     result={"macro_f1":float(f1_score(y,pred,labels=labels,average="macro",zero_division=0)),

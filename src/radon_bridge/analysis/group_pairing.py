@@ -30,7 +30,7 @@ def permutations(dataset):
 
 
 def diagnose(model, dataset, output, device, paused):
-    from expanded.native import metrics
+    from radon_bridge.evaluation.metrics import binary_metrics as metrics
     if dataset.split!='development' or dataset.augment:raise ValueError('Unchanged development view required')
     out=Path(output);out.mkdir(parents=True,exist_ok=True)
     modules=model.task.modules_by_name();exchanges=[m for n,m in modules.items() if n.endswith('_exchange')]

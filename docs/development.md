@@ -6,6 +6,19 @@ Create and activate a dedicated Python 3.11 virtual environment, then run
 Preflight checks structure and paths only; it does not certify data, GPU capacity or training.
 Integration scripts live under tests/integration and require explicit invocation.
 
+Run CPU acceptance in a clean checkout with only the declared dependencies and
+the pinned framework installed. Do not add a sibling Model_Training checkout to
+PYTHONPATH: that can hide undeclared imports. Evaluation and diagnostics own their
+metrics inside this application. Real-data study entry points that explicitly
+load a pinned training snapshot remain a separate integration boundary.
+
+A successful local test run is not a successful GitHub Actions run. Check the
+Actions result for the exact pushed SHA before calling a revision accepted.
+The required `Research checks` workflow covers clean installation, framework
+identity, the complete unit suite and the two-rank MHD trainer reference.
+Dataset/parent replay, full-input GPU resource and recovery checks, and scientific
+completion have separate receipts; none is implied by a green CPU workflow.
+
 See ../workspace/REPOSITORY_STANDARD.md for new-project reuse and archival rules.
 Install the fixed MHD checkout separately; do not bundle framework classes in this wheel.
 
