@@ -81,7 +81,9 @@ def configure_device():
     os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG',':4096:8')
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
+    # Historical parents used the cuDNN default TF32 convolution policy.
+    # Match it explicitly; changing it breaks exact saved-prediction replay.
+    torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=True
     # Explicit historical workstation budget; never inherit this on Ibex.
     torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
 
@@ -134,6 +136,7 @@ def profile(cfg,data,out):
         full_development_participants=296,peak_reserved_gib=peak,peak_process_sampled_gib=max(physical) if physical else None,seconds=time.monotonic()-tick,
         bridge_parameters=sum(p.numel() for n,m in g.modules_by_name().items() if n.startswith('bridge_') for p in m.parameters()),
         torch=str(torch.__version__),cuda=torch.version.cuda,device=torch.cuda.get_device_name(0),
+        numerical_policy=dict(parameter_dtype="float32",autocast=False,matmul_tf32=False,cudnn_tf32=True),
         resume_sha256=sha(out/'resume.pt')))
 
 
@@ -168,7 +171,8 @@ def train_case(cfg,data,out):
                     np.testing.assert_allclose(current[key],previous[key],rtol=1e-5,atol=1e-6)
         monitor.update(initial['mean_task_macro_f1'],0)
         atomic_save(dict(model=g.save_state(),epoch=0,metrics=initial,configuration=cfg),out/'best.pt');checkpoint()
-        write_json(out/'initial_acceptance.json',dict(strict_parent_predictions=True,test_used=False))
+        write_json(out/'initial_acceptance.json',dict(strict_parent_predictions=True,test_used=False,
+            numerical_policy=dict(parameter_dtype="float32",autocast=False,matmul_tf32=False,cudnn_tf32=True)))
     converged=epoch>=8 and monitor.bad>=6
     try:
         for current_epoch in range(epoch+1,61):
