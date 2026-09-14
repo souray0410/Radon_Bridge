@@ -130,3 +130,13 @@ New releases use one canonical artifact format. Current immutable study snapshot
 finish unchanged. MHD_Models owns one-time conversion; no WS02/Ibex or V4/V5
 fallback is to be added to the new project runtime. Parent replay and deployment
 remain explicit acceptance gates; this documentation does not claim they passed.
+
+
+## 2026-09-15 small-cohort completion acceptance
+
+WS02 factorized supplement is independently rechecked at 24/24, with source/config/
+artifact SHA, saved parent prediction, participant alignment, plateau history and
+metric recomputation. No new inference or test read. See
+[stage evidence](../../experiments/2026_09_14_19_43_11/acceptance_20260915/README.zh-CN.md).
+This closes only the small-cohort completion/report stage; Ibex factorized feed
+and full-input acceptance remain open. Preserve old frozen workers and contracts.
