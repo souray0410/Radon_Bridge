@@ -73,3 +73,11 @@ GitHub干净环境代码检查后，在Ibex的实际allocation做完整输入/�
 ## 2026-09-14：长期自动纠错责任
 
 用户明确自动纠错必须成为通用长期规则，不能只适用于本次故障。AGENTS及共享RESEARCH_AUDIT_STANDARD已规定：已授权流程必须从发现推进到诊断、版本化修复、验收、安全恢复和真实进度复查；不能停在报警、CI通过或调度器重启。未关闭问题保留证据、责任主体、下一步及可执行自动续接。保护健康任务和原科学标准，限制瞬时重试，不盲重启确定性错误。规范适用于未来模型、数据、框架、项目与CI/资源/评价/报告链路，但不是保证所有故障都能自动解决。规则更新本身不表示任何当前训练或故障已完成验收。
+
+## 2026-09-14 current-format migration boundary
+
+Shared model standard v4: new releases use one canonical artifact format and reader.
+MHD_Models main 0859bfe implements the new package and one-time converters. Running
+models and research projects retain original immutable snapshots until accepted
+transition. See [migration](../model_migration.md); package-layout deployment is not
+permission to change scientific protocols or follow main at runtime.
