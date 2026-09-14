@@ -72,7 +72,7 @@ class LinearMixer(nn.Module):
         return torch.split(y,self.widths,dim=1)
 
 class BridgeExchange(nn.Module):
-    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,bottleneck_rank=None):
         super().__init__()
         self.keys = [s.key for s in specs]
         if not self.keys or len(set(self.keys)) != len(self.keys):
@@ -87,15 +87,21 @@ class BridgeExchange(nn.Module):
                 raise ValueError('rho must be a finite compression ratio in (0,1]')
         if mode not in ('radon', 'self', 'pooled', 'random', 'scrambled', 'linear_resample'):
             raise ValueError(mode)
-        if compression not in ('learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel','learned_channel'):
+        if compression not in ('factorized_projected','learned_projected','fixed_svd_channel','fixed_random_orthogonal_channel','fixed_centered_svd_channel','learned_channel'):
             raise ValueError('Unknown compression method')
+        if compression == 'factorized_projected':
+            if mode not in ('radon', 'linear_resample') or rho != 1 or any(v is not None for v in (basis_files, cross_edges, nested_rhos, s_axis_permutation, r, h)):
+                raise ValueError('Global factorization requires rho=1, full projected input, and bidirectional Radon/resampling')
+            positive_integer(bottleneck_rank, 'bottleneck_rank')
+        elif bottleneck_rank is not None:
+            raise ValueError('bottleneck_rank belongs only to global factorization')
         if compression in ('fixed_svd_channel','fixed_centered_svd_channel') and mode not in ('radon','self','scrambled','linear_resample'):
             raise ValueError('Unsupported SVD mechanism')
         if compression=='fixed_random_orthogonal_channel' and mode not in ('radon','self','scrambled','linear_resample'):
             raise ValueError('Unsupported random orthogonal channel mechanism')
         if compression=='learned_projected' and mode=='linear_resample':
             raise ValueError('Linear resampling is a fixed SVD control')
-        if compression in ('learned_projected','learned_channel') and basis_files is not None:
+        if compression in ('learned_projected','learned_channel','factorized_projected') and basis_files is not None:
             raise ValueError('basis_files is only valid for fixed channel compression')
         if s_axis_permutation is not None:
             from radon_bridge.methods.sampling import validate_permutation
@@ -125,7 +131,10 @@ class BridgeExchange(nn.Module):
             for i,s in enumerate(specs)])
         widths = [s.channels if mode == 'pooled' else s.channels*directions[i] for i,s in enumerate(specs)]
         retained = [max(1, math.floor(ratio*w)) for ratio,w in zip(ratios,widths)]
-        if compression=='learned_projected':
+        if compression=='factorized_projected':
+            self.compress=nn.ModuleList([nn.Identity() for _ in widths])
+            self.expand=nn.ModuleList([nn.Identity() for _ in widths])
+        elif compression=='learned_projected':
             self.compress = nn.ModuleList([nn.Conv1d(w, h, 1, bias=False) for w,h in zip(widths,retained)])
             self.expand = nn.ModuleList([nn.Conv1d(h, w, 1, bias=False) for w,h in zip(widths,retained)])
         elif compression=='learned_channel':
@@ -139,13 +148,16 @@ class BridgeExchange(nn.Module):
             ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
             self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else CENTERED_VERSION if compression=='fixed_centered_svd_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
             retained=[rank*m for rank,m in zip(ranks,directions)]
-        self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else kernel_size, mode == 'self',self.keys,cross_edges,s_axis_permutation)
+        from radon_bridge.methods.factorized import FactorizedMixer
+        self.mixer = FactorizedMixer(widths,bottleneck_rank,kernel_size) if compression=='factorized_projected' else LinearMixer(retained, 1 if mode == 'pooled' else kernel_size, mode == 'self',self.keys,cross_edges,s_axis_permutation)
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [
             {'key': s.key, 'channels': s.channels, 'shape': list(s.shape), 'M': directions[i], 'rho': ratios[i], 'projected_channels': w,
              'retained_channels': retained[i], 'achieved_width_ratio': retained[i]/w,
              'geometry': self.projectors[i].metadata if mode != 'pooled' else None}
             for i, (s, w) in enumerate(zip(specs, widths))]}
         self.metadata['compression']=compression
+        if compression=='factorized_projected':
+            self.metadata.update(bottleneck_rank=bottleneck_rank, factorization='global_B_K_A', fixed_channel_compression=False, global_projected_width=sum(widths), effective_kernel_rank_bound=bottleneck_rank)
         self.metadata['kernel_size']=self.mixer.conv.kernel_size[0]
         if s_axis_permutation is not None:
             from radon_bridge.methods.sampling import permutation_metadata
@@ -156,7 +168,7 @@ class BridgeExchange(nn.Module):
         if compression=='learned_channel':
             for participant,codec in zip(self.metadata['participants'],self.channel_codecs):
                 participant.update(channel_rank=codec.metadata['channel_rank'],effective_channel_ratio=codec.metadata['channel_rank']/codec.metadata['channels'],channel_codec=codec.metadata)
-        elif compression!='learned_projected':
+        elif compression not in ('learned_projected','factorized_projected'):
             for participant,basis in zip(self.metadata['participants'],self.channel_bases):
                 participant['channel_rank']=basis.q.shape[1]
                 participant['effective_channel_ratio']=basis.q.shape[1]/basis.q.shape[0]
@@ -178,7 +190,7 @@ class BridgeExchange(nn.Module):
         self.latest_inputs = self.latest_deltas = None
 
     def export_fixed_bases(self, directory):
-        if self.compression in ('learned_projected','learned_channel'):return []
+        if self.compression in ('learned_projected','learned_channel','factorized_projected'):return []
         artifacts=[basis.export(directory) for basis in self.channel_bases]
         for participant,artifact in zip(self.metadata['participants'],artifacts):participant['basis']=artifact
         return artifacts
@@ -231,7 +243,7 @@ class BridgeExchange(nn.Module):
             encoded=[projector(codec.encode(x)) for codec,projector,x in zip(self.channel_codecs,self.projectors,features)]
             mixed=self.mixer(*encoded)
             deltas=[codec.decode(projector.backproject(p)) for codec,projector,p in zip(self.channel_codecs,self.projectors,mixed)]
-        elif self.compression!='learned_projected':
+        elif self.compression not in ('learned_projected','factorized_projected'):
             encoded=[projector(basis.encode(x)) for basis,projector,x in zip(self.channel_bases,self.projectors,features)]
             mixed=self.mixer(*encoded)
             deltas=[basis.decode(projector.backproject(p)) for basis,projector,p in zip(self.channel_bases,self.projectors,mixed)]
@@ -262,14 +274,14 @@ class ReturnParticipant(nn.Module):
         return result
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,channel_axes=None,input_strides=None):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,bottleneck_rank=None,channel_axes=None,input_strides=None):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
         if any(v is not None for v in (reduction_ratio,hidden_dimension,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
-        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
+        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,bottleneck_rank=bottleneck_rank)
     else:
-        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
+        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h,bottleneck_rank)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
         from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange
         if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio,hidden_dimension)
@@ -290,7 +302,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,channel_axes=None,input_strides=None):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,hidden_dimension=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,bottleneck_rank=None,channel_axes=None,input_strides=None):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -313,7 +325,7 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,hidden_dimension=hidden_dimension,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,channel_axes=channel_axes,input_strides={n:tuple(samples[n].stride()) for n in node_names} if channel_axes else input_strides)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,hidden_dimension=hidden_dimension,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,bottleneck_rank=bottleneck_rank,channel_axes=channel_axes,input_strides={n:tuple(samples[n].stride()) for n in node_names} if channel_axes else input_strides)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,
