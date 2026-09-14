@@ -39,6 +39,12 @@ def main():
     # These full receipts are generated before execution, not inferred from directory names.
     for name in ['dependencies_acceptance.json','code_acceptance.json']:
         if not (root/name).exists():raise ValueError('Missing preparation receipt '+name)
+    dependencies=json.loads((root/'dependencies_acceptance.json').read_text())
+    if dependencies.get('passed') is not True or dependencies.get('test_used') is not False or dependencies['queue_sha256']!=sha(root/'queue.json'):
+        raise ValueError('Dependencies or registered queue changed')
+    for section in ('config_files','references','data_files'):
+        for path,digest in dependencies[section].items():
+            if sha(path)!=digest:raise ValueError('Dependency changed: '+path)
     code=json.loads((root/'code_acceptance.json').read_text())
     for path,digest in code['files'].items():
         if sha(path)!=digest:raise ValueError('Code changed after acceptance: '+path)
