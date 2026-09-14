@@ -42,8 +42,10 @@ def work(config):
     if feed:
         if feed.get('schema')!='radon_bridge_project_work_feed_v1' or feed.get('test_access') is not False:raise ValueError('Unsealed project feed')
         result.extend(dict(t,execution='radon') for t in feed['tasks'])
-    native=read(config['native_feed'])
-    if native:
+    native_paths=[config['native_feed']]+config.get('additional_native_feeds',[])
+    for native_path in native_paths:
+        native=read(native_path)
+        if not native:continue
         if native.get('schema')!='radon_bridge_native_work_feed_v1' or native.get('test_access') is not False:raise ValueError('Unsealed replication feed')
         for item in native['queues']:
             if file_sha256(Path(item['queue']))!=item['queue_sha256']:raise ValueError('Replication queue changed')
@@ -53,7 +55,11 @@ def work(config):
     for task in result:
         if file_sha256(Path(task['spec']))!=task['spec_sha256']:raise ValueError('Work specification changed')
         run=str(Path(task['run_dir']).resolve())
-        if run in unique and unique[run]!=task:raise ValueError('Conflicting duplicate work')
+        if run in unique:
+            previous=unique[run]
+            if any(previous[k]!=task[k] for k in ('spec_sha256','execution')):
+                raise ValueError('Conflicting duplicate work')
+            continue  # Same immutable run may be referenced by several studies.
         unique[run]=task
     return list(unique.values())
 
@@ -121,7 +127,10 @@ def submit_one(config,path,journal):
     if not candidates:return 'waiting_dependencies'
     lock=Path(config['account_submission_lock'])
     with lock.open('a') as handle:
-        fcntl.flock(handle,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        try:
+            fcntl.flock(handle,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 'waiting_submission_lock'
         snap=snapshot()
         # Include every existing allocation and durable unconfirmed request.
         for entry in journal['requests']:

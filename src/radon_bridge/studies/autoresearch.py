@@ -85,6 +85,31 @@ def replica_spec(spec, seed, nomination):
     return child
 
 
+def reuse_replica(spec, queues):
+    """Reuse exact scientific recipes; selection provenance remains separately recorded.
+
+    The only excluded field is recipe_selection, which records why another
+    study nominated this model. No training/data/framework field is ignored.
+    Existing immutable task bytes and run identity are never rewritten.
+    """
+    expected = {k:v for k,v in spec.items() if k != 'recipe_selection'}
+    for reference in queues:
+        if file_sha256(Path(reference['path'])) != reference['sha256']:
+            raise ValueError('Replica reuse queue changed')
+        queue = read(reference['path'])
+        if queue.get('test_used') is not False:
+            raise ValueError('Unsealed replica reuse queue')
+        for item in queue['tasks']:
+            if file_sha256(Path(item['spec'])) != item['spec_sha256']:
+                raise ValueError('Replica reuse specification changed')
+            actual = read(item['spec'])
+            if actual.get('test_used') is not False:
+                raise ValueError('Unsealed replica specification')
+            if {k:v for k,v in actual.items() if k != 'recipe_selection'} == expected:
+                return dict(item)
+    return None
+
+
 class Controller:
     def __init__(self, config, verify_completion, reserve):
         self.config = config
@@ -201,12 +226,19 @@ class Controller:
             child = replica_spec(spec, seed, nomination)
             path = dest / f"seed{seed}.json"
             immutable(path, child)
-            namespace = "radon_bridge_parent_replication_" + self.config["catalog"]["sha256"][:16]
-            run = self.reserve(self.config["models_root"], namespace, name + f"/seed{seed}", child,
-                               source=dict(nomination=str(nomination_path)), refresh_summary=False)
-            tasks.append(dict(id=name.replace("/", "__") + f"__seed{seed}", role="model",
-                              spec=str(path), spec_sha256=file_sha256(path),
-                              run_dir=str(run), state="pending"))
+            reuse = reuse_replica(child, self.config.get('replica_reuse_queues', []))
+            if reuse is not None:
+                tasks.append(reuse)
+                immutable(dest/f'seed{seed}_reuse.json', dict(
+                    nomination=nomination, expected_spec_sha256=file_sha256(path),
+                    reused_task=reuse, equivalence='all_spec_fields_except_recipe_selection'))
+            else:
+                namespace = "radon_bridge_parent_replication_" + self.config["catalog"]["sha256"][:16]
+                run = self.reserve(self.config["models_root"], namespace, name + f"/seed{seed}", child,
+                                   source=dict(nomination=str(nomination_path)), refresh_summary=False)
+                tasks.append(dict(id=name.replace("/", "__") + f"__seed{seed}", role="model",
+                                  spec=str(path), spec_sha256=file_sha256(path),
+                                  run_dir=str(run), state="pending"))
         queue = dest / "queue.json"
         immutable(queue, dict(schema="radon_bridge_selected_native_replication_v1", tasks=tasks,
                               nomination=nomination, test_used=False))
