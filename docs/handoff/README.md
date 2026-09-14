@@ -85,3 +85,11 @@ GitHub干净环境代码检查后，在Ibex的实际allocation做完整输入/�
 ## 2026-09-14：阶段扩展复用管理层
 
 用户明确阶段必须可接续、扩展、复用，不能换阶段就重复训练。新增共用workspace/stage_registry.py和STAGED_RESEARCH_STANDARD.md；科学身份与stage分离、文件SHA、原run复用/恢复、不可变阶段与前驱摘要、跨进程锁、失败不自动重训。它仅做管理规划，必须由项目真实接受器/存活检查完成verify_live，未部署全部生产适配器，也不解封test；具体集成和真实模型恢复继续验收。
+
+## 2026-09-14：旧训练版本资源预检与短step退出修复
+
+现场发现两个新Radon allocation在预检导入阶段失败：资源探针假定所有不可变历史trainer均提供training_components/clipped_step和Inputs(recipe)，旧197a8cd不满足。修复在独立探针适配层完成，按精确native源码SHA限制历史适配，保留原优化器/组内裁剪、初始化、数据参数和原run；未知API在申卡前拒绝。现代路径仍调用其自己的函数，不改正在执行的科学源码。
+
+Radon调度补充短worker退出后读取step记录、有限等待Slurm确认退出、清除子step继承的一核请求，并对非0/75退出保留失败和禁止继续盲申的incident hold。陈旧paused状态不能掩盖本次预检失败。13项针对性测试已在Ibex通过；独立GPU恢复预检正在现有allocation内执行，旧健康训练保留。完整GPU接受、准确提交CI、claim恢复和新调度部署分别记录，不能由本段文字认定全部完成。
+
+现场证据：operations/2026_09_10_11_11_31/profile_recovery_20260914；此路径包含受限运行引用，GitHub仅保存代码、规则及非参与者级摘要。
