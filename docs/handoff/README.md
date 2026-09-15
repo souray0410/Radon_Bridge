@@ -155,3 +155,21 @@ admission remain required before production; this is not scientific completion.
 
 The preparation branch now carries the same mandatory current-contract/migration
 standard as main. This policy propagation does not migrate existing scientific artifacts.
+
+
+## 2026-09-15 prepared factorization report boundary
+
+`analysis/group_report.py` now writes explicit compression and global
+`bottleneck_rank` metadata; a factorized arm has no per-source `r` value.
+Supplementary `factorization_interactions` requires an explicit matched SVD
+Radon/ordinary pair and rejects missing controls or different geometry/settings.
+Its sign is factorized geometry gain minus SVD geometry gain, with no capacity
+matching claim. It is not automatically added to existing study comparisons;
+the supplementary case compiler must register it before outcomes.
+Ibex independent fixture accepts seven targeted tests, including full synthetic
+report creation. Full suite/CI are recorded separately. No live source, GPU task,
+legacy case definition, test access or formal study feed changed. Evidence:
+`operations/2026_09_10_11_11_31/factorized_report_20260915/`.
+Next: supplementary canonical-parent case and comparison registration, full-input
+resource/recovery acceptance, then atomic per-arm dispatch with real dependency
+barriers. Budget10/10/4 does not establish arm-level parallel execution.

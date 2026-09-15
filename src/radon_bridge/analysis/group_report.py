@@ -8,6 +8,54 @@ from radon_bridge.analysis.project_report import f1
 from radon_bridge.runtime.state import atomic_write_json, file_sha256, stable_hash
 
 
+def geometry_metadata(arm):
+    """Global factor rank is never labeled a per-source channel rank."""
+    result=dict(compression=None, r=None, M=None, S=None, k=None,
+                bottleneck_rank=None, rank_scope=None)
+    if arm['family']!='radon':return result
+    result.update(compression=arm['compression'],M=arm['M'],S=arm['S'],k=arm['k'])
+    if arm['compression']=='factorized_projected':
+        rank=arm['bottleneck_rank']
+        if type(rank) is not int or rank<=0 or any(arm.get(k) is not None for k in ('r','h')):
+            raise ValueError('Factorization requires global rank, not per-source r/h')
+        result.update(bottleneck_rank=rank,rank_scope='global_concatenated_projection')
+    else:
+        result.update(r=arm['r'],rank_scope='per_source_channel')
+    return result
+
+
+def factorization_interactions(arms, reference_pair):
+    """Explicit supplementary contrasts; caller must lock these before outcomes.
+
+    Does not add contrasts to the existing study or claim capacity matching.
+    The reference pair is ordered [SVD Radon, SVD ordinary communication].
+    """
+    by_id={a['id']:a for a in arms}
+    if len(by_id)!=len(arms) or len(reference_pair)!=2 or any(k not in by_id for k in reference_pair):
+        raise ValueError('Unique arms and an explicit complete SVD reference pair required')
+    def signature(a,ignore):return {k:v for k,v in a.items() if k not in ignore}
+    left,right=(by_id[k] for k in reference_pair)
+    if (left['compression']!='fixed_svd_channel' or left['mode']!='radon' or
+        right['mode']!='linear_resample' or
+        signature(left,('id','mode'))!=signature(right,('id','mode'))):
+        raise ValueError('Reference geometry pair is not matched')
+    result=[]
+    for a in arms:
+        if a.get('compression')!='factorized_projected' or a['mode']!='radon':continue
+        geometry_metadata(a)
+        if a.get('host') or a['family']!='radon':raise ValueError('Direct factorization arms required')
+        ignored=('id','mode','compression','r','bottleneck_rank')
+        if signature(a,ignored)!=signature(left,ignored):
+            raise ValueError('Factorization and SVD geometry/training settings differ')
+        peers=[b for b in arms if b['mode']=='linear_resample' and
+               signature(a,('id','mode'))==signature(b,('id','mode'))]
+        if len(peers)!=1:raise ValueError('Factorization lacks a unique matched ordinary arm')
+        result.append(dict(id='factorization_interaction_'+a['id'],family='parameterization_geometry',
+            weights={a['id']:1.,peers[0]['id']:-1.,left['id']:-1.,right['id']:1.},
+            interpretation='factorized geometry gain minus fixed SVD geometry gain; capacity is not matched'))
+    return result
+
+
 def comparisons(arms):
     by_id = {a['id']:a for a in arms}; rows = []
     reference = 'svd_radon' if 'svd_radon' in by_id else 'svd_all_radon'
@@ -83,7 +131,7 @@ def report_case(spec,root):
                     architecture=s['architecture'],seed=spec['seed'],macro_f1=r['metrics'][key]['macro_f1'],
                     mean_macro_f1=r['metrics']['mean_macro_f1'],best_epoch=r['best_epoch'],stop_epoch=r['stop_epoch'],
                     seconds=r['seconds'],parameters_total=r['parameters_total'],parameters_trainable=r['parameters_trainable'],
-                    **{name:arm[name] if arm['family']=='radon' else None for name in ('r','M','S','k')}))
+                    **geometry_metadata(arm)))
     definitions=comparisons(spec['arms']);weights=np.zeros((len(definitions),len(predictions)))
     arm_order=[a['id'] for a in spec['arms']]
     for i,d in enumerate(definitions):
