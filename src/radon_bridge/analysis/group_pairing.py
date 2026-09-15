@@ -29,14 +29,21 @@ def permutations(dataset):
     return np.stack(result)
 
 
-def diagnose(model, dataset, output, device, paused):
+def _diagnose(model, dataset, output, device, paused):
     from radon_bridge.evaluation.metrics import binary_metrics as metrics
     if dataset.split!='development' or dataset.augment:raise ValueError('Unchanged development view required')
     out=Path(output);out.mkdir(parents=True,exist_ok=True)
     modules=model.task.modules_by_name();exchanges=[m for n,m in modules.items() if n.endswith('_exchange')]
     if len(exchanges)!=1:raise ValueError('This fixed pairing protocol requires a single bridge')
     ex=getattr(exchanges[0],'exchange',exchanges[0])
-    if not hasattr(ex,'channel_bases'):raise ValueError('Fixed channel basis required')
+    if ex.compression == 'factorized_projected':
+        if ex.mode not in ('radon','linear_resample'):
+            raise ValueError('Unsupported factorized geometry')
+        def encode(i,x): return ex.projectors[i](x)
+    elif hasattr(ex,'channel_bases'):
+        def encode(i,x): return ex.projectors[i](ex.channel_bases[i].encode(x))
+    else:
+        raise ValueError('Pairing requires fixed-channel or global factorized communication')
     keys=model.source_keys;nsource=len(keys);offset=np.r_[0,np.cumsum(dataset.counts)]
     perms=permutations(dataset);inverses=np.argsort(perms,axis=1)
     np.savez(out/'permutations.npz',participant_ids=np.asarray(dataset.participant_ids),permutations=perms)
@@ -53,7 +60,7 @@ def diagnose(model, dataset, output, device, paused):
             z,_=model(move(batch,device))
             for k in keys:reference[k].append(z[k].softmax(1).cpu().numpy());labels[k].extend(batch['labels'][k].tolist())
             for i,x in enumerate(ex.latest_inputs):
-                caches[i][offset[index]:offset[index+1]]=ex.projectors[i](ex.channel_bases[i].encode(x)).cpu().numpy()
+                caches[i][offset[index]:offset[index+1]]=encode(i,x).cpu().numpy()
         for cache in caches:cache.flush()
         reference={k:np.concatenate(v) for k,v in reference.items()};labels={k:np.asarray(v) for k,v in labels.items()}
         selectors=[(f'sender_{i}',[i]) for i in range(nsource)]+[('all',list(range(nsource)))]
@@ -105,5 +112,21 @@ def diagnose(model, dataset, output, device, paused):
                 aggregates[name][key]=dict(mean=float(values.mean()),sample_sd=float(values.std(ddof=1)),minimum=float(values.min()),maximum=float(values.max()))
     result=dict(rows=rows,permutation_aggregates=aggregates,permutations_sha256=file_sha256(out/'permutations.npz'),
         conditions=len(schedule),test_access=False,paired_eyes_preserved=True,
+        compression=ex.compression, source_edge_definition='B_dst K A_src' if ex.compression=='factorized_projected' else 'dense source block',
         interpretation='fixed-model functional dependence; reciprocal edge-pair derangements; not clinical causality or global six-person reassignment')
     atomic_write_json(result,out/'summary.json');return result
+
+
+def diagnose(model, dataset, output, device, paused):
+    """Read-only diagnostics; callers must separately admit the real cache workload."""
+    from radon_bridge.runtime.host_checkpoint import capture_rng, restore_rng
+    from radon_bridge.analysis.native_diagnostics import tensor_state
+    modes=[(m,m.training) for m in model.modules()]
+    before=tensor_state(model);rng=capture_rng()
+    try:
+        result=_diagnose(model,dataset,output,device,paused)
+        if tensor_state(model)!=before:raise ValueError('Pairing altered weights or BN')
+        return result
+    finally:
+        for module,training in modes:module.training=training
+        restore_rng(rng)

@@ -34,6 +34,11 @@ def cached_forward(g,features,y):
 
 def block_messages(mixer,features,overrides):
     """Overrides (destination,source) only; None deletes that cross term."""
+    # Scientific parameterization dispatch, not a legacy artifact reader.
+    from radon_bridge.methods.factorized import FactorizedMixer
+    if isinstance(mixer, FactorizedMixer):
+        from radon_bridge.analysis.factorized_messages import source_messages
+        return source_messages(mixer, features, overrides)
     offsets=np.cumsum([0]+list(mixer.widths));weight=mixer.conv.weight*mixer.mask
     outputs=[]
     for dst in range(len(features)):

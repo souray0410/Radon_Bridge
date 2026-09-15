@@ -140,3 +140,18 @@ metric recomputation. No new inference or test read. See
 [stage evidence](../../experiments/2026_09_14_19_43_11/acceptance_20260915/README.zh-CN.md).
 This closes only the small-cohort completion/report stage; Ibex factorized feed
 and full-input acceptance remain open. Preserve old frozen workers and contracts.
+
+## 2026-09-15 factorized diagnostic implementation
+
+Source decomposition now uses B_destination K A_source, never latent K blocks.
+The pairing adapter accepts this scientific parameterization and restores RNG and
+module modes; it does not add legacy artifact fallbacks. Ibex isolated CPU targeted
+suite: 16 passed; full suite 108 passed, one two-CUDA test skipped, 14 third-party warnings.
+Validation attempt4 uses the real locked framework Git checkout and no training-repo
+PYTHONPATH. Earlier incomplete packaging attempts remain recorded as rejected. See [scope and remaining gates](../factorized_diagnostics_20260915.zh-CN.md).
+No live source, case feed, old protocol arm list or GPU owner changed. Full-input
+resources, canonical parent consumption, formal supplement case/report and feed
+admission remain required before production; this is not scientific completion.
+
+The preparation branch now carries the same mandatory current-contract/migration
+standard as main. This policy propagation does not migrate existing scientific artifacts.
