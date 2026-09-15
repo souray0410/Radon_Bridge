@@ -173,3 +173,18 @@ legacy case definition, test access or formal study feed changed. Evidence:
 Next: supplementary canonical-parent case and comparison registration, full-input
 resource/recovery acceptance, then atomic per-arm dispatch with real dependency
 barriers. Budget10/10/4 does not establish arm-level parallel execution.
+
+## 2026-09-15 resource-lease continuity standard
+
+The shared model/run and GPU execution standards are version 5 and AGENTS.md
+requires their continuity gates for training, PCA/SVD, correction and evaluation.
+See [the audit](../allocation_continuity.md) for checked production boundaries and
+remaining acceptance. Actual new allocation policy stays 48h. Existing healthy
+scientific snapshots remain unchanged. MHD_Models centralizes new submissions in
+the guarded planned pool; short unguarded legacy writers are retired. Prepared
+segment-admission changes do not certify all production recovery paths.
+
+Isolated Ibex management acceptance: 272 tests passed in
+`lease_continuity_20260915/validation2/`; the first failed fixture run is preserved.
+Shared document hashes match across all three repositories. This source is for
+new validated owners; original worker bindings and runtime states were not changed.
