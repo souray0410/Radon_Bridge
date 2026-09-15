@@ -129,3 +129,21 @@ Isolated Ibex management acceptance: 272 tests passed in
 `lease_continuity_20260915/validation2/`; the first failed fixture run is preserved.
 Shared document hashes match across all three repositories. This source is for
 new validated owners; original worker bindings and runtime states were not changed.
+
+## 2026-09-15 afternoon resource handoff
+
+The latest user instruction supersedes the four-card generic minimum: retain two
+generic GPUs and distribute other capacity dynamically to ready project work. The
+sole deployed publisher is `project_demand_floor2_20260915`; the old publisher is
+retired, with GPU workers and allocation owners preserved. Its 15:46 Saudi snapshot
+reported LOOK 7, Radon_Bridge 10 and other work 7 (running plus pending), with demand
+targets 11/11/2. These counts require a fresh Slurm/role check before action.
+
+The policy implementation passed 13 targeted tests on Ibex, including the two-card
+floor, borrowing, reduced limits and uncertain ownership. Healthy project work and
+registered project prerequisite models are distinct from generic exploration.
+Extra generic workers may yield at a verified checkpoint after a project preflight;
+quota publication alone does not transfer an existing allocation. The staged
+legacy-to-project handover must verify process identity, source-specific recovery,
+old step death, shared claims and actual downstream execution. Never cancel the
+allocation owner to rebalance. All new requests remain 48 hours.
