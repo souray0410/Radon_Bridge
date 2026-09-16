@@ -154,3 +154,17 @@ Added the identical SCIENTIFIC_REVIEW_STANDARD.md to LOOK, Radon_Bridge and
 MHD_Models and linked it from AGENTS and RESEARCH_AUDIT_STANDARD. This documents
 mandatory comparison/algorithm/evidence checks; no runtime checker, training
 snapshot, scientific result, GPU owner or test access changes in this update.
+
+## 2026-09-16 11:30：年末阶段与每周证据入口
+
+用户批准docs/semester_delivery_2026.zh-CN.md：首阶段309逻辑位置（162核心+147参考机制），既有线性补充另计，729六网络保留后续；眼科阶段接受后进入心脏内部，再进入有临床与时间依据的眼心研究。年内分类，三层迁移分别评价。LOOK年底前投稿目标不改。阶段test必须另验收，本次未解封。
+
+管理源码3036c22经本地/Ibex36针对测试及GitHub35073121989完整61项与两rank检查通过，PR4已合并main612c9ce。CPU controller在固定vsc509-03-l接替旧1071888，科学配置/source pins/GPU workers不改。真实新周期08:23 UTC状态active、native8接受；旧ResNet队列201计划位置，实际项目0登记，等待父模型锁定。它与新309位置登记是不同分母。seed3416不再等待其他父种子；后续种子要求首种子完整case技术/诊断/报告接受，不看分数符号。
+
+证据监控源码a89f392（37针对测试；GitHub35073920455成功）每900秒执行，输出semester_20260916的weekly_latest、positions、incidents、progress_clock和周报事件。按上一周交付快照比较，不按上一监控周期比较。只认可真实进度字段，不以心跳掩盖48小时停滞。它是观察器，不是另一个GPU调度器或万能修复器；既有ukb维护自动化继续诊断、版本修复、验收、恢复和复核。
+
+OPS/semester_20260916保存validation、deployment、monitor_deployment_v2及启动脚本；真实入口从radon_bridge_active_workflow.json读取。controller_source=source_3036c22，semester observer=source_a89f392；仅管理源差异，原GPU科学源保持。原生3D父模型仍在训练，未接受的不能进入正式桥研究。
+
+开放且未宣称完成：独立arm GPU执行DAG（当前旧worker仍整case串行）、三架构真实父模型/运行验收、分解等补充case编译接队、完整阶段统计/test门槛、心脏标签/访视/全局划分语义验收。下一维护应推进独立arm实现和首个合格父组的实际闭环，不仅看队列。源码矩阵不等于全部生产能力。
+
+每周六快照，周日06:45英文PPTX/中文讲稿、09:45刷新、09:55交付，10:00 Asia/Riyadh汇报。KAUST已有2026-09-20准备目录；未生成/渲染的PPTX不标ready。三小时ukb自动化已更新并保留原任务/保护规则。所有新申请仍至少48h、通用model底线2张，按实际配额与资源准入。
