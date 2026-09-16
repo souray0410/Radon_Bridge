@@ -1,0 +1,21 @@
+{
+  "schema": "staged_delivery_rollout_v1",
+  "controller_source": "3036c22aedf4f0b83530da2dc61f9fe817a729ef",
+  "evidence_monitor_source": "a89f392",
+  "cardiac_metadata_audit_source": "9add346",
+  "targeted_tests_local_and_ibex": 40,
+  "github_checks": [35073121989, 35073920455],
+  "source_archive_sha256": "3aeb42237f1e1b1a4bf3f1a8da40d4a0ef047f12fd0bee04cd641271b9a4fc68",
+  "post_handover_controller_observation_utc": "2026-09-16T08:23:11.539472+00:00",
+  "controller_state": "active",
+  "bound_legacy_resnet_cases": 0,
+  "stage_logical_positions": 309,
+  "waiting_reason": "locked 3D native parent acceptance",
+  "gpu_scientific_workers_changed": false,
+  "test_access": false,
+  "weekly_archive": "https://github.com/souray0410/KAUST/tree/main/weekly/2026/2026-09-20",
+  "weekly_archive_status": "preparing_not_rendered",
+  "cardiac_bytes": 8360335258048,
+  "cardiac_semantic_acceptance": false,
+  "remaining": ["independent arm production execution", "three-family GPU and parent acceptance", "supplement compiler and feed acceptance", "complete statistics and stage test authorization", "cardiac clinical data audit and user task lock"]
+}
