@@ -147,3 +147,10 @@ quota publication alone does not transfer an existing allocation. The staged
 legacy-to-project handover must verify process identity, source-specific recovery,
 old step death, shared claims and actual downstream execution. Never cancel the
 allocation owner to rebalance. All new requests remain 48 hours.
+
+## 2026-09-16: Scientific review obligations
+
+Added the identical SCIENTIFIC_REVIEW_STANDARD.md to LOOK, Radon_Bridge and
+MHD_Models and linked it from AGENTS and RESEARCH_AUDIT_STANDARD. This documents
+mandatory comparison/algorithm/evidence checks; no runtime checker, training
+snapshot, scientific result, GPU owner or test access changes in this update.
