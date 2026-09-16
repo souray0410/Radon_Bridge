@@ -134,3 +134,15 @@ def test_pilot_case_cannot_be_released_from_forged_acceptance(tmp_path,monkeypat
     def reject(*args):raise ValueError('Missing full scientific evidence')
     monkeypatch.setitem(sys.modules,'radon_bridge.studies.project_case',SimpleNamespace(verify_case=reject))
     with pytest.raises(ValueError,match='scientific'):po.pilot_accepted(tmp_path,'g')
+
+
+def test_weekly_delta_uses_prior_week_not_previous_monitor_tick(tmp_path,monkeypatch):
+    # Monday belongs to the following Sunday's report; prior delivery is baseline.
+    now=datetime(2026,9,21,12,tzinfo=ZoneInfo('Asia/Riyadh')).timestamp()
+    monkeypatch.setattr(s.time,'time',lambda:now)
+    key=s.manifest()['positions'][0]['id']
+    write(tmp_path/'weekly/2026-09-20/refresh_and_deliver.json',dict(report=dict(accepted_positions=[key])))
+    cfg=dict(schema='radon_semester_monitor_v1',output=str(tmp_path),test_access=False)
+    result=s.reconcile(cfg)
+    assert result['previous_week_baseline'].endswith('2026-09-20/refresh_and_deliver.json')
+    assert result['withdrawn_acceptances']==[key]

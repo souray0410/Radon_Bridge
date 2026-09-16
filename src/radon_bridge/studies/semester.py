@@ -240,8 +240,13 @@ def reconcile(config):
         if set(imported)&set(observations):raise ValueError('Duplicate case mapping')
         observations.update(imported);issues.extend(errors)
     now=time.time()
-    baseline=Path(config['previous_week_snapshot']) if config.get('previous_week_snapshot') else None
+    local=datetime.fromtimestamp(now,ZoneInfo('Asia/Riyadh'))
+    sunday=local.date()+timedelta(days=(6-local.weekday())%7)
+    prior=root/'weekly'/str(sunday-timedelta(days=7))
+    baseline=Path(config['previous_week_snapshot']) if config.get('previous_week_snapshot') else next(
+        (prior/name for name in ('refresh_and_deliver.json','draft.json','snapshot.json') if (prior/name).exists()),None)
     previous=json.loads(baseline.read_text()) if baseline and baseline.exists() else {}
+    previous=previous.get('report',previous)
     progress=json.loads((root/'progress_clock.json').read_text()) if (root/'progress_clock.json').exists() else {}
     all_observations={p['id']:observations.get(p['id'],dict(state='waiting')) for p in plan['positions']}
     dependency_rows={}
@@ -282,6 +287,7 @@ def reconcile(config):
     (root/'README.zh-CN.md').write_text('\n'.join(text)+'\n')
     report['import_issues']=issues
     report['parent_progress']=dependency_rows
+    report['previous_week_baseline']=str(baseline) if baseline else None
     atomic_write_json(report,root/'weekly_latest.json')
     return report
 
