@@ -248,9 +248,12 @@ class Controller:
             if not (root / "accepted.json").exists():
                 evidence.append(dict(run_dir=str(root), state="awaiting_native_acceptance"))
             else:
-                self.verify(str(root), read(task["spec"]))
-                evidence.append(dict(run_dir=str(root), state="accepted",
-                                     accepted_sha256=file_sha256(root / "accepted.json")))
+                try:
+                    self.verify(str(root), read(task["spec"]))
+                    evidence.append(dict(run_dir=str(root), state="accepted",
+                                         accepted_sha256=file_sha256(root / "accepted.json")))
+                except (OSError, ValueError, KeyError, RuntimeError) as error:
+                    evidence.append(dict(run_dir=str(root), state="needs_review", reason=str(error)))
         ready = all(r["state"] == "accepted" for r in evidence)
         return dict(state="waiting_project_adapter" if ready else "waiting_replications",
                     selected=nomination, queue=str(queue), queue_sha256=file_sha256(queue),
