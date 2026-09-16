@@ -172,3 +172,9 @@ OPS/semester_20260916保存validation、deployment、monitor_deployment_v2及启
 ### 心脏元数据首次可执行核查
 
 9add346增加data.cardiac_inventory，Ibex三个测试及真实文件核查通过。按已有独立传输receipt核对361888文件/8360335258048 bytes，总量一致；核对6个全量表型/字典文件当前大小与原验收引用。仅解析两份CSV表头：18255列/3426个字段、27750列/7145个字段；不读取参与者行、不读test性能。结果在semester_20260916/cardiac_metadata_audit.json，semantic_data_acceptance=false。标签含义、配对时间、全局split/父暴露、病例数及用户任务锁定仍待审计；不能据字段数量宣称心脏训练已就绪。
+
+## Current status publication
+
+Machine-readable current evidence is [status.json](status.json). Source review and live runtime verification are distinct; this publication does not change scientific jobs or certify unfinished experiments. Update this record after material evidence review.
+
+Private research overview and weekly archive: [PHD](https://github.com/souray0410/PHD). Adopted hub standards: research-standards-v1, 2026-09-16. Existing pinned study/runtime rules remain authoritative for current executions.

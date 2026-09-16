@@ -1,0 +1,38 @@
+{
+  "schema": "research_project_status_v1",
+  "project": "Radon_Bridge",
+  "goal": "结构化跨来源通信与可迁移专家协作",
+  "phase": "eye_stage_one",
+  "next_acceptance": "首个完整单种子匹配组和多架构执行验收",
+  "dependencies": [
+    "三维父模型",
+    "逐实验臂执行与线性补充验收"
+  ],
+  "source_commit": "07098c8244ab87bbf978a4e5bf2aa3bca9ee736b",
+  "evidence_cutoff": "2026-09-16T09:39:44.263419+00:00",
+  "verified_at": "2026-09-16T09:39:44.263419+00:00",
+  "verification_scope": "source_review_only",
+  "layers": {
+    "planned": "documented",
+    "implemented": "partial",
+    "deployed": "not_rechecked",
+    "running": "not_rechecked",
+    "accepted": "not_rechecked"
+  },
+  "results": [],
+  "limitations": [
+    "309是逻辑位置而不是已完成训练",
+    "三维父模型及逐臂执行等门槛尚未全部关闭"
+  ],
+  "blockers": [],
+  "actions": [
+    "Source and current handoff inspected; no scientific execution changed."
+  ],
+  "decisions": [],
+  "evidence": [
+    {
+      "label": "Reviewed source snapshot",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/07098c8244ab87bbf978a4e5bf2aa3bca9ee736b/docs/handoff/README.md"
+    }
+  ]
+}
