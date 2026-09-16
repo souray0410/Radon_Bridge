@@ -1,0 +1,12 @@
+{
+  "schema": "scientific_delivery_review_v1",
+  "question": "Staged, reusable UKB evidence with weekly independently verified reporting",
+  "changed": ["stage membership", "per-seed readiness", "technical pilot replication gate", "weekly evidence and stagnation review"],
+  "held_fixed": ["candidate nomination", "training protocol", "parent checkpoint identity", "MHD V4", "participant splits", "test sealed", "scientific worker snapshots"],
+  "legitimate_differences": ["Full mechanism conclusions restricted to reference group", "309 logical positions exclude independent supplements"],
+  "data_roles": {"train": "training and basis fitting", "dev": "prespecified selection and weekly analysis", "test": "sealed until independent stage authorization"},
+  "statistical_claim": "No new performance result is claimed by management tests",
+  "acceptance": "CPU tests plus actual Ibex controller shadow and post-handover progress must be recorded separately",
+  "open_gates": ["independent arm GPU execution", "three-family actual parent and runtime acceptance", "supplement compiler and evidence binding", "complete-stage statistical and test release acceptance", "cardiac semantic and user task-definition acceptance"],
+  "test_access": false
+}
