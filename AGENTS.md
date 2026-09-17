@@ -45,3 +45,5 @@ Maintain docs/handoff/status.json alongside its README after material evidence r
 Read workspace/RESULT_CONTINUITY_STANDARD.md for incremental dependencies, cumulative reporting, and traceable attempts including failed, superseded and withdrawn configurations. Low performance does not invalidate evidence. Verify publication and archive acceptance; documentation alone is not deployed automation.
 
 Read workspace/DELIVERY_STANDARD.md before scheduling or reporting: prioritize a finite end-to-end delivery package, prepare real dependencies concurrently, reuse exact accepted artifacts, and distinguish single-configuration, matched-package and replication acceptance. No new scheduler or performance-dependent release. Documented rules are not runtime acceptance.
+
+Read workspace/EFFICIENCY_STANDARD.md: proactively measure repeated computation, dependency stalls and resource bottlenecks before users report delays. Verify numerical/selection equivalence, measured cost improvement and actual downstream progress after safe deployment. Documentation alone is not an installed performance monitor.

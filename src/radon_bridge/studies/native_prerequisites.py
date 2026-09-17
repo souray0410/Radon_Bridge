@@ -11,6 +11,7 @@ import math
 from pathlib import Path
 
 from radon_bridge.runtime.state import atomic_write_json, file_sha256, stable_hash, utc_now
+from radon_bridge.studies.parent_routes import ROUTES
 
 MODELS = ("resnet18", "resnet34", "resnet50", "resnet101", "resnet152")
 TRACKS = ("cfp_2d", "oct_volume_3d")
@@ -30,7 +31,7 @@ def collect(queues):
             if file_sha256(spec_path) != task["spec_sha256"]:
                 raise ValueError("Candidate spec changed")
             spec = json.loads(spec_path.read_text())
-            if (spec.get("model", {}).get("name") not in MODELS or
+            if (spec.get("model", {}).get("name") not in {name for route in ROUTES.values() for name in route.values()} or
                     spec.get("track") not in TRACKS or
                     spec.get("disease") not in DISEASES or
                     spec.get("training", {}).get("seed") != 3416):
@@ -70,13 +71,31 @@ def audit(catalog, verify_completion):
     """Verifier is the explicitly pinned independent trainer's full acceptor.
 
     Returns nominations, never project-dispatch permission. The project still
-    requires full replay, participant/eye matching, three seeds and host acceptance.
+    requires full replay, participant/eye matching and per-seed host acceptance.
     """
     if catalog.get("schema") != "radon_bridge_native_screen_v1" or catalog.get("test_access") is not False:
         raise ValueError("Unknown or unsealed screen")
-    groups = {f"{d}/{m}/{t}": [] for d in DISEASES for m in MODELS for t in TRACKS}
+    allowed = {f"{d}/{name}/{track}" for d in DISEASES
+               for route in ROUTES.values() for role, name in route.items()
+               for track in ("cfp_2d" if role == "cfp" else "oct_volume_3d",)}
+    registered = catalog.get("registered_groups")
+    if registered is not None:
+        if not isinstance(registered, list) or len(set(registered)) != len(registered):
+            raise ValueError("Invalid registered native groups")
+        if set(registered) - allowed:
+            raise ValueError("Unregistered native architecture/track group")
+        keys = registered
+    else:
+        # Earlier finite ResNet catalogs did not declare groups. Their scientific
+        # identities are unchanged; the current route registry also admits the
+        # approved DenseNet and Swin input-specific implementations.
+        keys = sorted(allowed)
+    groups = {key: [] for key in keys}
     for row in catalog["candidates"]:
-        group = groups[f"{row['disease']}/{row['model']}/{row['track']}"]
+        key = f"{row['disease']}/{row['model']}/{row['track']}"
+        if key not in groups:
+            raise ValueError("Candidate outside the declared native groups: " + key)
+        group = groups[key]
         entry = dict(row)
         try:
             if file_sha256(Path(row["spec"])) != row["spec_sha256"]:
