@@ -8,9 +8,9 @@
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "600a15b00c4c344d5db0dd95288ad80c66bda201",
+  "source_commit": "46cd282dca7cf6b5e9d32febc9435276645282ae",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-17T09:48:00+00:00",
+  "verified_at": "2026-09-17T11:19:25.171611+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -23,20 +23,28 @@
   "limitations": [
     "309是逻辑位置而不是已完成训练",
     "三维父模型及逐臂执行等门槛尚未全部关闭",
-    "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance."
+    "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
+    "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
     "Active parent controller lacks accepted project runtime binding",
-    "Actual complete-pair replay and GPU integration acceptance remain required"
+    "Actual complete-pair replay and GPU integration acceptance remain required",
+    "登录管理进程消失后的待批申请owner及派发接续需核对；不能把Slurm待批状态当作获批后一定有执行者。"
   ],
   "actions": [
     "Corrected modality-specific DenseNet/Swin route lookup and duplicate family counting; 16 isolated Ibex tests passed",
     "Read-only verified all 18 route group keys against live 73-candidate catalog",
-    "Healthy LOOK and native scientific snapshots unchanged; no new allocation or test access"
+    "Healthy LOOK and native scientific snapshots unchanged; no new allocation or test access",
+    "共同采用PHD完整交付优先与真实依赖并行准则；本地和Ibex独立代码测试通过，新队列准备不等于正式派发已验收。",
+    "六臂case拆为9个执行单元，55臂拆为58个；6/55次训练数量不变。核心验收不代表49臂补充完成。85项本地单元测试及15项Ibex针对测试通过。"
   ],
   "decisions": [],
   "evidence": [
+    {
+      "label": "Independent delivery implementation and current activation limits",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/independent_delivery_20260917.md"
+    },
     {
       "label": "Reviewed source snapshot",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/07098c8244ab87bbf978a4e5bf2aa3bca9ee736b/docs/handoff/README.md"
