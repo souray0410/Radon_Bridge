@@ -8,31 +8,41 @@
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "07098c8244ab87bbf978a4e5bf2aa3bca9ee736b",
-  "evidence_cutoff": "2026-09-16T09:39:44.263419+00:00",
-  "verified_at": "2026-09-16T09:39:44.263419+00:00",
-  "verification_scope": "source_review_only",
+  "source_commit": "600a15b00c4c344d5db0dd95288ad80c66bda201",
+  "evidence_cutoff": "2026-09-17T09:48:00+00:00",
+  "verified_at": "2026-09-17T09:48:00+00:00",
+  "verification_scope": "live_controller_binding_and_catalog_route_audit_plus_isolated_cpu_tests",
   "layers": {
-    "planned": "documented",
-    "implemented": "partial",
-    "deployed": "not_rechecked",
-    "running": "not_rechecked",
-    "accepted": "not_rechecked"
+    "planned": "eye_stage_one_locked",
+    "implemented": "partial_parent_route_fix_tested",
+    "deployed": "active_controller_has_no_project_binding",
+    "running": "parent_workflow_only_no_formal_bridge_case_verified",
+    "accepted": "no_current_round_3d_parent_or_project_case_accepted"
   },
   "results": [],
   "limitations": [
     "309是逻辑位置而不是已完成训练",
     "三维父模型及逐臂执行等门槛尚未全部关闭"
   ],
-  "blockers": [],
+  "blockers": [
+    "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
+    "Active parent controller lacks accepted project runtime binding",
+    "Actual complete-pair replay and GPU integration acceptance remain required"
+  ],
   "actions": [
-    "Source and current handoff inspected; no scientific execution changed."
+    "Corrected modality-specific DenseNet/Swin route lookup and duplicate family counting; 16 isolated Ibex tests passed",
+    "Read-only verified all 18 route group keys against live 73-candidate catalog",
+    "Healthy LOOK and native scientific snapshots unchanged; no new allocation or test access"
   ],
   "decisions": [],
   "evidence": [
     {
       "label": "Reviewed source snapshot",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/07098c8244ab87bbf978a4e5bf2aa3bca9ee736b/docs/handoff/README.md"
+    },
+    {
+      "label": "Parent route correction and acceptance boundaries",
+      "path": "docs/handoff/parent_routes_20260917.md"
     }
   ]
 }
