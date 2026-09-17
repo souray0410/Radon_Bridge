@@ -191,3 +191,5 @@ Private research overview and weekly archive: [PHD](https://github.com/souray041
 ## 2026-09-17 父模型接续与性能审计
 
 见[parent_recovery_20260917.md](parent_recovery_20260917.md)：已修复多架构父清单审计回归及一个旧profiler失败后未回池任务；54/73父模型验收保持原证据，3D尚无accepted。列出1.37–2.04小时完整预检成本和资源限制，未把登记修复称为正式研究完成。
+
+Independent review found and fixed a per-step RAM admission gap before deployment; see [step-memory acceptance](native_profile_step_memory_20260917.md). Code65d98f6 passed44 isolated CPU tests. Profile reuse remains unactivated in production.

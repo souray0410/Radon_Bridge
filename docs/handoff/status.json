@@ -34,6 +34,7 @@
     "登录管理进程消失后的待批申请owner及派发接续需核对；不能把Slurm待批状态当作获批后一定有执行者。"
   ],
   "actions": [
+    "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
     "Corrected modality-specific DenseNet/Swin route lookup and duplicate family counting; 16 isolated Ibex tests passed",
     "Read-only verified all 18 route group keys against live 73-candidate catalog",
     "Healthy LOOK and native scientific snapshots unchanged; no new allocation or test access",
@@ -60,6 +61,10 @@
     {
       "label": "3D parent recovery and measured profiling costs",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/parent_recovery_20260917.md"
+    },
+    {
+      "label": "Independent-review step RAM correction and scoped acceptance",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/65d98f6/docs/handoff/native_profile_step_memory_20260917.md"
     }
   ]
 }
