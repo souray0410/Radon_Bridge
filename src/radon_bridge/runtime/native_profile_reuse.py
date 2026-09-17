@@ -49,6 +49,18 @@ def prior(reference, spec_sha, hardware):
     return dict(reference)
 
 
+def matching_reference(reference, spec_sha, hardware):
+    """A different verified device class requires a new full profile, not reuse."""
+    if not reference:
+        return None
+    if file_sha256(reference['path']) != reference['sha256']:
+        raise ValueError('Closed profile receipt changed')
+    row=read(reference['path'])
+    # Validate every stored fact before treating hardware mismatch as a cache miss.
+    validate(reference['path'],spec_sha,row.get('hardware'),full=True)
+    return prior(reference,spec_sha,hardware) if row.get('hardware')==hardware else None
+
+
 def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
             total_gpu_gib, other_gpu_gib, allocated_ram_gib, other_ram_gib,
             allocated_cpus, worker_cpus, worker_ram_gib, output):

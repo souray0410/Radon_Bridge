@@ -123,3 +123,22 @@ def test_unknown_measured_peak_rejects(tmp_path, key, value):
     with pytest.raises(ValueError, match='Unknown measured resource peak'):
         qualify(ref, **k)
     assert not k['output'].exists()
+
+
+def test_hardware_change_recomputes_full_profile_but_corruption_does_not(tmp_path):
+    from radon_bridge.runtime.native_profile_reuse import matching_reference
+    ref,k=fixture(tmp_path)
+    assert matching_reference(ref,k['spec_sha'],k['hardware'])==ref
+    assert matching_reference(ref,k['spec_sha'],dict(k['hardware'],driver='different')) is None
+    from pathlib import Path
+    Path(ref['path']).write_text('{}')
+    with pytest.raises(ValueError,match='changed'):
+        matching_reference(ref,k['spec_sha'],dict(k['hardware'],driver='different'))
+
+
+def test_operational_worker_memory_preserves_allocation_reserve():
+    from radon_bridge.runtime.project_dispatch import worker_memory_gib
+    assert worker_memory_gib({})==100
+    assert worker_memory_gib({'worker_memory_gib':104})==104
+    for bad in (True,0,39,107,128,'104'):
+        with pytest.raises(ValueError):worker_memory_gib({'worker_memory_gib':bad})

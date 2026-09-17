@@ -221,6 +221,15 @@ def allocation_owner(config_path):
         '--config',str(config_path),'--gpu-owner'],env=environment,check=True)
 
 
+def worker_memory_gib(config):
+    """Operational step allowance; never changes model microbatch or precision."""
+    memory=config.get('worker_memory_gib',100)
+    # A128GiB allocation retains15% including the2GiB allocation owner.
+    if type(memory) is not int or not 40<=memory<=106:
+        raise ValueError('Worker RAM must fit the128GiB allocation reserve')
+    return memory
+
+
 def gpu_owner(config_path):
     import torch
     from scheduling.policy import Claims
@@ -237,7 +246,7 @@ def gpu_owner(config_path):
         attempt=root/(run.name+'_'+str(token['generation']));attempt.mkdir()
         record=attempt/'step.json';environment=os.environ.copy()
         command=['srun','--jobid='+job,'--overlap','--exact','--nodes=1','--ntasks=1','--gpus=1',
-            '--cpus-per-task=14','--mem=100G','--unbuffered',config['python'],'-m','radon_bridge.runtime.project_dispatch',
+            '--cpus-per-task=14','--mem='+str(worker_memory_gib(config))+'G','--unbuffered',config['python'],'-m','radon_bridge.runtime.project_dispatch',
             '--config',str(config_path),'--execute',task['spec'],'--run',str(run),
             '--kind',task['execution'],'--record',str(record)]
         (run/'pause.json').unlink(missing_ok=True)
@@ -296,11 +305,11 @@ def execute_work(config_path,spec_path,run,kind,record):
     if kind=='native':
         binding=source_binding(spec,config)
         environment['PYTHONPATH']=binding['pythonpath']
-        from radon_bridge.runtime.native_profile_reuse import prior,qualify,live_envelope,hardware_identity
+        from radon_bridge.runtime.native_profile_reuse import prior,qualify,live_envelope,hardware_identity,matching_reference
         spec_sha=file_sha256(Path(spec_path));hardware=hardware_identity(torch)
         canonical=run/'resource_qualification/full_reference.json'
         reference=read(canonical) or config.get('native_profile_references',{}).get(spec_sha)
-        reuse=prior(reference,spec_sha,hardware) if reference else None
+        reuse=matching_reference(reference,spec_sha,hardware)
         if reuse:live_envelope(torch,step['job_id'],step['step'])
         command=[config['python'],str(Path(config['native_profile_source'])/'scheduling/profile_native.py'),
             '--source',binding['source'],'--spec',str(spec_path),'--output',str(profile_root),
@@ -360,8 +369,9 @@ def standby(config_path):
     work(config)
     for row in config['source_pins']:
         if file_sha256(Path(row['path']))!=row['sha256']:raise ValueError('Dispatcher snapshot changed')
-    atomic_write_json(dict(state='ready',pid=os.getpid(),config=str(config_path),time=time.time()),out/'handover_ready.json')
-    while not (out/'handover_armed.json').exists():time.sleep(2)
+    gate=Path(config.get('handover_gate_directory',str(out)));gate.mkdir(parents=True,exist_ok=True)
+    atomic_write_json(dict(state='ready',pid=os.getpid(),config=str(config_path),time=time.time()),gate/'handover_ready.json')
+    while not (gate/'handover_armed.json').exists():time.sleep(2)
     daemon(config_path)
 
 
