@@ -3,7 +3,7 @@
 最新实施：[2026-09-17独立交付与依赖并行](independent_delivery_20260917.md)。本地检查及Ibex独立CPU检查已通过，正式逐臂派发和真实下游验收仍未完成；下文较早运行快照保留原日期。
 
 
-最新专项核查：[2026-09-17父模型模态路由修复](parent_routes_20260917.md)。下方9月14日内容保留历史日期；新修复仅准备和CPU验收，尚未切换生产控制器。
+最新专项核查：[2026-09-17父模型模态路由修复](parent_routes_20260917.md)。下方9月14日内容保留历史日期；管理修复现已[正式启用](production_activation_20260917.md)，GPU新资源预检在获批时自动执行。
 
 最近核查：2026-09-14 08:46（Asia/Riyadh）。本页是有日期的交接快照，不是实时监控。
 
@@ -192,4 +192,4 @@ Private research overview and weekly archive: [PHD](https://github.com/souray041
 
 见[parent_recovery_20260917.md](parent_recovery_20260917.md)：已修复多架构父清单审计回归及一个旧profiler失败后未回池任务；54/73父模型验收保持原证据，3D尚无accepted。列出1.37–2.04小时完整预检成本和资源限制，未把登记修复称为正式研究完成。
 
-Independent review found and fixed a per-step RAM admission gap before deployment; see [step-memory acceptance](native_profile_step_memory_20260917.md). Code65d98f6 passed44 isolated CPU tests. Profile reuse remains unactivated in production.
+Independent review found and fixed a per-step RAM admission gap before deployment; see [step-memory acceptance](native_profile_step_memory_20260917.md). Code65d98f6 passed44 isolated CPU tests. Management is now activated; fresh GPU qualification is automatically grant-gated, see [deployment](production_activation_20260917.md).

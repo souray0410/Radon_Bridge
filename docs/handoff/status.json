@@ -8,9 +8,9 @@
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "46cd282dca7cf6b5e9d32febc9435276645282ae",
+  "source_commit": "7d1a723256250f615ac85bb26405fa51d68d9416",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-17T12:25:48.693812+00:00",
+  "verified_at": "2026-09-17T12:57:23.837565+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -25,13 +25,12 @@
     "三维父模型及逐臂执行等门槛尚未全部关闭",
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
-    "完整native预检本身实测约1.37–2.04小时；严格身份复用加速仍待实现，不以显存空余推断可安全并发。"
+    "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants."
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
     "Active parent controller lacks accepted project runtime binding",
-    "Actual complete-pair replay and GPU integration acceptance remain required",
-    "登录管理进程消失后的待批申请owner及派发接续需核对；不能把Slurm待批状态当作获批后一定有执行者。"
+    "Actual complete-pair replay and GPU integration acceptance remain required"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -42,7 +41,8 @@
     "六臂case拆为9个执行单元，55臂拆为58个；6/55次训练数量不变。核心验收不代表49臂补充完成。85项本地单元测试及15项Ibex针对测试通过。",
     "修复当前父模型审计忽略registered_groups导致Dense/Swin清单失败；Ibex20项针对测试及真实73候选/18组验收通过（54 accepted，无校验异常）。",
     "已核验终止的旧profiler导入失败claim恢复到原任务候选池，dispatcher API就绪14→15；仍待实际GPU接续。",
-    "完整资源证据严格身份复用实现完成，强制保留新断点与最大眼数GPU预检；Ibex31项针对及98项完整单元测试通过，生产尚未激活。"
+    "完整资源证据严格身份复用实现完成，强制保留新断点与最大眼数GPU预检；Ibex31项针对及98项完整单元测试通过，生产尚未激活。",
+    "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs."
   ],
   "decisions": [],
   "evidence": [
@@ -65,6 +65,10 @@
     {
       "label": "Independent-review step RAM correction and scoped acceptance",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/65d98f6/docs/handoff/native_profile_step_memory_20260917.md"
+    },
+    {
+      "label": "Production activation and actual pending owner binding",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/production_activation_20260917.md"
     }
   ]
 }
