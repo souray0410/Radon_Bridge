@@ -91,20 +91,30 @@ def paired_messages(model,dev,out,device,paused):
     atomic_write_json(result,out/'summary.json');return result
 
 
-def diagnose(spec,root,parents,shapes,bases,train,dev,device,paused):
+def diagnose(spec,root,parents,shapes,bases,train,dev,device,paused,*,arm_ids=None):
     root=Path(root);out=root/'diagnostics';out.mkdir(exist_ok=True)
-    if (out/'accepted.json').exists():
-        r=json.loads((out/'accepted.json').read_text())
+    selected=spec['arms'] if arm_ids is None else [a for a in spec['arms'] if a['id'] in arm_ids]
+    if not selected or (arm_ids is not None and {a['id'] for a in selected}!=set(arm_ids)):
+        raise ValueError('Unknown diagnostic scope')
+    names=[a['id'] for a in selected]
+    receipt=out/('accepted.json' if arm_ids is None else 'accepted_'+stable_hash(names)+'.json')
+    if receipt.exists():
+        r=json.loads(receipt.read_text())
         if r['identity']!=stable_hash(spec):raise ValueError('Diagnostic provenance changed')
+        if arm_ids is not None and r.get('arm_ids')!=names:raise ValueError('Diagnostic scope changed')
         for n,s in r['files'].items():
             if file_sha256(out/n)!=s:raise ValueError('Diagnostic evidence changed')
         return r
     order=sorted(range(len(train)),key=lambda i:train.participant_ids[i])[:128]
     atomic_write_json({'ids':[train.participant_ids[i] for i in order],'split':'train'},out/'probe.json')
     records=[]
-    for arm in spec['arms']:
+    for arm in selected:
         name=arm['id'];path=out/(name+'.json')
-        if path.exists():records.append(json.loads(path.read_text()));continue
+        if path.exists():
+            cached=json.loads(path.read_text())
+            if cached['checkpoint_sha256']!=file_sha256(root/'arms'/name/'best.pt'):
+                raise ValueError('Diagnostic checkpoint changed')
+            records.append(cached);continue
         active=bases
         if arm.get('host'):active=json.loads((root/'host_bases'/arm['host']/'accepted.json').read_text())['bases']
         model=build(parents,shapes,arm,active,spec['seed'],device)
@@ -168,9 +178,12 @@ def diagnose(spec,root,parents,shapes,bases,train,dev,device,paused):
         finally:
             model.zero_grad(set_to_none=True);restore_rng(rng);del model;gc.collect()
     render_sinograms(out)
-    files={str(p.relative_to(out)):file_sha256(p) for p in out.rglob('*') if p.is_file() and p.name!='accepted.json'}
-    result=dict(identity=stable_hash(spec),records=records,files=files,state='accepted',test_access=False)
-    atomic_write_json(result,out/'accepted.json');return result
+    files={str(p.relative_to(out)):file_sha256(p) for p in out.rglob('*')
+           if p.is_file() and not p.name.startswith('accepted') and
+           (arm_ids is None or p.name in ('probe.json','FIGURES.zh-CN.md') or
+            any(str(p.relative_to(out)).startswith(n+'.') or str(p.relative_to(out)).startswith(n+'_') for n in names))}
+    result=dict(identity=stable_hash(spec),arm_ids=names,records=records,files=files,state='accepted',test_access=False)
+    atomic_write_json(result,receipt);return result
 
 
 def render_sinograms(output):

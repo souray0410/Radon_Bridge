@@ -41,7 +41,10 @@ def work(config):
     result=[];feed=read(config['project_feed'])
     if feed:
         if feed.get('schema')!='radon_bridge_project_work_feed_v1' or feed.get('test_access') is not False:raise ValueError('Unsealed project feed')
-        result.extend(dict(t,execution='radon') for t in feed['tasks'])
+        for task in feed['tasks']:
+            kind=task.get('execution','radon')
+            if kind not in ('radon','radon_unit'):raise ValueError('Unknown project execution kind')
+            result.append(dict(task,execution=kind))
     native_paths=[config['native_feed']]+config.get('additional_native_feeds',[])
     for native_path in native_paths:
         native=read(native_path)
@@ -61,7 +64,11 @@ def work(config):
                 raise ValueError('Conflicting duplicate work')
             continue  # Same immutable run may be referenced by several studies.
         unique[run]=task
-    return list(unique.values())
+    result=list(unique.values())
+    if config.get('weekly_delivery_policy'):
+        from radon_bridge.runtime.weekly_delivery import filter_tasks
+        result,_=filter_tasks(result,config['weekly_delivery_policy'])
+    return sorted(result,key=lambda t:(t['execution']=='native',t.get('priority',0)))
 
 
 def eligible(task,claims):
@@ -73,10 +80,20 @@ def eligible(task,claims):
         if task['execution']=='native':
             from runtime.training_state import verify_completion
             verify_completion(task['run_dir'],spec)
+        elif task['execution']=='radon_unit':
+            from radon_bridge.studies.project_units import verify_unit
+            verify_unit(task['run_dir'],spec)
         else:
             from radon_bridge.studies.project_case import verify_case
             verify_case(task['run_dir'],spec)
         return False
+    if task.get('execution')=='radon_unit':
+        from radon_bridge.studies.project_units import unit_ready
+        try:return unit_ready(task)
+        except (OSError,ValueError,KeyError,TypeError) as error:
+            atomic_write_json(dict(state='needs_review',error=repr(error),spec_sha256=task['spec_sha256'],
+                test_access=False),Path(task['run_dir'])/'admission_error.json')
+            return False
     return True
 
 
@@ -109,7 +126,13 @@ def reconcile_expired(config):
         if len(rows)!=1:continue
         state=rows[0][1].split()[0]
         if state not in ('TIMEOUT','PREEMPTED','NODE_FAIL'):continue
-        checkpoint=run/'last.pt' if task['execution']=='native' else next(iter(sorted(run.glob('arms/*/last.pt'))),run/'bases/last.pt')
+        if task['execution']=='radon_unit':
+            from radon_bridge.studies.project_units import load_unit
+            unit=read(task['spec']);_,case_root=load_unit(unit);name=unit['unit']
+            if name.startswith('arm_'):checkpoint=case_root/'arms'/name[4:]/'last.pt'
+            elif name=='prepare':checkpoint=case_root/'bases/last.pt'
+            else:checkpoint=case_root/'prepared.json'
+        else:checkpoint=run/'last.pt' if task['execution']=='native' else next(iter(sorted(run.glob('arms/*/last.pt'))),run/'bases/last.pt')
         if not checkpoint.is_file():continue
         claims.release(run,record['owner'],'paused',step_dead=True)
         event=dict(run=str(run),allocation=job,terminal_state=state,checkpoint_sha256=file_sha256(checkpoint),
@@ -245,6 +268,9 @@ def gpu_owner(config_path):
             if task['execution']=='native':
                 from runtime.training_state import verify_completion
                 verify_completion(run,spec)
+            elif task['execution']=='radon_unit':
+                from radon_bridge.studies.project_units import verify_unit
+                verify_unit(run,spec)
             else:
                 from radon_bridge.studies.project_case import verify_case
                 verify_case(run,spec)
@@ -282,6 +308,20 @@ def execute_work(config_path,spec_path,run,kind,record):
         if receipt.get('peak_gpu_gib',float('inf'))*1.2+2>70:raise ValueError('Native GPU reserve failed')
         command=[config['python'],'-m','expanded.native','--spec',str(spec_path),'--output',str(run),'--mode','train']
         os.execvpe(config['python'],command,environment)
+    elif kind=='radon_unit':
+        from radon_bridge.studies.project_units import load_unit,execute
+        case,case_root=load_unit(spec)
+        # Preparation validates the full real pair before publishing shared bases.
+        # Training arms retain their own full update/recovery resource profile.
+        if spec['unit']=='prepare':
+            subprocess.run([config['python'],'-m','radon_bridge.runtime.project_dispatch','--config',str(config_path),
+                '--profile-project',spec['case_spec'],'--run',str(profile_root)],env=environment,check=True)
+            receipt=read(profile_root/'accepted.json')
+            if receipt.get('status')!='accepted' or receipt.get('case_identity')!=stable_hash(case):
+                raise ValueError('Project unit resource receipt mismatch')
+        total=torch.cuda.get_device_properties(0).total_memory
+        torch.cuda.set_per_process_memory_fraction((min(.875*total,total-10*1024**3)-2*1024**3)/total)
+        execute(spec,run)
     else:
         # Profiling runs in a subprocess so its optimizer, CUDA cache and limits
         # cannot leak into the formal model's RNG or memory accounting.
@@ -319,7 +359,7 @@ def configure_control_imports(config):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--config',required=True)
     p.add_argument('--standby',action='store_true');p.add_argument('--allocation-owner',action='store_true');p.add_argument('--gpu-owner',action='store_true')
-    p.add_argument('--execute');p.add_argument('--kind',choices=['native','radon']);p.add_argument('--record');p.add_argument('--run');p.add_argument('--profile-project')
+    p.add_argument('--execute');p.add_argument('--kind',choices=['native','radon','radon_unit']);p.add_argument('--record');p.add_argument('--run');p.add_argument('--profile-project')
     a=p.parse_args()
     configure_control_imports(read(a.config))
     if a.standby:standby(a.config)

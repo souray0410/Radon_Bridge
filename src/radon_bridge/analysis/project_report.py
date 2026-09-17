@@ -41,10 +41,13 @@ def bootstrap(y,pred,weights,iterations=10000,seed=73621):
         interval_scope='conditional_on_selected_development_models_not_independent_test',max_t_critical=critical)
 
 
-def report_case(spec,root):
-    root=Path(root);out=root/'report';out.mkdir(exist_ok=True)
+def report_case(spec,root,*,arm_ids=None,output=None):
+    root=Path(root);out=Path(output) if output is not None else root/'report';out.mkdir(parents=True,exist_ok=True)
+    selected=spec['arms'] if arm_ids is None else [a for a in spec['arms'] if a['id'] in arm_ids]
+    if not selected or (arm_ids is not None and {a['id'] for a in selected}!=set(arm_ids)):
+        raise ValueError('Unknown or empty report scope')
     rows=[];pred={};reference=None
-    for arm in spec['arms']:
+    for arm in selected:
         path=root/'arms'/arm['id'];r=json.loads((path/'accepted.json').read_text())
         z=np.load(path/'development_predictions.npz',allow_pickle=False)
         if reference is None:reference=z
@@ -53,7 +56,8 @@ def report_case(spec,root):
         rows.append(dict(arm=arm['id'],seed=spec['seed'],disease=spec['disease'],cfp_f1=r['metrics']['cfp']['macro_f1'],oct_f1=r['metrics']['oct']['macro_f1'],mean_f1=r['metrics']['mean_macro_f1'],best_epoch=r['best_epoch'],stop_epoch=r['stop_epoch'],seconds=r['seconds'],frozen=arm['frozen'],r=arm['r'] if arm['family']=='radon' else None,M=arm['M'] if arm['family']=='radon' else None,S=arm['S'] if arm['family']=='radon' else None,k=arm['k'] if arm['family']=='radon' else None,stages='+'.join(map(str,arm['stages']))))
     with (out/'metrics.csv').open('w',newline='') as f:
         w=csv.DictWriter(f,list(rows[0]));w.writeheader();w.writerows(rows)
-    keys=list(pred);definitions=comparisons(spec['disease'],spec['model']['name']);weights=[]
+    keys=list(pred);names={a['id'] for a in selected}
+    definitions=[c for c in comparisons(spec['disease'],spec['model']['name']) if {c['left'],c['right']}<=names];weights=[]
     for comparison in definitions:
         w=np.zeros(len(keys))
         branches=('cfp','oct') if comparison['branch']=='mean' else (comparison['branch'],)
@@ -61,7 +65,8 @@ def report_case(spec,root):
             w[keys.index((comparison['left'],branch))]+=1/len(branches);w[keys.index((comparison['right'],branch))]-=1/len(branches)
         weights.append(w)
     stats=bootstrap(reference['labels'],np.stack(list(pred.values())),weights,spec['bootstrap_iterations'])
-    stats.update(definitions=definitions,family='one_case_development; whole_study_intervals_are_separate')
+    stats.update(definitions=definitions,arm_ids=[a['id'] for a in selected],
+        family='registered_package_development; whole_study_intervals_are_separate')
     atomic_write_json(stats,out/'paired_statistics.json')
     lines=['# Radon_Bridge 匹配开发评价','', '主要指标为两分支macro-F1平均值；越高越好。差值按定义left减right，单位pp。',
         '本表仅为选中模型的开发证据。种子3416参与了父配方提名；不能当独立确认性验证。','',

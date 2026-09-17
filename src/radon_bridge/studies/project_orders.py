@@ -9,23 +9,25 @@ from radon_bridge.studies.parent_routes import catalog_routes,group_keys
 
 
 def pilot_accepted(root, name):
-    """Require the owning complete-case verifier, not a score threshold or PID."""
+    """Require the owning core-package verifier, independently of weekly release."""
     path=Path(root)/'bindings'/(stable_hash(name+'/seed3416')+'.json')
     if not path.exists():return False
     binding=read(path)
     if file_sha256(Path(binding['spec']))!=binding['spec_sha256']:
         raise ValueError('Pilot specification changed')
     spec=read(binding['spec']);run=Path(binding['run_dir'])
-    if not (run/'accepted.json').exists():return False
-    from radon_bridge.studies.project_case import verify_case
-    verify_case(run,spec)
+    from radon_bridge.studies.project_units import verify_core
+    if not (run/'packages/core/accepted.json').exists():return False
+    verify_core(spec,run)
     return True
 
 
 def advance(config,groups,verify_native,reserve):
-    p=config['project'];root=Path(p['output']);root.mkdir(parents=True,exist_ok=True);tasks=[];states={}
+    p=config['project'];root=Path(p['output']);root.mkdir(parents=True,exist_ok=True);tasks=[];cases=[];states={}
     gate=p['runtime_gate']
     if file_sha256(Path(gate['path']))!=gate['sha256'] or read(gate['path']).get('status')!='accepted':raise ValueError('Actual runtime integration not accepted')
+    if read(gate['path']).get('execution_contract')!='radon_independent_units_v1':
+        raise ValueError('Independent-unit runtime integration not accepted')
     routes=catalog_routes(read(config['catalog']['path'])['candidates'])
     for disease in DISEASES:
         for architecture,route in routes.items():
@@ -45,8 +47,13 @@ def advance(config,groups,verify_native,reserve):
             for seed in (3416,3417,3418):
                 if any(seed not in selected[role] for role in ('cfp','oct')):
                     seed_states[str(seed)]='waiting_this_seed_parents';continue
-                if seed!=3416 and not pilot_accepted(root,name):
-                    seed_states[str(seed)]='waiting_accepted_pilot_report';continue
+                if seed!=3416:
+                    from radon_bridge.runtime.weekly_delivery import release_state
+                    policy=p.get('weekly_delivery_policy')
+                    if not policy or not release_state(policy)['released']:
+                        seed_states[str(seed)]='waiting_whole_weekly_delivery';continue
+                    if not pilot_accepted(root,name):
+                        seed_states[str(seed)]='waiting_accepted_pilot_report';continue
                 spec=dict(schema='radon_project_case_v1',model={'name':architecture},disease=disease,seed=seed,
                     parents={role:selected[role][seed] for role in selected},training=p['training'],arms=arms(disease,architecture),
                     bootstrap_iterations=10000,source_pins=config['source_pins'],test_access=False,
@@ -55,13 +62,19 @@ def advance(config,groups,verify_native,reserve):
                 path=root/'specs'/(stable_hash(key)+'.json');path.parent.mkdir(exist_ok=True);immutable(path,spec)
                 run=reserve(root,'radon_expanded_'+config['catalog']['sha256'][:16],key,spec,
                     source={'protocol':config['protocol'],'native_groups':name},refresh_summary=False)
-                tasks.append(dict(id=key,spec=str(path),spec_sha256=file_sha256(path),run_dir=str(run),role='radon_project'))
+                cases.append(dict(id=key,spec=str(path),spec_sha256=file_sha256(path),run_dir=str(run),role='radon_project'))
+                from radon_bridge.studies.project_units import compile_units
+                tasks.extend(compile_units(path,run))
                 immutable(root/'bindings'/(stable_hash(key)+'.json'),dict(spec=str(path),run_dir=str(run),spec_sha256=file_sha256(path)))
                 seed_states[str(seed)]='project_task_registered'
             states[name]=seed_states
     queue=dict(schema='radon_bridge_project_work_feed_v1',tasks=tasks,test_access=False)
     atomic_write_json(queue,root/'queue.json');atomic_write_json(coverage(),root/'coverage.json')
     from radon_bridge.analysis.project_rollup import summarize
-    report=summarize(tasks,root/'report')
-    return dict(tasks=len(tasks),accepted=report['accepted'],complete=report['complete'],groups=states,
+    report=summarize(cases,root/'report')
+    atomic_write_json(dict(schema='radon_project_cases_v1',tasks=cases,test_access=False),root/'cases.json')
+    from radon_bridge.analysis.package_rollup import publish
+    packages=publish(cases,root/'packages')
+    return dict(tasks=len(tasks),cases=len(cases),accepted=report['accepted'],complete=report['complete'],groups=states,
+        accepted_core_packages=packages['accepted'],
         planned_training_positions=sum(len(arms(d,m)) for d in DISEASES for m in routes)*3,queue=str(root/'queue.json'))

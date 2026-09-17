@@ -103,7 +103,7 @@ def test_monitor_unbound_is_waiting_and_restart_keeps_progress_clock(tmp_path):
 def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,monkeypatch,architecture,oct_model):
     from radon_bridge.studies import project_orders as po
     root=tmp_path/'projects';catalog=write(tmp_path/'catalog.json',dict(candidates=[dict(model=n) for n in sorted({architecture,oct_model})]))
-    gate=write(tmp_path/'gate.json',dict(status='accepted'))
+    gate=write(tmp_path/'gate.json',dict(status='accepted',execution_contract='radon_independent_units_v1'))
     config=dict(project=dict(output=str(root),runtime_gate=gate,training={}),catalog=catalog,
                 protocol={'sha256':'protocol'},source_pins=[])
     selected=[]
@@ -121,7 +121,8 @@ def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,
         reserved.append(key);run=root/key.replace('/','_');run.mkdir(parents=True,exist_ok=True);return run
     status=po.advance(config,groups,lambda *a:True,reserve)
     assert reserved==[f'cataract/{architecture}/seed3416']
-    assert status['tasks']==1
+    assert status['tasks']==9  # shared preparation, six arms, core and full reports
+    assert status['cases']==1
     assert status['groups'][f'cataract/{architecture}']['3417']=='waiting_this_seed_parents'
     po.advance(config,groups,lambda *a:True,reserve)
     assert len(list((root/'bindings').glob('*.json')))==1
@@ -134,8 +135,10 @@ def test_pilot_case_cannot_be_released_from_forged_acceptance(tmp_path,monkeypat
     write(tmp_path/'bindings'/(stable_hash('g/seed3416')+'.json'),dict(spec=spec['path'],spec_sha256=spec['sha256'],run_dir=str(tmp_path/'run')))
     assert not po.pilot_accepted(tmp_path,'g')
     write(tmp_path/'run/accepted.json',dict(state='accepted'))
+    assert not po.pilot_accepted(tmp_path,'g')
+    write(tmp_path/'run/packages/core/accepted.json',dict(state='accepted'))
     def reject(*args):raise ValueError('Missing full scientific evidence')
-    monkeypatch.setitem(sys.modules,'radon_bridge.studies.project_case',SimpleNamespace(verify_case=reject))
+    monkeypatch.setitem(sys.modules,'radon_bridge.studies.project_units',SimpleNamespace(verify_core=reject))
     with pytest.raises(ValueError,match='scientific'):po.pilot_accepted(tmp_path,'g')
 
 
