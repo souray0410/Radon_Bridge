@@ -10,7 +10,7 @@
   ],
   "source_commit": "1b36d9243f9435ed70678bca6be171407b0246f8",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-17T13:54:17.595777+00:00",
+  "verified_at": "2026-09-17T17:53:06+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -43,7 +43,8 @@
     "已核验终止的旧profiler导入失败claim恢复到原任务候选池，dispatcher API就绪14→15；仍待实际GPU接续。",
     "完整资源证据严格身份复用实现完成，强制保留新断点与最大眼数GPU预检；Ibex31项针对及98项完整单元测试通过，生产尚未激活。",
     "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs.",
-    "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812→9817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model."
+    "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812→9817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model.",
+    "2026-09-17 17:53UTC：MHD_Models090c906/715866a有限canonical32接续已绑定9旧待批及未来R&B申请，实际CPU/watcher周期通过，原journal SHA不变。现有GPU/128层科学快照未停止；新32正式更新0，完整profile/claim/训练仍获批门控。"
   ],
   "decisions": [],
   "evidence": [
@@ -74,6 +75,10 @@
     {
       "label": "Current 3D parent progress and early-checkpoint limits",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/current_parent_progress_20260917.md"
+    },
+    {
+      "label": "32层独立阶段的配方、资源预检和实际获批接续边界",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_activation_20260917.md"
     }
   ]
 }
