@@ -48,3 +48,7 @@ The installed MHD release selects the API. Import `mhd_framework` / `mhd_framewo
 模型定义、时间戳训练记录、来源映射和保留规则统一遵循[长期模型与训练规范](workspace/MODEL_RUN_STANDARD.md)，适用于后续所有模型、数据集和研究项目。
 
 大队列研究的阶段、匹配对照和实施缺口见[完整研究流程设计](docs/automatic_research.zh-CN.md)。该设计与LOOK执行链独立；当前尚未部署Radon_Bridge大队列自动执行器，基础模型完成不等于项目结果完成。
+
+## Cumulative results and attempt history
+
+Use the [current results entry](docs/reports/current/README.md) and [attempt archive](docs/archive/README.md). Coverage and verification dates are explicit; these entries do not establish live execution or complete historical migration.
