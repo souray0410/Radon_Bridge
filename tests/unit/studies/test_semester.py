@@ -97,9 +97,12 @@ def test_monitor_unbound_is_waiting_and_restart_keeps_progress_clock(tmp_path):
     assert len(list(tmp_path.glob('positions.csv')))==1
 
 
-def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,monkeypatch):
+@pytest.mark.parametrize('architecture,oct_model', [
+    ('resnet50','resnet50'), ('densenet121','monai_densenet121_3d'),
+    ('swin_b','swin_unetr_encoder_3d')])
+def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,monkeypatch,architecture,oct_model):
     from radon_bridge.studies import project_orders as po
-    root=tmp_path/'projects';catalog=write(tmp_path/'catalog.json',dict(candidates=[dict(model='resnet50')]))
+    root=tmp_path/'projects';catalog=write(tmp_path/'catalog.json',dict(candidates=[dict(model=n) for n in sorted({architecture,oct_model})]))
     gate=write(tmp_path/'gate.json',dict(status='accepted'))
     config=dict(project=dict(output=str(root),runtime_gate=gate,training={}),catalog=catalog,
                 protocol={'sha256':'protocol'},source_pins=[])
@@ -108,7 +111,7 @@ def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,
         parent=tmp_path/role
         write(parent/'spec.json',dict(training=dict(seed=3416)))
         selected.append(dict(state='waiting_replications',selected=dict(run_dir=str(parent)),replicas=[dict(state='awaiting_native_acceptance',run_dir='absent')]))
-    groups={f'cataract/resnet50/{track}':g for track,g in zip(('cfp_2d','oct_volume_3d'),selected)}
+    groups={f'cataract/{model}/{track}':g for model,track,g in zip((architecture,oct_model),('cfp_2d','oct_volume_3d'),selected)}
     def materialize(source,dest,spec,verify):
         target=dest/Path(source).name;write(target/'selected_artifact.json',{'verified':True});return target
     monkeypatch.setattr(po,'materialize_selected',materialize)
@@ -117,9 +120,9 @@ def test_individual_seed_dispatch_does_not_wait_for_other_parent_seeds(tmp_path,
     def reserve(root,namespace,key,spec,**kwargs):
         reserved.append(key);run=root/key.replace('/','_');run.mkdir(parents=True,exist_ok=True);return run
     status=po.advance(config,groups,lambda *a:True,reserve)
-    assert reserved==['cataract/resnet50/seed3416']
+    assert reserved==[f'cataract/{architecture}/seed3416']
     assert status['tasks']==1
-    assert status['groups']['cataract/resnet50']['3417']=='waiting_this_seed_parents'
+    assert status['groups'][f'cataract/{architecture}']['3417']=='waiting_this_seed_parents'
     po.advance(config,groups,lambda *a:True,reserve)
     assert len(list((root/'bindings').glob('*.json')))==1
 

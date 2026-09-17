@@ -5,6 +5,7 @@ from radon_bridge.runtime.state import atomic_write_json,file_sha256,stable_hash
 from radon_bridge.studies.native_prerequisites import MODELS,DISEASES
 from radon_bridge.studies.autoresearch import read,immutable
 from radon_bridge.studies.research_matrix import arms,coverage
+from radon_bridge.studies.parent_routes import catalog_routes,group_keys
 
 
 def pilot_accepted(root, name):
@@ -25,10 +26,11 @@ def advance(config,groups,verify_native,reserve):
     p=config['project'];root=Path(p['output']);root.mkdir(parents=True,exist_ok=True);tasks=[];states={}
     gate=p['runtime_gate']
     if file_sha256(Path(gate['path']))!=gate['sha256'] or read(gate['path']).get('status')!='accepted':raise ValueError('Actual runtime integration not accepted')
+    routes=catalog_routes(read(config['catalog']['path'])['candidates'])
     for disease in DISEASES:
-        for architecture in sorted({r['model'] for r in read(config['catalog']['path'])['candidates']}):
+        for architecture,route in routes.items():
             name=disease+'/'+architecture
-            pair=[groups.get(name+'/'+track,{}) for track in ('cfp_2d','oct_volume_3d')]
+            pair=[groups.get(key,{}) for key in group_keys(disease,route)]
             if not all(g.get('selected') for g in pair):
                 states[name]='waiting_locked_parent_selection';continue
             selected={}
@@ -62,4 +64,4 @@ def advance(config,groups,verify_native,reserve):
     from radon_bridge.analysis.project_rollup import summarize
     report=summarize(tasks,root/'report')
     return dict(tasks=len(tasks),accepted=report['accepted'],complete=report['complete'],groups=states,
-        planned_training_positions=sum(len(arms(d,m)) for d in DISEASES for m in {r['model'] for r in read(config['catalog']['path'])['candidates']})*3,queue=str(root/'queue.json'))
+        planned_training_positions=sum(len(arms(d,m)) for d in DISEASES for m in routes)*3,queue=str(root/'queue.json'))
