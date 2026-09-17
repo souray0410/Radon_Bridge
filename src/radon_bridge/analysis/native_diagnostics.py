@@ -192,6 +192,15 @@ def render_sinograms(output):
     import matplotlib.pyplot as plt
     out=Path(output)
     for path in out.glob('*_sinogram.npz'):
+        receipt=path.with_suffix('.render.json')
+        images=[path.with_suffix('.png'),path.with_suffix('.svg')]
+        identity=file_sha256(path)
+        if receipt.exists():
+            saved=json.loads(receipt.read_text())
+            if saved.get('source_sha256')==identity and all(
+                p.exists() and saved.get('files',{}).get(p.name)==file_sha256(p) for p in images
+            ):
+                continue
         with np.load(path,allow_pickle=False) as z:
             projection=z['projection_rms'];support=z['support'];directions=z['directions']
         fig,ax=plt.subplots(figsize=(7,4),layout='constrained')
@@ -199,4 +208,5 @@ def render_sinograms(output):
         ax.set(xlabel='Normalized projection coordinate s',ylabel='Direction index (EEM order)',title='Radon_Bridge | projected feature RMS')
         fig.colorbar(image,ax=ax,label='RMS across retained channels and observed eyes')
         fig.savefig(path.with_suffix('.png'),dpi=180);fig.savefig(path.with_suffix('.svg'));plt.close(fig)
+        atomic_write_json(dict(source_sha256=identity,files={p.name:file_sha256(p) for p in images}),receipt)
     (out/'FIGURES.zh-CN.md').write_text('正弦图横轴为归一化投影位置s，纵轴为EEM方向索引，颜色是保留通道及有效眼的投影RMS。3D方向位于球面，不能把纵轴解释为单一平面角度。选取固定排序第一位训练参与者；亮度不代表诊断准确性或临床重要性。此图描述特征，不能证明物理配准。\n')
