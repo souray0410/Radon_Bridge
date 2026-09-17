@@ -26,7 +26,7 @@ def validate(path, spec_sha, hardware, *, full):
             row.get('warmup_updates', 0) < 5 or row.get('measured_updates', 0) < 20 or
             row.get('step_memory_observed') is not True):
         raise ValueError('Resource evidence identity or acceptance differs')
-    if any(not isinstance(row.get(k), (int, float)) or not math.isfinite(row[k]) or row[k] <= 0
+    if any(type(row.get(k)) not in (int, float) or not math.isfinite(row[k]) or row[k] <= 0
            for k in ('peak_gpu_gib', 'peak_step_memory_gib')):
         raise ValueError('Unknown measured resource peak')
     if full and (row.get('full_development') is not True or row.get('full_train_read') is not True):
@@ -51,11 +51,12 @@ def prior(reference, spec_sha, hardware):
 
 def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
             total_gpu_gib, other_gpu_gib, allocated_ram_gib, other_ram_gib,
-            allocated_cpus, worker_cpus, output):
+            allocated_cpus, worker_cpus, worker_ram_gib, output):
     """Join static full-cohort coverage with newly measured dynamic recovery.
 
     Envelope values are actual allocation/device observations, not requested
-    resources. Caller must account conservatively for all concurrent work.
+    resources. The worker step cap and allocation-wide 15% headroom are
+    independent constraints. Account conservatively for all concurrent work.
     """
     old = validate(reference['path'], spec_sha, hardware, full=True)
     if file_sha256(reference['path']) != reference['sha256']:
@@ -63,9 +64,11 @@ def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
     now = validate(current, spec_sha, hardware, full=False)
     if now.get('checkpoint_source_sha256') != checkpoint_sha:
         raise ValueError('Current checkpoint was not probed')
-    if not all(math.isfinite(x) for x in (total_gpu_gib, other_gpu_gib, allocated_ram_gib, other_ram_gib, allocated_cpus, worker_cpus)):
+    if not all(type(x) in (int, float) and math.isfinite(x) for x in
+               (total_gpu_gib, other_gpu_gib, allocated_ram_gib, other_ram_gib,
+                allocated_cpus, worker_cpus, worker_ram_gib)):
         raise ValueError('Unknown resource envelope')
-    if min(total_gpu_gib, allocated_ram_gib, allocated_cpus, worker_cpus) <= 0 or min(other_gpu_gib, other_ram_gib) < 0:
+    if min(total_gpu_gib, allocated_ram_gib, allocated_cpus, worker_cpus, worker_ram_gib) <= 0 or min(other_gpu_gib, other_ram_gib) < 0:
         raise ValueError('Unknown resource envelope')
     if worker_cpus > allocated_cpus:
         raise ValueError('CPU allocation insufficient')
@@ -73,6 +76,10 @@ def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
     ram = max(old['peak_step_memory_gib'], now['peak_step_memory_gib'])
     if other_gpu_gib + gpu*1.2 + 2 > min(.875*total_gpu_gib, total_gpu_gib-10):
         raise ValueError('GPU reserve insufficient')
+    if worker_ram_gib > allocated_ram_gib:
+        raise ValueError('Worker memory exceeds allocation')
+    if ram > worker_ram_gib:
+        raise ValueError('Worker step memory limit insufficient')
     if other_ram_gib + ram > .85*allocated_ram_gib:
         raise ValueError('Host memory reserve insufficient')
     record = dict(schema='radon_native_requalification_v1', status='accepted',
@@ -82,7 +89,8 @@ def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
         peak_gpu_gib=gpu, peak_step_memory_gib=ram, test_access=False,
         limits=dict(total_gpu_gib=total_gpu_gib, other_gpu_gib=other_gpu_gib,
             allocated_ram_gib=allocated_ram_gib, other_ram_gib=other_ram_gib,
-            allocated_cpus=allocated_cpus, worker_cpus=worker_cpus))
+            allocated_cpus=allocated_cpus, worker_cpus=worker_cpus,
+            worker_ram_gib=worker_ram_gib))
     atomic_write_json(record, Path(output))
     return record
 
@@ -102,21 +110,30 @@ def live_envelope(torch, job, step):
     def gib(text):
         units={'K':1/1024**2,'M':1/1024,'G':1,'T':1024}
         if not text or text[-1] not in units:raise ValueError('Unknown Slurm memory unit')
-        return float(text[:-1])*units[text[-1]]
-    ram=gib(tres['mem']); cpus=int(tres['cpu']);other_ram=0;other_cpus=0;worker_cpus=None
+        value = float(text[:-1])*units[text[-1]]
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError('Unknown Slurm memory limit')
+        return value
+    ram=gib(tres.get('mem')); cpus=int(tres['cpu']);other_ram=0;other_cpus=0;worker_cpus=None;worker_ram=None
+    if cpus <= 0:raise ValueError('Unknown Slurm CPU limit')
     lines=subprocess.check_output(['scontrol','show','step',str(job),'-o'],text=True,timeout=20)
     for line in lines.splitlines():
         row=fields(line)
         if row.get('State')!='RUNNING' or row.get('StepId','').endswith(('.extern','.batch')):continue
+        resource=fields(row.get('TRES','').replace(',', ' '))
+        m=gib(resource.get('mem'));c=int(row['CPUs'])
+        if c <= 0:raise ValueError('Unknown Slurm CPU limit')
         if row.get('StepId')==str(job)+'.'+str(step):
-            worker_cpus=int(row['CPUs']);continue
-        resource=fields(row.get('TRES','').replace(',', ' '));m=gib(resource['mem']);c=int(row['CPUs'])
+            if worker_cpus is not None:raise ValueError('Duplicate worker step')
+            worker_cpus=c;worker_ram=m;continue
         if m>2 or c>1:raise ValueError('Unmeasured concurrent scientific worker forbids profile reuse')
         other_ram+=m;other_cpus+=c
     if worker_cpus is None or worker_cpus+other_cpus>cpus:raise ValueError('Actual CPU step envelope unknown')
-    prop=torch.cuda.get_device_properties(0);free,total=torch.cuda.mem_get_info(0)
+    if worker_ram is None or worker_ram > ram or other_ram >= ram:
+        raise ValueError('Actual worker memory envelope unknown')
+    free,total=torch.cuda.mem_get_info(0)
     return dict(total_gpu_gib=total/1024**3,other_gpu_gib=(total-free)/1024**3,
-        allocated_ram_gib=ram,other_ram_gib=other_ram,allocated_cpus=cpus-other_cpus,worker_cpus=worker_cpus)
+        allocated_ram_gib=ram,other_ram_gib=other_ram,allocated_cpus=cpus-other_cpus,worker_cpus=worker_cpus,worker_ram_gib=worker_ram)
 
 
 def hardware_identity(torch):

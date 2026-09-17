@@ -22,7 +22,7 @@ def fixture(tmp_path):
     ref=dict(path=str(old),sha256=file_sha256(old))
     kwargs=dict(current=now,spec_sha='spec',hardware=hw,checkpoint_sha='new_checkpoint',
         total_gpu_gib=80,other_gpu_gib=1,allocated_ram_gib=128,other_ram_gib=2,
-        allocated_cpus=16,worker_cpus=14,output=tmp_path/'joined.json')
+        allocated_cpus=16,worker_cpus=14,worker_ram_gib=120,output=tmp_path/'joined.json')
     return ref,kwargs
 
 
@@ -64,6 +64,62 @@ def test_live_envelope_uses_slurm_limits_and_rejects_scientific_companion(monkey
     monkeypatch.setattr(subprocess,'check_output',output)
     row=live_envelope(gpu,'42','1')
     assert row['allocated_ram_gib']==128 and row['other_ram_gib']==2
+    assert row['worker_ram_gib']==100
     assert row['allocated_cpus']==15 and row['worker_cpus']==14
     steps.append('StepId=42.2 State=RUNNING CPUs=1 TRES=cpu=1,mem=6G')
     with pytest.raises(ValueError,match='concurrent scientific'):live_envelope(gpu,'42','1')
+
+
+@pytest.mark.parametrize('old_peak,current_peak,accepted', [
+    (105, 50, False), (90, 50, True), (50, 101, False), (100, 50, True)])
+def test_reused_full_peak_must_fit_actual_worker_step(tmp_path, old_peak, current_peak, accepted):
+    ref, k = fixture(tmp_path)
+    from pathlib import Path
+    for path, peak in ((Path(ref['path']), old_peak), (k['current'], current_peak)):
+        row = json.loads(path.read_text())
+        row['peak_step_memory_gib'] = peak
+        path.write_text(json.dumps(row))
+    ref['sha256'] = file_sha256(ref['path'])
+    k['worker_ram_gib'] = 100
+    if accepted:
+        result = qualify(ref, **k)
+        assert result['limits']['worker_ram_gib'] == 100
+        assert result['limits']['allocated_ram_gib'] == 128
+    else:
+        with pytest.raises(ValueError, match='Worker step memory limit'):
+            qualify(ref, **k)
+        assert not k['output'].exists()
+
+
+@pytest.mark.parametrize('value', [None, '100', True, 0, -1, float('nan'), float('inf'), 129])
+def test_unknown_or_inconsistent_worker_limit_rejects(tmp_path, value):
+    ref, k = fixture(tmp_path)
+    k['worker_ram_gib'] = value
+    with pytest.raises(ValueError):
+        qualify(ref, **k)
+    assert not k['output'].exists()
+
+
+@pytest.mark.parametrize('memory', ['', 'mem=NaNG', 'mem=infG', 'mem=0G', 'mem=-1G', 'mem=unknown', 'mem=129G'])
+def test_live_envelope_requires_finite_positive_worker_memory(monkeypatch, memory):
+    from radon_bridge.runtime.native_profile_reuse import live_envelope
+    import subprocess
+    def output(command, **_):
+        if 'job' in command:
+            return 'AllocTRES=cpu=16,mem=128G'
+        return f'StepId=42.1 State=RUNNING CPUs=14 TRES=cpu=14,{memory}'
+    monkeypatch.setattr(subprocess, 'check_output', output)
+    with pytest.raises(ValueError):
+        live_envelope(None, '42', '1')
+
+
+@pytest.mark.parametrize('key', ['peak_step_memory_gib', 'peak_gpu_gib'])
+@pytest.mark.parametrize('value', [None, True, '50', 0, -1, float('nan'), float('inf')])
+def test_unknown_measured_peak_rejects(tmp_path, key, value):
+    ref, k = fixture(tmp_path)
+    row = json.loads(k['current'].read_text())
+    row[key] = value
+    k['current'].write_text(json.dumps(row))
+    with pytest.raises(ValueError, match='Unknown measured resource peak'):
+        qualify(ref, **k)
+    assert not k['output'].exists()
