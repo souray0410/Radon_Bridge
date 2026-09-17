@@ -11,18 +11,19 @@
   "source_commit": "600a15b00c4c344d5db0dd95288ad80c66bda201",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
   "verified_at": "2026-09-17T09:48:00+00:00",
-  "verification_scope": "live_controller_binding_and_catalog_route_audit_plus_isolated_cpu_tests",
+  "verification_scope": "runtime_and_evidence",
   "layers": {
-    "planned": "eye_stage_one_locked",
-    "implemented": "partial_parent_route_fix_tested",
-    "deployed": "active_controller_has_no_project_binding",
-    "running": "parent_workflow_only_no_formal_bridge_case_verified",
-    "accepted": "no_current_round_3d_parent_or_project_case_accepted"
+    "planned": "documented",
+    "implemented": "partial",
+    "deployed": "partial",
+    "running": "partial",
+    "accepted": "waiting"
   },
   "results": [],
   "limitations": [
     "309是逻辑位置而不是已完成训练",
-    "三维父模型及逐臂执行等门槛尚未全部关闭"
+    "三维父模型及逐臂执行等门槛尚未全部关闭",
+    "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance."
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -42,7 +43,7 @@
     },
     {
       "label": "Parent route correction and acceptance boundaries",
-      "path": "docs/handoff/parent_routes_20260917.md"
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/80219199b8cf8f6899635a85a4cb204328175670/docs/handoff/parent_routes_20260917.md"
     }
   ]
 }
