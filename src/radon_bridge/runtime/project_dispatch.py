@@ -296,14 +296,34 @@ def execute_work(config_path,spec_path,run,kind,record):
     if kind=='native':
         binding=source_binding(spec,config)
         environment['PYTHONPATH']=binding['pythonpath']
+        from radon_bridge.runtime.native_profile_reuse import prior,qualify,live_envelope,hardware_identity
+        spec_sha=file_sha256(Path(spec_path));hardware=hardware_identity(torch)
+        canonical=run/'resource_qualification/full_reference.json'
+        reference=read(canonical) or config.get('native_profile_references',{}).get(spec_sha)
+        reuse=prior(reference,spec_sha,hardware) if reference else None
+        if reuse:live_envelope(torch,step['job_id'],step['step'])
         command=[config['python'],str(Path(config['native_profile_source'])/'scheduling/profile_native.py'),
             '--source',binding['source'],'--spec',str(spec_path),'--output',str(profile_root),
-            '--full-development','--full-train-read','--fresh-train-batches']
-        if (run/'last.pt').exists(): command.extend(['--checkpoint',str(run/'last.pt')])
+            '--fresh-train-batches']
+        if not reuse:command.extend(['--full-development','--full-train-read'])
+        checkpoint=run/'last.pt'
+        checkpoint_sha=file_sha256(checkpoint) if checkpoint.exists() else None
+        if checkpoint.exists(): command.extend(['--checkpoint',str(checkpoint)])
         subprocess.run(command,env=environment,check=True)
         from scheduling.prepared_owner import complete_profile
         receipt=read(profile_root/'accepted.json')
-        if not complete_profile(receipt):raise ValueError('Native full resource profile rejected')
+        if reuse:
+            if (file_sha256(checkpoint) if checkpoint.exists() else None)!=checkpoint_sha:
+                raise ValueError('Formal checkpoint changed during qualification')
+            qualified=qualify(reuse,profile_root/'accepted.json',spec_sha,hardware,checkpoint_sha,
+                output=profile_root/'requalification.json',**live_envelope(torch,step['job_id'],step['step']))
+            receipt=dict(receipt,peak_gpu_gib=qualified['peak_gpu_gib'])
+        else:
+            if not complete_profile(receipt):raise ValueError('Native full resource profile rejected')
+            reference=dict(path=str(profile_root/'accepted.json'),sha256=file_sha256(profile_root/'accepted.json'))
+            prior(reference,spec_sha,hardware)
+            canonical.parent.mkdir(parents=True,exist_ok=True)
+            atomic_write_json(reference,canonical)
         # A single exclusive workflow worker; the remaining allocation RAM is reserved.
         if receipt.get('peak_gpu_gib',float('inf'))*1.2+2>70:raise ValueError('Native GPU reserve failed')
         command=[config['python'],'-m','expanded.native','--spec',str(spec_path),'--output',str(run),'--mode','train']
