@@ -8,9 +8,9 @@
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "7d1a723256250f615ac85bb26405fa51d68d9416",
+  "source_commit": "1b36d9243f9435ed70678bca6be171407b0246f8",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-17T12:57:23.837565+00:00",
+  "verified_at": "2026-09-17T13:54:17.595777+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -42,7 +42,8 @@
     "修复当前父模型审计忽略registered_groups导致Dense/Swin清单失败；Ibex20项针对测试及真实73候选/18组验收通过（54 accepted，无校验异常）。",
     "已核验终止的旧profiler导入失败claim恢复到原任务候选池，dispatcher API就绪14→15；仍待实际GPU接续。",
     "完整资源证据严格身份复用实现完成，强制保留新断点与最大眼数GPU预检；Ibex31项针对及98项完整单元测试通过，生产尚未激活。",
-    "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs."
+    "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs.",
+    "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812→9817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model."
   ],
   "decisions": [],
   "evidence": [
@@ -69,6 +70,10 @@
     {
       "label": "Production activation and actual pending owner binding",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/production_activation_20260917.md"
+    },
+    {
+      "label": "Current 3D parent progress and early-checkpoint limits",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/current_parent_progress_20260917.md"
     }
   ]
 }
