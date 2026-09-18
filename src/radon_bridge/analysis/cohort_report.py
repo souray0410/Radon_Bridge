@@ -87,7 +87,8 @@ def report(root):
                 '|对照|差值|普通95%区间|五项同时95%区间|','|---|---:|---|---|']
         for c in current['comparisons']['contrasts']:
             lo,hi=c['ordinary95'];sl,sh=c['simultaneous95']
-            lines.append(f'|{(labels_name[c['method']]+' − ') if 'method' in c else ''}{labels_name[c["reference"]]}|{100*c["difference"]:+.2f}|[{100*lo:+.2f}, {100*hi:+.2f}]|[{100*sl:+.2f}, {100*sh:+.2f}]|')
+            contrast_label = (labels_name[c['method']]+' − ') if 'method' in c else ''
+            lines.append(f'|{contrast_label}{labels_name[c["reference"]]}|{100*c["difference"]:+.2f}|[{100*lo:+.2f}, {100*hi:+.2f}]|[{100*sl:+.2f}, {100*sh:+.2f}]|')
         initial=[r['name'] for r in rows if r['best_epoch']==0]
         if initial:lines+=['','选回初始父模型的设置：'+ '、'.join(initial)+'。它们已按停止规则训练，最终选模回到第0轮；分数相同不能解释成方法等效。']
         lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']

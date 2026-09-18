@@ -215,3 +215,5 @@ Independent review found and fixed a per-step RAM admission gap before deploymen
 ## 2026-09-18 核心通道压缩补充实际启动
 
 见[三种通道处理×两几何](../reports/current/channel_compression/README.md)。六臂不覆盖全部机制；QR-Radon已实际profile接受并正式训练，四新执行复用同父模型，原SVD两项只读引用。新active指向channel包，旧core接受结果/权重不改。标签统一CFP/OCT；原科研快照不热改。
+
+2026-09-18报告发布修复：52b469f/385a83a的嵌套f-string在ws02较新Python可运行，但GitHub Python3.11拒绝解析。已提取局部标签变量、全src按3.11语法解析通过，目标环境报告2测试通过；独立CPU报告修复，不热改运行中的52b469f科学快照，不影响训练。新提交CI须按准确SHA核验。
