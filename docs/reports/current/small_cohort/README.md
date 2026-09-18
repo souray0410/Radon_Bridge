@@ -1,3 +1,5 @@
+[后继核心问题与累计新结果](../augmentation/README.md)，原表和已验收结果保留。
+
 # Radon_Bridge 小队列核心比较
 
 本页只含六臂核心。另见[项目总览与覆盖](../README.md)、[已完成24项线性分解](../factorized/README.md)、[未完成的分组及机制](../coverage.md)。

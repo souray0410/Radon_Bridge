@@ -842,14 +842,16 @@
     },
     {
       "id": "ws02_mmtm_augmentation",
-      "state": "registered",
+      "state": "running",
       "report": "augmentation/README.md",
-      "remaining": "Three matched arms require GPU profile, training and report acceptance",
+      "remaining": "First arm profile accepted and real training; await all three arms, independent audit and simultaneous intervals",
       "expected_ids": [
         "host_continue",
         "host_radon",
         "host_linear"
-      ]
+      ],
+      "sequence_id": "2026_09_18_17_04_31_666766",
+      "data": "augmentation/current.json"
     }
   ],
   "reuse": [

@@ -1,0 +1,56 @@
+{
+  "schema": "radon_small_cohort_publication_v1",
+  "sequence_id": "2026_09_18_17_04_31_666766",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "input": {
+    "cfp": "two eyes x RGB x224x224",
+    "oct": "two eyes x1x32x96x96"
+  },
+  "backbone": "ResNet18 2D / inflated3D",
+  "selection": "development mean of branch macro-F1",
+  "configuration": {
+    "stage": 3,
+    "channel_rank": 32,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "real_batch": 16,
+    "minimum_epochs": 8,
+    "maximum_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "precision": "FP32; cuDNN TF32 true matching historical parents"
+  },
+  "state": {
+    "state": "running",
+    "accepted": 0,
+    "planned": 3,
+    "updated_at": 1789740424.8916216,
+    "active": [
+      {
+        "device": "1",
+        "name": "host_continue_seed3416",
+        "phase": "train"
+      }
+    ],
+    "failed": {}
+  },
+  "results": [],
+  "complete": false,
+  "limitations": [
+    "single_seed",
+    "same_dev_selection",
+    "explicit_identity_initialized_MMTM_adapter",
+    "additional_training_stage_all_arms_matched"
+  ],
+  "study_kind": "existing_method_augmentation",
+  "augmentation_host": {
+    "method": "identity-initialized MMTM adaptation",
+    "best_epoch": 0,
+    "source_model_sha256": "5c3a75ddd9ab22d7cf9c07d0e68673bf9284ff1efc16f428809e071c6d22ce07",
+    "native_parent_state_exact": true
+  }
+}

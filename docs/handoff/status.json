@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "通道压缩六项已接受；下一优先同A/A+桥与分组机制验收，尚未启动；Ibex父依赖仍等待",
+  "next_acceptance": "核验MMTM加桥三臂各自真实profile/训练/完整统计；继续原分组、中心化和正式Ibex门槛，不能把三臂上线称完整科研接受。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "52b469fec28f3b3024ee212d4534a1afc1a2d3cf",
   "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
-  "verified_at": "2026-09-18T13:43:22.724794+00:00",
+  "verified_at": "2026-09-18T14:08:08.156203+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -69,7 +69,8 @@
     "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。",
     "2026-09-18：修复已完成分解补充漏展示、总入口暂无结果和摘要四臂未齐的矛盾。显式coverage登记8个研究包/范围与49个机制臂，发布前及CI校验遗漏/重复/身份/复用SHA；24+6去重为28执行。原科研截止不刷新；此次没有复核Ibex进程或启动训练。",
     "2026-09-18：通道方向六项有限匹配包已登记并实际启动，source52b469f、run15_50_35；SVD两项核验复用，QR-Radon预检全296dev/梯度/恢复通过后正式epoch4推进。QR普通通信及可学习两项同一GPU1原manager后继；不是完整压缩比较接受。CFP/OCT名称与参数解释同步累计页和生成器。",
-    "2026-09-18 13:40UTC现场：ws02有限任务已正常结束且GPU空闲，独立最终核验并用新显示生成器发布；不是新任务在训练。Ibex两CPU进程及新周期error=null，1allocation运行/23待批；LOOK原残差内存保护失败仍待充足资源，Dense3D暂停epoch5/15319updates，新32仍4登记文件无正式更新。"
+    "2026-09-18 13:40UTC现场：ws02有限任务已正常结束且GPU空闲，独立最终核验并用新显示生成器发布；不是新任务在训练。Ibex两CPU进程及新周期error=null，1allocation运行/23待批；LOOK原残差内存保护失败仍待充足资源，Dense3D暂停epoch5/15319updates，新32仍4登记文件无正式更新。",
+    "新ws02 run2026_09_18_17_04_31_666766：MMTM继续训练／MMTM+Radon／MMTM+普通通信三臂，同种子3416同验收宿主和原停止规则。c0211ac独立源码，11项迁移/报告/覆盖检查通过；第一臂完整GPU恢复预检通过，正式训练已至epoch3，其他按原manager有限顺序接续。原MMTM best_epoch0与原生父状态逐项一致才允许本包复用SVD基。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"
@@ -122,6 +123,10 @@
     {
       "label": "SVD/QR/learned通道压缩有限匹配与实际接续",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/channel_compression/README.md"
+    },
+    {
+      "label": "2026-09-18：同一MMTM宿主加桥三臂已正式接入",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/augmentation/README.md"
     }
   ]
 }

@@ -1,3 +1,9 @@
+## 2026-09-18：同一MMTM宿主加桥三臂已正式接入
+
+新ws02 run2026_09_18_17_04_31_666766：MMTM继续训练／MMTM+Radon／MMTM+普通通信三臂，同种子3416同验收宿主和原停止规则。c0211ac独立源码，11项迁移/报告/覆盖检查通过；第一臂完整GPU恢复预检通过，正式训练已至epoch3，其他按原manager有限顺序接续。原MMTM best_epoch0与原生父状态逐项一致才允许本包复用SVD基。
+
+[配置和边界](ws02_augmentation_20260918.md)；[累计结果](../reports/current/augmentation/README.md)。
+
 ## 2026-09-18 09:12UTC：ws02六臂已完整接受
 
 [同配置六臂、普通/同时区间及初始模型选回解释](../reports/current/small_cohort/README.md)。原子队列四新臂自动全部完成，独立SHA与296人F1核验通过；Ibex父模型暂停/新32待资源，未混入本结论。
