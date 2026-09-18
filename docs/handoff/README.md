@@ -195,3 +195,7 @@ Private research overview and weekly archive: [PHD](https://github.com/souray041
 见[parent_recovery_20260917.md](parent_recovery_20260917.md)：已修复多架构父清单审计回归及一个旧profiler失败后未回池任务；54/73父模型验收保持原证据，3D尚无accepted。列出1.37–2.04小时完整预检成本和资源限制，未把登记修复称为正式研究完成。
 
 Independent review found and fixed a per-step RAM admission gap before deployment; see [step-memory acceptance](native_profile_step_memory_20260917.md). Code65d98f6 passed44 isolated CPU tests. Management is now activated; fresh GPU qualification is automatically grant-gated, see [deployment](production_activation_20260917.md).
+
+## 2026-09-18 05:34UTC维护
+
+原DenseNet121-3D同run推进到epoch5/updates15064，检查点137秒新，仍未通过父模型接受。CPU控制面短时Slurm查询超时已在后续周期恢复，未重启GPU。共享唯一待批watcher已随LOOK方法优先调整切到`OPS/look_fitting_priority_20260918/owner_v7/plan.json`，其中9个R&B与1个native条目原样保留；R&B科学源和finite32 owner不变。新32仍无正式更新，不能称六臂开始。旧科研结果保留原截止，不用新维护时间刷新其性能证据。
