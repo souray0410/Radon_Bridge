@@ -1,6 +1,6 @@
 # Radon_Bridge 小队列已有方法加桥比较
 
-本页固定同一MMTM适配宿主，比较再次训练、加入Radon桥和加入普通通信。另见[项目总览与覆盖](../README.md)、[已完成24项线性分解](../factorized/README.md)、[未完成的分组及机制](../coverage.md)。
+本页固定同一MMTM适配宿主，比较再次训练、加入Radon桥和加入普通通信。另见[项目总览与覆盖](../README.md)、[已完成24项线性分解](../factorized/README.md)、[覆盖与后续机制](../coverage.md)。
 
 ws02 GPU1；单种子3416；三项均从同一已验收MMTM权重重新建立优化器，按同一原停止规则继续训练；不复用第一阶段分数冒充第二阶段对照。
 CFP为224×224二维；OCT是旧数据32×96×96三维体积。不是Ibex的32×224×224大队列。
@@ -15,7 +15,7 @@ MMTM和交叉注意力为本项目身份初始化的适配实现，不声称复�
 |MMTM＋Radon桥|73.18%|68.55%|70.86%|8/14|same accepted MMTM host; new matched continuation|
 |MMTM＋普通通信|66.21%|66.54%|66.38%|10/16|same accepted MMTM host; new matched continuation|
 
-分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。完整后自动生成10,000次配对bootstrap普通与同时区间；单种子且dev参与选择，不能推出稳定泛化优势。
+分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。本页已基于296名开发集参与者生成10,000次配对bootstrap普通与同时区间；单种子且dev参与选择，不能推出稳定泛化优势。
 完整配置/状态和聚合指标：[current.json](current.json)。参与者预测及权重不上传GitHub。
 
 ## 完整匹配后的差异（百分点）

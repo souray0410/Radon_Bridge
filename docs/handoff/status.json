@@ -3,21 +3,21 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "grouped WS02有限包已由右侧完成8/8执行、profile/resume与技术audit，当前等待左侧按远端原产物做最终独立科学验收；Ibex父模型及正式门槛继续。",
+  "next_acceptance": "grouped WS02单种子固定SVD包已由左侧独立验收并接受；下一研究裁决依据已整理为中心化SVD与无压缩预算匹配的成本/辨识性事实，尚未授权新矩阵；Ibex父模型及正式门槛继续。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "52b469fec28f3b3024ee212d4534a1afc1a2d3cf",
+  "source_commit": "450a1227286efc2f87ec38be324ccbebcaedc001",
   "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
-  "verified_at": "2026-09-18T19:34:46.979007+00:00",
-  "verification_scope": "ws02_grouped_execution_and_four_grid_runtime; earlier accepted numerical packages retain their own cutoffs",
+  "verified_at": "2026-09-18T19:52:53.745547+00:00",
+  "verification_scope": "grouped_left_independent_acceptance_and_publication_cleanup; evidence_cutoff unchanged for earlier project-wide runtime",
   "layers": {
     "planned": "documented",
     "implemented": "partial",
     "deployed": "partial",
     "running": "partial",
-    "accepted": "waiting"
+    "accepted": "partial"
   },
   "results": [
     {
@@ -26,7 +26,7 @@
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     },
     {
-      "summary": "历史小队列全局分解24/24（3416/3417/3418），本次全部科研产物/父权重SHA、有序296人及分支F1重核后补入累计页，非新增训练。三种子均值：SVD69.4681%、无通信65.0211%；分解R256/R512/R1024分别66.2036/67.3709/67.3270%，同R普通通信65.2999/65.7675/66.5128%；几何差值同时区间均跨零。分组卷积尚未完成，全部大队列机制未由小队列替代。",
+      "summary": "历史小队列全局分解24/24（3416/3417/3418），本次全部科研产物/父权重SHA、有序296人及分支F1重核后补入累计页，非新增训练。三种子均值：SVD69.4681%、无通信65.0211%；分解R256/R512/R1024分别66.2036/67.3709/67.3270%，同R普通通信65.2999/65.7675/66.5128%；几何差值同时区间均跨零。该分解包本身不覆盖分组卷积；grouped现已由独立WS02有限包接受，全部大队列机制仍未由小队列替代。",
       "scope": "accepted_matched_group",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
     },
@@ -39,6 +39,11 @@
       "summary": "MMTM同宿主加桥三臂3/3完成并独立重核文件SHA、296人顺序及sklearn分支F1：继续训练66.0129%、加Radon70.8636%、加普通通信66.3750%；Radon相对继续+4.8507pp、相对普通+4.4886pp，三项同时95%区间均跨零。CFP/OCT概率损失均变差；宿主第一阶段选中第0轮，仅支持该身份初始化适配的单种子dev探索结论。",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/augmentation/README.md"
+    },
+    {
+      "summary": "固定SVD grouped WS02单种子包已由左侧独立接受：G1两项严格复用核心，G2/4/8/16×Radon/普通通信8个新增执行；89个源码文件、54份科研资产、296人有序F1与10,000次五项区间重核通过。Radon−普通点差随G增大在本seed上变小，但五项同时95%全跨0，且G同时降低参数量，不能作为单调拓扑机制证据。",
+      "scope": "preliminary_single_seed",
+      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/grouped_linear/README.md"
     }
   ],
   "limitations": [
@@ -48,13 +53,12 @@
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
     "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
     "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
-    "2026-09-18 grouped WS02包已8/8执行并通过右侧技术audit，但按左侧规划/右侧执行的新分工，右侧自检不替代左侧最终独立科学验收；当前coverage仍为pending_independent_acceptance。"
+    "2026-09-18 grouped接受仅限WS02单种子开发集固定SVD包；不代表Ibex、test、无压缩预算匹配或全项目接受。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
     "Active parent controller lacks accepted project runtime binding",
-    "Actual complete-pair replay and GPU integration acceptance remain required",
-    "Grouped WS02 execution is complete; left-side final independent acceptance is still required before marking the package scientifically accepted"
+    "Actual complete-pair replay and GPU integration acceptance remain required"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -79,10 +83,12 @@
     "2026-09-18 13:40UTC现场：ws02有限任务已正常结束且GPU空闲，独立最终核验并用新显示生成器发布；不是新任务在训练。Ibex两CPU进程及新周期error=null，1allocation运行/23待批；LOOK原残差内存保护失败仍待充足资源，Dense3D暂停epoch5/15319updates，新32仍4登记文件无正式更新。",
     "新ws02 run2026_09_18_17_04_31_666766：MMTM继续训练／MMTM+Radon／MMTM+普通通信三臂，同种子3416同验收宿主和原停止规则。c0211ac独立源码，11项迁移/报告/覆盖检查通过；第一臂完整GPU恢复预检通过，正式训练已至epoch3，其他按原manager有限顺序接续。原MMTM best_epoch0与原生父状态逐项一致才允许本包复用SVD基。",
     "2026-09-18 14:52UTC：三臂自动profile→训练→报告全部完成，独立audit通过；无活GPU进程且manager正常结束。远端active旧running已按完成证据修正，不重启已完成队列。Ibex14:50UTC两个dispatcher新鲜error=null，squeue为1运行allocation/23待批；不等于项目GPU正在训练。",
-    "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。"
+    "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。",
+    "2026-09-18 左侧独立复核grouped completion：89个源码文件与450a122一致、54份资产SHA、296人F1、8个profile恢复及10k五项区间全部通过；coverage批准accepted，G1精确复用core，公开仅保留脱敏摘要。"
   ],
   "decisions": [
-    "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"
+    "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
+    "grouped解释边界：同G Radon/普通是参数匹配几何对照；跨G同时改变直接连接拓扑和mixer参数量，不能把点估计趋势归因于拓扑。下一候选问题为中心化basis或无压缩预算匹配，先由左侧按辨识性/成本裁决，不自动扩矩阵。"
   ],
   "evidence": [
     {
@@ -136,6 +142,14 @@
     {
       "label": "2026-09-18：同一MMTM宿主加桥三臂已正式接入",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/augmentation/README.md"
+    },
+    {
+      "label": "WS02固定SVD grouped单种子完整报告",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/grouped_linear/README.md"
+    },
+    {
+      "label": "grouped后续中心化/预算匹配研究依据",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/grouped_next_evidence_20260918.md"
     }
   ]
 }

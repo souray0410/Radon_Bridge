@@ -21,7 +21,7 @@ class PublicationCoverageTest(unittest.TestCase):
 
     def test_current_and_idempotent(self):
         before={str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
-        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],35)  # Includes three accepted MMTM augmentation runs.
+        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],43)  # Adds eight new grouped runs; G=1 is strict reuse.
         self.assertFalse(a['full_project_accepted']);self.assertEqual(a,check(self.root))
         self.assertEqual(before,{str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()})
 
@@ -41,6 +41,10 @@ class PublicationCoverageTest(unittest.TestCase):
         self.mutate('small_cohort/current.json',lambda d:d['results'][0].update(prediction_sha256='wrong'))
         with self.assertRaisesRegex(ValueError,'Reused prediction'):check(self.root)
 
+    def test_grouped_g1_reuse_rejected_if_identity_changes(self):
+        self.mutate('grouped_linear/current.json',lambda d:d['results'][0].update(prediction_sha256='wrong'))
+        with self.assertRaisesRegex(ValueError,'Reused prediction'):check(self.root)
+
     def test_incomplete_cannot_claim_accepted(self):
         self.mutate('small_cohort/current.json',lambda d:d.update(complete=False))
         with self.assertRaisesRegex(ValueError,'Unaccepted'):check(self.root)
@@ -48,6 +52,10 @@ class PublicationCoverageTest(unittest.TestCase):
     def test_mechanism_removal_rejected(self):
         self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ibex_mechanisms')['expected_arms'].pop())
         with self.assertRaisesRegex(ValueError,'mechanism'):check(self.root)
+
+    def test_grouped_locked_identity_rejected(self):
+        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='grouped_linear').update(groups=[1,2,4,8]))
+        with self.assertRaisesRegex(ValueError,'grouped WS02'):check(self.root)
 
     def test_missing_page_rejected(self):
         (self.root/'factorized/README.md').unlink()

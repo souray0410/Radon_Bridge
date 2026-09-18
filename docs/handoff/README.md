@@ -1,4 +1,10 @@
-## 2026-09-18：grouped WS02有限执行包8/8完成，待左侧最终独立验收\n\n任务 `radon-grouped-20260918-completion-v1` 已由右侧按新分工执行完：部署源码 `450a1227286efc2f87ec38be324ccbebcaedc001`，run `/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54`；G=1严格复用，G=2/4/8/16×Radon/普通通信8个新臂全部accepted，failed={}。右侧最终audit已核296人有序身份、独立sklearn F1、8个profile/resume、源码/配置/资产SHA，publication `complete=true`；完成后GPU1空闲。\n\n当前职责边界：这是执行端技术/证据包完成，**不是左侧最终独立科学验收已完成**。详细原产物哈希、参数/连接规模、匹配区间与负面证据见 [ws02_grouped_completion_20260918.md](ws02_grouped_completion_20260918.md)；可发布快照见 [grouped_linear报告](../reports/current/grouped_linear/README.md)。\n\n## 2026-09-18：WebCodex 分组线性本地包已通过 CPU 结构验收
+## 2026-09-18：grouped WS02 单种子包已独立接受
+
+任务 `radon-grouped-20260918-completion-v1` 已完成：部署源码 `450a1227286efc2f87ec38be324ccbebcaedc001`；G=1严格复用，G=2/4/8/16×Radon/普通通信8个新臂全部完成且无失败。右侧包内 audit 后，左侧又从原始资产独立复核89个源码文件、54份科研资产、296人有序ID/标签与F1、8个profile/恢复以及10,000次五项区间，均通过。
+
+接受范围仅为 **WS02 单种子开发集 grouped 匹配包**，不代表 Ibex、test 或全项目接受。详细参数/连接规模、匹配区间与负面证据见 [ws02_grouped_completion_20260918.md](ws02_grouped_completion_20260918.md)；公开结果见 [grouped_linear报告](../reports/current/grouped_linear/README.md)。
+
+## 2026-09-18：WebCodex 分组线性本地包已通过 CPU 结构验收
 
 独立 Mac clone 的 `webcodex/grouped-linear-20260918` 已在提交 `a01bba6f0579fb10df6f570f91bcd7d41f68fb4f` 实现批准的跨来源 grouped Conv：按 `(group,source,channel,direction)` 排列、真实 `Conv1d(groups=G)`、逆排列恢复，G=1 保持旧配置/state/output/gradient 兼容。精确 Python3.11/Torch2.8.0/MHD V4 环境中新增6项与相关12项 CPU 测试通过；只读独立终审未发现 blocking local code defect。
 

@@ -38,6 +38,10 @@ def check(root):
                 raise ValueError('Locked factorized matrix changed')
         if p['id']=='ws02_core' and set(p['expected_ids'])!={'none','svd','linear','self','mmtm','attention'}:
             raise ValueError('Locked six-arm matrix changed')
+        if p['id']=='grouped_linear':
+            expected={f'grouped_g{g}_{mode}' for g in (1,2,4,8,16) for mode in ('radon','linear_resample')}
+            if set(p['expected_ids'])!=expected or p.get('groups')!=[1,2,4,8,16] or p.get('accepted_scope')!='ws02_single_seed_fixed_svd_grouped':
+                raise ValueError('Locked grouped WS02 package changed')
         if len(ids) != len(set(ids)) or set(ids) != set(p['expected_ids']):
             raise ValueError('Missing, duplicate or unexpected results: '+p['id'])
         if not data['complete'] or data['test_used']:

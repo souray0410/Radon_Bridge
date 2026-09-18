@@ -18,6 +18,10 @@ def report(root):
             parts=key.split('_');group=parts[1][1:];mode='_'.join(parts[2:])
             return f'G={group} '+('Radon' if mode=='radon' else '普通通信')
         raise KeyError(key)
+    def source_label(row):
+        if grouped:
+            return 'G=1严格复用已接受核心结果' if row['reused'] else '新增单种子3416匹配执行'
+        return row['provenance']
     comparisons=q.get('comparisons',[[ 'svd',k] for k in ('none','linear','self','mmtm','attention')])
     entries=list(q.get('references',[]))+list(q['cases'])
     for c in entries:
@@ -100,7 +104,7 @@ def report(root):
     old=json.loads((out/'current.json').read_text()) if (out/'current.json').exists() else None
     if old!=current:write_json(out/'current.json',current)
     lines=['# Radon_Bridge 小队列核心比较','',
-        '本页只含六臂核心。另见[项目总览与覆盖](../README.md)、[已完成24项线性分解](../factorized/README.md)、[未完成的分组及机制](../coverage.md)。','',
+        '本页只含六臂核心。另见[项目总览与覆盖](../README.md)、[已完成24项线性分解](../factorized/README.md)、[覆盖与后续机制](../coverage.md)。','',
         'ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。',
         'CFP为224×224二维；OCT是旧数据32×96×96三维体积。不是Ibex的32×224×224大队列。',
         '两条独立ResNet18专家；同一对父权重，Stage3通信；真实batch16，至少8轮、最多60轮、patience6；停止规则未为周报缩短。',
@@ -108,8 +112,10 @@ def report(root):
         f'完整核心：{"已齐全" if current["complete"] else "尚未齐全，以下仅逐臂进度，不排名"}；运行状态：{status.get("state")}。','',
         '|方法|CFP分支F1|OCT分支F1|分支均值F1|最佳/停止轮|来源|','|---|---:|---:|---:|---|---|']
     for row in rows:
-        lines.append(f'|{row["name"]}|{100*row["metrics"]["cfp"]["macro_f1"]:.2f}%|{100*row["metrics"]["oct"]["macro_f1"]:.2f}%|{100*row["mean_f1"]:.2f}%|{row["best_epoch"]}/{row["stop_epoch"]}|{row["provenance"]}|')
-    lines+=['','分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。完整后自动生成10,000次配对bootstrap普通与同时区间；单种子且dev参与选择，不能推出稳定泛化优势。',
+        lines.append(f'|{row["name"]}|{100*row["metrics"]["cfp"]["macro_f1"]:.2f}%|{100*row["metrics"]["oct"]["macro_f1"]:.2f}%|{100*row["mean_f1"]:.2f}%|{row["best_epoch"]}/{row["stop_epoch"]}|{source_label(row)}|')
+    interval_text=('本页已基于296名开发集参与者生成10,000次配对bootstrap普通与同时区间' if matched_results_complete
+                   else '完整后才生成10,000次配对bootstrap普通与同时区间')
+    lines+=['',f'分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。{interval_text}；单种子且dev参与选择，不能推出稳定泛化优势。',
         '完整配置/状态和聚合指标：[current.json](current.json)。参与者预测及权重不上传GitHub。']
     if matched_results_complete:
         lines+=['','## 完整匹配后的差异（百分点）','','均为SVD-Radon减对应对照，越大表示本配置下F1更高。','',
@@ -123,14 +129,15 @@ def report(root):
         lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']
     if channel:
         lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
-        lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD、分组卷积和A/A+桥另列后续，不冒充已覆盖。']
+        lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD仍属后续；分组卷积与MMTM宿主加桥已在各自有限包完成，不由本页冒充覆盖。']
     if augmentation:
         lines=[line.replace('小队列核心比较','小队列已有方法加桥比较').replace('本页只含六臂核心。','本页固定同一MMTM适配宿主，比较再次训练、加入Radon桥和加入普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416；三项均从同一已验收MMTM权重重新建立优化器，按同一原停止规则继续训练；不复用第一阶段分数冒充第二阶段对照。').replace('完整核心：','完整加桥匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','按左方法减右方法；同时区间覆盖三项预定比较。').replace('五项同时95%区间','三项同时95%区间') for line in lines]
         lines+=['','本包宿主为项目MMTM身份初始化适配，第一阶段选择第0轮；不是作者完整系统。三个新臂都保留同一宿主通信，新增项以并行残差写回，初始预测须严格重放。SVD沿用相同父模型Stage3基（本宿主选中状态与原父状态相同）；不是任意变化宿主都可复用。']
     if grouped:
         lines=[line.replace('小队列核心比较','小队列分组线性通信比较').replace('本页只含六臂核心。','本页固定SVD r32/M32/S64/k3，比较G=1/2/4/8/16；每个G均配同G普通线性重采样。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。G=1两臂仅在配置、父模型、SVD基和接受文件SHA一致时严格复用；G=2/4/8/16为8个新执行臂。').replace('完整核心：','完整分组匹配包：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','每项为同一G下Radon减普通线性重采样；完整组才给配对区间。').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
-        lines=[line.replace('完整分组匹配包：已齐全','完整分组匹配包：已齐全（manager、profiles 与独立 audit 均接受）') if current['complete'] else line for line in lines]
-        lines+=['','分组只限制桥内的直接连接：每组同时含CFP/OCT来源、保留通道内全部M方向，并在返回前逆排列。跨组直接梯度为零不代表完整网络彼此独立。无压缩分组的等参数/近似等计算比较仍是单独待验收问题。']
+        lines=[line.replace('完整分组匹配包：已齐全','完整分组匹配包：已齐全（manager、profiles 与包内独立 audit 均接受）') if current['complete'] else line for line in lines]
+        lines+=['','G表示桥内分组数：G=1是稠密混合；G越大，每组越小，桥内直接连接比例与mixer参数量都约按1/G下降。因此跨G点估计同时改变通信拓扑和参数量；只有同一G下Radon与普通线性重采样是参数匹配的几何对照。',
+                '分组只限制桥内的直接连接：每组同时含CFP/OCT来源、保留通道内全部M方向，并在返回前逆排列。跨组直接梯度为零不代表完整网络彼此独立。无压缩分组的等参数/近似等计算比较仍是单独待验收问题。']
     lines+=['','## 阅读图表前：缩写和参数','','CFP（Color Fundus Photography）为彩色眼底照片；OCT（Optical Coherence Tomography）为光学相干断层扫描。Stage3是第3个残差阶段后的通信位置；r=32是每分支保留通道方向数，M=32是投影方向数，S=64是每方向采样格点数，k=3是一维卷积核宽。','SVD用训练特征确定固定通道方向；随机QR不按信息重要性排序；可学习通道映射额外更新编码/解码参数。全局分解中间通道数大写R（另一个研究包）不是这里的小写压缩秩r。','批准范围、未完成项和下一步见[覆盖清单](../coverage.md)，不能把局部包完成当项目所有情况完成。']
     content='\n'.join(lines)+'\n';target=out/'README.md'
     if not target.exists() or target.read_text()!=content:

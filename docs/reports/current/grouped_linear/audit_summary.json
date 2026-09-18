@@ -1,0 +1,34 @@
+{
+  "schema": "radon_grouped_public_audit_summary_v1",
+  "scope": "WS02 grouped single-seed development package only",
+  "accepted": true,
+  "test_used": false,
+  "source_commit": "450a1227286efc2f87ec38be324ccbebcaedc001",
+  "left_independent_audit_sha256": "2f01bbdcaeda751b92e2c94b93911d00c9b5b11da21401d11ec2bcb8d33fb75f",
+  "right_audit_sha256": "3f50be5b6f58ebfddf780b08d90172be141bfb0b80d5995746ac726b99b12541",
+  "publication_sha256": "db16c21a70a01cb82d3c580a980f6886fcb99e2513a3a9b6526f6d536db9a285",
+  "queue_sha256": "206eb736b04a5a2da8f5def7eefbc4f4184e4a2eee06fb4dc2269be631686f0b",
+  "verification": {
+    "source_files_exact": 89,
+    "asset_files_verified": 54,
+    "participants": 296,
+    "ordered_ids_labels_matched": true,
+    "independent_sklearn_f1": true,
+    "bootstrap_resamples": 10000,
+    "five_simultaneous_intervals_recomputed": true,
+    "profiles_verified": 8,
+    "new_executions": 8,
+    "strict_reuse_results": 2
+  },
+  "profiles": [
+    {"id": "grouped_g2_radon", "group_count": 2, "receipt_sha256": "2b92d348a563da3db40dda1dcbabd8fee0f09b62c9807e7e18cfcaac64151dad"},
+    {"id": "grouped_g2_linear_resample", "group_count": 2, "receipt_sha256": "bf28115a6132ab10bb0f0630e1e1a286f216ebc64da480b26e177ec4c22a1894"},
+    {"id": "grouped_g4_radon", "group_count": 4, "receipt_sha256": "f30d4dcab90b51edafdb9d6c064a1d46fe2523e268063947ad6a6d0b2ea24585"},
+    {"id": "grouped_g4_linear_resample", "group_count": 4, "receipt_sha256": "f2f1ff90580dbf7ab12c5497c6405815a08acd1785710ff222b546562f422591"},
+    {"id": "grouped_g8_radon", "group_count": 8, "receipt_sha256": "f28eb690881f655dc7599a20fd6ac32105e7778db20d7a6c13ef47f1dcb74eb5"},
+    {"id": "grouped_g8_linear_resample", "group_count": 8, "receipt_sha256": "5ae03da0038d188dc665c7cfce8589bdedca4abccb64ed057fc88dd3dde261e3"},
+    {"id": "grouped_g16_radon", "group_count": 16, "receipt_sha256": "1c1906217a0cdbc119b8796a7b034050a779b6256535b7ed0349cfbbbedeaa3a"},
+    {"id": "grouped_g16_linear_resample", "group_count": 16, "receipt_sha256": "bd4372d53eeed588b3446eff91284d357e7c4533dae555b36d7407aef2db23c4"}
+  ],
+  "privacy": "Public summary only: no participant identifiers, predictions, weights, credentials, or server-absolute evidence paths."
+}

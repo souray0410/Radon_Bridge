@@ -1,6 +1,6 @@
 {
   "schema": "radon_publication_coverage_v1",
-  "reviewed_at": "2026-09-18T10:40:22.703894+00:00",
+  "reviewed_at": "2026-09-18T19:52:53.745547+00:00",
   "scope": "current approved eye-stage packages; historical archive explicitly separate",
   "packages": [
     {
@@ -53,12 +53,22 @@
     },
     {
       "id": "grouped_linear",
-      "state": "pending_independent_acceptance",
+      "state": "accepted",
       "sequence_id": "2026_09_18_22_01_54",
       "report": "grouped_linear/README.md",
       "data": "grouped_linear/current.json",
-      "remaining": "WS02 execution 8/8 plus right-side technical audit complete; left-side final independent acceptance pending. Uncompressed grouped budget match remains a separate scope.",
-      "expected_ids": ["grouped_g1_radon","grouped_g1_linear_resample","grouped_g2_radon","grouped_g2_linear_resample","grouped_g4_radon","grouped_g4_linear_resample","grouped_g8_radon","grouped_g8_linear_resample","grouped_g16_radon","grouped_g16_linear_resample"],
+      "expected_ids": [
+        "grouped_g1_radon",
+        "grouped_g1_linear_resample",
+        "grouped_g2_radon",
+        "grouped_g2_linear_resample",
+        "grouped_g4_radon",
+        "grouped_g4_linear_resample",
+        "grouped_g8_radon",
+        "grouped_g8_linear_resample",
+        "grouped_g16_radon",
+        "grouped_g16_linear_resample"
+      ],
       "groups": [
         1,
         2,
@@ -69,7 +79,19 @@
       "variants": [
         "fixed_svd_grouped",
         "uncompressed_grouped_budget_matched"
-      ]
+      ],
+      "accepted_scope": "ws02_single_seed_fixed_svd_grouped",
+      "acceptance_review": {
+        "kind": "left_independent_review",
+        "passed": true,
+        "audit_sha256": "2f01bbdcaeda751b92e2c94b93911d00c9b5b11da21401d11ec2bcb8d33fb75f",
+        "asset_files_verified": 54,
+        "source_files_exact": 89,
+        "participants": 296,
+        "bootstrap_resamples": 10000,
+        "test_used": false
+      },
+      "separate_remaining_scope": "uncompressed_grouped_budget_matched requires feasibility/design review; not accepted by this package"
     },
     {
       "id": "ibex_core",
@@ -880,6 +902,18 @@
       "source_id": "linear",
       "target_package": "ws02_channel_compression",
       "target_id": "linear"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "svd",
+      "target_package": "grouped_linear",
+      "target_id": "grouped_g1_radon"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "linear",
+      "target_package": "grouped_linear",
+      "target_id": "grouped_g1_linear_resample"
     }
   ],
   "unreviewed_history": [

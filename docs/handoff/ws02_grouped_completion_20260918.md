@@ -1,10 +1,10 @@
-# R&B grouped completion v1 — 右侧执行完成交回左侧独立验收
+# R&B grouped completion v1 — 右侧执行完成，左侧独立验收通过
 
 任务ID：`radon-grouped-20260918-completion-v1`  
 执行日期：2026-09-18  
 当前执行方：右侧 WebCodex  
 最终科学验收方：左侧规划/独立审查  
-状态：**包内实现、部署、8/8 新执行、右侧独立 audit 与 publication 已完成；等待左侧按原产物做最终独立验收。**
+状态：**包内实现、部署、8/8 新执行与右侧 audit 已完成；左侧随后从原始资产独立复核并接受本 WS02 单种子开发集包。**
 
 ## 1. 精确版本与运行身份
 
@@ -12,9 +12,9 @@
 - grouped operator：`a01bba6f0579fb10df6f570f91bcd7d41f68fb4f`
 - 初始本地 handoff：`c09ac5fe80930108e4a52ea0624d80cbbc80bdb7`
 - WS02 supplemental adapter：`450a1227286efc2f87ec38be324ccbebcaedc001`
-- WS02 部署源码：`/home/mengh/radon_ws02_20260918/source_450a122`
+- WS02 部署源码：source snapshot `450a1227286efc2f87ec38be324ccbebcaedc001`
 - MHD Framework：`3559caa8d596d4438533a69d39d8a2c32eb21e46`
-- WS02 run：`/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54`
+- WS02 run逻辑身份：`Radon_Bridge/2026_09_18_22_01_54`
 - sequence：`2026_09_18_22_01_54`
 - GPU：既有 GPU1 finite manager / 原锁；未另建调度器或重复 claim。
 - 最终 live probe（19:34:46 UTC）：WS02 GPU0/GPU1 均 15 MiB、0%；grouped manager 已结束。
@@ -32,7 +32,7 @@
 - 每个 profile 均验证组内跨来源直接梯度非零（13.0）、跨组直接梯度0、逆排列通过。
 - 最终 audit：296 IDs/labels 顺序一致；独立 sklearn F1 与 receipt 一致；所有产物 SHA 通过；`test_used=false`。
 - publication：`matched_results_complete=true`、`complete=true`。
-- 右侧技术/执行包完成；**这里不替代左侧最终独立科学验收。**
+- 左侧独立复核已通过：89个源码文件、54份科研资产、296人有序ID/标签与F1、8个profile/恢复以及10,000次五项普通/同时区间均重核一致。接受范围仅为本WS02单种子dev包。
 
 ## 4. 最终结果（单种子 dev，仅事实汇总）
 
@@ -79,13 +79,13 @@ G=2/4/8/16 普通通信四臂均按原停止规则真实训练8轮，但 best_ep
 | G16 Radon | `1c1906217a0cdbc119b8796a7b034050a779b6256535b7ed0349cfbbbedeaa3a` | `956d44e72c75a3fe91b61d671d39ca4dd65c03f94466b4e299b7830dd872eaec` | 7.102 / 7.523 |
 | G16 ordinary | `bd4372d53eeed588b3446eff91284d357e7c4533dae555b36d7407aef2db23c4` | `574de32628270f6d22fd841f7c1d9d412ef880bb9a4bc51546498be4fc1dd027` | 7.211 / 7.633 |
 
-所有 profile 路径均位于：
-`/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/<arm>_<timestamp>/accepted.json`。
-精确路径与结构字段已固化在 `independent_final_audit.json`。
+所有 profile 的逻辑位置为：
+`Radon_Bridge/2026_09_18_22_01_54/profiles/<arm>_<timestamp>/accepted.json`。
+结构字段与校验值保留在受限原始audit；公开仓库只发布摘要与SHA。
 
 ## 7. 部署、队列与最终报告哈希
 
-远端根：`/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54`
+原始run逻辑身份：`Radon_Bridge/2026_09_18_22_01_54`
 
 - `queue.json`: `206eb736b04a5a2da8f5def7eefbc4f4184e4a2eee06fb4dc2269be631686f0b`
 - `status.json`: `5870e21b398a7f9032cf824c735e99a6d8e66f08e53499987558420a979b32a5`
@@ -96,10 +96,10 @@ G=2/4/8/16 普通通信四臂均按原停止规则真实训练8轮，但 best_ep
 - `publication/current.json`: `db16c21a70a01cb82d3c580a980f6886fcb99e2513a3a9b6526f6d536db9a285`
 - `publication/README.md`: `b079cdca5275e320df3aa3eed90a1ed07a133fd93b9b5f80619273cb5cba5e4b`
 
-仓库内已复制同字节的：
+仓库公开结果：
 - `docs/reports/current/grouped_linear/current.json`
 - `docs/reports/current/grouped_linear/README.md`
-- `docs/reports/current/grouped_linear/independent_final_audit.json`
+- `docs/reports/current/grouped_linear/audit_summary.json`（脱敏摘要，不含参与者、权重、凭据或服务器绝对路径）
 
 ## 8. 负面证据与边界
 
@@ -111,15 +111,14 @@ G=2/4/8/16 普通通信四臂均按原停止规则真实训练8轮，但 best_ep
 - 本包没有完成 `uncompressed_grouped_budget_matched`。
 - Ibex/LOOK 的独立任务状态不由本包改变。
 
-## 9. 交给左侧的最终独立验收动作
+## 9. 左侧独立验收结论
 
-左侧应从远端原产物重新核：
+左侧已从原始资产重新核：
 1. run status 8/8、无 active/failed；
 2. queue/dependencies/code/CPU receipt 哈希及部署源码 commit；
-3. 8个 profile 的 grouped structure、resume SHA、资源值；
+3. 8个 profile 的 grouped structure 与恢复校验；
 4. 10个结果（含G1复用）的296人有序预测、独立F1与模型/预测SHA；
-5. 5个预登记 paired bootstrap 对比；
-6. local publication snapshot 与远端字节 SHA；
-7. 科学措辞和 limitation。
+5. 10,000次参与者重采样的5个预登记普通/同时区间；
+6. 89个源码文件与部署提交、54份科研资产身份。
 
-在左侧完成这些复核前，coverage 只标记“执行完成、待最终独立验收”，不把本右侧自检直接写成整个科研包最终 accepted。左侧若接受，应再把 `grouped_linear` coverage state 切到 accepted，并登记 G1 两项对 `ws02_core` 的精确 reuse 关系后运行 publication coverage gate。
+上述均通过，因此 coverage 可将 `grouped_linear` 标为 accepted，并登记 `ws02_core/svd → grouped_g1_radon`、`ws02_core/linear → grouped_g1_linear_resample` 两条严格复用。此接受不扩展到Ibex、test、无压缩预算匹配或全项目。下一研究依据见 [grouped_next_evidence_20260918.md](grouped_next_evidence_20260918.md)。
