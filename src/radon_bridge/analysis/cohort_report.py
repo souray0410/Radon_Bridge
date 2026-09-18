@@ -8,7 +8,9 @@ from radon_bridge.evaluation.metrics import classification_metrics
 
 def report(root):
     root=Path(root);q=json.loads((root/'queue.json').read_text());rows=[];predictions={};ids=labels=None
-    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配'}
+    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
+    channel=q.get('study_kind')=='channel_compression'
+    comparisons=q.get('comparisons',[[ 'svd',k] for k in ('none','linear','self','mmtm','attention')])
     for c in q['cases']:
         p=root/'trials'/c['name'];receipt=p/'accepted.json'
         if not receipt.exists():continue
@@ -52,13 +54,18 @@ def report(root):
             return (v[0]+v[1])/2
         dist={key:(f1(p['cfp'])+f1(p['oct']))/2 for key,p in predictions.items()}
         mean={r['id']:r['mean_f1'] for r in rows};contrasts=[];arrays=[]
-        for key in ('none','linear','self','mmtm','attention'):
-            d=dist['svd']-dist[key];arrays.append(d)
-            contrasts.append(dict(reference=key,difference=mean['svd']-mean[key],ordinary95=np.quantile(d,[.025,.975]).tolist()))
+        for method,key in comparisons:
+            d=dist[method]-dist[key];arrays.append(d)
+            c=dict(reference=key,difference=mean[method]-mean[key],ordinary95=np.quantile(d,[.025,.975]).tolist())
+            if channel:c['method']=method
+            contrasts.append(c)
         a=np.stack(arrays);sd=a.std(1,ddof=1);valid=sd>0
         critical=float(np.quantile(np.max(np.abs((a[valid]-a[valid].mean(1,keepdims=True))/sd[valid,None]),axis=0),.95)) if valid.any() else 0.
         for c,se in zip(contrasts,sd):c['simultaneous95']=[c['difference']-critical*se,c['difference']+critical*se]
         current['comparisons']=dict(resamples=10000,unit='participant',metric='mean branch macro-F1',contrasts=contrasts)
+    if channel:
+        current['study_kind']='channel_compression'
+        current['limitations']=['single_seed','same_dev_selection','learned_codec_has_extra_parameters','not_centered_or_grouped_ablation']
     old=json.loads((out/'current.json').read_text()) if (out/'current.json').exists() else None
     if old!=current:write_json(out/'current.json',current)
     lines=['# Radon_Bridge 小队列核心比较','',
@@ -68,7 +75,7 @@ def report(root):
         '两条独立ResNet18专家；同一对父权重，Stage3通信；真实batch16，至少8轮、最多60轮、patience6；停止规则未为周报缩短。',
         'MMTM和交叉注意力为本项目身份初始化的适配实现，不声称复现原论文完整系统。','',
         f'完整核心：{"已齐全" if current["complete"] else "尚未齐全，以下仅逐臂进度，不排名"}；运行状态：{status.get("state")}。','',
-        '|方法|眼底分支F1|OCT分支F1|分支均值F1|最佳/停止轮|来源|','|---|---:|---:|---:|---|---|']
+        '|方法|CFP分支F1|OCT分支F1|分支均值F1|最佳/停止轮|来源|','|---|---:|---:|---:|---|---|']
     for row in rows:
         lines.append(f'|{row["name"]}|{100*row["metrics"]["cfp"]["macro_f1"]:.2f}%|{100*row["metrics"]["oct"]["macro_f1"]:.2f}%|{100*row["mean_f1"]:.2f}%|{row["best_epoch"]}/{row["stop_epoch"]}|{row["provenance"]}|')
     lines+=['','分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。完整后自动生成10,000次配对bootstrap普通与同时区间；单种子且dev参与选择，不能推出稳定泛化优势。',
@@ -78,10 +85,13 @@ def report(root):
                 '|对照|差值|普通95%区间|五项同时95%区间|','|---|---:|---|---|']
         for c in current['comparisons']['contrasts']:
             lo,hi=c['ordinary95'];sl,sh=c['simultaneous95']
-            lines.append(f'|{labels_name[c["reference"]]}|{100*c["difference"]:+.2f}|[{100*lo:+.2f}, {100*hi:+.2f}]|[{100*sl:+.2f}, {100*sh:+.2f}]|')
+            lines.append(f'|{(labels_name[c['method']]+' − ') if 'method' in c else ''}{labels_name[c["reference"]]}|{100*c["difference"]:+.2f}|[{100*lo:+.2f}, {100*hi:+.2f}]|[{100*sl:+.2f}, {100*sh:+.2f}]|')
         initial=[r['name'] for r in rows if r['best_epoch']==0]
         if initial:lines+=['','选回初始父模型的设置：'+ '、'.join(initial)+'。它们已按停止规则训练，最终选模回到第0轮；分数相同不能解释成方法等效。']
         lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']
+    if channel:
+        lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间') for line in lines if 'MMTM和交叉注意力为' not in line]
+        lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD、分组卷积和A/A+桥另列后续，不冒充已覆盖。']
     content='\n'.join(lines)+'\n';target=out/'README.md'
     if not target.exists() or target.read_text()!=content:
         temp=out/'.README.tmp';temp.write_text(content);temp.replace(target)
