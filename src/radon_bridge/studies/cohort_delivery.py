@@ -58,7 +58,7 @@ def main():
             if proc.returncode==0 and receipt.exists():
                 if mode=='profile':
                     a=json.loads(receipt.read_text())
-                    if not a.get('passed') or a.get('formal_updates')!=0:raise ValueError('Invalid profile')
+                    if not a.get('passed') or a.get('formal_updates')!=0 or a.get('configuration')!=json.loads(Path(c['config']).read_text()):raise ValueError('Invalid profile')
                     profiles[c['resource']]=str(receipt)
                 elif verified(receipt,json.loads(Path(c['config']).read_text())):complete.add(c['name'])
             else:
@@ -89,7 +89,12 @@ def main():
             planned=len(cases),accepted=len(complete),failed=failed,resource_profiles=profiles,
             active={str(k):dict(pid=p.pid,name=c['name'],phase=m,output=str(o)) for k,(p,c,m,o,l) in active.items()},test_used=False))
         from radon_bridge.analysis.cohort_report import report
-        report(root)
+        try:
+            report(root)
+        except Exception as exc:
+            write_json(root/'publication_failure.json',dict(updated_at=time.time(),error=repr(exc),state='needs_review',training_preserved=True))
+        else:
+            (root/'publication_failure.json').unlink(missing_ok=True)
         if not active and len(complete)+len(failed)==len(cases):break
         time.sleep(10)
     if len(complete)==len(cases):
