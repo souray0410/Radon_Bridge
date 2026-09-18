@@ -1,3 +1,9 @@
+## 2026-09-18：WebCodex 分组线性本地包已通过 CPU 结构验收
+
+独立 Mac clone 的 `webcodex/grouped-linear-20260918` 已在提交 `a01bba6f0579fb10df6f570f91bcd7d41f68fb4f` 实现批准的跨来源 grouped Conv：按 `(group,source,channel,direction)` 排列、真实 `Conv1d(groups=G)`、逆排列恢复，G=1 保持旧配置/state/output/gradient 兼容。精确 Python3.11/Torch2.8.0/MHD V4 环境中新增6项与相关12项 CPU 测试通过；只读独立终审未发现 blocking local code defect。
+
+这不是远端部署或科研结果。G=1 只在完整身份一致时复用既有 SVD/普通通信；G>1 正式 case/receipt adapter 和 GPU matched acceptance 仍由原 Codex owner 接入，不新建调度器。见 [本轮有限包](webcodex_next_package_20260918.md) 与 [GPU owner 精确接续](grouped_linear_gpu_handoff_20260918.md)。Ibex/LOOK/父模型运行状态仍按各自原证据日期，不因本地 CPU 验收刷新。
+
 ## 2026-09-18 14:52UTC：MMTM加桥完整验收
 
 MMTM同宿主加桥三臂3/3完成并独立重核文件SHA、296人顺序及sklearn分支F1：继续训练66.0129%、加Radon70.8636%、加普通通信66.3750%；Radon相对继续+4.8507pp、相对普通+4.4886pp，三项同时95%区间均跨零。CFP/OCT概率损失均变差；宿主第一阶段选中第0轮，仅支持该身份初始化适配的单种子dev探索结论。
