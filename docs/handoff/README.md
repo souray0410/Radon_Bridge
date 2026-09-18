@@ -1,3 +1,9 @@
+## 2026-09-19：centered-SVD WS02有限包右侧完成，待左侧独立验收
+
+任务 `radon-centered-20260918-v1` 已按锁定范围完成：旧未中心化SVD-Radon/普通通信两项严格复用，只新增中心化Radon与中心化普通通信两臂。scientific source 为 `27aafca11796e3969bb263ab950e93dc49d58f23`；独立basis数值validator为 `15b02427596f39a83011c0732924a78e86348eb8`。WS02 run `2026_09_19_01_19_02_633840` 2/2完成、failed={}，包内audit通过后manager退出，GPU1回到15 MiB/0%。
+
+中心化定义的额外验收在formal前完成：从保存的float64 sufficient statistics独立重算1264训练参与者顺序/fingerprint、mean/second/covariance、Q正交/eigen残差与 qᵀsecond q 能量，receipt SHA为 `1194787cd3f0ed8d49f5980dde1d84220cf2836a9754d981edbb29e4ed377440`。当前**只说明右侧执行/技术证据包完整，不表示左侧最终科学接受**；详细比较与反例见 [centered_basis报告](../reports/current/centered_basis/README.md) 和 [正式handoff](ws02_centered_20260918.md)。
+
 ## 2026-09-18：grouped WS02 单种子包已独立接受
 
 任务 `radon-grouped-20260918-completion-v1` 已完成：部署源码 `450a1227286efc2f87ec38be324ccbebcaedc001`；G=1严格复用，G=2/4/8/16×Radon/普通通信8个新臂全部完成且无失败。右侧包内 audit 后，左侧又从原始资产独立复核89个源码文件、54份科研资产、296人有序ID/标签与F1、8个profile/恢复以及10,000次五项区间，均通过。

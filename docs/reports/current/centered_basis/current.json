@@ -1,0 +1,367 @@
+{
+  "schema": "radon_small_cohort_publication_v1",
+  "sequence_id": "2026_09_19_01_19_02_633840",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "input": {
+    "cfp": "two eyes x RGB x224x224",
+    "oct": "two eyes x1x32x96x96"
+  },
+  "backbone": "ResNet18 2D / inflated3D",
+  "selection": "development mean of branch macro-F1",
+  "configuration": {
+    "stage": 3,
+    "channel_rank": 32,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "real_batch": 16,
+    "minimum_epochs": 8,
+    "maximum_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "precision": "FP32; cuDNN TF32 true matching historical parents"
+  },
+  "state": {
+    "state": "complete",
+    "accepted": 2,
+    "planned": 2,
+    "updated_at": 1789771110.538052,
+    "active": [],
+    "failed": {}
+  },
+  "results": [
+    {
+      "id": "uncentered_radon",
+      "name": "\u672a\u4e2d\u5fc3\u5316SVD-Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7229603250696252,
+          "macro_precision": 0.723013698630137,
+          "macro_recall": 0.722972972972973,
+          "accuracy": 0.722972972972973,
+          "confusion_matrix": [
+            [
+              106,
+              42
+            ],
+            [
+              40,
+              108
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.164560954883288,
+          "auroc": 0.7687636961285611,
+          "calibration_in_the_large": 0.00020074844360351562
+        },
+        "oct": {
+          "macro_f1": 0.7127558767453277,
+          "macro_precision": 0.7130810366104484,
+          "macro_recall": 0.7128378378378378,
+          "accuracy": 0.7128378378378378,
+          "confusion_matrix": [
+            [
+              108,
+              40
+            ],
+            [
+              45,
+              103
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.319738123387117,
+          "auroc": 0.7694028487947407,
+          "calibration_in_the_large": -0.017169952392578125
+        }
+      },
+      "reused": true,
+      "mean_f1": 0.7178581009074765,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "provenance": "strict accepted-core uncentered reuse; no new training",
+      "prediction_sha256": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/svd/best.pt",
+        "sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847"
+      }
+    },
+    {
+      "id": "uncentered_linear_resample",
+      "name": "\u672a\u4e2d\u5fc3\u5316SVD-\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6958904109589041,
+          "macro_precision": 0.6960891812865497,
+          "macro_recall": 0.6959459459459459,
+          "accuracy": 0.6959459459459459,
+          "confusion_matrix": [
+            [
+              105,
+              43
+            ],
+            [
+              47,
+              101
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.270154298053045,
+          "auroc": 0.7254839298758218,
+          "calibration_in_the_large": -0.007118940353393555
+        },
+        "oct": {
+          "macro_f1": 0.6546328071379548,
+          "macro_precision": 0.6568085498433758,
+          "macro_recall": 0.6554054054054055,
+          "accuracy": 0.6554054054054054,
+          "confusion_matrix": [
+            [
+              104,
+              44
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.6055514761965435,
+          "auroc": 0.68745434623813,
+          "calibration_in_the_large": -0.038012951612472534
+        }
+      },
+      "reused": true,
+      "mean_f1": 0.6752616090484295,
+      "best_epoch": 9,
+      "stop_epoch": 15,
+      "provenance": "strict accepted-core uncentered reuse; no new training",
+      "prediction_sha256": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/linear/best.pt",
+        "sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f"
+      }
+    },
+    {
+      "id": "centered_radon",
+      "name": "\u4e2d\u5fc3\u5316SVD-Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7461319427767676,
+          "macro_precision": 0.748539222452266,
+          "macro_recall": 0.7466216216216217,
+          "accuracy": 0.7466216216216216,
+          "confusion_matrix": [
+            [
+              117,
+              31
+            ],
+            [
+              44,
+              104
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.3067604093058227,
+          "auroc": 0.7653624908692476,
+          "calibration_in_the_large": -0.03639519214630127
+        },
+        "oct": {
+          "macro_f1": 0.733031932504481,
+          "macro_precision": 0.7333744686685864,
+          "macro_recall": 0.7331081081081081,
+          "accuracy": 0.7331081081081081,
+          "confusion_matrix": [
+            [
+              111,
+              37
+            ],
+            [
+              42,
+              106
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.5046903943365944,
+          "auroc": 0.7520544192841491,
+          "calibration_in_the_large": -0.008957117795944214
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.7395819376406243,
+      "best_epoch": 28,
+      "stop_epoch": 28,
+      "provenance": "new approved centered-SVD single-seed execution",
+      "prediction_sha256": "6fc43d2d63bd44d3dc4e8a8cfe66d157e3fdd3f11831b68fc08fb368f516181b",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_19_01_19_02_633840/centered_radon/best.pt",
+        "sha256": "5df82ac735a62e1a9d5e2017b3b36c91c2b7d56d76df87462f6603a28d9591ff"
+      }
+    },
+    {
+      "id": "centered_linear_resample",
+      "name": "\u4e2d\u5fc3\u5316SVD-\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537,
+          "calibration_in_the_large": -0.0015845298767089844
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379,
+          "calibration_in_the_large": -0.029426783323287964
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "new approved centered-SVD single-seed execution",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_19_01_19_02_633840/centered_linear_resample/best.pt",
+        "sha256": "b47ec9bc9d77422ba6794fbf42e0694d986180c1d5e6a75cfccbc8a67a0a3e97"
+      }
+    }
+  ],
+  "matched_results_complete": true,
+  "complete": true,
+  "reused_references": 2,
+  "limitations": [
+    "single_seed",
+    "same_dev_selection",
+    "different_cohort_and_input_from_Ibex",
+    "centered_basis_changes_fit_directions_not_runtime_mean_centering",
+    "strict_uncentered_core_reuse"
+  ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "reference": "uncentered_radon",
+        "difference": 0.021723836733147817,
+        "ordinary95": [
+          -0.006610919827029135,
+          0.05101175070627005
+        ],
+        "method": "centered_radon",
+        "simultaneous95": [
+          -0.013442107578353651,
+          0.056889781044649285
+        ]
+      },
+      {
+        "reference": "uncentered_linear_resample",
+        "difference": -0.015132440109053458,
+        "ordinary95": [
+          -0.047432022647518605,
+          0.017189712085102418
+        ],
+        "method": "centered_linear_resample",
+        "simultaneous95": [
+          -0.05426705583824876,
+          0.02400217562014184
+        ]
+      },
+      {
+        "reference": "centered_linear_resample",
+        "difference": 0.07945276870124829,
+        "ordinary95": [
+          0.037454462599876275,
+          0.1212396949125291
+        ],
+        "method": "centered_radon",
+        "simultaneous95": [
+          0.028982379567678053,
+          0.12992315783481853
+        ]
+      }
+    ]
+  },
+  "study_kind": "centered_basis",
+  "basis_definition": {
+    "uncentered": "FF^T/N",
+    "centered": "FF^T/N - mu mu^T",
+    "runtime_centering": false
+  },
+  "historical_reference": {
+    "source_sequence_id": "2026_09_18_11_32_21_119628",
+    "publication_sha256": "d080650e391360d1a8563a65c738594e22773bfdd7c7e68116644d8452c42c75",
+    "left": "uncentered_radon",
+    "right": "uncentered_linear_resample",
+    "difference": 0.042596491859047014,
+    "ordinary95": [
+      0.0016725620636362196,
+      0.082929687102633
+    ],
+    "simultaneous95": [
+      -0.004785469091679602,
+      0.08997845280977362
+    ],
+    "simultaneous_family": "original_core_five_contrasts"
+  }
+}

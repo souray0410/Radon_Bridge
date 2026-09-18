@@ -95,9 +95,9 @@
     },
     {
       "id": "ws02_centered_basis",
-      "state": "registered",
-      "report": "coverage.md",
-      "remaining": "Approved WS02 single-seed centered-SVD package is registered; centered train-only basis refit, two new matched arms, right-side audit and left independent acceptance remain.",
+      "state": "pending_independent_acceptance",
+      "report": "centered_basis/README.md",
+      "remaining": "WS02 execution 2/2, independent centered-basis numeric acceptance, two profiles and right-side final audit are complete; left-side final independent scientific acceptance remains required.",
       "expected_ids": [
         "uncentered_radon",
         "uncentered_linear_resample",
@@ -109,9 +109,18 @@
         "uncentered_linear_resample": "ws02_core/linear"
       },
       "comparisons": [
-        ["centered_radon", "uncentered_radon"],
-        ["centered_linear_resample", "uncentered_linear_resample"],
-        ["centered_radon", "centered_linear_resample"]
+        [
+          "centered_radon",
+          "uncentered_radon"
+        ],
+        [
+          "centered_linear_resample",
+          "uncentered_linear_resample"
+        ],
+        [
+          "centered_radon",
+          "centered_linear_resample"
+        ]
       ],
       "fixed": {
         "stage": 3,
@@ -122,6 +131,18 @@
         "rho": 0.125,
         "group_count": 1,
         "seed": 3416
+      },
+      "sequence_id": "2026_09_19_01_19_02_633840",
+      "data": "centered_basis/current.json",
+      "right_execution_review": {
+        "passed": true,
+        "scientific_source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
+        "numeric_validator_commit": "15b02427596f39a83011c0732924a78e86348eb8",
+        "numeric_acceptance_sha256": "1194787cd3f0ed8d49f5980dde1d84220cf2836a9754d981edbb29e4ed377440",
+        "right_audit_sha256": "3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397",
+        "participants": 296,
+        "bootstrap_resamples": 10000,
+        "test_used": false
       }
     },
     {

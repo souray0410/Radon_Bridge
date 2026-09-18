@@ -172,7 +172,7 @@ def report(root,_allow_centered_audit_build=False):
                .replace('五项同时95%区间','三项同时95%区间')
                .replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。')
                for line in lines if 'MMTM和交叉注意力为' not in line]
-        lines=[line.replace('完整中心化匹配包：已齐全','完整中心化匹配包：已齐全（两新臂、profiles与包内独立audit均接受）') if current['complete'] else line for line in lines]
+        lines=[line.replace('完整中心化匹配包：已齐全','完整中心化匹配包：两新臂、profiles与包内独立audit已齐全（不等于外部最终科学接受）') if current['complete'] else line for line in lines]
         lines+=['','## 概率质量与校准方向','','校准方向采用 calibration-in-the-large：正类平均预测概率减开发集正类比例；正值表示整体偏高估，负值表示整体偏低估。它只作方向性描述，不新增显著性检验。','',
                 '|方法|CFP log-loss|CFP AUROC|CFP校准方向|OCT log-loss|OCT AUROC|OCT校准方向|','|---|---:|---:|---:|---:|---:|---:|']
         for row in rows:
