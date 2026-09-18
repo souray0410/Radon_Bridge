@@ -25,27 +25,248 @@
     "precision": "FP32; cuDNN TF32 true matching historical parents"
   },
   "state": {
-    "state": "running",
-    "accepted": 0,
+    "state": "complete",
+    "accepted": 3,
     "planned": 3,
-    "updated_at": 1789740424.8916216,
-    "active": [
-      {
-        "device": "1",
-        "name": "host_continue_seed3416",
-        "phase": "train"
-      }
-    ],
+    "updated_at": 1789741026.0590568,
+    "active": [],
     "failed": {}
   },
-  "results": [],
-  "complete": false,
+  "results": [
+    {
+      "id": "host_continue",
+      "name": "MMTM\u7ee7\u7eed\u8bad\u7ec3",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "same accepted MMTM host; new matched continuation",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_17_04_31_666766/host_continue/best.pt",
+        "sha256": "5c6e2385673057e8fc42b2bcc4a595fd646f66f4f9cc5af9795c829219673d52"
+      }
+    },
+    {
+      "id": "host_radon",
+      "name": "MMTM\uff0bRadon\u6865",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7317579581301978,
+          "macro_precision": 0.7378977775707031,
+          "macro_recall": 0.7331081081081081,
+          "accuracy": 0.7331081081081081,
+          "confusion_matrix": [
+            [
+              119,
+              29
+            ],
+            [
+              50,
+              98
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1710732780149338,
+          "auroc": 0.7527392257121986
+        },
+        "oct": {
+          "macro_f1": 0.6855136733185514,
+          "macro_precision": 0.6984674329501916,
+          "macro_recall": 0.6891891891891891,
+          "accuracy": 0.6891891891891891,
+          "confusion_matrix": [
+            [
+              118,
+              30
+            ],
+            [
+              62,
+              86
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.6534636704353278,
+          "auroc": 0.7322863403944485
+        }
+      },
+      "mean_f1": 0.7086358157243746,
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "provenance": "same accepted MMTM host; new matched continuation",
+      "prediction_sha256": "52ce759020198127d1deca29f1e48670b173b94de635db2026112844b4216723",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_17_04_31_666766/host_radon/best.pt",
+        "sha256": "48047b6c8e73472cbb6894455ffff6c229224bf0381bfbd269250460842b9aa8"
+      }
+    },
+    {
+      "id": "host_linear",
+      "name": "MMTM\uff0b\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6621467378897867,
+          "macro_precision": 0.6621917808219178,
+          "macro_recall": 0.6621621621621622,
+          "accuracy": 0.6621621621621622,
+          "confusion_matrix": [
+            [
+              97,
+              51
+            ],
+            [
+              49,
+              99
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.220536545330464,
+          "auroc": 0.720553323593864
+        },
+        "oct": {
+          "macro_f1": 0.6653533865497276,
+          "macro_precision": 0.6659116906886295,
+          "macro_recall": 0.6655405405405406,
+          "accuracy": 0.6655405405405406,
+          "confusion_matrix": [
+            [
+              102,
+              46
+            ],
+            [
+              53,
+              95
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.6054399129183756,
+          "auroc": 0.6906729364499633
+        }
+      },
+      "mean_f1": 0.6637500622197572,
+      "best_epoch": 10,
+      "stop_epoch": 16,
+      "provenance": "same accepted MMTM host; new matched continuation",
+      "prediction_sha256": "2083c396b62741bbed58e39a05174c02d374958d39ea973e42ca9f69dc8b5ba7",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_17_04_31_666766/host_linear/best.pt",
+        "sha256": "b7c9128ba5e2fe419902df8691f32f69f39d441ead0dfbc231ba3ec0f73eed6f"
+      }
+    }
+  ],
+  "complete": true,
   "limitations": [
     "single_seed",
     "same_dev_selection",
     "explicit_identity_initialized_MMTM_adapter",
     "additional_training_stage_all_arms_matched"
   ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "reference": "host_continue",
+        "difference": 0.04850664678499861,
+        "ordinary95": [
+          0.005831223096695904,
+          0.09067359265193714
+        ],
+        "method": "host_radon",
+        "simultaneous95": [
+          -0.0018431904148706255,
+          0.09885648398486785
+        ]
+      },
+      {
+        "reference": "host_continue",
+        "difference": 0.0036208932803811766,
+        "ordinary95": [
+          -0.02840216397982081,
+          0.034704465682364266
+        ],
+        "method": "host_linear",
+        "simultaneous95": [
+          -0.03404418480537112,
+          0.041285971366133475
+        ]
+      },
+      {
+        "reference": "host_linear",
+        "difference": 0.04488575350461743,
+        "ordinary95": [
+          0.004772856075282325,
+          0.08513071380956119
+        ],
+        "method": "host_radon",
+        "simultaneous95": [
+          -0.003220729974724036,
+          0.09299223698395889
+        ]
+      }
+    ]
+  },
   "study_kind": "existing_method_augmentation",
   "augmentation_host": {
     "method": "identity-initialized MMTM adaptation",

@@ -842,9 +842,8 @@
     },
     {
       "id": "ws02_mmtm_augmentation",
-      "state": "running",
+      "state": "accepted",
       "report": "augmentation/README.md",
-      "remaining": "First arm profile accepted and real training; await all three arms, independent audit and simultaneous intervals",
       "expected_ids": [
         "host_continue",
         "host_radon",
