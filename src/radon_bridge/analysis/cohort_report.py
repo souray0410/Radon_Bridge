@@ -72,6 +72,15 @@ def report(root):
         lines.append(f'|{row["name"]}|{100*row["metrics"]["cfp"]["macro_f1"]:.2f}%|{100*row["metrics"]["oct"]["macro_f1"]:.2f}%|{100*row["mean_f1"]:.2f}%|{row["best_epoch"]}/{row["stop_epoch"]}|{row["provenance"]}|')
     lines+=['','分支均值不是概率融合后的单模型分数，不与LOOK的融合输出F1混排。完整后自动生成10,000次配对bootstrap普通与同时区间；单种子且dev参与选择，不能推出稳定泛化优势。',
         '完整配置/状态和聚合指标：[current.json](current.json)。参与者预测及权重不上传GitHub。']
+    if current['complete']:
+        lines+=['','## 完整匹配后的差异（百分点）','','均为SVD-Radon减对应对照，越大表示本配置下F1更高。','',
+                '|对照|差值|普通95%区间|五项同时95%区间|','|---|---:|---|---|']
+        for c in current['comparisons']['contrasts']:
+            lo,hi=c['ordinary95'];sl,sh=c['simultaneous95']
+            lines.append(f'|{labels_name[c["reference"]]}|{100*c["difference"]:+.2f}|[{100*lo:+.2f}, {100*hi:+.2f}]|[{100*sl:+.2f}, {100*sh:+.2f}]|')
+        initial=[r['name'] for r in rows if r['best_epoch']==0]
+        if initial:lines+=['','选回初始父模型的设置：'+ '、'.join(initial)+'。它们已按停止规则训练，最终选模回到第0轮；分数相同不能解释成方法等效。']
+        lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']
     content='\n'.join(lines)+'\n';target=out/'README.md'
     if not target.exists() or target.read_text()!=content:
         temp=out/'.README.tmp';temp.write_text(content);temp.replace(target)
