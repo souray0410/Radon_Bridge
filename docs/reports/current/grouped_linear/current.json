@@ -1,0 +1,738 @@
+{
+  "schema": "radon_small_cohort_publication_v1",
+  "sequence_id": "2026_09_18_22_01_54",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "input": {
+    "cfp": "two eyes x RGB x224x224",
+    "oct": "two eyes x1x32x96x96"
+  },
+  "backbone": "ResNet18 2D / inflated3D",
+  "selection": "development mean of branch macro-F1",
+  "configuration": {
+    "stage": 3,
+    "channel_rank": 32,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "real_batch": 16,
+    "minimum_epochs": 8,
+    "maximum_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "precision": "FP32; cuDNN TF32 true matching historical parents"
+  },
+  "state": {
+    "state": "complete",
+    "accepted": 8,
+    "planned": 8,
+    "updated_at": 1789759913.6842487,
+    "active": [],
+    "failed": {}
+  },
+  "results": [
+    {
+      "id": "grouped_g1_radon",
+      "name": "G=1 Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7229603250696252,
+          "macro_precision": 0.723013698630137,
+          "macro_recall": 0.722972972972973,
+          "accuracy": 0.722972972972973,
+          "confusion_matrix": [
+            [
+              106,
+              42
+            ],
+            [
+              40,
+              108
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.164560954883288,
+          "auroc": 0.7687636961285611
+        },
+        "oct": {
+          "macro_f1": 0.7127558767453277,
+          "macro_precision": 0.7130810366104484,
+          "macro_recall": 0.7128378378378378,
+          "accuracy": 0.7128378378378378,
+          "confusion_matrix": [
+            [
+              108,
+              40
+            ],
+            [
+              45,
+              103
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.319738123387117,
+          "auroc": 0.7694028487947407
+        }
+      },
+      "reused": true,
+      "mean_f1": 0.7178581009074765,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "provenance": "G=1 strict accepted-core reuse; no new training",
+      "prediction_sha256": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/svd/best.pt",
+        "sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847"
+      }
+    },
+    {
+      "id": "grouped_g1_linear_resample",
+      "name": "G=1 \u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6958904109589041,
+          "macro_precision": 0.6960891812865497,
+          "macro_recall": 0.6959459459459459,
+          "accuracy": 0.6959459459459459,
+          "confusion_matrix": [
+            [
+              105,
+              43
+            ],
+            [
+              47,
+              101
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.270154298053045,
+          "auroc": 0.7254839298758218
+        },
+        "oct": {
+          "macro_f1": 0.6546328071379548,
+          "macro_precision": 0.6568085498433758,
+          "macro_recall": 0.6554054054054055,
+          "accuracy": 0.6554054054054054,
+          "confusion_matrix": [
+            [
+              104,
+              44
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.6055514761965435,
+          "auroc": 0.68745434623813
+        }
+      },
+      "reused": true,
+      "mean_f1": 0.6752616090484295,
+      "best_epoch": 9,
+      "stop_epoch": 15,
+      "provenance": "G=1 strict accepted-core reuse; no new training",
+      "prediction_sha256": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/linear/best.pt",
+        "sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f"
+      }
+    },
+    {
+      "id": "grouped_g2_radon",
+      "name": "G=2 Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6871323529411765,
+          "macro_precision": 0.694298574643661,
+          "macro_recall": 0.6891891891891893,
+          "accuracy": 0.6891891891891891,
+          "confusion_matrix": [
+            [
+              90,
+              58
+            ],
+            [
+              34,
+              114
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1739107949613992,
+          "auroc": 0.7503652300949599
+        },
+        "oct": {
+          "macro_f1": 0.7025804978305549,
+          "macro_precision": 0.7030364002194989,
+          "macro_recall": 0.7027027027027027,
+          "accuracy": 0.7027027027027027,
+          "confusion_matrix": [
+            [
+              101,
+              47
+            ],
+            [
+              41,
+              107
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.362920825345731,
+          "auroc": 0.7386778670562454
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.6948564253858657,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "4d4295a30842566897da584bb0c8fad7a836bac3280ae5145c78836ce188fdfe",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g2_radon/best.pt",
+        "sha256": "847fa93db534e114d35eab41a59626198a8f4d716010053a1a0dca76af001245"
+      }
+    },
+    {
+      "id": "grouped_g2_linear_resample",
+      "name": "G=2 \u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g2_linear_resample/best.pt",
+        "sha256": "eb502b4bea7c01683fbc07e6b47a175cc4f6089866772e448362d0e52f44d807"
+      }
+    },
+    {
+      "id": "grouped_g4_radon",
+      "name": "G=4 Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7059971914922766,
+          "macro_precision": 0.7063165592577357,
+          "macro_recall": 0.7060810810810811,
+          "accuracy": 0.706081081081081,
+          "confusion_matrix": [
+            [
+              107,
+              41
+            ],
+            [
+              46,
+              102
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1749986199649163,
+          "auroc": 0.7526935719503287
+        },
+        "oct": {
+          "macro_f1": 0.6674004769767015,
+          "macro_precision": 0.6720610119047619,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              109,
+              39
+            ],
+            [
+              59,
+              89
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.5465511243558274,
+          "auroc": 0.727264426588751
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.6866988342344891,
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "1c61e902ffc0b3d180bf0c71ee750932dabe3af55e02d8500bd0e7497c1860c9",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g4_radon/best.pt",
+        "sha256": "bf1df0371c9ee5ca49d93407437d2beb3ec638007171c066571e7ee335cbe656"
+      }
+    },
+    {
+      "id": "grouped_g4_linear_resample",
+      "name": "G=4 \u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g4_linear_resample/best.pt",
+        "sha256": "da6dd15bd511f3ea21598fa05cad35bd831222d26246349123f7583bb6b8676b"
+      }
+    },
+    {
+      "id": "grouped_g8_radon",
+      "name": "G=8 Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.671212797874655,
+          "macro_precision": 0.6746009715475365,
+          "macro_recall": 0.6722972972972974,
+          "accuracy": 0.6722972972972973,
+          "confusion_matrix": [
+            [
+              91,
+              57
+            ],
+            [
+              40,
+              108
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1818970727968403,
+          "auroc": 0.7394996347699051
+        },
+        "oct": {
+          "macro_f1": 0.654838119626852,
+          "macro_precision": 0.6564338235294118,
+          "macro_recall": 0.6554054054054055,
+          "accuracy": 0.6554054054054054,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              57,
+              91
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.4047979032956552,
+          "auroc": 0.689554419284149
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.6630254587507536,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "3b56200d1e9841b304de86336fe6eb8b1fedee38ef70f0b976e81f778f654d1f",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g8_radon/best.pt",
+        "sha256": "b87222262fe0fecc807cb2a3fb28b24b19ef0045a7534f98875126501d413b28"
+      }
+    },
+    {
+      "id": "grouped_g8_linear_resample",
+      "name": "G=8 \u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g8_linear_resample/best.pt",
+        "sha256": "3c913c5d84e7bb6373284f587cc3416c518efe0d44fe86f9766ccaa61d9b5d03"
+      }
+    },
+    {
+      "id": "grouped_g16_radon",
+      "name": "G=16 Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6788744618406477,
+          "macro_precision": 0.6794555021734157,
+          "macro_recall": 0.6790540540540541,
+          "accuracy": 0.6790540540540541,
+          "confusion_matrix": [
+            [
+              104,
+              44
+            ],
+            [
+              51,
+              97
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1902889067487668,
+          "auroc": 0.7379930606281957
+        },
+        "oct": {
+          "macro_f1": 0.6451690242148166,
+          "macro_precision": 0.6454362630833219,
+          "macro_recall": 0.6452702702702703,
+          "accuracy": 0.6452702702702703,
+          "confusion_matrix": [
+            [
+              93,
+              55
+            ],
+            [
+              50,
+              98
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.5917424917080352,
+          "auroc": 0.6753560993425859
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.6620217430277322,
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "a647a96bd9cfa4acbe1c87ec484628de3076a37d28bedeb9d819bdee1b48b098",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g16_radon/best.pt",
+        "sha256": "de732259657c96736735e2edc6455a373aeeea78f99df12f83a8717b5c588112"
+      }
+    },
+    {
+      "id": "grouped_g16_linear_resample",
+      "name": "G=16 \u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "reused": false,
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "new approved grouped-linear single-seed execution",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_22_01_54/grouped_g16_linear_resample/best.pt",
+        "sha256": "39ff82887e74d1cebef05a135b69b617d1e8d318b053f2221c3cf811a804670c"
+      }
+    }
+  ],
+  "matched_results_complete": true,
+  "complete": true,
+  "reused_references": 2,
+  "limitations": [
+    "single_seed",
+    "same_dev_selection",
+    "different_cohort_and_input_from_Ibex",
+    "G1_strict_reuse",
+    "grouping_limits_direct_bridge_connectivity_not_whole_network_independence",
+    "uncompressed_budget_match_separate"
+  ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "reference": "grouped_g1_linear_resample",
+        "difference": 0.042596491859047014,
+        "ordinary95": [
+          0.0016725620636362196,
+          0.082929687102633
+        ],
+        "method": "grouped_g1_radon",
+        "simultaneous95": [
+          -0.009976342358736581,
+          0.09516932607683061
+        ]
+      },
+      {
+        "reference": "grouped_g2_linear_resample",
+        "difference": 0.03472725644648966,
+        "ordinary95": [
+          -0.00704185014923791,
+          0.07606902219308584
+        ],
+        "method": "grouped_g2_radon",
+        "simultaneous95": [
+          -0.018794640626306855,
+          0.08824915351928618
+        ]
+      },
+      {
+        "reference": "grouped_g4_linear_resample",
+        "difference": 0.026569665295113065,
+        "ordinary95": [
+          -0.011948103578965013,
+          0.06484882352143473
+        ],
+        "method": "grouped_g4_radon",
+        "simultaneous95": [
+          -0.023156057118857577,
+          0.0762953877090837
+        ]
+      },
+      {
+        "reference": "grouped_g8_linear_resample",
+        "difference": 0.0028962898113775726,
+        "ordinary95": [
+          -0.033733738841030265,
+          0.038347412149774565
+        ],
+        "method": "grouped_g8_radon",
+        "simultaneous95": [
+          -0.043574122597701506,
+          0.04936670222045665
+        ]
+      },
+      {
+        "reference": "grouped_g16_linear_resample",
+        "difference": 0.0018925740883561915,
+        "ordinary95": [
+          -0.030441152163474233,
+          0.0321884549983579
+        ],
+        "method": "grouped_g16_radon",
+        "simultaneous95": [
+          -0.03879229964598308,
+          0.042577447822695465
+        ]
+      }
+    ]
+  },
+  "study_kind": "grouped_linear",
+  "groups": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ]
+}

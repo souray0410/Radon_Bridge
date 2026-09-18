@@ -7,7 +7,7 @@
 |小队列六臂：桥是否有附加收益|[6/6，单3416](small_cohort/README.md)|正式多种子与大队列不能由此替代|
 |SVD与QR/可学习通道是否不同|[有限六项匹配包](channel_compression/README.md)|6/6已独立验收：原SVD两项复用、四项新增；中心化方向另待验收|
 |全局线性分解是否保留几何收益|[24/24，三种子](factorized/README.md)，本次重新核验全部原产物和F1|补入累计页，精确复用，不重训；容量与几何因素分开解释|
-|固定SVD+分组卷积|原方案G=1/2/4/8/16，各G匹配普通通信|尚无已验收分组比较。先实现跨来源分组和逆排列，验证组内/跨组梯度，再做一个代表配置及匹配对照|
+|固定SVD+分组卷积|[右侧完整执行包](grouped_linear/README.md)：G=1严格复用，G=2/4/8/16×Radon/普通通信8/8结束，右侧SHA/296人/F1/profile/audit通过|等待左侧按原产物做最终独立科学验收；当前不把右侧自检直接升级为最终accepted|
 |不压缩+分组与SVD+稠密比较|原批准补充保留|先核验等参数/近似等计算的可行匹配；不通过填通道或暗改r/M/S制造匹配|
 |大队列六臂/三疾病/三架构|有限162位置；源状态保留最近运行核验时间|父模型、实际pair/runtime/恢复/逐臂验收尚未齐；13:40UTC复核Ibex仍待资源：Dense3D暂停、新32无正式更新|
 |参考组49机制×三种子|147位置，下面逐臂列出|实现/CPU测试不是科研接受；不能把ws02的SVD/普通通信直接计为这里的ResNet50大队列结果|
@@ -20,7 +20,7 @@
 
 - 固定SVD降维后做稠密卷积：当前核心的主桥。
 - 全局A/K/B可学习分解：本页24项，R是全局瓶颈容量。
-- 分组卷积：限制直接连接范围；各组需含不同来源，尚无已验收结果。
+- 分组卷积：限制直接连接范围；各组含CFP/OCT来源。WS02有限包已由右侧8/8执行并完成技术audit，左侧最终独立验收尚待完成。
 - 旧learned_projected是按来源分别学习两端映射，与全局分解不同；learned_channel是另一个已登记机制因素。代码支持不代表已经训练。
 
 原批准依据：[分组补充历史协议](https://github.com/souray0410/Radon_Bridge/blob/91beacfdbc3173993dbe84e11a824633b98b28c4/docs/linear_grouping_supplement_20260914.zh-CN.md)、[分解协议](https://github.com/souray0410/Radon_Bridge/blob/91beacfdbc3173993dbe84e11a824633b98b28c4/docs/factorized_ws_20260914.zh-CN.md)、[年末有限范围](../../semester_delivery_2026.zh-CN.md)、[研究矩阵](../../../src/radon_bridge/studies/research_matrix.py)。
@@ -95,4 +95,4 @@
 
 ## 2026-09-18 新增完整包
 
-ws02 MMTM加桥三臂3/3已独立接受，当前四包去重35次执行；[详细比较](augmentation/README.md)。本适配不覆盖所有外部方法加桥，分组、中心化及大队列等原范围保留。
+ws02 MMTM加桥三臂3/3已独立接受，当前四包去重35次执行；[详细比较](augmentation/README.md)。本适配不覆盖所有外部方法加桥，分组、中心化及大队列等原范围保留。\n\n## 2026-09-18 grouped 执行完成，待左侧最终独立验收\n\n[G=1/2/4/8/16完整执行报告](grouped_linear/README.md)已由右侧从WS02原产物复制并校验字节SHA。G=2/4/8/16共8个新臂均完成，manager无失败；最终技术audit核296人顺序、独立sklearn F1、profile/resume和全部资产SHA通过。此处仍保持coverage非accepted，直到左侧按原产物独立复核并显式接受。

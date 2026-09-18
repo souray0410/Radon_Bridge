@@ -3,15 +3,15 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "MMTM加桥三臂已完整接受；分组卷积本地结构/匹配CPU验收已通过，下一门槛为原owner接入独立formal case/receipt并完成首个G=2匹配GPU验收；Ibex父模型及正式门槛继续。",
+  "next_acceptance": "grouped WS02有限包已由右侧完成8/8执行、profile/resume与技术audit，当前等待左侧按远端原产物做最终独立科学验收；Ibex父模型及正式门槛继续。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "52b469fec28f3b3024ee212d4534a1afc1a2d3cf",
   "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
-  "verified_at": "2026-09-18T14:53:07.294070+00:00",
-  "verification_scope": "runtime_and_evidence",
+  "verified_at": "2026-09-18T19:34:46.979007+00:00",
+  "verification_scope": "ws02_grouped_execution_and_four_grid_runtime; earlier accepted numerical packages retain their own cutoffs",
   "layers": {
     "planned": "documented",
     "implemented": "partial",
@@ -48,13 +48,13 @@
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
     "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
     "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
-    "2026-09-18 WebCodex grouped-linear证据只覆盖本地实现/CPU结构验收；未部署formal supplemental case/receipt，未运行G>1 GPU，不能记为科研接受。"
+    "2026-09-18 grouped WS02包已8/8执行并通过右侧技术audit，但按左侧规划/右侧执行的新分工，右侧自检不替代左侧最终独立科学验收；当前coverage仍为pending_independent_acceptance。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
     "Active parent controller lacks accepted project runtime binding",
     "Actual complete-pair replay and GPU integration acceptance remain required",
-    "Grouped supplement formal case/receipt adapter and first G=2 matched GPU acceptance remain undeployed"
+    "Grouped WS02 execution is complete; left-side final independent acceptance is still required before marking the package scientifically accepted"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -79,7 +79,7 @@
     "2026-09-18 13:40UTC现场：ws02有限任务已正常结束且GPU空闲，独立最终核验并用新显示生成器发布；不是新任务在训练。Ibex两CPU进程及新周期error=null，1allocation运行/23待批；LOOK原残差内存保护失败仍待充足资源，Dense3D暂停epoch5/15319updates，新32仍4登记文件无正式更新。",
     "新ws02 run2026_09_18_17_04_31_666766：MMTM继续训练／MMTM+Radon／MMTM+普通通信三臂，同种子3416同验收宿主和原停止规则。c0211ac独立源码，11项迁移/报告/覆盖检查通过；第一臂完整GPU恢复预检通过，正式训练已至epoch3，其他按原manager有限顺序接续。原MMTM best_epoch0与原生父状态逐项一致才允许本包复用SVD基。",
     "2026-09-18 14:52UTC：三臂自动profile→训练→报告全部完成，独立audit通过；无活GPU进程且manager正常结束。远端active旧running已按完成证据修正，不重启已完成队列。Ibex14:50UTC两个dispatcher新鲜error=null，squeue为1运行allocation/23待批；不等于项目GPU正在训练。",
-    "2026-09-18 WebCodex：独立Mac clone提交a01bba6f0579fb10df6f570f91bcd7d41f68fb4f实现跨来源grouped Conv及匹配配置；精确Python3.11/Torch2.8.0/MHD V4下新增6项与相关12项CPU测试通过，结构/framework/publication coverage/术语/diff检查通过；只读SOL终审无blocking local defect。G1明确严格复用，G2/4/8/16共8个新臂尚未远端派发，formal supplemental adapter/GPU验收仍归原owner。"
+    "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"

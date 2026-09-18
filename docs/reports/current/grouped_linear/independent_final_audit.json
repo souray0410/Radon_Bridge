@@ -1,0 +1,531 @@
+{
+  "schema": "radon_grouped_final_audit_v1",
+  "passed": true,
+  "participants": 296,
+  "independent_sklearn_f1": true,
+  "ordered_ids_labels_matched": true,
+  "all_artifact_sha_verified": true,
+  "test_used": false,
+  "queue_sha256": "206eb736b04a5a2da8f5def7eefbc4f4184e4a2eee06fb4dc2269be631686f0b",
+  "deployment": {
+    "dependencies_sha256": "d1efdeb02c577dc5d19337957b8e8b8bd3ff2748e1a27ec1e3871821e1b6c256",
+    "code_sha256": "cddde9ebf723d2c1dfe0a0a5989cc79030fdd85519de19af2c700b478adfc498",
+    "cpu_acceptance_sha256": "f863d958d756cae6f5dee6b22fdabb416ee48fc49f7a4fe19c3338a9517f77dc"
+  },
+  "status_sha256": "5870e21b398a7f9032cf824c735e99a6d8e66f08e53499987558420a979b32a5",
+  "rows": [
+    {
+      "id": "grouped_g1_radon",
+      "reused": true,
+      "metrics": {
+        "cfp": 0.7229603250696252,
+        "oct": 0.7127558767453277
+      },
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "prediction_sha256": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb"
+    },
+    {
+      "id": "grouped_g1_linear_resample",
+      "reused": true,
+      "metrics": {
+        "cfp": 0.6958904109589041,
+        "oct": 0.6546328071379548
+      },
+      "best_epoch": 9,
+      "stop_epoch": 15,
+      "prediction_sha256": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88"
+    },
+    {
+      "id": "grouped_g2_radon",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.6871323529411765,
+        "oct": 0.7025804978305549
+      },
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "prediction_sha256": "4d4295a30842566897da584bb0c8fad7a836bac3280ae5145c78836ce188fdfe"
+    },
+    {
+      "id": "grouped_g2_linear_resample",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+    },
+    {
+      "id": "grouped_g4_radon",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.7059971914922766,
+        "oct": 0.6674004769767015
+      },
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "prediction_sha256": "1c61e902ffc0b3d180bf0c71ee750932dabe3af55e02d8500bd0e7497c1860c9"
+    },
+    {
+      "id": "grouped_g4_linear_resample",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+    },
+    {
+      "id": "grouped_g8_radon",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.671212797874655,
+        "oct": 0.654838119626852
+      },
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "prediction_sha256": "3b56200d1e9841b304de86336fe6eb8b1fedee38ef70f0b976e81f778f654d1f"
+    },
+    {
+      "id": "grouped_g8_linear_resample",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+    },
+    {
+      "id": "grouped_g16_radon",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.6788744618406477,
+        "oct": 0.6451690242148166
+      },
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "prediction_sha256": "a647a96bd9cfa4acbe1c87ec484628de3076a37d28bedeb9d819bdee1b48b098"
+    },
+    {
+      "id": "grouped_g16_linear_resample",
+      "reused": false,
+      "metrics": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+    }
+  ],
+  "profiles": {
+    "grouped_g2_radon": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g2_radon_seed3416_1789758211795595661/accepted.json",
+      "sha256": "2b92d348a563da3db40dda1dcbabd8fee0f09b62c9807e7e18cfcaac64151dad",
+      "grouped_structure": {
+        "group_count": 2,
+        "conv_groups": 2,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.3828125,
+      "peak_process_sampled_gib": 7.8046875,
+      "seconds": 8.882463592017302
+    },
+    "grouped_g2_linear_resample": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g2_linear_resample_seed3416_1789758458248948492/accepted.json",
+      "sha256": "bf28115a6132ab10bb0f0630e1e1a286f216ebc64da480b26e177ec4c22a1894",
+      "grouped_structure": {
+        "group_count": 2,
+        "conv_groups": 2,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            512,
+            512
+          ],
+          [
+            512,
+            512
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.3515625,
+      "peak_process_sampled_gib": 7.7734375,
+      "seconds": 8.531021833012346
+    },
+    "grouped_g4_radon": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g4_radon_seed3416_1789758622347359034/accepted.json",
+      "sha256": "f30d4dcab90b51edafdb9d6c064a1d46fe2523e268063947ad6a6d0b2ea24585",
+      "grouped_structure": {
+        "group_count": 4,
+        "conv_groups": 4,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.369140625,
+      "peak_process_sampled_gib": 7.791015625,
+      "seconds": 8.798957237013383
+    },
+    "grouped_g4_linear_resample": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g4_linear_resample_seed3416_1789758902319041979/accepted.json",
+      "sha256": "f2f1ff90580dbf7ab12c5497c6405815a08acd1785710ff222b546562f422591",
+      "grouped_structure": {
+        "group_count": 4,
+        "conv_groups": 4,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ],
+          [
+            256,
+            256
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.376953125,
+      "peak_process_sampled_gib": 7.798828125,
+      "seconds": 8.36358521899092
+    },
+    "grouped_g8_radon": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g8_radon_seed3416_1789759066826506968/accepted.json",
+      "sha256": "f28eb690881f655dc7599a20fd6ac32105e7778db20d7a6c13ef47f1dcb74eb5",
+      "grouped_structure": {
+        "group_count": 8,
+        "conv_groups": 8,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.33984375,
+      "peak_process_sampled_gib": 7.76171875,
+      "seconds": 8.742862829996739
+    },
+    "grouped_g8_linear_resample": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g8_linear_resample_seed3416_1789759315106767477/accepted.json",
+      "sha256": "5ae03da0038d188dc665c7cfce8589bdedca4abccb64ed057fc88dd3dde261e3",
+      "grouped_structure": {
+        "group_count": 8,
+        "conv_groups": 8,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            128,
+            128
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.359375,
+      "peak_process_sampled_gib": 7.78125,
+      "seconds": 8.325722363981185
+    },
+    "grouped_g16_radon": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g16_radon_seed3416_1789759491207308437/accepted.json",
+      "sha256": "1c1906217a0cdbc119b8796a7b034050a779b6256535b7ed0349cfbbbedeaa3a",
+      "grouped_structure": {
+        "group_count": 16,
+        "conv_groups": 16,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.1015625,
+      "peak_process_sampled_gib": 7.5234375,
+      "seconds": 8.707856583001558
+    },
+    "grouped_g16_linear_resample": {
+      "path": "/backup/mengh/Radon_Bridge/runs/2026_09_18_22_01_54/profiles/grouped_g16_linear_resample_seed3416_1789759755571055946/accepted.json",
+      "sha256": "bd4372d53eeed588b3446eff91284d357e7c4533dae555b36d7407aef2db23c4",
+      "grouped_structure": {
+        "group_count": 16,
+        "conv_groups": 16,
+        "source_widths": [
+          1024,
+          1024
+        ],
+        "group_source_counts": [
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            64,
+            64
+          ]
+        ],
+        "within_group_cross_source_gradient": 13.0,
+        "cross_group_direct_gradient": 0.0,
+        "inverse_permutation_verified": true
+      },
+      "peak_reserved_gib": 7.2109375,
+      "peak_process_sampled_gib": 7.6328125,
+      "seconds": 8.3245271120104
+    }
+  },
+  "publication_sha256": "db16c21a70a01cb82d3c580a980f6886fcb99e2513a3a9b6526f6d536db9a285"
+}
