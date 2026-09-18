@@ -44,8 +44,12 @@ def main():
     lock=(root/'manager.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     q=json.loads((root/'queue.json').read_text())
     if q.get('test_used') is not False:raise ValueError('Unsealed cohort queue')
-    if q.get('study_kind')=='grouped_linear':
+    study=q.get('study_kind')
+    if study=='grouped_linear':
         from radon_bridge.studies.cohort_grouped import validate_queue
+        validate_queue(root,q)
+    elif study=='centered_basis':
+        from radon_bridge.studies.cohort_centered import validate_queue
         validate_queue(root,q)
     elif q.get('schema')!='radon_small_cohort_core_v1':raise ValueError('Unknown cohort queue contract')
     cases=q['cases'];active={};failed={};complete=set();profiles={}
@@ -60,7 +64,7 @@ def main():
         for key,path in old.get('resource_profiles',{}).items():
             if key not in by_resource:raise ValueError('Unknown recovered resource profile')
             cfg=json.loads(Path(by_resource[key]['config']).read_text())
-            if profile_verified(path,cfg,q.get('study_kind')=='grouped_linear'):profiles[key]=path
+            if profile_verified(path,cfg,study=='grouped_linear'):profiles[key]=path
 
     # These full receipts are generated before execution, not inferred from directory names.
     for name in ['dependencies_acceptance.json','code_acceptance.json']:
@@ -72,11 +76,14 @@ def main():
         for path,digest in dependencies[section].items():
             if sha(path)!=digest:raise ValueError('Dependency changed: '+path)
     code=json.loads((root/'code_acceptance.json').read_text())
-    if q.get('study_kind')=='grouped_linear' and (code.get('source_commit')!=q['source_commit'] or code.get('framework_commit')!=q['framework_commit'] or code.get('passed_cpu') is not True or code.get('test_used') is not False):raise ValueError('Grouped code acceptance mismatch')
+    if study in ('grouped_linear','centered_basis') and (code.get('source_commit')!=q['source_commit'] or code.get('framework_commit')!=q['framework_commit'] or code.get('passed_cpu') is not True or code.get('test_used') is not False):raise ValueError('Supplement code acceptance mismatch')
     for path,digest in code['files'].items():
         if sha(path)!=digest:raise ValueError('Code changed after acceptance: '+path)
-    if q.get('study_kind')=='grouped_linear':
+    if study=='grouped_linear':
         from radon_bridge.studies.cohort_grouped import verify_deployment_receipts
+        verify_deployment_receipts(root,q)
+    elif study=='centered_basis':
+        from radon_bridge.studies.cohort_centered import verify_deployment_receipts
         verify_deployment_receipts(root,q)
     (root/'profiles').mkdir(exist_ok=True);(root/'trials').mkdir(exist_ok=True)
     started=time.time()
@@ -88,7 +95,7 @@ def main():
             if proc.returncode==0 and receipt.exists():
                 if mode=='profile':
                     cfg=json.loads(Path(c['config']).read_text())
-                    if profile_verified(receipt,cfg,q.get('study_kind')=='grouped_linear'):profiles[c['resource']]=str(receipt)
+                    if profile_verified(receipt,cfg,study=='grouped_linear'):profiles[c['resource']]=str(receipt)
                 elif verified(receipt,json.loads(Path(c['config']).read_text())):complete.add(c['name'])
             else:
                 failed[c['name']]=dict(exit_code=proc.returncode,mode=mode,path=str(output),state='paused' if proc.returncode==75 else 'needs_review')

@@ -19,6 +19,62 @@ def tensor_sha(t):return hashlib.sha256(t.detach().cpu().contiguous().numpy().to
 def file_sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+def same_parent_identity(old,new):
+    return (isinstance(old,dict) and isinstance(new,dict) and set(old)==set(new)
+            and all(old[k].get('sha256')==new[k].get('sha256') for k in old))
+
+
+def statistics_fingerprint(config,data,initial_native_sha256):
+    data=Path(data)
+    parents={k:v['sha256'] for k,v in sorted(config['parent_checkpoints'].items())}
+    uncentered={k:v['sha256'] for k,v in sorted(config.get('uncentered_basis_files',{}).items())}
+    payload=dict(schema='train_channel_sufficient_statistics_v1',seed=config['seed'],parents=parents,
+        nodes=list(config['nodes']),microbatch=config['microbatch'],source_commit=config['source_commit'],
+        fit_centered=bool(config.get('fit_centered',False)),uncentered_basis_sha256=uncentered,
+        data_audit_sha256=file_sha(data/'audit.json'),selected_sha256=file_sha(data/'selected.csv'),
+        preprocessing='PairedDataset train, CFP224 normalization, OCT fixed normalization',
+        sampling='all eyes and spatial positions; deterministic train order; no shuffle',
+        batchnorm='eval; unchanged',fit_domain=config.get('fit_domain','native stage3 channel features; all eyes and spatial positions equally weighted'),
+        initial_native_sha256=initial_native_sha256,basis_versions=[BASIS_VERSION,CENTERED_VERSION])
+    text=json.dumps(payload,sort_keys=True,separators=(',',':'))
+    return hashlib.sha256(text.encode()).hexdigest(),payload
+
+
+def save_statistics_state(path,fingerprint,offset,moments,sums,counts,ids):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_suffix('.tmp')
+    torch.save(dict(schema='train_channel_sufficient_statistics_state_v1',fingerprint=fingerprint,offset=offset,
+        moments=moments,sums=sums,counts=counts,ids=list(ids)),tmp);tmp.replace(path)
+
+
+def load_statistics_state(path,fingerprint,nodes,centered,total):
+    value=torch.load(path,map_location='cpu',weights_only=False)
+    if (value.get('schema')!='train_channel_sufficient_statistics_state_v1' or value.get('fingerprint')!=fingerprint
+            or type(value.get('offset')) is not int or not 0<=value['offset']<=total or len(value.get('ids',[]))!=value['offset']):
+        raise ValueError('Centered sufficient-statistics cache identity changed')
+    moments=value.get('moments',{});sums=value.get('sums',{});counts=value.get('counts',{})
+    if (len(set(value['ids']))!=len(value['ids']) or set(moments)-set(nodes) or set(counts)-set(nodes)
+            or (centered and set(sums)-set(nodes))):
+        raise ValueError('Centered sufficient-statistics cache nodes changed')
+    if value['offset']>0 and (set(moments)!=set(nodes) or set(counts)!=set(nodes) or (centered and set(sums)!=set(nodes))):
+        raise ValueError('Incomplete cached sufficient-statistics nodes')
+    for key,moment in moments.items():
+        if (moment.dtype!=torch.float64 or moment.device.type!='cpu' or moment.ndim!=2 or moment.shape[0]!=moment.shape[1]
+                or not torch.isfinite(moment).all() or type(counts.get(key)) is not int or counts[key]<=0):
+            raise ValueError('Invalid cached second moment')
+        if centered:
+            channel_sum=sums.get(key)
+            if channel_sum is None or channel_sum.dtype!=torch.float64 or channel_sum.shape!=(moment.shape[0],) or not torch.isfinite(channel_sum).all():
+                raise ValueError('Invalid cached channel sum')
+    return value
+
+
+def archive_incomplete_basis_directory(output):
+    output=Path(output);bases=output/'bases'
+    if not bases.exists():return None
+    attempts=output/'basis_attempts';attempts.mkdir(parents=True,exist_ok=True)
+    destination=attempts/('bases_'+str(time.time_ns()));bases.replace(destination);return destination
+
+
 def save_basis(moment, count, directory, source_key, seed, provenance):
     """Eigenvectors of FF^T/N are the uncentered left singular vectors of F."""
     if moment.dtype!=torch.float64 or moment.device.type!='cpu' or moment.ndim!=2 or moment.shape[0]!=moment.shape[1] or count<=0 or not torch.isfinite(moment).all():
@@ -164,6 +220,7 @@ def fit_training_bases(config, output, data):
     from radon_bridge.training.trainer import parameter_hash, loader, write_json
     from radon_bridge.data.dataset import PairedDataset
     from radon_bridge.models.model import PilotGraph
+    from torch.utils.data import Subset
     start=time.monotonic();torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
@@ -180,8 +237,14 @@ def fit_training_bases(config, output, data):
     initial=parameter_hash(g);moments={};counts={};ids=[];sums={}
     centered=config.get('fit_centered',False)
     if centered and set(config.get('uncentered_basis_files',{}))!=set(config['nodes']):raise ValueError('Paired centered fit requires original bases')
+    fingerprint,fingerprint_payload=statistics_fingerprint(config,data,initial);state_path=output/'sufficient_statistics.pt'
+    offset=0
+    if state_path.exists():
+        state=load_statistics_state(state_path,fingerprint,config['nodes'],centered,len(train))
+        offset=state['offset'];moments=state['moments'];sums=state['sums'];counts=state['counts'];ids=state['ids']
     with torch.no_grad():
-        for c,o,y,keys in loader(train,config['microbatch'],seed):
+        remaining=Subset(train,range(offset,len(train)))
+        for c,o,y,keys in loader(remaining,config['microbatch'],seed):
             g.forward(c.cuda(),o.cuda(),y.cuda());ids.extend(keys)
             for key in config['nodes']:
                 x=g.by_name[key].feature_message.current_state.detach()
@@ -189,23 +252,32 @@ def fit_training_bases(config, output, data):
                 moments[key]=moments.get(key,torch.zeros(f.shape[0],f.shape[0],dtype=torch.float64))+f@f.T
                 counts[key]=counts.get(key,0)+f.shape[1]
                 if centered:sums[key]=sums.get(key,torch.zeros(f.shape[0],dtype=torch.float64))+f.sum(1)
-            write_json(output/'progress.json',{'participants':len(ids),'seconds':time.monotonic()-start})
+            offset+=len(keys)
+            if offset%128==0 or offset==len(train):save_statistics_state(state_path,fingerprint,offset,moments,sums,counts,ids)
+            write_json(output/'progress.json',{'participants':offset,'seconds':time.monotonic()-start,'statistics_fingerprint':fingerprint})
     assert len(ids)==1264 and len(set(ids))==1264 and parameter_hash(g)==initial
+    save_statistics_state(state_path,fingerprint,len(train),moments,sums,counts,ids)
     provenance={'parent_checkpoints':config['parent_checkpoints'],'initial_native_sha256':initial,
                 'participant_ids_sha256':hashlib.sha256(json.dumps(ids,separators=(',',':')).encode()).hexdigest(),
                 'participants':len(ids),'source_commit':config['source_commit'],'data_audit_sha256':file_sha(Path(data)/'audit.json'),
-                'batchnorm':'eval; unchanged','fit_domain':config.get('fit_domain','native stage3 channel features; all eyes and spatial positions equally weighted')}
+                'batchnorm':'eval; unchanged','fit_domain':config.get('fit_domain','native stage3 channel features; all eyes and spatial positions equally weighted'),
+                'statistics_fingerprint':fingerprint,'statistics_fingerprint_payload':fingerprint_payload,
+                'sufficient_statistics_sha256':file_sha(state_path)}
     if centered:
         for key,moment in moments.items():
             ref=config['uncentered_basis_files'][key];_,_,meta=_load_basis(ref['path'],ref['sha256'])
             assert meta['version']==BASIS_VERSION and meta['seed']==seed and meta['source_key']==key
-            assert meta['provenance']['parent_checkpoints']==config['parent_checkpoints'] and meta['sampled_channel_vectors']==counts[key]
+            old_parents=meta['provenance']['parent_checkpoints'];new_parents=config['parent_checkpoints']
+            assert same_parent_identity(old_parents,new_parents) and meta['sampled_channel_vectors']==counts[key]
             assert meta['provenance']['initial_native_sha256']==initial and meta['provenance']['participant_ids_sha256']==provenance['participant_ids_sha256']
             with np.load(ref['path'],allow_pickle=False) as z:old_moment=torch.from_numpy(z['second_moment'].copy())
             assert torch.allclose(moment/counts[key],old_moment,atol=1e-10,rtol=1e-10),'Paired source statistics changed'
         provenance['uncentered_basis_files']=config['uncentered_basis_files']
+        archive_incomplete_basis_directory(output)
         bases={key:save_centered_basis(moment,sums[key],counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
-    else:bases={key:save_basis(moment,counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
+    else:
+        archive_incomplete_basis_directory(output)
+        bases={key:save_basis(moment,counts[key],output/'bases',key,seed,provenance) for key,moment in moments.items()}
     write_json(output/'summary.json',{'state':'complete','passed':True,'seed':seed,'bases':bases,'provenance':provenance,'seconds':time.monotonic()-start,'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'test_used':False})
 
 if __name__=='__main__':

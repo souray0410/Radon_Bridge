@@ -22,6 +22,7 @@ class PublicationCoverageTest(unittest.TestCase):
     def test_current_and_idempotent(self):
         before={str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
         a=check(self.root);self.assertEqual(a['unique_accepted_executions'],43)  # Adds eight new grouped runs; G=1 is strict reuse.
+        self.assertEqual(a['indexed_packages'],11)
         self.assertFalse(a['full_project_accepted']);self.assertEqual(a,check(self.root))
         self.assertEqual(before,{str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()})
 
@@ -56,6 +57,24 @@ class PublicationCoverageTest(unittest.TestCase):
     def test_grouped_locked_identity_rejected(self):
         self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='grouped_linear').update(groups=[1,2,4,8]))
         with self.assertRaisesRegex(ValueError,'grouped WS02'):check(self.root)
+
+    def test_centered_locked_identity_rejected(self):
+        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ws02_centered_basis')['comparisons'].pop())
+        with self.assertRaisesRegex(ValueError,'centered WS02'):check(self.root)
+
+    def test_centered_fixed_identity_rejected(self):
+        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ws02_centered_basis')['fixed'].update(r=64))
+        with self.assertRaisesRegex(ValueError,'centered WS02'):check(self.root)
+
+    def test_centered_acceptance_requires_global_reuse_registration(self):
+        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ws02_centered_basis').update(state='accepted'))
+        with self.assertRaisesRegex(ValueError,'global reuse'):check(self.root)
+
+    def test_duplicate_reuse_target_rejected(self):
+        def duplicate(d):
+            row=dict(d['reuse'][0]);row['source_id']='another_source';d['reuse'].append(row)
+        self.mutate('coverage.json',duplicate)
+        with self.assertRaisesRegex(ValueError,'Duplicate reuse target'):check(self.root)
 
     def test_missing_page_rejected(self):
         (self.root/'factorized/README.md').unlink()

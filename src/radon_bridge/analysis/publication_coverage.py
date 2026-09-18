@@ -15,12 +15,32 @@ def check(root):
     package_ids = [p['id'] for p in registry['packages']]
     if len(set(package_ids)) != len(package_ids):
         raise ValueError('Duplicate package identity')
-    required = {'ws02_channel_compression','ws02_core','ws02_factorized','grouped_linear','ibex_core','ibex_mechanisms','ibex_factorized','existing_method_augmentation','later_transfer_multinetwork'}
+    required = {'ws02_channel_compression','ws02_core','ws02_factorized','grouped_linear','ws02_centered_basis',
+                'ibex_core','ibex_mechanisms','ibex_factorized','existing_method_augmentation','later_transfer_multinetwork'}
     if not required.issubset(package_ids):
         raise ValueError('Approved package removed from registry')
     mechanisms = next(p for p in registry['packages'] if p['id']=='ibex_mechanisms')
     if mechanisms['expected_arms'] != arms('glaucoma')[6:]:
         raise ValueError('Approved mechanism matrix changed or omitted')
+    centered = next(p for p in registry['packages'] if p['id']=='ws02_centered_basis')
+    if (centered.get('expected_ids')!=['uncentered_radon','uncentered_linear_resample','centered_radon','centered_linear_resample']
+            or centered.get('comparisons')!=[['centered_radon','uncentered_radon'],
+                ['centered_linear_resample','uncentered_linear_resample'],['centered_radon','centered_linear_resample']]
+            or centered.get('strict_reuse')!={'uncentered_radon':'ws02_core/svd','uncentered_linear_resample':'ws02_core/linear'}
+            or centered.get('fixed')!={'stage':3,'r':32,'M':32,'S':64,'k':3,'rho':.125,'group_count':1,'seed':3416}):
+        raise ValueError('Locked centered WS02 package changed')
+    centered_reuse=[
+        {'source_package':'ws02_core','source_id':'svd','target_package':'ws02_centered_basis','target_id':'uncentered_radon'},
+        {'source_package':'ws02_core','source_id':'linear','target_package':'ws02_centered_basis','target_id':'uncentered_linear_resample'},
+    ]
+    if centered.get('state')=='accepted' and any(row not in registry['reuse'] for row in centered_reuse):
+        raise ValueError('Accepted centered WS02 package lacks exact global reuse registration')
+    reuse_fields={'source_package','source_id','target_package','target_id'}
+    if any(set(row)!=reuse_fields for row in registry['reuse']):
+        raise ValueError('Invalid reuse registration fields')
+    reuse_targets=[(row['target_package'],row['target_id']) for row in registry['reuse']]
+    if len(reuse_targets)!=len(set(reuse_targets)):
+        raise ValueError('Duplicate reuse target registration')
     publications = {}
     for p in registry['packages']:
         if not p.get('report') or not (root/p['report']).is_file():

@@ -94,6 +94,37 @@
       "separate_remaining_scope": "uncompressed_grouped_budget_matched requires feasibility/design review; not accepted by this package"
     },
     {
+      "id": "ws02_centered_basis",
+      "state": "registered",
+      "report": "coverage.md",
+      "remaining": "Approved WS02 single-seed centered-SVD package is registered; centered train-only basis refit, two new matched arms, right-side audit and left independent acceptance remain.",
+      "expected_ids": [
+        "uncentered_radon",
+        "uncentered_linear_resample",
+        "centered_radon",
+        "centered_linear_resample"
+      ],
+      "strict_reuse": {
+        "uncentered_radon": "ws02_core/svd",
+        "uncentered_linear_resample": "ws02_core/linear"
+      },
+      "comparisons": [
+        ["centered_radon", "uncentered_radon"],
+        ["centered_linear_resample", "uncentered_linear_resample"],
+        ["centered_radon", "centered_linear_resample"]
+      ],
+      "fixed": {
+        "stage": 3,
+        "r": 32,
+        "M": 32,
+        "S": 64,
+        "k": 3,
+        "rho": 0.125,
+        "group_count": 1,
+        "seed": 3416
+      }
+    },
+    {
       "id": "ibex_core",
       "state": "waiting_dependencies_last_verified",
       "report": "coverage.md",
