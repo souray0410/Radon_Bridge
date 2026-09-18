@@ -24,12 +24,35 @@ def participant_values(value, keys, name):
     return [value for _ in keys]
 
 class LinearMixer(nn.Module):
-    def __init__(self,widths,kernel_size=3,self_only=False,keys=None,cross_edges=None,s_axis_permutation=None):
+    def __init__(self,widths,kernel_size=3,self_only=False,keys=None,cross_edges=None,s_axis_permutation=None,group_count=1,source_ranks=None,directions=None):
         super().__init__();self.widths=tuple(widths)
         if kernel_size<1 or kernel_size%2!=1:raise ValueError("Use a positive odd kernel")
-        n=sum(widths);self.conv=nn.Conv1d(n,n,kernel_size,padding=kernel_size//2,bias=False)
+        positive_integer(group_count,'group_count')
+        if group_count>1:
+            if self_only or cross_edges is not None or s_axis_permutation is not None:
+                raise ValueError('Grouped mixing cannot combine with self, cross-edge or S-axis controls')
+            if source_ranks is None or directions is None or len(source_ranks)!=len(widths) or len(directions)!=len(widths):
+                raise ValueError('Grouped mixing requires one rank and direction count per source')
+            if any(rank%group_count for rank in source_ranks):
+                raise ValueError('Each source channel rank must be divisible by group_count')
+            if any(width!=rank*m for width,rank,m in zip(widths,source_ranks,directions)):
+                raise ValueError('Grouped source width must equal channel rank times directions')
+        n=sum(widths);self.conv=nn.Conv1d(n,n,kernel_size,padding=kernel_size//2,bias=False,groups=group_count)
         nn.init.zeros_(self.conv.weight)
         mask=torch.ones_like(self.conv.weight)
+        if group_count>1:
+            offsets=[0]
+            for width in widths:offsets.append(offsets[-1]+width)
+            order=[]
+            for group in range(group_count):
+                for offset,rank,m in zip(offsets[:-1],source_ranks,directions):
+                    block=rank//group_count
+                    for channel in range(group*block,(group+1)*block):
+                        order.extend(offset+channel*m+direction for direction in range(m))
+            permutation=torch.tensor(order,dtype=torch.long)
+            if len(order)!=n or len(set(order))!=n:raise RuntimeError('Invalid grouped channel permutation')
+            self.register_buffer('group_permutation',permutation)
+            self.register_buffer('group_inverse',torch.argsort(permutation))
         if self_only:
             mask.zero_();start=0
             for width in widths:mask[start:start+width,start:start+width]=1;start+=width
@@ -56,23 +79,25 @@ class LinearMixer(nn.Module):
             self.register_buffer('s_axis_permutation',torch.tensor(values,dtype=torch.long))
             self.register_buffer('s_axis_inverse',torch.argsort(self.s_axis_permutation))
     def _load_from_state_dict(self,state_dict,prefix,*args,**kwargs):
-        # A checkpoint must not silently replace the prespecified control.
-        for name in ('s_axis_permutation','s_axis_inverse'):
+        # A checkpoint must not silently replace a prespecified structural control.
+        for name in ('s_axis_permutation','s_axis_inverse','group_permutation','group_inverse'):
             if hasattr(self,name) and prefix+name in state_dict:
                 if not torch.equal(state_dict[prefix+name].cpu(),getattr(self,name).cpu()):
-                    raise RuntimeError('Checkpoint S-axis permutation does not match configuration')
+                    raise RuntimeError('Checkpoint structural permutation does not match configuration')
         return super()._load_from_state_dict(state_dict,prefix,*args,**kwargs)
     def forward(self,*features):
         z=torch.cat(features,dim=1)
+        if hasattr(self,'group_permutation'):z=z.index_select(1,self.group_permutation)
         if hasattr(self,'s_axis_permutation'):
             if z.shape[-1]!=len(self.s_axis_permutation):raise ValueError('S-axis length mismatch')
             z=z.index_select(-1,self.s_axis_permutation)
-        y=nn.functional.conv1d(z,self.conv.weight*self.mask,padding=self.conv.kernel_size[0]//2)
+        y=nn.functional.conv1d(z,self.conv.weight*self.mask,padding=self.conv.kernel_size[0]//2,groups=self.conv.groups)
         if hasattr(self,'s_axis_inverse'):y=y.index_select(-1,self.s_axis_inverse)
+        if hasattr(self,'group_inverse'):y=y.index_select(1,self.group_inverse)
         return torch.split(y,self.widths,dim=1)
 
 class BridgeExchange(nn.Module):
-    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+    def __init__(self, specs, *, M, S, rho, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
         super().__init__()
         self.keys = [s.key for s in specs]
         if not self.keys or len(set(self.keys)) != len(self.keys):
@@ -106,6 +131,9 @@ class BridgeExchange(nn.Module):
         if kernel_size % 2 != 1: raise ValueError('kernel_size must be odd')
         if mode == 'pooled' and kernel_size != 3: raise ValueError('Legacy pooled kernel is fixed at one')
         if nested_rhos is not None and kernel_size != 3: raise ValueError('Joint-width legacy protocol uses kernel three')
+        positive_integer(group_count,'group_count')
+        if group_count>1 and (compression!='fixed_svd_channel' or mode not in ('radon','linear_resample') or cross_edges is not None or nested_rhos is not None or s_axis_permutation is not None):
+            raise ValueError('Grouped protocol requires fixed SVD Radon/linear-resample without other structural controls')
         if r is not None or h is not None:
             if compression not in ('fixed_svd_channel', 'fixed_random_orthogonal_channel') or r is None or h is None:
                 raise ValueError('Explicit r/h requires fixed SVD/QR and both fields')
@@ -139,7 +167,8 @@ class BridgeExchange(nn.Module):
             ranks=[max(1,math.floor(ratio*s.channels)) for ratio,s in zip(ratios,specs)]
             self.channel_bases=nn.ModuleList([FixedChannelBasis(s.channels,rank,s.key,basis_files[s.key],version=QR_VERSION if compression=='fixed_random_orthogonal_channel' else CENTERED_VERSION if compression=='fixed_centered_svd_channel' else BASIS_VERSION) for s,rank in zip(specs,ranks)])
             retained=[rank*m for rank,m in zip(ranks,directions)]
-        self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else kernel_size, mode == 'self',self.keys,cross_edges,s_axis_permutation)
+        self.mixer = LinearMixer(retained, 1 if mode == 'pooled' else kernel_size, mode == 'self',self.keys,cross_edges,s_axis_permutation,
+                                 group_count=group_count,source_ranks=ranks if group_count>1 else None,directions=directions if group_count>1 else None)
         self.metadata = {'mode': mode, 'M': M, 'S': S, 'rho': rho, 'participants': [
             {'key': s.key, 'channels': s.channels, 'shape': list(s.shape), 'M': directions[i], 'rho': ratios[i], 'projected_channels': w,
              'retained_channels': retained[i], 'achieved_width_ratio': retained[i]/w,
@@ -147,6 +176,13 @@ class BridgeExchange(nn.Module):
             for i, (s, w) in enumerate(zip(specs, widths))]}
         self.metadata['compression']=compression
         self.metadata['kernel_size']=self.mixer.conv.kernel_size[0]
+        if group_count>1:
+            self.metadata['group_count']=group_count
+            self.metadata['grouping_order']='group,source,channel,direction; inverse restored before source split'
+            dense_mixer_parameters=sum(retained)**2*self.mixer.conv.kernel_size[0]
+            self.metadata['dense_equivalent_mixer_parameters']=dense_mixer_parameters
+            self.metadata['grouped_mixer_parameters']=self.mixer.conv.weight.numel()
+            self.metadata['grouped_connection_fraction']=self.mixer.conv.weight.numel()/dense_mixer_parameters
         if s_axis_permutation is not None:
             from radon_bridge.methods.sampling import permutation_metadata
             self.metadata['s_axis_control']=permutation_metadata(s_axis_permutation)
@@ -259,14 +295,14 @@ class ReturnParticipant(nn.Module):
         return packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
         if any(v is not None for v in (reduction_ratio,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
-        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
+        exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,group_count=group_count)
     else:
-        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
+        if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or group_count!=1 or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
         from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange
         if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio)
@@ -284,7 +320,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -305,7 +341,7 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,group_count=group_count)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,

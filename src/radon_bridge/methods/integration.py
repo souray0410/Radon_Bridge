@@ -13,7 +13,7 @@ def attach_communications(native,configs):
     for c in configs:
         family=c.get('family','radon')
         required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'}
-        optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation','kernel_size','r','h','parallel_to'} if family=='radon' else set()
+        optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation','kernel_size','r','h','group_count','parallel_to'} if family=='radon' else set()
         if family not in ('radon','mmtm','cross_attention') or not required<=set(c) or set(c)-required-optional:
             raise ValueError('Invalid communication configuration for '+str(family))
     modules=[e.edge_operations[0].function for e in builder.edges]

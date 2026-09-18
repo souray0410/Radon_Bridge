@@ -32,6 +32,7 @@ def bridges_for(parents,shapes,arm,bases,seed):
                 config['basis_files']={n:bases[arm['compression']][n] for n in names}
             if arm['compression'] in ('fixed_svd_channel','fixed_random_orthogonal_channel'):
                 config.update(r=r,h=r*M)
+            if arm.get('group_count',1)!=1:config['group_count']=arm['group_count']
             if arm.get('direction'):config['cross_edges']=[[source+'_stage'+str(stage) for source in arm['direction']]]
             if arm.get('s_axis_scramble'):config['s_axis_permutation']=np.random.default_rng(seed+907).permutation(S).tolist()
         configs.append(config)
