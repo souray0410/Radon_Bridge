@@ -9,6 +9,8 @@ from radon_bridge.evaluation.metrics import classification_metrics
 def report(root):
     root=Path(root);q=json.loads((root/'queue.json').read_text());rows=[];predictions={};ids=labels=None
     labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
+    augmentation=q.get('study_kind')=='existing_method_augmentation'
+    labels_name.update(host_continue='MMTM继续训练',host_radon='MMTM＋Radon桥',host_linear='MMTM＋普通通信')
     channel=q.get('study_kind')=='channel_compression'
     comparisons=q.get('comparisons',[[ 'svd',k] for k in ('none','linear','self','mmtm','attention')])
     for c in q['cases']:
@@ -59,7 +61,7 @@ def report(root):
         for method,key in comparisons:
             d=dist[method]-dist[key];arrays.append(d)
             c=dict(reference=key,difference=mean[method]-mean[key],ordinary95=np.quantile(d,[.025,.975]).tolist())
-            if channel:c['method']=method
+            if channel or augmentation:c['method']=method
             contrasts.append(c)
         a=np.stack(arrays);sd=a.std(1,ddof=1);valid=sd>0
         critical=float(np.quantile(np.max(np.abs((a[valid]-a[valid].mean(1,keepdims=True))/sd[valid,None]),axis=0),.95)) if valid.any() else 0.
@@ -68,6 +70,10 @@ def report(root):
     if channel:
         current['study_kind']='channel_compression'
         current['limitations']=['single_seed','same_dev_selection','learned_codec_has_extra_parameters','not_centered_or_grouped_ablation']
+    if augmentation:
+        current['study_kind']='existing_method_augmentation'
+        current['augmentation_host']=q['host_summary']
+        current['limitations']=['single_seed','same_dev_selection','explicit_identity_initialized_MMTM_adapter','additional_training_stage_all_arms_matched']
     old=json.loads((out/'current.json').read_text()) if (out/'current.json').exists() else None
     if old!=current:write_json(out/'current.json',current)
     lines=['# Radon_Bridge 小队列核心比较','',
@@ -95,6 +101,9 @@ def report(root):
     if channel:
         lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
         lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD、分组卷积和A/A+桥另列后续，不冒充已覆盖。']
+    if augmentation:
+        lines=[line.replace('小队列核心比较','小队列已有方法加桥比较').replace('本页只含六臂核心。','本页固定同一MMTM适配宿主，比较再次训练、加入Radon桥和加入普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416；三项均从同一已验收MMTM权重重新建立优化器，按同一原停止规则继续训练；不复用第一阶段分数冒充第二阶段对照。').replace('完整核心：','完整加桥匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','按左方法减右方法；同时区间覆盖三项预定比较。').replace('五项同时95%区间','三项同时95%区间') for line in lines]
+        lines+=['','本包宿主为项目MMTM身份初始化适配，第一阶段选择第0轮；不是作者完整系统。三个新臂都保留同一宿主通信，新增项以并行残差写回，初始预测须严格重放。SVD沿用相同父模型Stage3基（本宿主选中状态与原父状态相同）；不是任意变化宿主都可复用。']
     lines+=['','## 阅读图表前：缩写和参数','','CFP（Color Fundus Photography）为彩色眼底照片；OCT（Optical Coherence Tomography）为光学相干断层扫描。Stage3是第3个残差阶段后的通信位置；r=32是每分支保留通道方向数，M=32是投影方向数，S=64是每方向采样格点数，k=3是一维卷积核宽。','SVD用训练特征确定固定通道方向；随机QR不按信息重要性排序；可学习通道映射额外更新编码/解码参数。全局分解中间通道数大写R（另一个研究包）不是这里的小写压缩秩r。','批准范围、未完成项和下一步见[覆盖清单](../coverage.md)，不能把局部包完成当项目所有情况完成。']
     content='\n'.join(lines)+'\n';target=out/'README.md'
     if not target.exists() or target.read_text()!=content:

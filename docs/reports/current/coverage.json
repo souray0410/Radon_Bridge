@@ -839,6 +839,17 @@
       ],
       "data": "channel_compression/current.json",
       "sequence_id": "2026_09_18_15_50_35_740024"
+    },
+    {
+      "id": "ws02_mmtm_augmentation",
+      "state": "registered",
+      "report": "augmentation/README.md",
+      "remaining": "Three matched arms require GPU profile, training and report acceptance",
+      "expected_ids": [
+        "host_continue",
+        "host_radon",
+        "host_linear"
+      ]
     }
   ],
   "reuse": [

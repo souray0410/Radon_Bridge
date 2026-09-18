@@ -59,6 +59,9 @@ def build(cfg):
         if p.get('branch')!=branch or p.get('seed')!=cfg['seed'] or p.get('stop_reason')!='validation_plateau':
             raise ValueError('Unaccepted parent')
         g.load_native_state(p['model'],branch)
+    if 'augmentation_host' in cfg:
+        from radon_bridge.studies.cohort_augmentation import load_host
+        load_host(cfg,g)
     opt=configure_optimizer(g,dict(adapt_stages=[1,2,3,4],backbone_lr=6e-5,
         head_lr=1e-4,bridge_lr=1e-4,weight_decay=.01,training_regime='full_finetune'))
     return g,opt
@@ -179,8 +182,13 @@ def train_case(cfg,data,out):
     else:
         initial=evaluate(g,dev,16,cfg['seed'],out/'initial_predictions.npz',stop=check_resources)
         with np.load(out/'initial_predictions.npz',allow_pickle=False) as current:
-            for key,parent in cfg['parents'].items():
-                with np.load(Path(parent['path']).parent/'selected_predictions.npz',allow_pickle=False) as previous:
+            if 'augmentation_host' in cfg:
+                manifest=json.loads(Path(cfg['augmentation_host']['path']).read_text())
+                references={k:Path(manifest['predictions']['path']) for k in ('cfp','oct')}
+            else:
+                references={k:Path(v['path']).parent/'selected_predictions.npz' for k,v in cfg['parents'].items()}
+            for key,path in references.items():
+                with np.load(path,allow_pickle=False) as previous:
                     assert np.array_equal(current['ids'],previous['ids']) and np.array_equal(current['y'],previous['y'])
                     np.testing.assert_allclose(current[key],previous[key],rtol=1e-5,atol=1e-6)
         monitor.update(initial['mean_task_macro_f1'],0)
