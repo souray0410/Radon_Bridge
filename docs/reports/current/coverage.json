@@ -827,9 +827,8 @@
     },
     {
       "id": "ws02_channel_compression",
-      "state": "running",
+      "state": "accepted",
       "report": "channel_compression/README.md",
-      "remaining": "同父模型三种通道处理×两种几何；复用SVD两项，新QR与learned各两项先预检后正式；中心化与分组另列未完成",
       "expected_ids": [
         "svd",
         "linear",
@@ -854,6 +853,18 @@
       "source_id": "svd_seed3416",
       "target_package": "ws02_core",
       "target_id": "svd"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "svd",
+      "target_package": "ws02_channel_compression",
+      "target_id": "svd"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "linear",
+      "target_package": "ws02_channel_compression",
+      "target_id": "linear"
     }
   ],
   "unreviewed_history": [

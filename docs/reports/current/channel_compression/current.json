@@ -25,17 +25,11 @@
     "precision": "FP32; cuDNN TF32 true matching historical parents"
   },
   "state": {
-    "state": "running",
-    "accepted": 2,
+    "state": "complete",
+    "accepted": 6,
     "planned": 6,
-    "updated_at": 1789736141.840212,
-    "active": [
-      {
-        "device": "1",
-        "name": "qr_seed3416",
-        "phase": "train"
-      }
-    ],
+    "updated_at": 1789736840.9593143,
+    "active": [],
     "failed": {}
   },
   "results": [
@@ -158,14 +152,352 @@
         "artifact_ref": "Radon_Bridge/2026_09_18_15_50_35_740024/linear/best.pt",
         "sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f"
       }
+    },
+    {
+      "id": "qr",
+      "name": "\u968f\u673aQR-Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7120984998455218,
+          "macro_precision": 0.7150468195027446,
+          "macro_recall": 0.7128378378378378,
+          "accuracy": 0.7128378378378378,
+          "confusion_matrix": [
+            [
+              113,
+              35
+            ],
+            [
+              50,
+              98
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1199932073480219,
+          "auroc": 0.7566654492330167
+        },
+        "oct": {
+          "macro_f1": 0.6925359845674433,
+          "macro_precision": 0.6926467229961177,
+          "macro_recall": 0.6925675675675675,
+          "accuracy": 0.6925675675675675,
+          "confusion_matrix": [
+            [
+              104,
+              44
+            ],
+            [
+              47,
+              101
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.5065689061743348,
+          "auroc": 0.7366691015339664
+        }
+      },
+      "mean_f1": 0.7023172422064825,
+      "best_epoch": 7,
+      "stop_epoch": 13,
+      "provenance": "\u65b0\u589e\u53553416\u5339\u914d\u6267\u884c",
+      "prediction_sha256": "e996dccbd1f5b4e6bf821830e8516f0d1929abfc0ccd7a828738da71a4dd0192",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_15_50_35_740024/qr/best.pt",
+        "sha256": "24fe7e0db1dfc3c06641d6c735653542d35f7436ddf74f83a76947088329084a"
+      }
+    },
+    {
+      "id": "qr_linear",
+      "name": "\u968f\u673aQR-\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "\u65b0\u589e\u53553416\u5339\u914d\u6267\u884c",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_15_50_35_740024/qr_linear/best.pt",
+        "sha256": "d39b23faea9ea63b27d2f6b39d7480344b39c8ce826e5ebdaa53c930f2d4b79a"
+      }
+    },
+    {
+      "id": "learned",
+      "name": "\u53ef\u5b66\u4e60\u901a\u9053-Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7092470760233918,
+          "macro_precision": 0.71007326007326,
+          "macro_recall": 0.7094594594594594,
+          "accuracy": 0.7094594594594594,
+          "confusion_matrix": [
+            [
+              101,
+              47
+            ],
+            [
+              39,
+              109
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.25595597174203,
+          "auroc": 0.7442019722425127
+        },
+        "oct": {
+          "macro_f1": 0.6824324324324325,
+          "macro_precision": 0.6824324324324325,
+          "macro_recall": 0.6824324324324325,
+          "accuracy": 0.6824324324324325,
+          "confusion_matrix": [
+            [
+              101,
+              47
+            ],
+            [
+              47,
+              101
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.46005610099605,
+          "auroc": 0.72941015339664
+        }
+      },
+      "mean_f1": 0.6958397542279121,
+      "best_epoch": 10,
+      "stop_epoch": 16,
+      "provenance": "\u65b0\u589e\u53553416\u5339\u914d\u6267\u884c",
+      "prediction_sha256": "e099dc9fd79396098d724749996efcde70fe3d30406ec7a21c87314643102613",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_15_50_35_740024/learned/best.pt",
+        "sha256": "2fe167b2b814e4929a97917b81e1944560cc8386483fcc54a67984bcef898a18"
+      }
+    },
+    {
+      "id": "learned_linear",
+      "name": "\u53ef\u5b66\u4e60\u901a\u9053-\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "\u65b0\u589e\u53553416\u5339\u914d\u6267\u884c",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_15_50_35_740024/learned_linear/best.pt",
+        "sha256": "e6fca5bf203596c517ef6263dc72f5bbb856efa7de8a7f759db761a018c35486"
+      }
     }
   ],
-  "complete": false,
+  "complete": true,
   "limitations": [
     "single_seed",
     "same_dev_selection",
     "learned_codec_has_extra_parameters",
     "not_centered_or_grouped_ablation"
   ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "reference": "qr",
+        "difference": 0.015540858700993976,
+        "ordinary95": [
+          -0.018520754036146368,
+          0.04918774355045132
+        ],
+        "method": "svd",
+        "simultaneous95": [
+          -0.029006626280854035,
+          0.06008834368284199
+        ]
+      },
+      {
+        "reference": "qr_linear",
+        "difference": 0.015132440109053458,
+        "ordinary95": [
+          -0.017189712085102418,
+          0.047432022647518605
+        ],
+        "method": "linear",
+        "simultaneous95": [
+          -0.027681829298742522,
+          0.05794670951684944
+        ]
+      },
+      {
+        "reference": "learned",
+        "difference": 0.02201834667956437,
+        "ordinary95": [
+          -0.01246817327891492,
+          0.05761534412750234
+        ],
+        "method": "svd",
+        "simultaneous95": [
+          -0.024455476648983426,
+          0.06849217000811217
+        ]
+      },
+      {
+        "reference": "learned_linear",
+        "difference": 0.015132440109053458,
+        "ordinary95": [
+          -0.017189712085102418,
+          0.047432022647518605
+        ],
+        "method": "linear",
+        "simultaneous95": [
+          -0.027681829298742522,
+          0.05794670951684944
+        ]
+      },
+      {
+        "reference": "linear",
+        "difference": 0.042596491859047014,
+        "ordinary95": [
+          0.0016725620636362196,
+          0.082929687102633
+        ],
+        "method": "svd",
+        "simultaneous95": [
+          -0.011362981905951003,
+          0.09655596562404503
+        ]
+      },
+      {
+        "reference": "qr_linear",
+        "difference": 0.042188073267106496,
+        "ordinary95": [
+          0.0019397064849958608,
+          0.08130083880501172
+        ],
+        "method": "qr",
+        "simultaneous95": [
+          -0.010651604657790421,
+          0.0950277511920034
+        ]
+      },
+      {
+        "reference": "learned_linear",
+        "difference": 0.0357105852885361,
+        "ordinary95": [
+          -0.0052363914216976256,
+          0.0760541426024179
+        ],
+        "method": "learned",
+        "simultaneous95": [
+          -0.018171067701525816,
+          0.08959223827859802
+        ]
+      }
+    ]
+  },
   "study_kind": "channel_compression"
 }

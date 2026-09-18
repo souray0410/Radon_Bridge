@@ -21,7 +21,7 @@ class PublicationCoverageTest(unittest.TestCase):
 
     def test_current_and_idempotent(self):
         before={str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
-        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],28)
+        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],32)
         self.assertFalse(a['full_project_accepted']);self.assertEqual(a,check(self.root))
         self.assertEqual(before,{str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()})
 

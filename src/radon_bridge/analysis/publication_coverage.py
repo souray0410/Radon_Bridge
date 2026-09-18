@@ -15,7 +15,7 @@ def check(root):
     package_ids = [p['id'] for p in registry['packages']]
     if len(set(package_ids)) != len(package_ids):
         raise ValueError('Duplicate package identity')
-    required = {'ws02_core','ws02_factorized','grouped_linear','ibex_core','ibex_mechanisms','ibex_factorized','existing_method_augmentation','later_transfer_multinetwork'}
+    required = {'ws02_channel_compression','ws02_core','ws02_factorized','grouped_linear','ibex_core','ibex_mechanisms','ibex_factorized','existing_method_augmentation','later_transfer_multinetwork'}
     if not required.issubset(package_ids):
         raise ValueError('Approved package removed from registry')
     mechanisms = next(p for p in registry['packages'] if p['id']=='ibex_mechanisms')
@@ -48,9 +48,11 @@ def check(root):
     for reuse in registry['reuse']:
         a = publications[reuse['source_package']][reuse['source_id']]
         b = publications[reuse['target_package']][reuse['target_id']]
-        if a['artifacts']['selected_predictions.npz']['sha256'] != b['prediction_sha256']:
+        source_prediction = a['artifacts']['selected_predictions.npz']['sha256'] if 'artifacts' in a else a['prediction_sha256']
+        source_model = a['artifacts']['best.pt']['sha256'] if 'artifacts' in a else a['selected_model']['sha256']
+        if source_prediction != b['prediction_sha256']:
             raise ValueError('Reused prediction identity changed')
-        if a['artifacts']['best.pt']['sha256'] != b['selected_model']['sha256']:
+        if source_model != b['selected_model']['sha256']:
             raise ValueError('Reused model identity changed')
         if abs(a['mean_f1']-b['mean_f1'])>1e-12:
             raise ValueError('Reused metric changed')

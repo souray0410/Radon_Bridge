@@ -88,3 +88,7 @@
 |`attention256_plus_continue`|待对应大队列完整验收|
 |`attention256_plus_radon`|待对应大队列完整验收|
 |`attention256_plus_linear_resample`|待对应大队列完整验收|
+
+## 2026-09-18通道压缩补充验收
+
+[SVD／随机QR／可学习通道，各配Radon与普通通信](channel_compression/README.md)六项已齐全并独立重核。两项SVD结果引用旧核心包，新增四次训练。三个接受包去重32次执行；早先28是新增包之前的历史计数。分组、中心化、A/A+桥及大队列门槛仍开放，不称全项目完成。

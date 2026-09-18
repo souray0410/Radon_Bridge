@@ -217,3 +217,9 @@ Independent review found and fixed a per-step RAM admission gap before deploymen
 见[三种通道处理×两几何](../reports/current/channel_compression/README.md)。六臂不覆盖全部机制；QR-Radon已实际profile接受并正式训练，四新执行复用同父模型，原SVD两项只读引用。新active指向channel包，旧core接受结果/权重不改。标签统一CFP/OCT；原科研快照不热改。
 
 2026-09-18报告发布修复：52b469f/385a83a的嵌套f-string在ws02较新Python可运行，但GitHub Python3.11拒绝解析。已提取局部标签变量、全src按3.11语法解析通过，目标环境报告2测试通过；独立CPU报告修复，不热改运行中的52b469f科学快照，不影响训练。新提交CI须按准确SHA核验。
+
+## 2026-09-18 13:40UTC完整匹配核验
+
+通道压缩六项完整匹配已独立验收：SVD、QR、可学习通道的Radon分支均值F1为71.7858/70.2317/69.5840%，普通通信为67.5262/66.0129/66.0129%；SVD−QR和SVD−可学习通道普通区间跨零，7项同时区间全部跨零。四新执行、两项复用；当前三包去重32次执行，不是全项目完成。
+
+ws02本批有限流程已正常结束，GPU空闲；下一个研究包尚未运行。Ibex当前1运行allocation/23待批，两个派发器活跃且周期无错误；LOOK原内存保护故障等待资源，Dense3D暂停，新32无正式更新。不能把管理器健康当GPU科研任务正在运行。
