@@ -13,3 +13,11 @@
 这回答桥相对无通信、普通通信、自身处理和适配基线的初步差异；外部A与A+桥仍是后继独立问题，不由六臂比较替代。MMTM与attention是身份初始化适配，不宣称原论文完整系统复现。首种子不支持稳定优越或正式test结论。
 
 实际部署、profile、正式更新和接受状态须读源队列与当前报告；本文件是协议和迁移说明，不是启动回执。
+
+## 已部署与真实后续进展
+
+2026-09-18，独立c3a832c源码、项目pin3559caa框架，5项针对CPU测试通过。唯一finite manager在GPU1执行六臂包；none/SVD原accepted和全部预测/模型SHA重核，296人顺序与F1重算通过后引用，未重复训练。新普通通信实际profile通过（25更新、完整dev、梯度/Node/下一更新恢复），正式初始化严格重放父模型预测，并推进epoch4/1024人。后续self、MMTM、attention逐一预检后自动接续。profile与正式产物分离，未提前宣称六臂完成。
+
+磁盘初始准入被拒绝：data仅75GiB空闲。没有降低102GiB门槛；在无活GPU的唯一CPU manager安全停止后，将本批新产物安置到backup约250GiB余量，逐文件SHA与symlink目标核验，保留旧小副本及原逻辑路径，再恢复同队列。实际训练越过准入进入epoch4，存储故障闭环；其他项目和已完成历史资产未移动。
+
+现有自动维护读取ws02 `/home/mengh/radon_ws02_20260918/active.json`，按其root核验status/log/profile/断点/accepted与publication，不照抄PID。科学执行器只处理有限清单，报告失败不杀健康训练；完成后由维护负责人依照PHD结果驱动决策规则审查下一研究包。固定[累计入口](../reports/current/small_cohort/README.md)只同步脱敏汇总，参与者及权重留在授权存储。

@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "首个完整单种子匹配组和多架构执行验收",
+  "next_acceptance": "ws02 GPU1有限单种子六臂包：引用已核验none/SVD，新增普通通信→自身处理→MMTM→交叉注意力；Ibex独立按获批恢复父模型及fast32",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "1b36d9243f9435ed70678bca6be171407b0246f8",
+  "source_commit": "c3a832cdc256c8209bd0be56917df69a1fc34a1f",
   "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-18T05:34:50+00:00",
+  "verified_at": "2026-09-18T08:36:54.881614+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -19,13 +19,20 @@
     "running": "partial",
     "accepted": "waiting"
   },
-  "results": [],
+  "results": [
+    {
+      "summary": "ws02旧小队列1264train/296dev，seed3416同ResNet18 2D/3D父模型：none与SVD历史产物SHA和参与者级分支F1独立重算后引用；分支均值分别66.0129%和71.7858%。其余四对照未齐，不能据此排名或宣称六臂完成，非本轮新训练结果。",
+      "scope": "preliminary_single_seed",
+      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
+    }
+  ],
   "limitations": [
     "309是逻辑位置而不是已完成训练",
     "三维父模型及逐臂执行等门槛尚未全部关闭",
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
-    "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants."
+    "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
+    "ws02 OCT为32x96x96，与Ibex32x224x224及原128层分别报告。只有完整六臂后计算整组差异；不把CPU或profile当科学验收。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -45,7 +52,9 @@
     "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs.",
     "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812→9817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model.",
     "2026-09-17 17:53UTC：MHD_Models090c906/715866a有限canonical32接续已绑定9旧待批及未来R&B申请，实际CPU/watcher周期通过，原journal SHA不变。现有GPU/128层科学快照未停止；新32正式更新0，完整profile/claim/训练仍获批门控。",
-    "2026-09-18 05:34UTC：旧DenseNet121-3D原run推进epoch5/updates15064，last.pt137秒新；未作为父模型接受。R&B CPU短时squeue20秒超时后原周期恢复error=null。共用watcher由LOOK owner_v7安全接替，9R&B和1native条目不变；新32仍无正式更新，实际GPU/profile/claim仍待批。"
+    "2026-09-18 05:34UTC：旧DenseNet121-3D原run推进epoch5/updates15064，last.pt137秒新；未作为父模型接受。R&B CPU短时squeue20秒超时后原周期恢复error=null。共用watcher由LOOK owner_v7安全接替，9R&B和1native条目不变；新32仍无正式更新，实际GPU/profile/claim仍待批。",
+    "2026-09-18：独立c3a832c源码与项目原pin3559caa部署，5项方法/报告CPU测试通过；GPU1普通通信完整dev/梯度/下一更新恢复profile通过，父预测严格重放通过，正式epoch4/1024人已推进。其余新臂同卡顺序预检后派发。",
+    "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。"
   ],
   "decisions": [],
   "evidence": [
@@ -80,6 +89,10 @@
     {
       "label": "32层独立阶段的配方、资源预检和实际获批接续边界",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_activation_20260917.md"
+    },
+    {
+      "label": "ws02单种子核心累计结果",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     }
   ]
 }

@@ -1,0 +1,170 @@
+{
+  "schema": "radon_small_cohort_publication_v1",
+  "sequence_id": "2026_09_18_11_32_21_119628",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "input": {
+    "cfp": "two eyes x RGB x224x224",
+    "oct": "two eyes x1x32x96x96"
+  },
+  "backbone": "ResNet18 2D / inflated3D",
+  "selection": "development mean of branch macro-F1",
+  "configuration": {
+    "stage": 3,
+    "channel_rank": 32,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "real_batch": 16,
+    "minimum_epochs": 8,
+    "maximum_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "precision": "FP32; cuDNN TF32 true matching historical parents"
+  },
+  "state": {
+    "state": "running",
+    "accepted": 2,
+    "planned": 6,
+    "updated_at": 1789720612.516186,
+    "active": [
+      {
+        "device": "1",
+        "name": "linear_seed3416",
+        "phase": "train"
+      }
+    ],
+    "failed": {}
+  },
+  "results": [
+    {
+      "id": "none",
+      "name": "\u65e0\u901a\u4fe1\u7ee7\u7eed\u8bad\u7ec3",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "\u5386\u53f2\u5df2\u9a8c\u6536\u7ed3\u679c\uff0c\u72ec\u7acb\u6838\u9a8c\u540e\u590d\u7528",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/none/best.pt",
+        "sha256": "2384b3868f03386bb4639c47b31df13f76a5124a752ce70abdb54ace9a4aef8d"
+      }
+    },
+    {
+      "id": "svd",
+      "name": "SVD-Radon",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.7229603250696252,
+          "macro_precision": 0.723013698630137,
+          "macro_recall": 0.722972972972973,
+          "accuracy": 0.722972972972973,
+          "confusion_matrix": [
+            [
+              106,
+              42
+            ],
+            [
+              40,
+              108
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.164560954883288,
+          "auroc": 0.7687636961285611
+        },
+        "oct": {
+          "macro_f1": 0.7127558767453277,
+          "macro_precision": 0.7130810366104484,
+          "macro_recall": 0.7128378378378378,
+          "accuracy": 0.7128378378378378,
+          "confusion_matrix": [
+            [
+              108,
+              40
+            ],
+            [
+              45,
+              103
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.319738123387117,
+          "auroc": 0.7694028487947407
+        }
+      },
+      "mean_f1": 0.7178581009074765,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "provenance": "\u5386\u53f2\u5df2\u9a8c\u6536\u7ed3\u679c\uff0c\u72ec\u7acb\u6838\u9a8c\u540e\u590d\u7528",
+      "prediction_sha256": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/svd/best.pt",
+        "sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847"
+      }
+    }
+  ],
+  "complete": false,
+  "limitations": [
+    "single_seed",
+    "same_dev_selection",
+    "different_cohort_and_input_from_Ibex",
+    "MMTM_and_attention_are_explicit_identity_initialized_adaptations"
+  ]
+}
