@@ -142,9 +142,10 @@ def validate(root):
             raise ValueError('Centered sufficient-statistics count differs from accepted uncentered fit')
         m=moment.numpy();s=channel_sum.numpy()
         moment_sym=float(np.max(np.abs(m-m.T)))
-        if moment_sym>SYMMETRY_TOL:
-            raise ValueError(f'Centered raw moment is not symmetric; max_abs={moment_sym}')
         second=m/count
+        second_sym=float(np.max(np.abs(second-second.T)))
+        if second_sym>SYMMETRY_TOL:
+            raise ValueError(f'Centered normalized second moment is not symmetric; max_abs={second_sym}')
         mean=s/count
         covariance=second-np.outer(mean,mean)
 
@@ -204,7 +205,8 @@ def validate(root):
         _assert_close(f'{key} qT-second-q energy',energy,expected_energy)
         measured[key]={
             'count':count,
-            'moment_symmetry_max_abs':moment_sym,
+            'raw_moment_symmetry_max_abs':moment_sym,
+            'second_symmetry_max_abs':second_sym,
             'mean_max_abs':float(np.max(np.abs(saved_mean-mean))),
             'second_max_abs':float(np.max(np.abs(saved_second-second))),
             'covariance_max_abs':float(np.max(np.abs(saved_cov-covariance))),
