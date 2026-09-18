@@ -2,7 +2,7 @@
 
 [维护与交接 / Handoff](docs/handoff/README.md) — 当前版本、部署状态、验收证据与跨项目调用；读取后请刷新实时状态。
 
-R&B（Radon Bridge）：基于固定 MHD V4 的研究项目。`main` 是与 LOOK 统一的当前开发结构；`2026_09_09_10_30_34` 是本次研究批次标识。修改前的完整代码、配置和报告见[历史复现](docs/history.md)。
+R&B（Radon Bridge）：基于固定 MHD V4 的研究项目。`main` 是与 LOOK 统一的当前开发结构；`2026_09_09_10_30_34` 是初始统一结构批次标识；当前实验以交接记录和锁定配置为准。修改前的完整代码、配置和报告见[历史复现](docs/history.md)。
 
 ```text
 src/radon_bridge/
@@ -52,3 +52,5 @@ The installed MHD release selects the API. Import `mhd_framework` / `mhd_framewo
 ## Cumulative results and attempt history
 
 Use the [current results entry](docs/reports/current/README.md) and [attempt archive](docs/archive/README.md). Coverage and verification dates are explicit; these entries do not establish live execution or complete historical migration.
+
+显示名称、缩写、指标单位及符号遵循[统一命名规范](workspace/NAMING_STANDARD.md)。

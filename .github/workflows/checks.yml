@@ -19,6 +19,8 @@ jobs:
           python-version: '3.11'
       - name: Cumulative research publication coverage
         run: PYTHONPATH=src python -m radon_bridge.analysis.publication_coverage --root docs/reports/current
+      - name: Current terminology and entrypoint consistency
+        run: python workspace/check_terminology.py --root .
       - run: python -m venv .venv
       - name: Install CPU test dependencies and locked project
         run: |

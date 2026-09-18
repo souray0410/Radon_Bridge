@@ -51,3 +51,5 @@ Read workspace/EFFICIENCY_STANDARD.md: proactively measure repeated computation,
 Before publishing cumulative results, run `python -m radon_bridge.analysis.publication_coverage --root docs/reports/current`. Register new approved packages before dispatch; reconcile approved scope, accepted artifacts and visible reports. Preserve explicit unfinished and unreviewed historical scope. Structured coverage checks do not replace scientific review of teacher questions, alternative explanations and protocol contradictions.
 
 For research reports, figures, cumulative pages and weekly delivery, apply workspace/SCIENTIFIC_COMMUNICATION_STANDARD.md. Independently review whether an unfamiliar reader can identify the question, comparison, evidence, limitations and next action. Mechanical checks do not certify scientific interpretation; update generators with presentation changes.
+
+Read workspace/NAMING_STANDARD.md and run python workspace/check_terminology.py --root . before publication. Check generators and generated pages together; preserve machine identities and archived evidence.
