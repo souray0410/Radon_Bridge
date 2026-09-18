@@ -211,3 +211,7 @@ Independent review found and fixed a per-step RAM admission gap before deploymen
 ## 2026-09-18：累计覆盖漏报修复
 
 当前统一入口已补[24项分解结果](../reports/current/factorized/README.md)、[六臂](../reports/current/small_cohort/README.md)及[覆盖清单](../reports/current/coverage.md)。旧总入口“暂无合格结果”和源状态“四对照未齐”已修正，历史时间线不改写。显式迁移器只读旧factorized_ws_queue_v1，重核24组receipt/config/artifact/parent/basis SHA及有序dev F1后输出脱敏publication_v1；当前训练不增加旧格式fallback。原权重/断点/预测完整保留，未新训或解封test。发布覆盖门槛与故障注入测试在CI执行，ukb同步前使用同一检查；不是所有科学矛盾都能自动判断。下一阶段和开放范围见coverage，不能把本次补刊算作本周新训练。
+
+## 2026-09-18 核心通道压缩补充实际启动
+
+见[三种通道处理×两几何](../reports/current/channel_compression/README.md)。六臂不覆盖全部机制；QR-Radon已实际profile接受并正式训练，四新执行复用同父模型，原SVD两项只读引用。新active指向channel包，旧core接受结果/权重不改。标签统一CFP/OCT；原科研快照不热改。

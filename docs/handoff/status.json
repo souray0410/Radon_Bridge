@@ -62,7 +62,8 @@
     "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。",
     "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。",
     "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。",
-    "2026-09-18：修复已完成分解补充漏展示、总入口暂无结果和摘要四臂未齐的矛盾。显式coverage登记8个研究包/范围与49个机制臂，发布前及CI校验遗漏/重复/身份/复用SHA；24+6去重为28执行。原科研截止不刷新；此次没有复核Ibex进程或启动训练。"
+    "2026-09-18：修复已完成分解补充漏展示、总入口暂无结果和摘要四臂未齐的矛盾。显式coverage登记8个研究包/范围与49个机制臂，发布前及CI校验遗漏/重复/身份/复用SHA；24+6去重为28执行。原科研截止不刷新；此次没有复核Ibex进程或启动训练。",
+    "2026-09-18：通道方向六项有限匹配包已登记并实际启动，source52b469f、run15_50_35；SVD两项核验复用，QR-Radon预检全296dev/梯度/恢复通过后正式epoch4推进。QR普通通信及可学习两项同一GPU1原manager后继；不是完整压缩比较接受。CFP/OCT名称与参数解释同步累计页和生成器。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"
@@ -111,6 +112,10 @@
     {
       "label": "历史24项分解的独立重核与资产引用",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
+    },
+    {
+      "label": "SVD/QR/learned通道压缩有限匹配与实际接续",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/channel_compression/README.md"
     }
   ]
 }

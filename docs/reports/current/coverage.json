@@ -827,7 +827,7 @@
     },
     {
       "id": "ws02_channel_compression",
-      "state": "registered",
+      "state": "running",
       "report": "channel_compression/README.md",
       "remaining": "同父模型三种通道处理×两种几何；复用SVD两项，新QR与learned各两项先预检后正式；中心化与分组另列未完成",
       "expected_ids": [
@@ -837,7 +837,9 @@
         "qr_linear",
         "learned",
         "learned_linear"
-      ]
+      ],
+      "data": "channel_compression/current.json",
+      "sequence_id": "2026_09_18_15_50_35_740024"
     }
   ],
   "reuse": [

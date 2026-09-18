@@ -43,7 +43,9 @@ def report(root):
             minimum_epochs=8,maximum_epochs=60,patience=6,min_delta=.001,precision='FP32; cuDNN TF32 true matching historical parents'),
         state=status,results=rows,complete=len(rows)==len(q['cases']),
         limitations=['single_seed','same_dev_selection','different_cohort_and_input_from_Ibex','MMTM_and_attention_are_explicit_identity_initialized_adaptations'])
-    # Paired bootstrap for complete core only, never rank an incomplete group.
+    if channel:
+        current['limitations'] = ['single_seed','same_dev_selection','different_cohort_and_input_from_Ibex','learned_codec_has_additional_trainable_parameters']
+    # Paired bootstrap for complete matched groups only.
     if current['complete']:
         counts=np.random.default_rng(20260918).multinomial(len(labels),np.full(len(labels),1/len(labels)),size=10000)
         def f1(prob):
@@ -90,8 +92,9 @@ def report(root):
         if initial:lines+=['','选回初始父模型的设置：'+ '、'.join(initial)+'。它们已按停止规则训练，最终选模回到第0轮；分数相同不能解释成方法等效。']
         lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']
     if channel:
-        lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间') for line in lines if 'MMTM和交叉注意力为' not in line]
+        lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
         lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD、分组卷积和A/A+桥另列后续，不冒充已覆盖。']
+    lines+=['','## 阅读图表前：缩写和参数','','CFP（Color Fundus Photography）为彩色眼底照片；OCT（Optical Coherence Tomography）为光学相干断层扫描。Stage3是第3个残差阶段后的通信位置；r=32是每分支保留通道方向数，M=32是投影方向数，S=64是每方向采样格点数，k=3是一维卷积核宽。','SVD用训练特征确定固定通道方向；随机QR不按信息重要性排序；可学习通道映射额外更新编码/解码参数。全局分解中间通道数大写R（另一个研究包）不是这里的小写压缩秩r。','批准范围、未完成项和下一步见[覆盖清单](../coverage.md)，不能把局部包完成当项目所有情况完成。']
     content='\n'.join(lines)+'\n';target=out/'README.md'
     if not target.exists() or target.read_text()!=content:
         temp=out/'.README.tmp';temp.write_text(content);temp.replace(target)
