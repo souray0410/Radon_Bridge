@@ -54,7 +54,8 @@
     "2026-09-17 17:53UTC：MHD_Models090c906/715866a有限canonical32接续已绑定9旧待批及未来R&B申请，实际CPU/watcher周期通过，原journal SHA不变。现有GPU/128层科学快照未停止；新32正式更新0，完整profile/claim/训练仍获批门控。",
     "2026-09-18 05:34UTC：旧DenseNet121-3D原run推进epoch5/updates15064，last.pt137秒新；未作为父模型接受。R&B CPU短时squeue20秒超时后原周期恢复error=null。共用watcher由LOOK owner_v7安全接替，9R&B和1native条目不变；新32仍无正式更新，实际GPU/profile/claim仍待批。",
     "2026-09-18：独立c3a832c源码与项目原pin3559caa部署，5项方法/报告CPU测试通过；GPU1普通通信完整dev/梯度/下一更新恢复profile通过，父预测严格重放通过，正式epoch4/1024人已推进。其余新臂同卡顺序预检后派发。",
-    "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。"
+    "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。",
+    "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。"
   ],
   "decisions": [],
   "evidence": [

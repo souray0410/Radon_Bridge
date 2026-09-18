@@ -26,13 +26,13 @@
   },
   "state": {
     "state": "running",
-    "accepted": 2,
+    "accepted": 3,
     "planned": 6,
-    "updated_at": 1789720612.516186,
+    "updated_at": 1789720871.0247374,
     "active": [
       {
         "device": "1",
-        "name": "linear_seed3416",
+        "name": "self_seed3416",
         "phase": "train"
       }
     ],
@@ -157,6 +157,66 @@
       "selected_model": {
         "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/svd/best.pt",
         "sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847"
+      }
+    },
+    {
+      "id": "linear",
+      "name": "\u5339\u914d\u666e\u901a\u901a\u4fe1",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6958904109589041,
+          "macro_precision": 0.6960891812865497,
+          "macro_recall": 0.6959459459459459,
+          "accuracy": 0.6959459459459459,
+          "confusion_matrix": [
+            [
+              105,
+              43
+            ],
+            [
+              47,
+              101
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.270154298053045,
+          "auroc": 0.7254839298758218
+        },
+        "oct": {
+          "macro_f1": 0.6546328071379548,
+          "macro_precision": 0.6568085498433758,
+          "macro_recall": 0.6554054054054055,
+          "accuracy": 0.6554054054054054,
+          "confusion_matrix": [
+            [
+              104,
+              44
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.6055514761965435,
+          "auroc": 0.68745434623813
+        }
+      },
+      "mean_f1": 0.6752616090484295,
+      "best_epoch": 9,
+      "stop_epoch": 15,
+      "provenance": "\u672c\u6b21\u65b0\u589e\u5355\u79cd\u5b50\u6267\u884c",
+      "prediction_sha256": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/linear/best.pt",
+        "sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f"
       }
     }
   ],
