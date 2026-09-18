@@ -21,7 +21,8 @@ class PublicationCoverageTest(unittest.TestCase):
 
     def test_current_and_idempotent(self):
         before={str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
-        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],43)  # Adds eight new grouped runs; G=1 is strict reuse.
+        a=check(self.root);self.assertEqual(a['unique_accepted_executions'],45)  # Centered adds two new executions; two rows strictly reuse core.
+        self.assertEqual(a['accepted_packages'],6)
         self.assertEqual(a['indexed_packages'],11)
         self.assertFalse(a['full_project_accepted']);self.assertEqual(a,check(self.root))
         self.assertEqual(before,{str(p):p.read_bytes() for p in self.root.rglob('*') if p.is_file()})
@@ -67,8 +68,18 @@ class PublicationCoverageTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'centered WS02'):check(self.root)
 
     def test_centered_acceptance_requires_global_reuse_registration(self):
-        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ws02_centered_basis').update(state='accepted'))
+        def remove_centered_reuse(d):
+            d['reuse']=[row for row in d['reuse'] if row['target_package']!='ws02_centered_basis']
+        self.mutate('coverage.json',remove_centered_reuse)
         with self.assertRaisesRegex(ValueError,'global reuse'):check(self.root)
+
+    def test_centered_acceptance_review_identity_is_locked(self):
+        self.mutate('coverage.json',lambda d:next(p for p in d['packages'] if p['id']=='ws02_centered_basis')['acceptance_review'].update(source_files_exact=90))
+        with self.assertRaisesRegex(ValueError,'centered WS02 review identity'):check(self.root)
+
+    def test_centered_strict_reuse_identity_rejected_if_prediction_changes(self):
+        self.mutate('centered_basis/current.json',lambda d:next(r for r in d['results'] if r['id']=='uncentered_radon').update(prediction_sha256='wrong'))
+        with self.assertRaisesRegex(ValueError,'Reused prediction'):check(self.root)
 
     def test_duplicate_reuse_target_rejected(self):
         def duplicate(d):

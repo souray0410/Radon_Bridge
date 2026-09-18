@@ -6,7 +6,7 @@ ws02 GPU1；单种子3416。中心化基用同父模型、同1264训练样本、
 CFP为224×224二维；OCT是旧数据32×96×96三维体积。不是Ibex的32×224×224大队列。
 两条独立ResNet18专家；同一对父权重，Stage3通信；真实batch16，至少8轮、最多60轮、patience6；停止规则未为周报缩短。
 
-完整中心化匹配包：右侧执行与包内独立audit已齐全；运行状态：complete。**左侧最终独立科学验收尚未完成，因此本页当前不是accepted发布包。**
+完整中心化匹配包：**已由左侧从原始WS02产物独立验收并接受**；运行状态：complete。接受范围仅为本WS02单种子开发集包，不代表Ibex、test、多种子或全项目接受。
 
 |方法|CFP分支F1|OCT分支F1|分支均值F1|最佳/停止轮|来源|
 |---|---:|---:|---:|---|---|
@@ -57,6 +57,14 @@ CFP为224×224二维；OCT是旧数据32×96×96三维体积。不是Ibex的32×
 - centered Radon 的F1点估计更高，但CFP/OCT log-loss都比未中心化Radon更差，AUROC也下降；这是“分类F1与概率质量不一致”的明确反例。centered ordinary则F1较低但log-loss明显改善。
 
 centered basis 的独立数值验收另从保存的float64 sums/moments/counts重算 participant顺序、fingerprint、mean=sum/N、second=moment/N、covariance、Q正交/eigen关系、排序以及 qᵀsecond q 能量；通过后才放行两臂formal。公开摘要见 [audit_summary.json](audit_summary.json)。
+
+左侧最终独立复核进一步重新核了91个源码文件、3160份科研资产/输入文件合计、296名dev有序ID/标签、四行sklearn指标、两份profile/恢复、训练停止历史及三项10,000次bootstrap；左审计SHA为 `43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd`。注意“3160”是资产和输入文件的总核验数，不是3160个模型资产。
+
+## 这页最终回答什么
+
+最直接的两个“中心化效应”比较都跨0，因此**不能说中心化SVD稳定优于未中心化SVD**。同时，centered Radon虽然F1点估计更高，但log-loss和AUROC反而变差，说明“F1更高”不等于“概率质量全面更好”。
+
+更完整的“问题—证据—反例—替代解释—下一动作/成本—再检查条件”见 [centered机制结论与下一研究决策](../../../handoff/centered_decision_20260919.md)。本包之后不继续堆centered种子/r/骨干；后继核心优先LOOK融合阶段，但尚未正式派发，本页不启动LOOK。
 
 ## 阅读图表前：缩写和参数
 

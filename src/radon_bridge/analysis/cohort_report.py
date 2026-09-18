@@ -154,7 +154,7 @@ def report(root,_allow_centered_audit_build=False):
         lines+=['','区间是固定已选模型下的参与者重采样，未计入训练种子波动及开发集选择偏差；MMTM/注意力只代表此适配配方，不能据此否定原方法。']
     if channel:
         lines=[line.replace('小队列核心比较','小队列通道压缩比较').replace('本页只含六臂核心。','本页比较SVD、随机QR和可学习通道映射，各自匹配Radon与普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。SVD两项精确复用，新增QR和可学习通道各两项，逐臂预检后训练。').replace('完整核心：','完整压缩匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','差值按表中左方法减右方法；完整组才给配对区间。').replace('五项同时95%区间',str(len(comparisons))+'项同时95%区间').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
-        lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD仍属后续；分组卷积与MMTM宿主加桥已在各自有限包完成，不由本页冒充覆盖。']
+        lines+=['','SVD按训练特征能量选固定方向；随机QR独立于数据且不按能量排序；可学习通道映射从同一随机QR初始化，但训练时更新编码和解码参数，参数量不同。中心化SVD、分组卷积与MMTM宿主加桥均已在各自有限包完成；它们的接受范围和反例仍须回到各自页面，不能由本页冒充覆盖。']
     if augmentation:
         lines=[line.replace('小队列核心比较','小队列已有方法加桥比较').replace('本页只含六臂核心。','本页固定同一MMTM适配宿主，比较再次训练、加入Radon桥和加入普通通信。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416；三项均从同一已验收MMTM权重重新建立优化器，按同一原停止规则继续训练；不复用第一阶段分数冒充第二阶段对照。').replace('完整核心：','完整加桥匹配组：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','按左方法减右方法；同时区间覆盖三项预定比较。').replace('五项同时95%区间','三项同时95%区间') for line in lines]
         lines+=['','本包宿主为项目MMTM身份初始化适配，第一阶段选择第0轮；不是作者完整系统。三个新臂都保留同一宿主通信，新增项以并行残差写回，初始预测须严格重放。SVD沿用相同父模型Stage3基（本宿主选中状态与原父状态相同）；不是任意变化宿主都可复用。']
@@ -172,7 +172,7 @@ def report(root,_allow_centered_audit_build=False):
                .replace('五项同时95%区间','三项同时95%区间')
                .replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。')
                for line in lines if 'MMTM和交叉注意力为' not in line]
-        lines=[line.replace('完整中心化匹配包：已齐全','完整中心化匹配包：两新臂、profiles与包内独立audit已齐全（不等于外部最终科学接受）') if current['complete'] else line for line in lines]
+        lines=[line.replace('完整中心化匹配包：已齐全','完整中心化匹配包：两新臂、profiles与包内独立audit已齐全；独立科研接受状态以coverage与左侧审核记录为准') if current['complete'] else line for line in lines]
         lines+=['','## 概率质量与校准方向','','校准方向采用 calibration-in-the-large：正类平均预测概率减开发集正类比例；正值表示整体偏高估，负值表示整体偏低估。它只作方向性描述，不新增显著性检验。','',
                 '|方法|CFP log-loss|CFP AUROC|CFP校准方向|OCT log-loss|OCT AUROC|OCT校准方向|','|---|---:|---:|---:|---:|---:|---:|']
         for row in rows:

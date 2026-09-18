@@ -23,7 +23,7 @@ def test_current_status_matches_shared_phd_contract():
     value=payload()
     assert set(value)==REQUIRED
     assert value['verification_scope']=='runtime_and_evidence'
-    assert value['evidence_cutoff']=='2026-09-18T08:49:11.006936+00:00'
+    assert value['evidence_cutoff']=='2026-09-18T22:38:30.538052+00:00'
     assert validate(value,'Radon_Bridge',now()) is value
 
 

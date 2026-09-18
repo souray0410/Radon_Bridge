@@ -29,6 +29,15 @@ def check(root):
             or centered.get('strict_reuse')!={'uncentered_radon':'ws02_core/svd','uncentered_linear_resample':'ws02_core/linear'}
             or centered.get('fixed')!={'stage':3,'r':32,'M':32,'S':64,'k':3,'rho':.125,'group_count':1,'seed':3416}):
         raise ValueError('Locked centered WS02 package changed')
+    if centered.get('state')=='accepted':
+        review=centered.get('acceptance_review',{})
+        if (centered.get('accepted_scope')!='ws02_single_seed_centered_basis_direction'
+                or review.get('kind')!='left_independent_review' or review.get('passed') is not True
+                or review.get('audit_sha256')!='43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd'
+                or review.get('participants')!=296 or review.get('source_files_exact')!=91
+                or review.get('asset_and_input_files_verified')!=3160 or review.get('bootstrap_resamples')!=10000
+                or review.get('test_used') is not False):
+            raise ValueError('Accepted centered WS02 review identity changed')
     centered_reuse=[
         {'source_package':'ws02_core','source_id':'svd','target_package':'ws02_centered_basis','target_id':'uncentered_radon'},
         {'source_package':'ws02_core','source_id':'linear','target_package':'ws02_centered_basis','target_id':'uncentered_linear_resample'},

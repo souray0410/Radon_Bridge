@@ -1,8 +1,10 @@
-## 2026-09-19：centered-SVD WS02有限包右侧完成，待左侧独立验收
+## 2026-09-19：centered-SVD WS02有限包已独立接受
 
 任务 `radon-centered-20260918-v1` 已按锁定范围完成：旧未中心化SVD-Radon/普通通信两项严格复用，只新增中心化Radon与中心化普通通信两臂。scientific source 为 `27aafca11796e3969bb263ab950e93dc49d58f23`；独立basis数值validator为 `15b02427596f39a83011c0732924a78e86348eb8`。WS02 run `2026_09_19_01_19_02_633840` 2/2完成、failed={}，包内audit通过后manager退出，GPU1回到15 MiB/0%。
 
-中心化定义的额外验收在formal前完成：从保存的float64 sufficient statistics独立重算1264训练参与者顺序/fingerprint、mean/second/covariance、Q正交/eigen残差与 qᵀsecond q 能量，receipt SHA为 `1194787cd3f0ed8d49f5980dde1d84220cf2836a9754d981edbb29e4ed377440`。当前**只说明右侧执行/技术证据包完整，不表示左侧最终科学接受**；详细比较与反例见 [centered_basis报告](../reports/current/centered_basis/README.md) 和 [正式handoff](ws02_centered_20260918.md)。
+中心化定义的额外验收在formal前完成：从保存的float64 sufficient statistics独立重算1264训练参与者顺序/fingerprint、mean/second/covariance、Q正交/eigen残差与 qᵀsecond q 能量，receipt SHA为 `1194787cd3f0ed8d49f5980dde1d84220cf2836a9754d981edbb29e4ed377440`。随后左侧又从原始WS02产物独立复核91个源码文件、3160份科研资产/输入文件、296人指标、profiles/恢复、停止历史与三项10k区间，审计SHA为 `43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd`。
+
+接受范围仅为 **WS02单种子centered-basis方向包**，不代表Ibex、test、多种子或全项目接受。详细比较与反例见 [centered_basis报告](../reports/current/centered_basis/README.md)、[正式handoff](ws02_centered_20260918.md) 与 [下一研究决策](centered_decision_20260919.md)。
 
 ## 2026-09-18：grouped WS02 单种子包已独立接受
 

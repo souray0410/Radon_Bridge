@@ -1,6 +1,6 @@
 {
   "schema": "radon_publication_coverage_v1",
-  "reviewed_at": "2026-09-18T19:52:53.745547+00:00",
+  "reviewed_at": "2026-09-18T22:54:19.207239+00:00",
   "scope": "current approved eye-stage packages; historical archive explicitly separate",
   "packages": [
     {
@@ -95,9 +95,8 @@
     },
     {
       "id": "ws02_centered_basis",
-      "state": "pending_independent_acceptance",
+      "state": "accepted",
       "report": "centered_basis/README.md",
-      "remaining": "WS02 execution 2/2, independent centered-basis numeric acceptance, two profiles and right-side final audit are complete; left-side final independent scientific acceptance remains required.",
       "expected_ids": [
         "uncentered_radon",
         "uncentered_linear_resample",
@@ -134,16 +133,25 @@
       },
       "sequence_id": "2026_09_19_01_19_02_633840",
       "data": "centered_basis/current.json",
-      "right_execution_review": {
+      "accepted_scope": "ws02_single_seed_centered_basis_direction",
+      "acceptance_review": {
+        "kind": "left_independent_review",
         "passed": true,
-        "scientific_source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
-        "numeric_validator_commit": "15b02427596f39a83011c0732924a78e86348eb8",
-        "numeric_acceptance_sha256": "1194787cd3f0ed8d49f5980dde1d84220cf2836a9754d981edbb29e4ed377440",
-        "right_audit_sha256": "3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397",
+        "audit_sha256": "43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd",
+        "source_files_exact": 91,
+        "asset_and_input_files_verified": 3160,
         "participants": 296,
+        "basis_numeric_recomputed": true,
+        "training_stop_history_recomputed": true,
         "bootstrap_resamples": 10000,
         "test_used": false
-      }
+      },
+      "accepted_limitations": [
+        "single_seed_and_same_dev_selection",
+        "not_Ibex_or_full_project_acceptance",
+        "direct_centering_effect_intervals_cross_zero",
+        "F1_and_probability_quality_disagree"
+      ]
     },
     {
       "id": "ibex_core",
@@ -966,6 +974,18 @@
       "source_id": "linear",
       "target_package": "grouped_linear",
       "target_id": "grouped_g1_linear_resample"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "svd",
+      "target_package": "ws02_centered_basis",
+      "target_id": "uncentered_radon"
+    },
+    {
+      "source_package": "ws02_core",
+      "source_id": "linear",
+      "target_package": "ws02_centered_basis",
+      "target_id": "uncentered_linear_resample"
     }
   ],
   "unreviewed_history": [

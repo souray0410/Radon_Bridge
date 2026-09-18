@@ -1,8 +1,8 @@
 {
   "schema": "radon_centered_public_audit_summary_v1",
-  "scope": "WS02 centered-SVD single-seed development package; right-side execution/audit complete, left independent acceptance pending",
-  "scientific_acceptance": false,
-  "pending_left_independent_acceptance": true,
+  "scope": "WS02 centered-SVD single-seed development package; independently accepted by left-side review",
+  "scientific_acceptance": true,
+  "pending_left_independent_acceptance": false,
   "test_used": false,
   "sequence_id": "2026_09_19_01_19_02_633840",
   "scientific_source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
@@ -57,5 +57,19 @@
     "publication_current": "3a87ce7aabd2a36d890f240638b97a95a1f761e4da3df5c7274573a88a8e487c",
     "publication_readme_remote": "6b047f989e285f1aaddb3a427bdb399e4541ba7d917f8b5e0cbff558a1a481b5"
   },
-  "privacy": "Public summary only: no participant identifiers, participant predictions, model weights, credentials, or server-absolute paths."
+  "privacy": "Public summary only: 3160 means verified research assets/input files collectively, not 3160 model artifacts; no participant identifiers, participant predictions, model weights, credentials, or private paths are published.",
+  "left_independent_review": {
+    "passed": true,
+    "audit_sha256": "43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd",
+    "source_files_exact": 91,
+    "asset_and_input_files_verified": 3160,
+    "participants": 296,
+    "ordered_ids_labels_matched": true,
+    "independent_sklearn_metrics": true,
+    "training_stop_history_recomputed": true,
+    "basis_numeric_recomputed": true,
+    "three_10000_bootstrap_contrasts_recomputed": true,
+    "test_used": false
+  },
+  "acceptance_limit": "WS02 single-seed centered basis direction package only; not Ibex, test, multi-seed, or full-project acceptance"
 }

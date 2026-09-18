@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "centered-SVD WS02单种子有限包已由右侧完成2/2执行、独立basis数值gate、profiles及包内audit；下一门槛为左侧从原始产物做最终独立科学验收。Ibex父模型与正式大队列门槛继续独立维护。",
+  "next_acceptance": "centered-SVD WS02单种子方向包已由左侧从原始产物独立验收并接受；下一核心研究优先LOOK融合阶段/写回问题，但尚未正式派发，当前不启动。R&B未压缩预算匹配、其他宿主与Ibex范围继续保留并独立维护。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
-  "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
-  "verified_at": "2026-09-18T22:43:31+00:00",
+  "evidence_cutoff": "2026-09-18T22:38:30.538052+00:00",
+  "verified_at": "2026-09-18T22:54:19.207239+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -44,6 +44,11 @@
       "summary": "固定SVD grouped WS02单种子包已由左侧独立接受：G1两项严格复用核心，G2/4/8/16×Radon/普通通信8个新增执行；89个源码文件、54份科研资产、296人有序F1与10,000次五项区间重核通过。Radon−普通点差随G增大在本seed上变小，但五项同时95%全跨0，且G同时降低参数量，不能作为单调拓扑机制证据。",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/grouped_linear/README.md"
+    },
+    {
+      "summary": "centered-SVD WS02单种子包已由左侧独立接受：未中心化Radon/ordinary分支均值F1为71.7858/67.5262%，中心化Radon/ordinary为73.9582/66.0129%。中心化Radon−未中心化Radon+2.1724pp、centered ordinary−uncentered ordinary−1.5132pp，两项普通/三项同时95%均跨0；同centered basis下Radon−ordinary+7.9453pp且三项同时95%[2.8982,12.9923]。centered Radon两分支log-loss变差、AUROC下降，F1与概率质量结论不一致。仅WS02单seed/dev、test未用。",
+      "scope": "preliminary_single_seed",
+      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/centered_basis/README.md"
     }
   ],
   "limitations": [
@@ -55,8 +60,9 @@
     "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
     "2026-09-18 grouped接受仅限WS02单种子开发集固定SVD包；不代表Ibex、test、无压缩预算匹配或全项目接受。",
     "2026-09-18 status verification_scope 按共同PHD契约保持枚举 runtime_and_evidence；说明文字不再塞入枚举字段。既有 evidence_cutoff 仍保持原科研截止时间，不因发布清理刷新。",
-    "2026-09-19 centered证据当前仅为WS02单seed3416开发集，右侧包内audit通过但左侧最终独立验收尚未完成；不代表Ibex、test、多种子或全项目接受。",
-    "centered Radon相对未中心化Radon的F1点估计+2.17pp，但普通/三项同时区间均跨0；同时两分支log-loss变差且AUROC下降，不能将中心化概括为稳定或全面更好。"
+    "centered Radon相对未中心化Radon的F1点估计+2.17pp，但普通/三项同时区间均跨0；同时两分支log-loss变差且AUROC下降，不能将中心化概括为稳定或全面更好。",
+    "2026-09-19 centered接受仅限WS02单seed3416开发集basis方向包；不代表Ibex、test、多种子、运行时去均值或全项目接受。",
+    "2026-09-19 centered包使用其真实manager完成时刻作为本status evidence_cutoff；更早已接受包的各自科学截止时间仍保留在对应报告/资产中，不因本次发布重写。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -89,12 +95,14 @@
     "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。",
     "2026-09-18 左侧独立复核grouped completion：89个源码文件与450a122一致、54份资产SHA、296人F1、8个profile恢复及10k五项区间全部通过；coverage批准accepted，G1精确复用core，公开仅保留脱敏摘要。",
     "2026-09-18 跨仓同步修复：PHD project_status 现行契约只接受 runtime_and_evidence/source_review_only；本页本次已有远端原产物核验，故使用 runtime_and_evidence。自由说明移入 actions/limitations/evidence，未改 evidence_cutoff。",
-    "2026-09-19 centered-v1：scientific source27aafca、validator15b0242、WS02 run2026_09_19_01_19_02_633840；独立数值gate从sums/moments/counts重算1264顺序、fingerprint、mean/second/cov、Q/eigen/energy后通过；两新臂2/2按原GPU1唯一manager完成，right audit SHA 3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397，结束后GPU1空闲。"
+    "2026-09-19 centered-v1：scientific source27aafca、validator15b0242、WS02 run2026_09_19_01_19_02_633840；独立数值gate从sums/moments/counts重算1264顺序、fingerprint、mean/second/cov、Q/eigen/energy后通过；两新臂2/2按原GPU1唯一manager完成，right audit SHA 3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397，结束后GPU1空闲。",
+    "2026-09-19 左侧独立复核centered-v1原始WS02产物：91个源码文件、3160份科研资产/输入文件、1264训练basis数值关系、296人四行指标、两份profile/恢复、停止历史与3项10k区间全部通过；审计SHA43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
     "grouped解释边界：同G Radon/普通是参数匹配几何对照；跨G同时改变直接连接拓扑和mixer参数量，不能把点估计趋势归因于拓扑。下一候选问题为中心化basis或无压缩预算匹配，先由左侧按辨识性/成本裁决，不自动扩矩阵。",
-    "centered解释边界：两个直接“中心化效应”比较区间均跨0；同centered basis下Radon−普通为+7.95pp且本三项同时区间不跨0，但仍是单seed/dev。F1与log-loss/AUROC方向不一致，不能据此宣称中心化稳定提升，也不能把basis拟合中心化解释成运行时输入去均值。"
+    "centered解释边界：两个直接“中心化效应”比较区间均跨0；同centered basis下Radon−普通为+7.95pp且本三项同时区间不跨0，但仍是单seed/dev。F1与log-loss/AUROC方向不一致，不能据此宣称中心化稳定提升，也不能把basis拟合中心化解释成运行时输入去均值。",
+    "centered最终决策：两个直接中心化效应区间均跨0，且centered Radon的F1点估计提高同时伴随两分支log-loss变差和AUROC下降；不继续为centered追加r/种子/骨干，不删除原正式对照。后继核心优先LOOK融合阶段，但等待左侧正式任务包后才执行。"
   ],
   "evidence": [
     {
@@ -160,6 +168,14 @@
     {
       "label": "当前项目状态契约与证据入口",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/status.json"
+    },
+    {
+      "label": "WS02 centered-SVD单种子方向包独立接受结果",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/centered_basis/README.md"
+    },
+    {
+      "label": "centered机制结论、反例与下一研究决策",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/centered_decision_20260919.md"
     }
   ]
 }
