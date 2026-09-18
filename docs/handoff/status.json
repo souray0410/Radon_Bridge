@@ -3,7 +3,7 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "ws02首个六臂包已完成；原生/适配比较边界审查后推进老师A/A+桥问题，Ibex恢复大队列父模型与fast32接续仍待资源",
+  "next_acceptance": "现有ws02六臂与分解24项均进入累计覆盖；先验收A/A+桥适配与分组线性代表包，大队列继续父依赖和正式接续；未完成范围不能因局部包接受而消失",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
@@ -21,14 +21,14 @@
   },
   "results": [
     {
-      "summary": "ws02旧小队列1264train/296dev，seed3416同ResNet18 2D/3D父模型：none与SVD历史产物SHA和参与者级分支F1独立重算后引用；分支均值分别66.0129%和71.7858%。其余四对照未齐，不能据此排名或宣称六臂完成，非本轮新训练结果。",
+      "summary": "小队列1264train/296dev、3416、R18二维/三维完整六臂，全部文件SHA与有序参与者及sklearn F1独立复核通过。分支均值F1：无通信66.0129%、SVD-Radon71.7858%、普通通信67.5262%、自身处理66.0129%、MMTM适配66.0129%、注意力适配66.5317%。Radon−普通通信+4.2596pp，普通95%[0.1673,8.29297]，五项同时95%[-0.4785,8.9978]，后者跨零。非test或多种子结论。",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     },
     {
-      "summary": "小队列1264train/296dev、3416、R18二维/三维完整六臂，全部文件SHA与有序参与者及sklearn F1独立复核通过。分支均值F1：无通信66.0129%、SVD-Radon71.7858%、普通通信67.5262%、自身处理66.0129%、MMTM适配66.0129%、注意力适配66.5317%。Radon−普通通信+4.2596pp，普通95%[0.1673,8.29297]，五项同时95%[-0.4785,8.9978]，后者跨零。非test或多种子结论。",
-      "scope": "preliminary_single_seed",
-      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
+      "summary": "历史小队列全局分解24/24（3416/3417/3418），本次全部科研产物/父权重SHA、有序296人及分支F1重核后补入累计页，非新增训练。三种子均值：SVD69.4681%、无通信65.0211%；分解R256/R512/R1024分别66.2036/67.3709/67.3270%，同R普通通信65.2999/65.7675/66.5128%；几何差值同时区间均跨零。分组卷积尚未完成，全部大队列机制未由小队列替代。",
+      "scope": "accepted_matched_group",
+      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
     }
   ],
   "limitations": [
@@ -37,7 +37,7 @@
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
     "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
-    "ws02 OCT为32x96x96，与Ibex32x224x224及原128层分别报告。只有完整六臂后计算整组差异；不把CPU或profile当科学验收。"
+    "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -61,7 +61,8 @@
     "2026-09-18：独立c3a832c源码与项目原pin3559caa部署，5项方法/报告CPU测试通过；GPU1普通通信完整dev/梯度/下一更新恢复profile通过，父预测严格重放通过，正式epoch4/1024人已推进。其余新臂同卡顺序预检后派发。",
     "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。",
     "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。",
-    "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。"
+    "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。",
+    "2026-09-18：修复已完成分解补充漏展示、总入口暂无结果和摘要四臂未齐的矛盾。显式coverage登记8个研究包/范围与49个机制臂，发布前及CI校验遗漏/重复/身份/复用SHA；24+6去重为28执行。原科研截止不刷新；此次没有复核Ibex进程或启动训练。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"
@@ -102,6 +103,14 @@
     {
       "label": "ws02单种子核心累计结果",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
+    },
+    {
+      "label": "累计覆盖审查、24项保留与未完成清单",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/coverage.md"
+    },
+    {
+      "label": "历史24项分解的独立重核与资产引用",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
     }
   ]
 }

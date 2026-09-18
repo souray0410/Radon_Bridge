@@ -1,0 +1,846 @@
+{
+  "schema": "radon_publication_coverage_v1",
+  "reviewed_at": "2026-09-18T10:40:22.703894+00:00",
+  "scope": "current approved eye-stage packages; historical archive explicitly separate",
+  "packages": [
+    {
+      "id": "ws02_core",
+      "state": "accepted",
+      "sequence_id": "2026_09_18_11_32_21_119628",
+      "report": "small_cohort/README.md",
+      "data": "small_cohort/current.json",
+      "expected_ids": [
+        "none",
+        "svd",
+        "linear",
+        "self",
+        "mmtm",
+        "attention"
+      ]
+    },
+    {
+      "id": "ws02_factorized",
+      "state": "accepted",
+      "sequence_id": "2026_09_14_19_43_11",
+      "report": "factorized/README.md",
+      "data": "factorized/current.json",
+      "expected_ids": [
+        "factorized_R512_radon_seed3416",
+        "factorized_R512_linear_resample_seed3416",
+        "factorized_R256_radon_seed3416",
+        "factorized_R256_linear_resample_seed3416",
+        "factorized_R1024_radon_seed3416",
+        "factorized_R1024_linear_resample_seed3416",
+        "svd_seed3416",
+        "none_seed3416",
+        "factorized_R512_radon_seed3417",
+        "factorized_R512_linear_resample_seed3417",
+        "factorized_R256_radon_seed3417",
+        "factorized_R256_linear_resample_seed3417",
+        "factorized_R1024_radon_seed3417",
+        "factorized_R1024_linear_resample_seed3417",
+        "svd_seed3417",
+        "none_seed3417",
+        "factorized_R512_radon_seed3418",
+        "factorized_R512_linear_resample_seed3418",
+        "factorized_R256_radon_seed3418",
+        "factorized_R256_linear_resample_seed3418",
+        "factorized_R1024_radon_seed3418",
+        "factorized_R1024_linear_resample_seed3418",
+        "svd_seed3418",
+        "none_seed3418"
+      ]
+    },
+    {
+      "id": "grouped_linear",
+      "state": "not_accepted",
+      "report": "coverage.md",
+      "remaining": "Cross-source grouped operator, resource and matched ordinary controls; no accepted current result",
+      "groups": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "variants": [
+        "fixed_svd_grouped",
+        "uncompressed_grouped_budget_matched"
+      ]
+    },
+    {
+      "id": "ibex_core",
+      "state": "waiting_dependencies_last_verified",
+      "report": "coverage.md",
+      "remaining": "Accepted 3D parents, pair runtime, six arms; 32x224 distinct from 128-layer and small cohort"
+    },
+    {
+      "id": "ibex_mechanisms",
+      "state": "not_accepted",
+      "report": "coverage.md",
+      "remaining": "49 supplemental arms indexed individually; real bindings/receipts still required",
+      "expected_arms": [
+        {
+          "id": "qr_radon",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "qr_linear_resample",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "qr_self",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "self",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "centered_radon",
+          "family": "radon",
+          "compression": "fixed_centered_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "centered_linear_resample",
+          "family": "radon",
+          "compression": "fixed_centered_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "learned_channel_radon",
+          "family": "radon",
+          "compression": "learned_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "learned_channel_linear_resample",
+          "family": "radon",
+          "compression": "learned_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "svd_spatial_scramble",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "scrambled",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "svd_s_axis_scramble",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "s_axis_scramble": true
+        },
+        {
+          "id": "svd_oct_to_cfp",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "direction": [
+            "oct",
+            "cfp"
+          ]
+        },
+        {
+          "id": "svd_cfp_to_oct",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "direction": [
+            "cfp",
+            "oct"
+          ]
+        },
+        {
+          "id": "svd_frozen_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "svd_frozen_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "svd_frozen_self",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "self",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "qr_spatial_scramble",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "scrambled",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "qr_s_axis_scramble",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "s_axis_scramble": true
+        },
+        {
+          "id": "qr_oct_to_cfp",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "direction": [
+            "oct",
+            "cfp"
+          ]
+        },
+        {
+          "id": "qr_cfp_to_oct",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "direction": [
+            "cfp",
+            "oct"
+          ]
+        },
+        {
+          "id": "qr_frozen_radon",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "qr_frozen_linear_resample",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "qr_frozen_self",
+          "family": "radon",
+          "compression": "fixed_random_orthogonal_channel",
+          "mode": "self",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": true
+        },
+        {
+          "id": "r16_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "r16_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "r64_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 64,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "r64_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 64,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "M16_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 16,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "M16_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 16,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "M64_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 64,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "M64_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 64,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "S32_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 32,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "S32_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 32,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "S128_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 128,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "S128_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 128,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "k1_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 1,
+          "frozen": false
+        },
+        {
+          "id": "k1_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 1,
+          "frozen": false
+        },
+        {
+          "id": "k5_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 5,
+          "frozen": false
+        },
+        {
+          "id": "k5_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 5,
+          "frozen": false
+        },
+        {
+          "id": "depth23_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            2,
+            3
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "depth23_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            2,
+            3
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "depth23_self",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "self",
+          "stages": [
+            2,
+            3
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "depth234_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            2,
+            3,
+            4
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "depth234_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "linear_resample",
+          "stages": [
+            2,
+            3,
+            4
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "depth234_self",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "self",
+          "stages": [
+            2,
+            3,
+            4
+          ],
+          "r": 16,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false
+        },
+        {
+          "id": "mmtm256_plus_continue",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "mmtm256",
+          "addition": "continue"
+        },
+        {
+          "id": "mmtm256_plus_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "mmtm256",
+          "addition": "radon"
+        },
+        {
+          "id": "mmtm256_plus_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "mmtm256",
+          "addition": "linear_resample"
+        },
+        {
+          "id": "attention256_plus_continue",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "attention256",
+          "addition": "continue"
+        },
+        {
+          "id": "attention256_plus_radon",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "attention256",
+          "addition": "radon"
+        },
+        {
+          "id": "attention256_plus_linear_resample",
+          "family": "radon",
+          "compression": "fixed_svd_channel",
+          "mode": "radon",
+          "stages": [
+            3
+          ],
+          "r": 32,
+          "M": 32,
+          "S": 64,
+          "k": 3,
+          "frozen": false,
+          "host": "attention256",
+          "addition": "linear_resample"
+        }
+      ]
+    },
+    {
+      "id": "ibex_factorized",
+      "state": "not_accepted",
+      "report": "coverage.md",
+      "remaining": "Formal finite config/feed, complete GPU case and report acceptance; ws02 performance not reused"
+    },
+    {
+      "id": "existing_method_augmentation",
+      "state": "not_accepted",
+      "report": "coverage.md",
+      "remaining": "Matched A/A+bridge and ordinary-addition; module baseline not original paper reproduction"
+    },
+    {
+      "id": "later_transfer_multinetwork",
+      "state": "deferred",
+      "report": "coverage.md",
+      "remaining": "Eye stage gate then cardiac/transfer/eye-heart; 729 six-network arrangements retain identities"
+    }
+  ],
+  "reuse": [
+    {
+      "source_package": "ws02_factorized",
+      "source_id": "none_seed3416",
+      "target_package": "ws02_core",
+      "target_id": "none"
+    },
+    {
+      "source_package": "ws02_factorized",
+      "source_id": "svd_seed3416",
+      "target_package": "ws02_core",
+      "target_id": "svd"
+    }
+  ],
+  "unreviewed_history": [
+    "Earlier archived broad sweeps/development-test reports: not imported or re-ranked; test remains sealed; full historical migration open"
+  ]
+}

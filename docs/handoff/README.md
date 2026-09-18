@@ -207,3 +207,7 @@ Independent review found and fixed a per-step RAM admission gap before deploymen
 ## 2026-09-18 05:34UTC维护
 
 原DenseNet121-3D同run推进到epoch5/updates15064，检查点137秒新，仍未通过父模型接受。CPU控制面短时Slurm查询超时已在后续周期恢复，未重启GPU。共享唯一待批watcher已随LOOK方法优先调整切到`OPS/look_fitting_priority_20260918/owner_v7/plan.json`，其中9个R&B与1个native条目原样保留；R&B科学源和finite32 owner不变。新32仍无正式更新，不能称六臂开始。旧科研结果保留原截止，不用新维护时间刷新其性能证据。
+
+## 2026-09-18：累计覆盖漏报修复
+
+当前统一入口已补[24项分解结果](../reports/current/factorized/README.md)、[六臂](../reports/current/small_cohort/README.md)及[覆盖清单](../reports/current/coverage.md)。旧总入口“暂无合格结果”和源状态“四对照未齐”已修正，历史时间线不改写。显式迁移器只读旧factorized_ws_queue_v1，重核24组receipt/config/artifact/parent/basis SHA及有序dev F1后输出脱敏publication_v1；当前训练不增加旧格式fallback。原权重/断点/预测完整保留，未新训或解封test。发布覆盖门槛与故障注入测试在CI执行，ukb同步前使用同一检查；不是所有科学矛盾都能自动判断。下一阶段和开放范围见coverage，不能把本次补刊算作本周新训练。

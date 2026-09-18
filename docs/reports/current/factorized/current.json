@@ -1,0 +1,1759 @@
+{
+  "schema": "radon_factorized_publication_v1",
+  "sequence_id": "2026_09_14_19_43_11",
+  "source_commit": "91beacfdbc3173993dbe84e11a824633b98b28c4",
+  "evidence_cutoff_unix": 1789410855.3633347,
+  "original_independent_audit_unix": 1789422524.8685417,
+  "test_used": false,
+  "train": 1264,
+  "development": 296,
+  "seeds": [
+    3416,
+    3417,
+    3418
+  ],
+  "complete": true,
+  "verification": "all receipt/config/artifact/parent SHA; ordered dev participants/labels and sklearn F1; no new inference, no raw-cache rescan, no new bootstrap",
+  "source_hashes": {
+    "queue.json": "072818a7cd9b26218d743a700ccd2b2bea2b1309ca3d262a9e9b25cab0e12e68",
+    "results.csv": "e14b7bfc71f9b3b7bb9e9b4049da5436260273d3fc2a5ef7bb35b2092688f392",
+    "comparisons.json": "4137f753bd1eec7e7b312d86027aae1a95273992cb28b473c97a58afcf1bcaf0",
+    "code_acceptance.json": "c07f89c031b3a46aa64ae6c07c98f6e995a21c3fa2eaf83ddeebc4d266f82cf0",
+    "dependencies_acceptance.json": "7138692466f9338a1dc96f23d6fe5ae3ff6996015f3becb13d9173aa29a0d55b",
+    "independent_acceptance_20260915/accepted.json": "103c1baa76dd9365ee0affd6dd78b54045332098f80251cce87e097a4f0bd671"
+  },
+  "configuration": {
+    "backbones": "ResNet18 2D / inflated3D",
+    "cfp": "two eyes RGB224x224",
+    "oct": "two eyes 1x32x96x96",
+    "stage": 3,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "batch": 16,
+    "min_epochs": 8,
+    "max_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001,
+    "optimizer": "AdamW",
+    "backbone_lr": 6e-05,
+    "head_bridge_lr": 0.0001,
+    "weight_decay": 0.01,
+    "precision": "FP32; cuDNN TF32 true",
+    "selection": "dev mean branch macro-F1 incl epoch0"
+  },
+  "results": [
+    {
+      "id": "factorized_R512_radon_seed3416",
+      "seed": 3416,
+      "family": "factorized_R512_radon",
+      "configuration_sha256": "2e13651031e1bfffb50d3f36aad46ccf8dead2a05eacaada1a9464d73f442d92",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.7026891293430124,
+        "oct": 0.6945514584479913
+      },
+      "mean_f1": 0.6986202938955018,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "receipt_sha256": "f6c7f4bcf3d82a85c9f858932acfe460e058263507d6f924a7d71374096da088",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3416/best.pt",
+          "sha256": "07d396174a5b17bb213882926de976cecbd276935a5e5c962e2f79829c289dd7",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3416/resume.pt",
+          "sha256": "7e5967f7fece0b88e9d51ea243bc186265dd03829b86e6e347565c8634ff0ae5",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3416/selected_predictions.npz",
+          "sha256": "0613c3817f029eaa6be6c93323cd16940fedd89188871bfccae062c9d8531d44",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3416/history.json",
+          "sha256": "deab793b9df54a65780ec5210c8e407d4d5560d1effc82ad0983bac1fefc8aa5",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R512_linear_resample_seed3416",
+      "seed": 3416,
+      "family": "factorized_R512_linear_resample",
+      "configuration_sha256": "cf26c6665738a10c153622af82f8727c94a3ad1bf732e420ba1278d5483e6085",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "ea73cae48eec1a4395e17199f7b185fbdadfc574415297e802651d4b5a36fe3c",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3416/best.pt",
+          "sha256": "ed05515a81fd32b50c0631e2e098eb76984be2bf07bcb223edb83177e3e40471",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3416/resume.pt",
+          "sha256": "a2b39336d23e3fa4c09864b21892f7c6cf5fafadae23a8359741d2cd8c5867d6",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3416/selected_predictions.npz",
+          "sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3416/history.json",
+          "sha256": "b9b7854f0fc0260ff93cb8e3a21165b3743ca869fdf77e3a34f9f9bdad8e37fa",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_radon_seed3416",
+      "seed": 3416,
+      "family": "factorized_R256_radon",
+      "configuration_sha256": "c65a3b44c8f65bdc5fa0ea6b84c25679ece1bffda29b7913a426853b116f3c80",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6925359845674433,
+        "oct": 0.6553424657534247
+      },
+      "mean_f1": 0.6739392251604339,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "receipt_sha256": "7d7267064a167ba27c9cd8b1eaa45a30e2c58e944f41738d7a6ff6a2246cd34b",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3416/best.pt",
+          "sha256": "412d034d50a1052ea288a303214a8befdca1db19c10f4259001c9502dcff1c78",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3416/resume.pt",
+          "sha256": "c8be69ffcdb7f2248c2718fda0ac649d1f656601f940bf1b6142557fef6b1615",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3416/selected_predictions.npz",
+          "sha256": "ee2c5e7ad3f225ccc6730294c8a293ed793818b1a9162c6088cc98db4223c7dc",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3416/history.json",
+          "sha256": "5cb8e8be02b42a9a7586072683baea65738c0991b4b2bd6b9c8713b3694cc58c",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_linear_resample_seed3416",
+      "seed": 3416,
+      "family": "factorized_R256_linear_resample",
+      "configuration_sha256": "4d3f401c4e13402ff9bfac6a06530f770e91181b2dd33ebb2ce5ad8bb82cf5fd",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "1603a529f6bc0a577e3d810167b77d9316b81089464f248647f76c9f4b381a3d",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3416/best.pt",
+          "sha256": "b537e8b56d01c44457c1cd29869228d4b007568137f544bd09c507dc5dade825",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3416/resume.pt",
+          "sha256": "b5096cd27f0b8a53ddaa2a575c4167fd61fb1e82c589e17d63ce8baeed8de5bc",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3416/selected_predictions.npz",
+          "sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3416/history.json",
+          "sha256": "37d3cf4f6f04e2ac0067d00180abd12cf4d640dca08377f74ca47a954da61d19",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_radon_seed3416",
+      "seed": 3416,
+      "family": "factorized_R1024_radon",
+      "configuration_sha256": "c62c25ef05391ab79cc86d8be39af07d271e0228a0d2fc6d9dd0e567f6ae2b0a",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.708981159685385,
+        "oct": 0.6921424081376079
+      },
+      "mean_f1": 0.7005617839114964,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "receipt_sha256": "be50b33fcaef56dbbaeb9779956221560c62b7723563c2fcd8930bb3b385863f",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3416/best.pt",
+          "sha256": "f432de03b92d5c58ced3f0a7070f8de6052a6072c066d852927bc48d93f11a61",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3416/resume.pt",
+          "sha256": "4e39b38aef563dfa6fbd93e24f57524f9560fded5c09720ef8cff5fd3857ae24",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3416/selected_predictions.npz",
+          "sha256": "ce511181666b53263401bf0a9b4d180a5306044d5a97279411d7c81919659dad",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3416/history.json",
+          "sha256": "30016f69d52eaace1740e4f5ec77c70a0e500d7f7d86b24a43a5ac5fb7e1e3e6",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_linear_resample_seed3416",
+      "seed": 3416,
+      "family": "factorized_R1024_linear_resample",
+      "configuration_sha256": "a6b2ca606ff1692a511d08c8faaaa1b2d87af7d756c90c18976788c4d27ab780",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6817204301075268,
+        "oct": 0.6653533865497276
+      },
+      "mean_f1": 0.6735369083286272,
+      "best_epoch": 7,
+      "stop_epoch": 13,
+      "receipt_sha256": "cc0c4c7187af8fbf440298d3a6cd61a2c52d6953fb2a25b1fddf90bfaead91a6",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3416/best.pt",
+          "sha256": "40c74b71c34d2c27564219d83d9e0a89ccb87a02a33230f5996e361ed20e3066",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3416/resume.pt",
+          "sha256": "8cbb24a42fcc38c5fb2415bcb852d84e66a297193d8c18a30cbb9e72e862be01",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3416/selected_predictions.npz",
+          "sha256": "df30302159c90fc561080dae166b14801b42804ed324786f24c06d9f99b021c2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3416/history.json",
+          "sha256": "f55e49bfd5a90d6ec9088d9fd43f5565deb680dc966be9fdef73e1bf95a2ead1",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "svd_seed3416",
+      "seed": 3416,
+      "family": "svd",
+      "configuration_sha256": "472e33b2662fc6f97736d50f8981faffc6c2cd05a93ff7239455f26e9e141672",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 0.125,
+          "mode": "radon",
+          "compression": "fixed_svd_channel",
+          "basis_files": {
+            "cfp_stage3": {
+              "sha256": "deee3527b78250153084e5dd2167ea2c0bc8e5813b4a5e247ac04bd27473110c",
+              "artifact_ref": "bases/seed3416/cfp_stage3"
+            },
+            "oct_stage3": {
+              "sha256": "5ec66b075ec9eee9cd7fccb7dc06d52bfaa58700386abd76b4a2ff3822257aff",
+              "artifact_ref": "bases/seed3416/oct_stage3"
+            }
+          },
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.7229603250696252,
+        "oct": 0.7127558767453277
+      },
+      "mean_f1": 0.7178581009074765,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "receipt_sha256": "c23ddcf401afb702cfd4d14130668a19f3c966929ae3916fc074bb781f25970e",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3416/best.pt",
+          "sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3416/resume.pt",
+          "sha256": "2c7423f0c15308d96dd0dcf23dc9d10e8d8a00df644f9d0a9e15e3e6de6afa06",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3416/selected_predictions.npz",
+          "sha256": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3416/history.json",
+          "sha256": "a1f445f59721242c0090b45d064003467f84587eaaf82fb63f8fb8ccd1e0c201",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "none_seed3416",
+      "seed": 3416,
+      "family": "none",
+      "configuration_sha256": "1e38086ccf16a1e7d1895db1f67e7a0f3681ef1d71697864c8eb8aa3d8b2bb16",
+      "bridges": [],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3416/cfp.pt",
+          "sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3416/oct.pt",
+          "sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.668903803131991,
+        "oct": 0.6513545347467609
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "6195539358b07ca459354b09e3376efa47ae2e42c5fb91e05dec15e1009a83cd",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3416/best.pt",
+          "sha256": "2384b3868f03386bb4639c47b31df13f76a5124a752ce70abdb54ace9a4aef8d",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3416/resume.pt",
+          "sha256": "4dffaf7112becf0244cdc7f2d313a708386e5d42d36ea90b167e1d5f602ddfa3",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3416/selected_predictions.npz",
+          "sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3416/history.json",
+          "sha256": "1c7e91ea336bb2e21523ef838de565aa95f8fe0f1334041a1730624ca81bd6e7",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3416/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R512_radon_seed3417",
+      "seed": 3417,
+      "family": "factorized_R512_radon",
+      "configuration_sha256": "d54d22dd3b909b7a0881d86feaa4e8204ade84f96e5db53aebe32af9231462dd",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6384763774584223,
+        "oct": 0.641875542163174
+      },
+      "mean_f1": 0.6401759598107981,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "d5d33c205f03a0fa61d04f2b17c688ae8d1e9df4e5be370337833ddb62a70236",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3417/best.pt",
+          "sha256": "e34ca602e8c395f84539bd9c12ca635b25832456cf68ada77ceca6badcbe84fd",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3417/resume.pt",
+          "sha256": "40733b7465f78cf9f9af7516b76431fe94236a428d10bb94de8f1ff310cdd108",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3417/selected_predictions.npz",
+          "sha256": "0d12cca1f3fba7e07a8ced1625ee072883cd009dbf0a11568cc31ca4af018ef2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3417/history.json",
+          "sha256": "d8e495771c150c307cb8c18cbbeb1962f849bd38daea7004f2f18ed05ea20f4f",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R512_linear_resample_seed3417",
+      "seed": 3417,
+      "family": "factorized_R512_linear_resample",
+      "configuration_sha256": "6515a9a371ba845a8499b8a5e637ff97c5b9c1b9edfcb97b86cf3df01db91092",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6384763774584223,
+        "oct": 0.641875542163174
+      },
+      "mean_f1": 0.6401759598107981,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "bc9157d8c0f93190587b2d8eb9b2c9b4057e4e06fbce0ffd75218301c4d553a8",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3417/best.pt",
+          "sha256": "8a92b3c09fc7e0e0a1e9f86fc421e36cb6deba1696cdacb6639ef9e5f7ac1ca4",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3417/resume.pt",
+          "sha256": "c06fde244b5fe4e49b08caa20169caec884653c97b186804457265fbad891a07",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3417/selected_predictions.npz",
+          "sha256": "0d12cca1f3fba7e07a8ced1625ee072883cd009dbf0a11568cc31ca4af018ef2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3417/history.json",
+          "sha256": "fa479655ca553d802c4773a3a2f7fd30429ff3f7bd18d60665dfb42d2faa5a33",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_radon_seed3417",
+      "seed": 3417,
+      "family": "factorized_R256_radon",
+      "configuration_sha256": "ced2b3c33b4d0b034d0240425e03d83472e4c0c62562cfa20423702e948a957a",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6485844748858447,
+        "oct": 0.6554054054054054
+      },
+      "mean_f1": 0.6519949401456251,
+      "best_epoch": 7,
+      "stop_epoch": 13,
+      "receipt_sha256": "c5ef0a14b5b8597992e88f31c0f941718c4f07bf1e1e6673cfeb65d54a7feabc",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3417/best.pt",
+          "sha256": "92f4b0dcfc93d274127d3fca3c65f8db2fcd7e34467753fbf5eb4e49226c5f25",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3417/resume.pt",
+          "sha256": "20b2cd4866e274aa74ee30ef959dde585c91e56871fce895c87a55072178e2e8",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3417/selected_predictions.npz",
+          "sha256": "e8a5e35ed60261fe1a6651e1d8ea209e30794892582a41b046989e45ae37feff",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3417/history.json",
+          "sha256": "e924f53f15c62e8563569c75144850bf739fd793ea0d67e0ffd0cdde2955938d",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_linear_resample_seed3417",
+      "seed": 3417,
+      "family": "factorized_R256_linear_resample",
+      "configuration_sha256": "df3bea0ba642b302ea7db0832fcd9910d9ce0e0525d0a2140174a9f51a59acda",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6384763774584223,
+        "oct": 0.641875542163174
+      },
+      "mean_f1": 0.6401759598107981,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "155a3a464ccc49d93332523387023c0c6925215163090c020fe99020ebedd9f3",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3417/best.pt",
+          "sha256": "44bd5b89a6215276f80a7f80057f2d74a2b8f88945918f22bd6bc03773972fd6",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3417/resume.pt",
+          "sha256": "ec784039678ddfc6f2fd5b3e16ad55ce20de1c50f3a4399ea6a36f109019b578",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3417/selected_predictions.npz",
+          "sha256": "0d12cca1f3fba7e07a8ced1625ee072883cd009dbf0a11568cc31ca4af018ef2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3417/history.json",
+          "sha256": "e4a8ff702206d8409b14de2a5108a8ee788af084cf628b6a8b0225599696dd31",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_radon_seed3417",
+      "seed": 3417,
+      "family": "factorized_R1024_radon",
+      "configuration_sha256": "1fc5963fa693e195eef01d9889fdc7ffbc985d8a74c06de8a3d3679e1b480e4f",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6824179336163996,
+        "oct": 0.6486486486486487
+      },
+      "mean_f1": 0.6655332911325241,
+      "best_epoch": 11,
+      "stop_epoch": 17,
+      "receipt_sha256": "1d0189c402fc4ab8a1cac9121098b368c458146f2839f2a63ccb54cd34de93ef",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3417/best.pt",
+          "sha256": "9500b5a3cf0e52a6fce68ae73b7b14f675ac439548763db1e0ae91079ce202bf",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3417/resume.pt",
+          "sha256": "675c38d343c5357915d30dc66db70978720fc1d50d859287e153f0ac075c55dd",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3417/selected_predictions.npz",
+          "sha256": "293d749dd64c0f046c4b1bde8b30a5ed991a3976e18bd90e02ff4d68a8a17bbf",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3417/history.json",
+          "sha256": "c3e18dcf9c3bdf7dfee4b4ae4d0a64324089274095a08191ae7f25229f61d069",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_linear_resample_seed3417",
+      "seed": 3417,
+      "family": "factorized_R1024_linear_resample",
+      "configuration_sha256": "576ed7559779b0eb637328919a0905125c335dabbd92c1d92a6de22837d7318f",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6413023596122188,
+        "oct": 0.653125
+      },
+      "mean_f1": 0.6472136798061094,
+      "best_epoch": 10,
+      "stop_epoch": 16,
+      "receipt_sha256": "e148cd913362568e4ef8e505e9b56331b0c6d7e7ca4c92c71af103349748b863",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3417/best.pt",
+          "sha256": "b8ca9dddc29ad8c701a9aef2278a8329a3f59f9e7f8b5da93b10cf2bafc06467",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3417/resume.pt",
+          "sha256": "d7c74d291d1757863a4f1b478e8df59269f350d078d58374b1ed50a68fbcc753",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3417/selected_predictions.npz",
+          "sha256": "c68927a3bf8b3826901b0bf187c6c9882291c348fbe13ba695cf1322eaea369f",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3417/history.json",
+          "sha256": "e6ee247ae7c94596d09867ce93c01d4060aae579a0dcd247ed92ac9eb13d33b1",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "svd_seed3417",
+      "seed": 3417,
+      "family": "svd",
+      "configuration_sha256": "45799b99515e7ca50cbe8826e92bfe461c19ff882b12f9a6a3648305d92223e8",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 0.125,
+          "mode": "radon",
+          "compression": "fixed_svd_channel",
+          "basis_files": {
+            "cfp_stage3": {
+              "sha256": "cad27217b040069b15ff21e987105df53151bf9ac23abfbcc5f10800e72d522d",
+              "artifact_ref": "bases/seed3417/cfp_stage3"
+            },
+            "oct_stage3": {
+              "sha256": "8d1a3c0f311983ca6250e6788019426e6963117d910fc80eb9a21856b43019bb",
+              "artifact_ref": "bases/seed3417/oct_stage3"
+            }
+          },
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.698329268153034,
+        "oct": 0.6788744618406477
+      },
+      "mean_f1": 0.6886018649968408,
+      "best_epoch": 10,
+      "stop_epoch": 16,
+      "receipt_sha256": "a9d9b6b4f702927287a4df68a42a13f1792087abb2b7992c9aae10e76f585e0a",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3417/best.pt",
+          "sha256": "09df30a1cb439747ed24c42e27c77f8760eef6cf72f1912d3e9d242ffb2e581e",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3417/resume.pt",
+          "sha256": "df1d6351f417c44f3c429bf2fb0d63a459f787d0dd0ba2c7466fb3cf16ff8073",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3417/selected_predictions.npz",
+          "sha256": "f074a233a3e8633b24da2dccd3662ef1ac7857965146626ddc3165603f0fc138",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3417/history.json",
+          "sha256": "0f48f3a989cb9575bed9ae053a680369e8cd7429c001e5ecd66b060c9d2f2c11",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "none_seed3417",
+      "seed": 3417,
+      "family": "none",
+      "configuration_sha256": "4ebb0ad83b36dc1aabbdde7441b55d631d281dc48a64dac582197ab3960b5f01",
+      "bridges": [],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3417/cfp.pt",
+          "sha256": "368dc093b22a22aecf7cd8ccef42bb60d68d8962a029504347b0ab22945ee07a"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3417/oct.pt",
+          "sha256": "b597bc7544eac65b5897fba6a31f868bb8fbe86bf7c9c6858a5875769188ef6c"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6384763774584223,
+        "oct": 0.641875542163174
+      },
+      "mean_f1": 0.6401759598107981,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "7f4f211fba48762bcbfb4f16342a60bf430e24f4c01d5adbed7b9f061c743d2f",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3417/best.pt",
+          "sha256": "82d493457db036193cf17f364fc06a2e1ea64f33fc13428798ac83adc0b6058c",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3417/resume.pt",
+          "sha256": "720beecf4f5e98945a6fee304d893b23bc14e84400bb2af05dc411ab636c94eb",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3417/selected_predictions.npz",
+          "sha256": "0d12cca1f3fba7e07a8ced1625ee072883cd009dbf0a11568cc31ca4af018ef2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3417/history.json",
+          "sha256": "457ae580c87c872731328d1b7cc0bba2f4427a12e42b346343525ac5c6418d84",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3417/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R512_radon_seed3418",
+      "seed": 3418,
+      "family": "factorized_R512_radon",
+      "configuration_sha256": "9aeba72e1bdbdd4b4da95b7dd021ced7f12be13c6f762adb42e65956b0175d39",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6722636319015604,
+        "oct": 0.6923955371315678
+      },
+      "mean_f1": 0.682329584516564,
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "receipt_sha256": "7357b7e88581f3d5fec5d99bf9f8d968e2a15e99c0aadcd27a0ccd22785c69cb",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3418/best.pt",
+          "sha256": "cbc3a927e80e59412d6b354ae1381899bdd1f0d8b88d548824d04832359d8299",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3418/resume.pt",
+          "sha256": "2164e369c6a820ef2c67a98e152b62a4f4ed90080e3e42f3952039ea69e8274b",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3418/selected_predictions.npz",
+          "sha256": "6a31088423e39b1258b876433bfddef6525c309071d7320f0bc28779205df858",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3418/history.json",
+          "sha256": "05c236a946ff700ddba10be28bdfcbb81c3e189278210e39f15414537c8353f3",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_radon_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R512_linear_resample_seed3418",
+      "seed": 3418,
+      "family": "factorized_R512_linear_resample",
+      "configuration_sha256": "c6b62c0bfa8d63c52b86f2dc42ee12990d29493776f1368f6c25fcc917625c2f",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 512,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6395220588235294,
+        "oct": 0.7059166124224879
+      },
+      "mean_f1": 0.6727193356230087,
+      "best_epoch": 14,
+      "stop_epoch": 18,
+      "receipt_sha256": "88064fb219182cd522e7ae8c9b5494ac9f5fb1919301ac3a0991ef852dc93208",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3418/best.pt",
+          "sha256": "5dedacd45f34b717bc1632db5edeb49c115873c14b5652cfec6ef888db1f58cc",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3418/resume.pt",
+          "sha256": "00c5e4d82c62ab9624a4c41e573aba9c259ff668518442bc43dc7104595897f4",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3418/selected_predictions.npz",
+          "sha256": "dbfa72fb86640d0b99321ea860ac2c160eeb482c530598bb6e17b85d190b7905",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3418/history.json",
+          "sha256": "564be27714345cff4e2c5c3ed88c057ac3a51133a3949dff340f9c023c1aba5b",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R512_linear_resample_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_radon_seed3418",
+      "seed": 3418,
+      "family": "factorized_R256_radon",
+      "configuration_sha256": "d5298b6ce2a367cdeaa51a800eeaa262db80deb1595b1443e8aa9fe878b38d39",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6718441053774502,
+        "oct": 0.6485042247088376
+      },
+      "mean_f1": 0.6601741650431439,
+      "best_epoch": 4,
+      "stop_epoch": 10,
+      "receipt_sha256": "38279ca3a1f8ef345291ec3454cd45892dc2b3f0734c0b4fef9e02eb9c7fd0c1",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3418/best.pt",
+          "sha256": "a74aa7a98660cc400e82324fd6aa36c7a6c5609a907bcd4ad8ca58a1c876c0aa",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3418/resume.pt",
+          "sha256": "80a25ea300de39f46ea11b0a6ce027a932479a5a368aead5c9a684d7afaecc97",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3418/selected_predictions.npz",
+          "sha256": "91ec1330842882d2444ae1c51205ff5adc5a00e7ebde50be1349325be6695601",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3418/history.json",
+          "sha256": "755f94d8a246e9d67e74a9c048b31ba735ff293b462ff1c5b575967fa98ddf8b",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_radon_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R256_linear_resample_seed3418",
+      "seed": 3418,
+      "family": "factorized_R256_linear_resample",
+      "configuration_sha256": "f704a8ec592e8173d679acfb4ec572cff506bb965989d7f7a10f433b754327f6",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 256,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6450717736133476,
+        "oct": 0.6723096083767701
+      },
+      "mean_f1": 0.6586906909950588,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "receipt_sha256": "7f43db8c6fb7c8cedcb36b36514fa94af1e89f06a206ee1480123066e97d6259",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3418/best.pt",
+          "sha256": "ae750fa6efe1a83573cf667e201f250d6aeed6c93d799c02d82b1a6e35968208",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3418/resume.pt",
+          "sha256": "d2999b01c5648ba9aa3d3916484bb1df5df2d966466ac50e4c886d4b44df5d15",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3418/selected_predictions.npz",
+          "sha256": "b528b6ad67307070e227636d57faed32192c02f7a4b8c8790d669adfb21fcf86",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3418/history.json",
+          "sha256": "4bf0b844bcf2686d9848655d2dd0f250cecac7d333eafc0eedfa0a30d12ddf43",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R256_linear_resample_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_radon_seed3418",
+      "seed": 3418,
+      "family": "factorized_R1024_radon",
+      "configuration_sha256": "d107a11f22a8fdc3244692319d1661bf750d6dd84552ead12005e6d2cf38b3a7",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "radon",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6486486486486487,
+        "oct": 0.6587798892883638
+      },
+      "mean_f1": 0.6537142689685063,
+      "best_epoch": 4,
+      "stop_epoch": 10,
+      "receipt_sha256": "3d0c0125dddcaaa14513a36c42f1645cdc4f545e674ee94a8e018fa6bd40a6b3",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3418/best.pt",
+          "sha256": "aa3dac16c53751addf7aacdcf39f80bf2a0a495fc6397abff13cb367905c2ec1",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3418/resume.pt",
+          "sha256": "6df7fa9e948597b86b1d2891baab517c4da6ee7883bd95d5122d2086a8d30e6c",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3418/selected_predictions.npz",
+          "sha256": "0fafdc879a704fbdbaa26ee476e465a92e0fa65f28e686bf29d1b9c35a38b2db",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3418/history.json",
+          "sha256": "e2176572d9d247a983e610a0c782438c9925283d6ed0ed5f3173a9ebd898297b",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_radon_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "factorized_R1024_linear_resample_seed3418",
+      "seed": 3418,
+      "family": "factorized_R1024_linear_resample",
+      "configuration_sha256": "5fca8d9f86ebbe87b03d420239e81d7d300a3f67a4a735bf6dc2d0b9b5fcbf1d",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 1,
+          "mode": "linear_resample",
+          "compression": "factorized_projected",
+          "bottleneck_rank": 1024,
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6703067047894634,
+        "oct": 0.6789624504800722
+      },
+      "mean_f1": 0.6746345776347678,
+      "best_epoch": 6,
+      "stop_epoch": 12,
+      "receipt_sha256": "dc7f4bd0d6ad41b206a489d131034d4111291ced581ae5a60451fc1b6edd1a26",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3418/best.pt",
+          "sha256": "0281672951e7137cbc837b104ea77e012d6b885c54ad1b0a46454f3a317dc722",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3418/resume.pt",
+          "sha256": "5257b79c782bd615ae2935f538888c0b6aa1e400d2f496c359161bdc9f5d8530",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3418/selected_predictions.npz",
+          "sha256": "7faeba90acb80682cdf9a45476d9e72154df8e4941e7715573db2a022d51112c",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3418/history.json",
+          "sha256": "5e16aa8427a23690db6658c2d5252106332cc52afc19fac8efb4eb96a39cdc16",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/factorized_R1024_linear_resample_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "svd_seed3418",
+      "seed": 3418,
+      "family": "svd",
+      "configuration_sha256": "98d9e21a232903a7b2268e2ce64b5b9788713e416366eab076d1256006bf7527",
+      "bridges": [
+        {
+          "nodes": [
+            "cfp_stage3",
+            "oct_stage3"
+          ],
+          "M": 32,
+          "S": 64,
+          "rho": 0.125,
+          "mode": "radon",
+          "compression": "fixed_svd_channel",
+          "basis_files": {
+            "cfp_stage3": {
+              "sha256": "6706ead8131cd37267f5c1a2e3f7446e8475e28a814167e99f4c8ced29e287bf",
+              "artifact_ref": "bases/seed3418/cfp_stage3"
+            },
+            "oct_stage3": {
+              "sha256": "e1879ab489649cf17f9958f08725e2c2cbdfe466e06c230acb16361da6ca22d5",
+              "artifact_ref": "bases/seed3418/oct_stage3"
+            }
+          },
+          "kernel_size": 3
+        }
+      ],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6809759677123464,
+        "oct": 0.6741882223445239
+      },
+      "mean_f1": 0.6775820950284351,
+      "best_epoch": 14,
+      "stop_epoch": 20,
+      "receipt_sha256": "2d24be764caacec60a62e2ed8133f9f5203f9f6726bb9fdc3704378d445b0597",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3418/best.pt",
+          "sha256": "21d201997510a513736aaa09f6c71074be7959faed6fa9cf8847b045d37ea568",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3418/resume.pt",
+          "sha256": "57f80836d28adb11616faf36a1def6bc81e8dd3c41217633fa0b4607b5dc20f7",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3418/selected_predictions.npz",
+          "sha256": "aee1a3bd2ba2c972f669ae05207d4a6c985437366ade5d1498a67f2f6d37a0c2",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3418/history.json",
+          "sha256": "51e9e12d7d3907d754f0ff8230022aea2d531624ee9c2a3f26ca9605b8ebe49f",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/svd_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    },
+    {
+      "id": "none_seed3418",
+      "seed": 3418,
+      "family": "none",
+      "configuration_sha256": "13fe14b3b592fe00c934a3c0c6374eac0a53b7b62cefc9329f0fc500097f47e7",
+      "bridges": [],
+      "parents": {
+        "cfp": {
+          "artifact_ref": "parents/seed3418/cfp.pt",
+          "sha256": "fac9663c683b28887ca1e752ff5296d03fd5461f3ca0e5460b6cf3ad185cd736"
+        },
+        "oct": {
+          "artifact_ref": "parents/seed3418/oct.pt",
+          "sha256": "3a81d7cc54fc7c746379eac87300764bb2f183e3f8163c2718d14a5752de6a6a"
+        }
+      },
+      "branch_f1": {
+        "cfp": 0.6587798892883638,
+        "oct": 0.641875542163174
+      },
+      "mean_f1": 0.650327715725769,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "receipt_sha256": "150528d5697b7d3935b9d1b8a6c12291f7e83b152dab9259cba413056d9a51ed",
+      "artifacts": {
+        "best.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3418/best.pt",
+          "sha256": "0e38441e1e0bb205e1a4a072a36c6ea5bba0b22eab08a92729ded9c391c13d56",
+          "retention": "retained_hash_verified"
+        },
+        "resume.pt": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3418/resume.pt",
+          "sha256": "f90d4db70362ed47cabeee163e78818f2bd28b8e354d3d4daeb73acd35b3676f",
+          "retention": "retained_hash_verified"
+        },
+        "selected_predictions.npz": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3418/selected_predictions.npz",
+          "sha256": "c7a857505ce62d0039a10fc876d34c88560f1cfa9301741a27a4eff52202e933",
+          "retention": "retained_hash_verified"
+        },
+        "history.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3418/history.json",
+          "sha256": "34c550cdd21ede03f630353b4e558a57c198665090000a4d75c13b2f26b9e4df",
+          "retention": "retained_hash_verified"
+        },
+        "initial_acceptance.json": {
+          "artifact_ref": "Radon_Bridge/2026_09_14_19_43_11/none_seed3418/initial_acceptance.json",
+          "sha256": "3cd22b36fca03dd8c286d1dc2ddb41a07532df7ec77f46b6337d9522c3ef603e",
+          "retention": "retained_hash_verified"
+        }
+      }
+    }
+  ],
+  "comparisons": {
+    "test_used": false,
+    "cohort": "ws02_small_development_exploration",
+    "participants": 296,
+    "resamples": 10000,
+    "shared_participant_indices": true,
+    "seed_repetitions": 3,
+    "primary_family_size": 9,
+    "direction": "Radon minus same-rank linear resampling",
+    "contrasts": [
+      {
+        "rank": 256,
+        "metric": "cfp",
+        "difference": 0.020170870208992404,
+        "ci95": [
+          -0.0036614247394018665,
+          0.04369699922834254
+        ],
+        "simultaneous95": [
+          -0.012835085864772267,
+          0.05317682628275708
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 256,
+        "metric": "oct",
+        "difference": -0.002095863139679096,
+        "ci95": [
+          -0.030959390688135822,
+          0.02643113600576235
+        ],
+        "simultaneous95": [
+          -0.04144755141668026,
+          0.03725582513732206
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 256,
+        "metric": "mean",
+        "difference": 0.009037503534656635,
+        "ci95": [
+          -0.00999277401860343,
+          0.027742126287702094
+        ],
+        "simultaneous95": [
+          -0.01720405467522399,
+          0.03527906174453726
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 512,
+        "metric": "cfp",
+        "difference": 0.02217563309635077,
+        "ci95": [
+          0.0031804582294774806,
+          0.0413381682818719
+        ],
+        "simultaneous95": [
+          -0.004322978983568572,
+          0.048674245176270114
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 512,
+        "metric": "oct",
+        "difference": 0.009891949470103412,
+        "ci95": [
+          -0.014694700888871483,
+          0.03467054423465647
+        ],
+        "simultaneous95": [
+          -0.023818623543697043,
+          0.043602522483903866
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 512,
+        "metric": "mean",
+        "difference": 0.016033791283227055,
+        "ci95": [
+          0.00015090325129152535,
+          0.03214925498546572
+        ],
+        "simultaneous95": [
+          -0.006029309068838973,
+          0.03809689163529308
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 1024,
+        "metric": "cfp",
+        "difference": 0.015572749147074738,
+        "ci95": [
+          -0.010108446488108649,
+          0.041380201044032804
+        ],
+        "simultaneous95": [
+          -0.019963435716184502,
+          0.05110893401033398
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 1024,
+        "metric": "oct",
+        "difference": 0.0007100363482735276,
+        "ci95": [
+          -0.0388242713328043,
+          0.04180434144125878
+        ],
+        "simultaneous95": [
+          -0.05575449278751232,
+          0.05717456548405937
+        ],
+        "zero_variance": false
+      },
+      {
+        "rank": 1024,
+        "metric": "mean",
+        "difference": 0.008141392747674114,
+        "ci95": [
+          -0.016733376753510762,
+          0.03326329342475946
+        ],
+        "simultaneous95": [
+          -0.026696120953657233,
+          0.04297890644900546
+        ],
+        "zero_variance": false
+      }
+    ]
+  },
+  "limitations": [
+    "historical exploratory development cohort",
+    "SVD versus factorized not parameter matched",
+    "bootstrap fixed selected models and three observed seeds; not general seed uncertainty"
+  ]
+}
