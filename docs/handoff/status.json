@@ -11,7 +11,7 @@
   "source_commit": "450a1227286efc2f87ec38be324ccbebcaedc001",
   "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
   "verified_at": "2026-09-18T19:52:53.745547+00:00",
-  "verification_scope": "grouped_left_independent_acceptance_and_publication_cleanup; evidence_cutoff unchanged for earlier project-wide runtime",
+  "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
     "implemented": "partial",
@@ -54,6 +54,8 @@
     "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
     "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
     "2026-09-18 grouped接受仅限WS02单种子开发集固定SVD包；不代表Ibex、test、无压缩预算匹配或全项目接受。"
+,
+    "2026-09-18 status verification_scope 按共同PHD契约保持枚举 runtime_and_evidence；说明文字不再塞入枚举字段。既有 evidence_cutoff 仍保持原科研截止时间，不因发布清理刷新。"
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -85,6 +87,8 @@
     "2026-09-18 14:52UTC：三臂自动profile→训练→报告全部完成，独立audit通过；无活GPU进程且manager正常结束。远端active旧running已按完成证据修正，不重启已完成队列。Ibex14:50UTC两个dispatcher新鲜error=null，squeue为1运行allocation/23待批；不等于项目GPU正在训练。",
     "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。",
     "2026-09-18 左侧独立复核grouped completion：89个源码文件与450a122一致、54份资产SHA、296人F1、8个profile恢复及10k五项区间全部通过；coverage批准accepted，G1精确复用core，公开仅保留脱敏摘要。"
+,
+    "2026-09-18 跨仓同步修复：PHD project_status 现行契约只接受 runtime_and_evidence/source_review_only；本页本次已有远端原产物核验，故使用 runtime_and_evidence。自由说明移入 actions/limitations/evidence，未改 evidence_cutoff。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -150,6 +154,11 @@
     {
       "label": "grouped后续中心化/预算匹配研究依据",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/grouped_next_evidence_20260918.md"
+    }
+,
+    {
+      "label": "当前项目状态契约与证据入口",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/status.json"
     }
   ]
 }
