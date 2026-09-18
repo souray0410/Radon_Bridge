@@ -21,11 +21,34 @@ def verified(path,config):
     return True
 
 
+
+def profile_verified(path,config,grouped=False):
+    path=Path(path)
+    if not path.exists():return False
+    value=json.loads(path.read_text())
+    if (value.get('passed') is not True or value.get('test_used') is not False or value.get('formal_updates')!=0
+            or value.get('configuration')!=config or value.get('checkpoint_update_exact') is not True
+            or value.get('node_ids_preserved') is not True or value.get('autograd_equivalence') is not True
+            or value.get('full_development_participants')!=296):
+        raise ValueError('Invalid resource profile')
+    if sha(path.parent/'resume.pt')!=value.get('resume_sha256'):raise ValueError('Resource profile resume changed')
+    if grouped:
+        from radon_bridge.studies.cohort_grouped import validate_grouped_profile_structure
+        validate_grouped_profile_structure(value.get('grouped_structure'),config)
+    return True
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--devices',nargs='+',type=int,required=True)
     args=parser.parse_args();root=Path(args.root)
     lock=(root/'manager.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    q=json.loads((root/'queue.json').read_text());cases=q['cases'];active={};failed={};complete=set();profiles={}
+    q=json.loads((root/'queue.json').read_text())
+    if q.get('test_used') is not False:raise ValueError('Unsealed cohort queue')
+    if q.get('study_kind')=='grouped_linear':
+        from radon_bridge.studies.cohort_grouped import validate_queue
+        validate_queue(root,q)
+    elif q.get('schema')!='radon_small_cohort_core_v1':raise ValueError('Unknown cohort queue contract')
+    cases=q['cases'];active={};failed={};complete=set();profiles={}
     if (root/'status.json').exists():
         old=json.loads((root/'status.json').read_text())
         for worker in old.get('active',{}).values():
@@ -33,8 +56,11 @@ def main():
             except ProcessLookupError:pass
             else:raise RuntimeError('Previous worker still alive; do not steal its run')
         failed={k:v for k,v in old.get('failed',{}).items() if v.get('state')!='paused'}
+        by_resource={c['resource']:c for c in cases}
         for key,path in old.get('resource_profiles',{}).items():
-            if Path(path).exists() and json.loads(Path(path).read_text()).get('passed'):profiles[key]=path
+            if key not in by_resource:raise ValueError('Unknown recovered resource profile')
+            cfg=json.loads(Path(by_resource[key]['config']).read_text())
+            if profile_verified(path,cfg,q.get('study_kind')=='grouped_linear'):profiles[key]=path
 
     # These full receipts are generated before execution, not inferred from directory names.
     for name in ['dependencies_acceptance.json','code_acceptance.json']:
@@ -46,8 +72,12 @@ def main():
         for path,digest in dependencies[section].items():
             if sha(path)!=digest:raise ValueError('Dependency changed: '+path)
     code=json.loads((root/'code_acceptance.json').read_text())
+    if q.get('study_kind')=='grouped_linear' and (code.get('source_commit')!=q['source_commit'] or code.get('framework_commit')!=q['framework_commit'] or code.get('passed_cpu') is not True or code.get('test_used') is not False):raise ValueError('Grouped code acceptance mismatch')
     for path,digest in code['files'].items():
         if sha(path)!=digest:raise ValueError('Code changed after acceptance: '+path)
+    if q.get('study_kind')=='grouped_linear':
+        from radon_bridge.studies.cohort_grouped import verify_deployment_receipts
+        verify_deployment_receipts(root,q)
     (root/'profiles').mkdir(exist_ok=True);(root/'trials').mkdir(exist_ok=True)
     started=time.time()
     while True:
@@ -57,9 +87,8 @@ def main():
             receipt=output/('accepted.json')
             if proc.returncode==0 and receipt.exists():
                 if mode=='profile':
-                    a=json.loads(receipt.read_text())
-                    if not a.get('passed') or a.get('formal_updates')!=0 or a.get('configuration')!=json.loads(Path(c['config']).read_text()):raise ValueError('Invalid profile')
-                    profiles[c['resource']]=str(receipt)
+                    cfg=json.loads(Path(c['config']).read_text())
+                    if profile_verified(receipt,cfg,q.get('study_kind')=='grouped_linear'):profiles[c['resource']]=str(receipt)
                 elif verified(receipt,json.loads(Path(c['config']).read_text())):complete.add(c['name'])
             else:
                 failed[c['name']]=dict(exit_code=proc.returncode,mode=mode,path=str(output),state='paused' if proc.returncode==75 else 'needs_review')

@@ -101,6 +101,43 @@ def configure_device():
     torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
 
 
+def grouped_structure_probe(g,cfg):
+    grouped=[(i,c) for i,c in enumerate(cfg.get('bridges',[])) if c.get('group_count',1)>1]
+    if not grouped:return None
+    if len(grouped)!=1:raise ValueError('WS02 grouped supplement expects one grouped bridge')
+    index,config=grouped[0];groups=config['group_count']
+    mixer=g.modules_by_name()[f'bridge_{index}_exchange'].mixer
+    if mixer.conv.groups!=groups or not hasattr(mixer,'group_permutation') or not hasattr(mixer,'group_inverse'):
+        raise ValueError('Grouped mixer structure mismatch')
+    permutation=mixer.group_permutation.detach().cpu();inverse=mixer.group_inverse.detach().cpu()
+    if not torch.equal(permutation.index_select(0,inverse),torch.arange(len(permutation))):
+        raise ValueError('Grouped inverse permutation mismatch')
+    widths=list(mixer.widths)
+    if len(widths)!=2 or sum(widths)%groups:raise ValueError('Grouped WS02 source widths invalid')
+    offsets=[0,widths[0],sum(widths)];per_group=sum(widths)//groups;counts=[]
+    for group in range(groups):
+        segment=permutation[group*per_group:(group+1)*per_group]
+        row=[]
+        for start,end in zip(offsets[:-1],offsets[1:]):row.append(int(((segment>=start)&(segment<end)).sum()))
+        if min(row)<=0:raise ValueError('Every group must contain every source')
+        counts.append(row)
+    probe=copy.deepcopy(mixer).cpu()
+    with torch.no_grad():probe.conv.weight.fill_(1)
+    features=[torch.ones(1,width,5,requires_grad=True) for width in widths]
+    output=probe(*features)
+    first_group=permutation[:per_group];second_group=permutation[per_group:2*per_group]
+    dst=int(first_group[first_group<offsets[1]][0])
+    within=int(first_group[first_group>=offsets[1]][0])-offsets[1]
+    cross=int(second_group[second_group>=offsets[1]][0])-offsets[1]
+    gradient=torch.autograd.grad(output[0][:,dst].sum(),features[1])[0]
+    within_value=float(gradient[0,within].abs().sum())
+    cross_value=float(gradient[0,cross].abs().sum())
+    if not within_value>0 or cross_value!=0:raise ValueError('Grouped direct-gradient structure mismatch')
+    return dict(group_count=groups,conv_groups=mixer.conv.groups,source_widths=widths,group_source_counts=counts,
+        within_group_cross_source_gradient=within_value,cross_group_direct_gradient=cross_value,
+        inverse_permutation_verified=True)
+
+
 def profile(cfg,data,out):
     out.mkdir(parents=True,exist_ok=False);configure_device();train,dev=datasets(data)
     g,opt=build(cfg);b=next(iter(loader(train,16,cfg['seed'],0)))
@@ -144,17 +181,20 @@ def profile(cfg,data,out):
     assert same(expected,g.save_state()) and same(expected_opt,opt.state_dict())
     assert ids=={n:g.by_name[n].id for n in ids}
     val=evaluate(g,dev,16,cfg['seed'],stop=check_resources)
+    grouped_structure=grouped_structure_probe(g,cfg)
     torch.cuda.synchronize();peak=torch.cuda.max_memory_reserved()/1024**3
     sample_physical()
     if peak>9 or (physical and max(physical)>10):raise RuntimeError('Workstation project memory budget exceeded')
-    write_json(out/'accepted.json',dict(passed=True,scope='resource_and_MHD_development_only',test_used=False,
+    receipt=dict(passed=True,scope='resource_and_MHD_development_only',test_used=False,
         formal_updates=0,seed=cfg['seed'],configuration=cfg,warmup=5,measured_updates=20,
         checkpoint_update_exact=True,node_ids_preserved=True,autograd_equivalence=True,
         full_development_participants=296,peak_reserved_gib=peak,peak_process_sampled_gib=max(physical) if physical else None,seconds=time.monotonic()-tick,
         bridge_parameters=sum(p.numel() for n,m in g.modules_by_name().items() if n.startswith('bridge_') for p in m.parameters()),
         torch=str(torch.__version__),cuda=torch.version.cuda,device=torch.cuda.get_device_name(0),
         numerical_policy=dict(parameter_dtype="float32",autocast=False,matmul_tf32=False,cudnn_tf32=True),
-        resume_sha256=sha(out/'resume.pt')))
+        resume_sha256=sha(out/'resume.pt'))
+    if grouped_structure is not None:receipt['grouped_structure']=grouped_structure
+    write_json(out/'accepted.json',receipt)
 
 
 def train_case(cfg,data,out):

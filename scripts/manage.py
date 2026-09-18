@@ -3,6 +3,7 @@ import argparse, importlib.util, json, subprocess, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 REQUIRED={".github","src","configs","scripts","tests","docs","experiments","third_party","workspace"}
+LOCAL_ONLY={".git",".venv",".webcodex-local","build","dist",".pytest_cache"}
 def load(name):
     spec=importlib.util.spec_from_file_location(name,ROOT/"workspace"/(name+".py"))
     m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
@@ -12,7 +13,7 @@ def check():
     layout=importlib.util.module_from_spec(spec);spec.loader.exec_module(layout)
     internal=layout.check(ROOT)
     cfg=json.loads((ROOT/"project.json").read_text())
-    actual={p.name for p in ROOT.iterdir() if p.is_dir() and p.name not in {".git",".venv","build","dist",".pytest_cache"} and not p.name.endswith(".egg-info")}
+    actual={p.name for p in ROOT.iterdir() if p.is_dir() and p.name not in LOCAL_ONLY and not p.name.endswith(".egg-info")}
     if actual!=REQUIRED:raise ValueError(f"Research root directories differ: {actual ^ REQUIRED}")
     if not (ROOT/"src"/cfg["package_name"]).is_dir():raise ValueError("Missing package")
     for name in ["pyproject.toml","framework.lock.json","requirements.txt","README.md","AGENTS.md","CONTRIBUTING.md"]:
