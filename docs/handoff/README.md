@@ -1,3 +1,7 @@
+## 2026-09-18 09:12UTC：ws02六臂已完整接受
+
+[同配置六臂、普通/同时区间及初始模型选回解释](../reports/current/small_cohort/README.md)。原子队列四新臂自动全部完成，独立SHA与296人F1核验通过；Ibex父模型暂停/新32待资源，未混入本结论。
+
 ## 2026-09-18：ws02快速核心包
 
 [单种子六臂协议与实际运行](ws02_single_seed_core_20260918.md)；[累计结果](../reports/current/small_cohort/README.md)。GPU1普通通信已越过预检进入正式训练；Ibex大队列依赖与原队列保持，旧记录按时间追溯。

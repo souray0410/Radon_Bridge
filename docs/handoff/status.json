@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "ws02 GPU1有限单种子六臂包：引用已核验none/SVD，新增普通通信→自身处理→MMTM→交叉注意力；Ibex独立按获批恢复父模型及fast32",
+  "next_acceptance": "ws02首个六臂包已完成；原生/适配比较边界审查后推进老师A/A+桥问题，Ibex恢复大队列父模型与fast32接续仍待资源",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "c3a832cdc256c8209bd0be56917df69a1fc34a1f",
-  "evidence_cutoff": "2026-09-17T09:48:00+00:00",
-  "verified_at": "2026-09-18T08:36:54.881614+00:00",
+  "evidence_cutoff": "2026-09-18T08:49:11.006936+00:00",
+  "verified_at": "2026-09-18T09:17:02.657310+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -22,6 +22,11 @@
   "results": [
     {
       "summary": "ws02旧小队列1264train/296dev，seed3416同ResNet18 2D/3D父模型：none与SVD历史产物SHA和参与者级分支F1独立重算后引用；分支均值分别66.0129%和71.7858%。其余四对照未齐，不能据此排名或宣称六臂完成，非本轮新训练结果。",
+      "scope": "preliminary_single_seed",
+      "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
+    },
+    {
+      "summary": "小队列1264train/296dev、3416、R18二维/三维完整六臂，全部文件SHA与有序参与者及sklearn F1独立复核通过。分支均值F1：无通信66.0129%、SVD-Radon71.7858%、普通通信67.5262%、自身处理66.0129%、MMTM适配66.0129%、注意力适配66.5317%。Radon−普通通信+4.2596pp，普通95%[0.1673,8.29297]，五项同时95%[-0.4785,8.9978]，后者跨零。非test或多种子结论。",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     }
@@ -55,9 +60,12 @@
     "2026-09-18 05:34UTC：旧DenseNet121-3D原run推进epoch5/updates15064，last.pt137秒新；未作为父模型接受。R&B CPU短时squeue20秒超时后原周期恢复error=null。共用watcher由LOOK owner_v7安全接替，9R&B和1native条目不变；新32仍无正式更新，实际GPU/profile/claim仍待批。",
     "2026-09-18：独立c3a832c源码与项目原pin3559caa部署，5项方法/报告CPU测试通过；GPU1普通通信完整dev/梯度/下一更新恢复profile通过，父预测严格重放通过，正式epoch4/1024人已推进。其余新臂同卡顺序预检后派发。",
     "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。",
-    "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。"
+    "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。",
+    "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。"
   ],
-  "decisions": [],
+  "decisions": [
+    "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。"
+  ],
   "evidence": [
     {
       "label": "Independent delivery implementation and current activation limits",

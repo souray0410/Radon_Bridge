@@ -25,17 +25,11 @@
     "precision": "FP32; cuDNN TF32 true matching historical parents"
   },
   "state": {
-    "state": "running",
-    "accepted": 3,
+    "state": "complete",
+    "accepted": 6,
     "planned": 6,
-    "updated_at": 1789720871.0247374,
-    "active": [
-      {
-        "device": "1",
-        "name": "self_seed3416",
-        "phase": "train"
-      }
-    ],
+    "updated_at": 1789721351.0069358,
+    "active": [],
     "failed": {}
   },
   "results": [
@@ -218,13 +212,260 @@
         "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/linear/best.pt",
         "sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f"
       }
+    },
+    {
+      "id": "self",
+      "name": "\u81ea\u8eab\u5904\u7406",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "\u672c\u6b21\u65b0\u589e\u5355\u79cd\u5b50\u6267\u884c",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/self/best.pt",
+        "sha256": "d1d9bd7640c09b2d746f3a21e5aa5e24d4471eb58aef822e049b690e39e944fb"
+      }
+    },
+    {
+      "id": "mmtm",
+      "name": "MMTM\u9002\u914d",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.668903803131991,
+          "macro_precision": 0.6689497716894977,
+          "macro_recall": 0.6689189189189189,
+          "accuracy": 0.668918918918919,
+          "confusion_matrix": [
+            [
+              98,
+              50
+            ],
+            [
+              48,
+              100
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 0.9324178618684056,
+          "auroc": 0.7006482834185537
+        },
+        "oct": {
+          "macro_f1": 0.6513545347467609,
+          "macro_precision": 0.6532091097308488,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              103,
+              45
+            ],
+            [
+              58,
+              90
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1492943787468952,
+          "auroc": 0.6917001460920379
+        }
+      },
+      "mean_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "provenance": "\u672c\u6b21\u65b0\u589e\u5355\u79cd\u5b50\u6267\u884c",
+      "prediction_sha256": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/mmtm/best.pt",
+        "sha256": "5c3a75ddd9ab22d7cf9c07d0e68673bf9284ff1efc16f428809e071c6d22ce07"
+      }
+    },
+    {
+      "id": "attention",
+      "name": "\u4ea4\u53c9\u6ce8\u610f\u529b\u9002\u914d",
+      "seed": 3416,
+      "metrics": {
+        "cfp": {
+          "macro_f1": 0.6786102062975027,
+          "macro_precision": 0.6800486618004866,
+          "macro_recall": 0.6790540540540541,
+          "accuracy": 0.6790540540540541,
+          "confusion_matrix": [
+            [
+              106,
+              42
+            ],
+            [
+              53,
+              95
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.1590188554636995,
+          "auroc": 0.7513239590942293
+        },
+        "oct": {
+          "macro_f1": 0.6520230554128859,
+          "macro_precision": 0.6520339679495959,
+          "macro_recall": 0.652027027027027,
+          "accuracy": 0.652027027027027,
+          "confusion_matrix": [
+            [
+              97,
+              51
+            ],
+            [
+              52,
+              96
+            ]
+          ],
+          "class_support": [
+            148,
+            148
+          ],
+          "log_loss": 1.5421726562528857,
+          "auroc": 0.6858564645726808
+        }
+      },
+      "mean_f1": 0.6653166308551943,
+      "best_epoch": 7,
+      "stop_epoch": 13,
+      "provenance": "\u672c\u6b21\u65b0\u589e\u5355\u79cd\u5b50\u6267\u884c",
+      "prediction_sha256": "27b36fd994018e963ce50d052c9a4be1393642b244bfee8fce77bed70351e79d",
+      "selected_model": {
+        "artifact_ref": "Radon_Bridge/2026_09_18_11_32_21_119628/attention/best.pt",
+        "sha256": "6ed873b7cdadd62fc0868ca62b1be6d0e087aad70396f3b4d3dc2b5b36802632"
+      }
     }
   ],
-  "complete": false,
+  "complete": true,
   "limitations": [
     "single_seed",
     "same_dev_selection",
     "different_cohort_and_input_from_Ibex",
     "MMTM_and_attention_are_explicit_identity_initialized_adaptations"
-  ]
+  ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "reference": "none",
+        "difference": 0.05772893196810047,
+        "ordinary95": [
+          0.015757218452310925,
+          0.09843007062120561
+        ],
+        "simultaneous95": [
+          0.009735168367259225,
+          0.10572269556894172
+        ]
+      },
+      {
+        "reference": "linear",
+        "difference": 0.042596491859047014,
+        "ordinary95": [
+          0.0016725620636362196,
+          0.082929687102633
+        ],
+        "simultaneous95": [
+          -0.004785469091679602,
+          0.08997845280977362
+        ]
+      },
+      {
+        "reference": "self",
+        "difference": 0.05772893196810047,
+        "ordinary95": [
+          0.015757218452310925,
+          0.09843007062120561
+        ],
+        "simultaneous95": [
+          0.009735168367259225,
+          0.10572269556894172
+        ]
+      },
+      {
+        "reference": "mmtm",
+        "difference": 0.05772893196810047,
+        "ordinary95": [
+          0.015757218452310925,
+          0.09843007062120561
+        ],
+        "simultaneous95": [
+          0.009735168367259225,
+          0.10572269556894172
+        ]
+      },
+      {
+        "reference": "attention",
+        "difference": 0.05254147005228216,
+        "ordinary95": [
+          0.012851217108329352,
+          0.09152975707108475
+        ],
+        "simultaneous95": [
+          0.006629727755162837,
+          0.09845321234940148
+        ]
+      }
+    ]
+  }
 }

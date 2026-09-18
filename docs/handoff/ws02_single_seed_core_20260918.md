@@ -21,3 +21,9 @@
 磁盘初始准入被拒绝：data仅75GiB空闲。没有降低102GiB门槛；在无活GPU的唯一CPU manager安全停止后，将本批新产物安置到backup约250GiB余量，逐文件SHA与symlink目标核验，保留旧小副本及原逻辑路径，再恢复同队列。实际训练越过准入进入epoch4，存储故障闭环；其他项目和已完成历史资产未移动。
 
 现有自动维护读取ws02 `/home/mengh/radon_ws02_20260918/active.json`，按其root核验status/log/profile/断点/accepted与publication，不照抄PID。科学执行器只处理有限清单，报告失败不杀健康训练；完成后由维护负责人依照PHD结果驱动决策规则审查下一研究包。固定[累计入口](../reports/current/small_cohort/README.md)只同步脱敏汇总，参与者及权重留在授权存储。
+
+## 09:12 UTC维护：完整六臂接受
+
+有限队列已自动全部完成，无active/failed；四新臂依次通过profile并训练至各自原plateau停止。最终6臂所有产物SHA、296人顺序/标签及sklearn独立F1重算通过，现场independent_final_audit.json保存回执。none/self/MMTM最佳0轮且最终预测与初始逐项完全相同，但都实际训练8轮，不能解释成方法等效。SVD最佳11/停17、普通通信9/15、注意力7/13。统计在原public-safe current.json累计，单种子同dev选择边界不变。
+
+训练source仍c3a832c，独立CPU报告59caf11增加区间及第0轮说明，1项报告重放/幂等/拒绝污染测试通过；没有热改训练源码。正式主项目、大队列/多种子仍未完成，下一包须经教师问题与匹配身份审查，不为占卡重跑。
