@@ -1,3 +1,7 @@
+## 2026-09-19 晚：cross-attention 加桥三臂已独立接受
+
+WS02 `attention_teacher_20260919_v1` 已 3/3 完成且 manager 正常退出；独立复核三臂起点精确重放同一 cross-attention A、fresh Stage3 SVD、全部资产 SHA、profiles/resume、296 人 sklearn 指标及 10k 三项配对区间。continue / Radon / 普通通信分支均值 Macro-F1 分别 69.256% / 71.114% / 70.067%；Radon−continue +1.858pp、Radon−ordinary +1.047pp，但三项同时95%区间全部跨0。详细见 [attention三臂报告](../reports/current/attention_augmentation/README.md) 与 [handoff](ws02_attention_augmentation_20260919.md)。
+
 ## 2026-09-19 02:13 UTC：Ibex canonical32开始正式训练
 
 完整预检通过，正式更新93→147且断点已保存。辅助控制器缺少人数配置已在原锁下恢复，主训练未中断；未来owner生成器绑定仍待验收。父模型和大队列六臂尚未完成。见[本轮运行证据](fast32_runtime_20260919.md)。LOOK新融合包已派发但恢复诊断尚未接受，不能沿用旧“未派发”状态。
