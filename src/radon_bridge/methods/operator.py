@@ -295,18 +295,19 @@ class ReturnParticipant(nn.Module):
         return packet[:, self.start:self.start+self.length].reshape(packet.shape[0], *self.shape)
 
 
-def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
+def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,alignment_tokens=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
     if not specs or len({s.key for s in specs}) != len(specs) or set(inputs) != {s.key for s in specs}:
         raise ValueError('Participant identity mismatch')
     if family=='radon':
-        if any(v is not None for v in (reduction_ratio,attention_dimension,heads)):raise ValueError('Baseline-only fields supplied to Radon')
+        if any(v is not None for v in (reduction_ratio,attention_dimension,heads,alignment_tokens)):raise ValueError('Baseline-only fields supplied to Radon')
         exchange = BridgeExchange(specs, M=M, S=S, rho=rho, mode=mode, compression=compression, basis_files=basis_files,cross_edges=cross_edges,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,group_count=group_count)
     else:
         if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or group_count!=1 or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
-        from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange
-        if family=='mmtm' and attention_dimension is None and heads is None:exchange=MMTMExchange(specs,reduction_ratio)
-        elif family=='cross_attention' and reduction_ratio is None:exchange=AttentionExchange(specs,attention_dimension,heads)
+        from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange, CMXRectifyExchange
+        if family=='mmtm' and attention_dimension is None and heads is None and alignment_tokens is None:exchange=MMTMExchange(specs,reduction_ratio)
+        elif family=='cross_attention' and reduction_ratio is None and alignment_tokens is None:exchange=AttentionExchange(specs,attention_dimension,heads)
+        elif family=='cmx_frm' and reduction_ratio is None and attention_dimension is None and heads is None:exchange=CMXRectifyExchange(specs,alignment_tokens)
         else:raise ValueError('Unknown family or incompatible configuration')
     packet = node(prefix+'communication')
     edge(prefix+'exchange', exchange, [inputs[s.key] for s in specs], [packet])
@@ -320,7 +321,7 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     return dict(inputs), meta
 
 
-def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
+def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, samples=None, mode='radon', compression='learned_projected', basis_files=None,cross_edges=None,family='radon',reduction_ratio=None,attention_dimension=None,heads=None,alignment_tokens=None,nested_rhos=None,s_axis_permutation=None,kernel_size=3,r=None,h=None,group_count=1):
     if len(set(node_names)) != len(node_names) or not node_names:
         raise ValueError('Select distinct existing nodes')
     specs, inputs = [], {}
@@ -341,7 +342,7 @@ def attach_to_nodes(builder, node_names, *, prefix, M=None, S=None, rho=None, sa
             for n in tails: affected[n]=min(affected.get(n,i),i)
     if any(last_produced.get(n,-1) in delayed for n in inputs.values()):
         raise ValueError('Selected Nodes are causally nested; choose one frontier per network or specify a versioned iterative schedule')
-    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,group_count=group_count)
+    result,meta=attach_group(builder.node,builder.edge,specs,inputs,prefix,M=M,S=S,rho=rho,mode=mode,compression=compression,basis_files=basis_files,cross_edges=cross_edges,family=family,reduction_ratio=reduction_ratio,attention_dimension=attention_dimension,heads=heads,alignment_tokens=alignment_tokens,nested_rhos=nested_rhos,s_axis_permutation=s_axis_permutation,kernel_size=kernel_size,r=r,h=h,group_count=group_count)
     inserted=builder.steps[len(old):]
     builder.steps[:]=[row for i,row in enumerate(old) if i not in delayed]+inserted+[row for i,row in enumerate(old) if i in delayed]
     meta.update(shape_inference='representative_features',native_edges_rewired=False,
