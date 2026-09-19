@@ -1,0 +1,152 @@
+{
+  "schema": "radon_cmx_same_A_augmentation_public_report_v1",
+  "sequence_id": "cmx_frm_augmentation_20260919_v1",
+  "scientific_scope": "WS02 single-seed matched second-stage comparison from one accepted project CMX-FRM-init checkpoint",
+  "source_commit": "28ebefcb9136e5fe1e56fc1d102130c288203670",
+  "framework_commit": "3559caa8d596d4438533a69d39d8a2c32eb21e46",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "incoming_A": {
+    "method": "CMX FeatureRectifyModule project adaptation",
+    "selected_epoch": 0,
+    "native_parent_state_exact": true,
+    "degenerate_identity_checkpoint": true,
+    "source_audit_sha256": "e67be48c401bf8f4c7a2a67ba6fe00504acf154a267c20704da2a13bf8dc3310",
+    "boundary": "incoming A is exact identity/no-communication checkpoint; not a nontrivial CMX communication result and not the full author CMX system"
+  },
+  "fresh_basis": {
+    "cfp_stage3": {
+      "sha256": "19fea81e2c78d8a9f8e39cd8b68014fed78c44b4cca958c8564775acc8d2efe6",
+      "sampled_channel_vectors": 495488
+    },
+    "oct_stage3": {
+      "sha256": "5a2647630f11c8074b730fd1625599064a90bf3e5102dc95a0e65500a8cd4f63",
+      "sampled_channel_vectors": 728064
+    }
+  },
+  "results": [
+    {
+      "id": "host_continue",
+      "mean_macro_f1": 0.660129168939376,
+      "best_epoch": 0,
+      "stop_epoch": 8,
+      "cfp": {
+        "macro_f1": 0.668903803131991,
+        "log_loss": 0.9324178618684056,
+        "auroc": 0.7006482834185537
+      },
+      "oct": {
+        "macro_f1": 0.6513545347467609,
+        "log_loss": 1.1492943787468952,
+        "auroc": 0.6917001460920379
+      }
+    },
+    {
+      "id": "host_radon",
+      "mean_macro_f1": 0.7262982431310057,
+      "best_epoch": 20,
+      "stop_epoch": 26,
+      "cfp": {
+        "macro_f1": 0.7263232390105814,
+        "log_loss": 1.222837242535479,
+        "auroc": 0.7578524470416363
+      },
+      "oct": {
+        "macro_f1": 0.7262732472514299,
+        "log_loss": 1.413357645436084,
+        "auroc": 0.7549762600438276
+      }
+    },
+    {
+      "id": "host_linear",
+      "mean_macro_f1": 0.6739087130206503,
+      "best_epoch": 11,
+      "stop_epoch": 16,
+      "cfp": {
+        "macro_f1": 0.702648401826484,
+        "log_loss": 1.238481689973343,
+        "auroc": 0.731327611395179
+      },
+      "oct": {
+        "macro_f1": 0.6451690242148166,
+        "log_loss": 1.614473760451574,
+        "auroc": 0.6871347699050402
+      }
+    }
+  ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "method": "host_radon",
+        "reference": "host_continue",
+        "difference": 0.06616907419162965,
+        "ordinary95": [
+          0.025118297930020666,
+          0.1080213208604296
+        ],
+        "simultaneous95": [
+          0.017251085523676074,
+          0.11508706285958323
+        ]
+      },
+      {
+        "method": "host_linear",
+        "reference": "host_continue",
+        "difference": 0.013779544081274242,
+        "ordinary95": [
+          -0.016865094156169984,
+          0.04401371385232575
+        ],
+        "simultaneous95": [
+          -0.02215329597589505,
+          0.04971238413844353
+        ]
+      },
+      {
+        "method": "host_radon",
+        "reference": "host_linear",
+        "difference": 0.05238953011035541,
+        "ordinary95": [
+          0.013224010156227456,
+          0.09234438599846834
+        ],
+        "simultaneous95": [
+          0.005644959951889378,
+          0.09913410026882144
+        ]
+      }
+    ]
+  },
+  "costs": {
+    "host_continue": {
+      "bridge_parameters": 1706244,
+      "peak_reserved_gib": 7.267578125,
+      "seconds_20_updates": 8.202743764966726
+    },
+    "host_radon": {
+      "bridge_parameters": 14289156,
+      "peak_reserved_gib": 7.328125,
+      "seconds_20_updates": 9.432287392031867
+    },
+    "host_linear": {
+      "bridge_parameters": 14289156,
+      "peak_reserved_gib": 7.482421875,
+      "seconds_20_updates": 9.023942695988808
+    }
+  },
+  "independent_audit_sha256": "38a2f5b723c3e04530d12f787b1ac14f9802e257577aa2928a8519d8a835647c",
+  "limitations": [
+    "single_seed_3416",
+    "same_296_development_used_for_selection_and_effect_estimation",
+    "incoming_CMX_A_selected_identity_checkpoint",
+    "project_CMX_FRM_component_adapter_not_full_author_system",
+    "participant_bootstrap_excludes_training_seed_variability",
+    "mean_of_branch_macro_f1_not_probability_fusion"
+  ],
+  "scientific_acceptance": false
+}
