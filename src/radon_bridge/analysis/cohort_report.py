@@ -8,13 +8,13 @@ from radon_bridge.evaluation.metrics import classification_metrics
 
 def report(root,_allow_centered_audit_build=False):
     root=Path(root);q=json.loads((root/'queue.json').read_text());rows=[];predictions={};ids=labels=None
-    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
+    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','cmx_frm':'CMX-FRM适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
     augmentation=q.get('study_kind')=='existing_method_augmentation'
     augmentation_label=q.get('host_summary',{}).get('display_name','MMTM') if augmentation else None
     labels_name.update(host_continue=f'{augmentation_label}继续训练' if augmentation else 'MMTM继续训练',
         host_radon=f'{augmentation_label}＋Radon桥' if augmentation else 'MMTM＋Radon桥',
         host_linear=f'{augmentation_label}＋普通通信' if augmentation else 'MMTM＋普通通信')
-    channel=q.get('study_kind')=='channel_compression';grouped=q.get('study_kind')=='grouped_linear';centered=q.get('study_kind')=='centered_basis'
+    channel=q.get('study_kind')=='channel_compression';grouped=q.get('study_kind')=='grouped_linear';centered=q.get('study_kind')=='centered_basis';cmx_host=q.get('study_kind')=='cmx_frm_host'
     def display_name(key):
         if key in labels_name:return labels_name[key]
         if grouped and key.startswith('grouped_g'):
@@ -121,6 +121,10 @@ def report(root,_allow_centered_audit_build=False):
         current['augmentation_host']=q['host_summary']
         current['limitations']=['single_seed','same_dev_selection',q['host_summary'].get('limitation_tag','project_existing_method_adapter'),
             'additional_training_stage_all_arms_matched']
+    if cmx_host:
+        current['study_kind']='cmx_frm_host'
+        current['author']=q['author'];current['adaptation']=q['adaptation']
+        current['limitations']=['single_seed','same_dev_selection','project_CMX_FRM_component_adapter_not_full_CMX_system','heterogeneous_2D_3D_spatial_lattice_adaptation']
     if grouped:
         current['study_kind']='grouped_linear';current['groups']=q['groups']
         current['limitations']=['single_seed','same_dev_selection','different_cohort_and_input_from_Ibex','G1_strict_reuse','grouping_limits_direct_bridge_connectivity_not_whole_network_independence','uncompressed_budget_match_separate']
@@ -170,6 +174,16 @@ def report(root,_allow_centered_audit_build=False):
         basis_note=host.get('basis_policy','SVD基必须与冻结宿主Stage3输入状态匹配')
         system_note=host.get('system_boundary','本项目适配，不声称复现作者完整系统')
         lines+=['',f'本包宿主为{label}；第一阶段选中第{first_epoch}轮；{system_note}。三个新臂都保留同一宿主通信，新增项以并行残差写回，初始预测须严格重放。{basis_note}。']
+    if cmx_host:
+        lines=[line.replace('小队列核心比较','CMX-FRM 第一阶段宿主比较')
+            .replace('本页只含六臂核心。','本页固定相同2D/3D父专家，比较严格复用无通信reference与一个新CMX-FRM Stage3项目适配A。')
+            .replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。CMX-FRM保留作者FRM通道/空间权重和双向残差公式；跨2D/3D只把空间对应改为固定共享token lattice。')
+            .replace('完整核心：','完整CMX-FRM A包：')
+            .replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','本页只有CMX-FRM减严格复用无通信reference这一项预登记比较。')
+            .replace('五项同时95%区间','单项同时95%区间')
+            .replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','；本页CMX-FRM只代表FRM组件项目适配，不等于作者完整CMX分割系统。')
+            for line in lines if 'MMTM和交叉注意力为' not in line]
+        lines+=['','作者来源固定为 huaaaliu/RGBX_Semantic_Segmentation commit e251d860…（MIT）。同尺寸2D synthetic 已逐项复现作者FRM；当前2D/3D空间lattice是显式project adaptation。第一阶段A是否优于无通信不作为后续A+bridge的性能筛选条件。']
     if grouped:
         lines=[line.replace('小队列核心比较','小队列分组线性通信比较').replace('本页只含六臂核心。','本页固定SVD r32/M32/S64/k3，比较G=1/2/4/8/16；每个G均配同G普通线性重采样。').replace('ws02 GPU1；单种子3416。核心六种设置按顺序完成，精确复用已验收的无通信及SVD-Radon，补普通通信、自身处理、MMTM与交叉注意力。','ws02 GPU1；单种子3416。G=1两臂仅在配置、父模型、SVD基和接受文件SHA一致时严格复用；G=2/4/8/16为8个新执行臂。').replace('完整核心：','完整分组匹配包：').replace('均为SVD-Radon减对应对照，越大表示本配置下F1更高。','每项为同一G下Radon减普通线性重采样；完整组才给配对区间。').replace('；MMTM/注意力只代表此适配配方，不能据此否定原方法。','。') for line in lines if 'MMTM和交叉注意力为' not in line]
         lines=[line.replace('完整分组匹配包：已齐全','完整分组匹配包：已齐全（manager、profiles 与包内独立 audit 均接受）') if current['complete'] else line for line in lines]
