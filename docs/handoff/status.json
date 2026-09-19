@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "centered-SVD WS02单种子方向包已由左侧从原始产物独立验收并接受；下一核心研究优先LOOK融合阶段/写回问题，但尚未正式派发，当前不启动。R&B未压缩预算匹配、其他宿主与Ibex范围继续保留并独立维护。",
+  "next_acceptance": "Ibex canonical32已通过完整预检并正式推进147更新，继续核验训练/断点/资源和最终父模型；未来owner配置修复尚待独立绑定。LOOK融合阶段包已正式派发，两个宿主完成但拟合恢复与精确环境诊断仍未验收。既有WS02六包保持接受，R&B预算匹配、其他宿主及大队列范围保留。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
   "evidence_cutoff": "2026-09-18T22:38:30.538052+00:00",
-  "verified_at": "2026-09-18T22:54:19.207239+00:00",
+  "verified_at": "2026-09-19T02:13:00+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -56,7 +56,7 @@
     "三维父模型及逐臂执行等门槛尚未全部关闭",
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
     "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
-    "Management7d1a723 is active; first fresh GPU requalification and formal parent completion remain pending allocation grants.",
+    "2026-09-19 canonical32已完整预检并正式训练；父模型最终接受与项目六臂仍未完成。",
     "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
     "2026-09-18 grouped接受仅限WS02单种子开发集固定SVD包；不代表Ibex、test、无压缩预算匹配或全项目接受。",
     "2026-09-18 status verification_scope 按共同PHD契约保持枚举 runtime_and_evidence；说明文字不再塞入枚举字段。既有 evidence_cutoff 仍保持原科研截止时间，不因发布清理刷新。",
@@ -96,7 +96,8 @@
     "2026-09-18 左侧独立复核grouped completion：89个源码文件与450a122一致、54份资产SHA、296人F1、8个profile恢复及10k五项区间全部通过；coverage批准accepted，G1精确复用core，公开仅保留脱敏摘要。",
     "2026-09-18 跨仓同步修复：PHD project_status 现行契约只接受 runtime_and_evidence/source_review_only；本页本次已有远端原产物核验，故使用 runtime_and_evidence。自由说明移入 actions/limitations/evidence，未改 evidence_cutoff。",
     "2026-09-19 centered-v1：scientific source27aafca、validator15b0242、WS02 run2026_09_19_01_19_02_633840；独立数值gate从sums/moments/counts重算1264顺序、fingerprint、mean/second/cov、Q/eigen/energy后通过；两新臂2/2按原GPU1唯一manager完成，right audit SHA 3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397，结束后GPU1空闲。",
-    "2026-09-19 左侧独立复核centered-v1原始WS02产物：91个源码文件、3160份科研资产/输入文件、1264训练basis数值关系、296人四行指标、两份profile/恢复、停止历史与3项10k区间全部通过；审计SHA43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd。"
+    "2026-09-19 左侧独立复核centered-v1原始WS02产物：91个源码文件、3160份科研资产/输入文件、1264训练basis数值关系、296人四行指标、两份profile/恢复、停止历史与3项10k区间全部通过；审计SHA43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd。",
+    "2026-09-19 02:13UTC：Ibex canonical32线程2/fulltrain/full-dev/精确恢复预检通过，正式93→147更新和last.pt核验。辅助控制器train_sizes缺失在原锁下独立新配置恢复至稳定基线采集，主训练未中断；生成器6fbaf28经9项CPU测试，未来owner快照未热切换。LOOK融合新结果仍待恢复验收，科学evidence_cutoff保持。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -176,6 +177,10 @@
     {
       "label": "centered机制结论、反例与下一研究决策",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/centered_decision_20260919.md"
+    },
+    {
+      "label": "Ibex 32层完整预检、正式训练和辅助控制器恢复边界",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_runtime_20260919.md"
     }
   ]
 }
