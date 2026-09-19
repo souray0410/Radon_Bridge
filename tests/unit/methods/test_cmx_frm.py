@@ -12,10 +12,22 @@ def _unpack(packet, x1, x2):
     return packet[:,:n1].reshape_as(x1),packet[:,n1:].reshape_as(x2)
 
 
+def test_cmx_frm_resize_matches_linear_interpolate_on_cpu():
+    torch.manual_seed(29)
+    for source,size in ((1,7),(2,7),(7,2),(5,11),(11,5)):
+        x=torch.randn(2,3,source,dtype=torch.float32,requires_grad=True)
+        got=CMXRectifyExchange._resize(x,size)
+        expected=F.interpolate(x,size=size,mode="linear",align_corners=False)
+        torch.testing.assert_close(got,expected,rtol=0,atol=2e-6)
+        got.square().sum().backward()
+        assert torch.isfinite(x.grad).all()
+
+
 def test_cmx_frm_equal_grid_matches_author_formula():
     torch.manual_seed(31)
     specs=[FeatureSpec("cfp_stage3",4,(2,3)),FeatureSpec("oct_stage3",4,(2,3))]
     module=CMXRectifyExchange(specs,alignment_tokens=6)
+    with torch.no_grad(): module.residual_gate.fill_(1.0)
     x1=torch.randn(2,4,2,3);x2=torch.randn(2,4,2,3)
     out1,out2=_unpack(module(x1,x2),x1,x2)
 
@@ -44,6 +56,7 @@ def test_cmx_frm_cross_dimensional_adapter_shapes_and_gradients():
     torch.manual_seed(37)
     specs=[FeatureSpec("cfp_stage3",8,(3,4)),FeatureSpec("oct_stage3",8,(2,3,4))]
     module=CMXRectifyExchange(specs,alignment_tokens=16)
+    with torch.no_grad(): module.residual_gate.fill_(1.0)
     x1=torch.randn(2,8,3,4,requires_grad=True)
     x2=torch.randn(2,8,2,3,4,requires_grad=True)
     packet=module(x1,x2)
@@ -75,3 +88,20 @@ def test_project_builder_emits_explicit_cmx_frm_config():
     arm={"family":"cmx_frm","stages":[3],"alignment_tokens":64}
     cfg=bridges_for(parents,{},arm,{},3416)
     assert cfg==[{"nodes":["cfp_stage3","oct_stage3"],"family":"cmx_frm","alignment_tokens":64}]
+
+
+def test_cmx_frm_project_identity_initialization_is_exact_and_trainable():
+    torch.manual_seed(41)
+    specs=[FeatureSpec("cfp_stage3",8,(3,4)),FeatureSpec("oct_stage3",8,(2,3,4))]
+    module=CMXRectifyExchange(specs,alignment_tokens=16)
+    x1=torch.randn(2,8,3,4,requires_grad=True)
+    x2=torch.randn(2,8,2,3,4,requires_grad=True)
+    packet=module(x1,x2)
+    y1,y2=_unpack(packet,x1,x2)
+    torch.testing.assert_close(y1,x1,rtol=0,atol=0)
+    torch.testing.assert_close(y2,x2,rtol=0,atol=0)
+    packet.square().mean().backward()
+    assert module.residual_gate.grad is not None
+    assert torch.isfinite(module.residual_gate.grad).all()
+    assert torch.count_nonzero(module.residual_gate.grad)>0
+    assert module.metadata["identity_initialization"].startswith("trainable residual_gate")

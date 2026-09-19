@@ -117,6 +117,12 @@ class CMXRectifyExchange(NativeExchange):
         if len(channels)!=1:raise ValueError('CMX-FRM author formula requires equal channel dimensions')
         self.dim=next(iter(channels));self.alignment_tokens=alignment_tokens
         self.lambda_c=.5;self.lambda_s=.5;reduction=1
+        # Project identity initialization, analogous to the zero-residual
+        # initialization already used for MMTM and cross-attention adapters.
+        # The internal FRM formula remains unchanged; these two learned scalars
+        # only gate the final directional residual so epoch0 exactly reproduces
+        # the accepted native parents.
+        self.residual_gate=nn.Parameter(torch.zeros(2))
         self.channel_mlp=nn.Sequential(
             nn.Linear(self.dim*4,self.dim*4//reduction),nn.ReLU(inplace=True),
             nn.Linear(self.dim*4//reduction,self.dim*2),nn.Sigmoid())
@@ -131,14 +137,25 @@ class CMXRectifyExchange(NativeExchange):
             author_net_utils_sha256=self.AUTHOR_NET_UTILS_SHA256,
             author_license='MIT',author_license_sha256=self.AUTHOR_LICENSE_SHA256,
             author_component='FeatureRectifyModule only; not full CMX encoder/fusion/segmentation system',
-            adaptation='channel branch preserves author pooling/MLP exactly; spatial 1x1 weighting uses a deterministic shared flattened-token lattice and linear resampling for heterogeneous 2D/3D grids',
-            spatial_alignment='flatten -> linear interpolate to shared token lattice -> author-equivalent 1x1 spatial MLP -> linear interpolate directional weight/source to destination native shape')
+            adaptation='channel branch preserves author pooling/MLP exactly; spatial 1x1 weighting uses a deterministic shared flattened-token lattice for heterogeneous 2D/3D grids; project adds a trainable zero-initialized directional residual gate solely for exact-parent initialization',
+            identity_initialization='trainable residual_gate[2] initialized to 0; author-equivalent FRM recovered at gate=1',
+            spatial_alignment='flatten -> deterministic half-pixel linear resample to shared token lattice -> author-equivalent 1x1 spatial MLP -> deterministic resample directional weight/source to destination native shape')
         self.finish_metadata()
 
     @staticmethod
     def _resize(tokens,size):
         if tokens.shape[-1]==size:return tokens
-        return nn.functional.interpolate(tokens,size=size,mode='linear',align_corners=False)
+        source=tokens.shape[-1]
+        if source<1 or size<1:raise ValueError('CMX-FRM token sizes must be positive')
+        # Deterministic equivalent of interpolate(..., mode='linear', align_corners=False).
+        # CUDA does not provide a deterministic backward for interpolate1d, so
+        # compute the fixed half-pixel coordinates explicitly and use gather.
+        position=(torch.arange(size,device=tokens.device,dtype=torch.float64)+.5)*(source/size)-.5
+        position=position.clamp(0,source-1)
+        left=position.floor().to(torch.long);right=(left+1).clamp(max=source-1)
+        weight=(position-left.to(position.dtype)).to(tokens.dtype).reshape(*([1]*(tokens.ndim-1)),size)
+        a=tokens.index_select(-1,left);b=tokens.index_select(-1,right)
+        return a+(b-a)*weight
 
     def forward(self,*features):
         self.check(features)
@@ -156,5 +173,6 @@ class CMXRectifyExchange(NativeExchange):
             channel_weight=channel[:,source].reshape(batch,channels,*([1]*(features[destination].ndim-2)))
             spatial_weight=self._resize(spatial[:,source:source+1],tokens).reshape(
                 batch,1,*features[destination].shape[2:])
-            deltas.append(self.lambda_c*channel_weight*source_native + self.lambda_s*spatial_weight*source_native)
+            frm_delta=self.lambda_c*channel_weight*source_native + self.lambda_s*spatial_weight*source_native
+            deltas.append(self.residual_gate[destination]*frm_delta)
         return self.packet(features,deltas)

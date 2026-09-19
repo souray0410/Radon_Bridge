@@ -36,7 +36,9 @@
     "equal_grid_parity": "when grids match and alignment_tokens=H*W, implementation must numerically match author FRM",
     "cross_dimensional_spatial_rule": "flatten native grids; linearly resample both to one fixed shared token lattice; apply author-equivalent kernel-1 spatial MLP; resample directional source feature and spatial weight back to each destination native grid",
     "fixed_alignment_tokens": 64,
-    "scientific_boundary": "project adaptation of an author communication component; no claim of reproducing author SegFormer/decoder/system results"
+    "scientific_boundary": "project adaptation of an author communication component; no claim of reproducing author SegFormer/decoder/system results",
+    "identity_initialization": "two trainable directional residual gates initialized to 0 for exact accepted-parent prediction replay; FRM internal author formula is recovered when gate=1",
+    "deterministic_resampling": "manual half-pixel linear gather equivalent to align_corners=False linear interpolation; chosen because CUDA interpolate1d backward is not deterministic"
   },
   "future_matched_A_plus_bridge": {
     "A_train_count": 1,
