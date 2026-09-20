@@ -8,7 +8,7 @@ from radon_bridge.evaluation.metrics import classification_metrics
 
 def report(root,_allow_centered_audit_build=False):
     root=Path(root);q=json.loads((root/'queue.json').read_text());rows=[];predictions={};ids=labels=None
-    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','cmx_frm':'CMX-FRM适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
+    labels_name={'none':'无通信继续训练','svd':'SVD-Radon','linear':'匹配普通通信','self':'自身处理','mmtm':'MMTM适配','attention':'交叉注意力适配','cmx_frm':'CMX-FRM适配','cmx_full':'CMX-FRM+FFM核心适配','qr':'随机QR-Radon','qr_linear':'随机QR-普通通信','learned':'可学习通道-Radon','learned_linear':'可学习通道-普通通信'}
     augmentation=q.get('study_kind')=='existing_method_augmentation'
     augmentation_label=q.get('host_summary',{}).get('display_name','MMTM') if augmentation else None
     labels_name.update(host_continue=f'{augmentation_label}继续训练' if augmentation else 'MMTM继续训练',
