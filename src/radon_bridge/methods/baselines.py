@@ -179,17 +179,21 @@ class CMXRectifyExchange(NativeExchange):
 
 
 class CMXChannelWeights2D(nn.Module):
-    """Author CMX ChannelWeights on an already aligned 2-D grid."""
+    """Author CMX ChannelWeights on an already aligned 2-D grid.
+
+    Global average/max pooling are written as explicit reductions.  They are
+    algebraically identical to AdaptiveAvgPool2d(1)/AdaptiveMaxPool2d(1), but
+    avoid PyTorch's nondeterministic CUDA adaptive-max-pool backward.
+    """
     def __init__(self,dim,reduction=1):
         super().__init__();self.dim=dim
-        self.avg_pool=nn.AdaptiveAvgPool2d(1);self.max_pool=nn.AdaptiveMaxPool2d(1)
         self.mlp=nn.Sequential(
             nn.Linear(dim*4,dim*4//reduction),nn.ReLU(inplace=True),
             nn.Linear(dim*4//reduction,dim*2),nn.Sigmoid())
 
     def forward(self,x1,x2):
         b=x1.shape[0];x=torch.cat((x1,x2),dim=1)
-        avg=self.avg_pool(x).view(b,self.dim*2);maximum=self.max_pool(x).view(b,self.dim*2)
+        avg=x.mean(dim=(2,3));maximum=x.amax(dim=(2,3))
         y=self.mlp(torch.cat((avg,maximum),dim=1))
         return y.reshape(b,2,self.dim,1,1).permute(1,0,2,3,4)
 
