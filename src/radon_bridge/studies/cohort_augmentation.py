@@ -15,7 +15,7 @@ def migrate(source, output):
     for name,digest in a['files'].items():
         if sha(source/name)!=digest:raise ValueError('Host artifact changed')
     cfg=a['configuration']
-    if len(cfg['bridges'])!=1 or cfg['bridges'][0].get('family') not in ('mmtm','cross_attention','cmx_frm'):
+    if len(cfg['bridges'])!=1 or cfg['bridges'][0].get('family') not in ('mmtm','cross_attention','cmx_frm','cmx_full'):
         raise ValueError('One nonlinear host required')
     output.mkdir(parents=True,exist_ok=False)
     state=torch.load(source/'best.pt',map_location='cpu',weights_only=False)

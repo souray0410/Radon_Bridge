@@ -304,10 +304,11 @@ def attach_group(node, edge, specs, inputs, prefix, *, M=None, S=None, rho=None,
     else:
         if any(v is not None for v in (M,S,rho,basis_files,cross_edges,nested_rhos,s_axis_permutation,r,h)) or group_count!=1 or mode!='radon' or compression!='learned_projected':raise ValueError('Radon-only fields supplied to baseline')
         if kernel_size != 3: raise ValueError('Radon kernel field is not applicable to a nonlinear baseline')
-        from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange, CMXRectifyExchange
+        from radon_bridge.methods.baselines import MMTMExchange, AttentionExchange, CMXRectifyExchange, CMXFullExchange
         if family=='mmtm' and attention_dimension is None and heads is None and alignment_tokens is None:exchange=MMTMExchange(specs,reduction_ratio)
         elif family=='cross_attention' and reduction_ratio is None and alignment_tokens is None:exchange=AttentionExchange(specs,attention_dimension,heads)
         elif family=='cmx_frm' and reduction_ratio is None and attention_dimension is None and heads is None:exchange=CMXRectifyExchange(specs,alignment_tokens)
+        elif family=='cmx_full' and reduction_ratio is None and attention_dimension is None:exchange=CMXFullExchange(specs,alignment_tokens,heads)
         else:raise ValueError('Unknown family or incompatible configuration')
     packet = node(prefix+'communication')
     edge(prefix+'exchange', exchange, [inputs[s.key] for s in specs], [packet])

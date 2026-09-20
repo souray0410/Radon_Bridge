@@ -176,3 +176,200 @@ class CMXRectifyExchange(NativeExchange):
             frm_delta=self.lambda_c*channel_weight*source_native + self.lambda_s*spatial_weight*source_native
             deltas.append(self.residual_gate[destination]*frm_delta)
         return self.packet(features,deltas)
+
+
+class CMXChannelWeights2D(nn.Module):
+    """Author CMX ChannelWeights on an already aligned 2-D grid."""
+    def __init__(self,dim,reduction=1):
+        super().__init__();self.dim=dim
+        self.avg_pool=nn.AdaptiveAvgPool2d(1);self.max_pool=nn.AdaptiveMaxPool2d(1)
+        self.mlp=nn.Sequential(
+            nn.Linear(dim*4,dim*4//reduction),nn.ReLU(inplace=True),
+            nn.Linear(dim*4//reduction,dim*2),nn.Sigmoid())
+
+    def forward(self,x1,x2):
+        b=x1.shape[0];x=torch.cat((x1,x2),dim=1)
+        avg=self.avg_pool(x).view(b,self.dim*2);maximum=self.max_pool(x).view(b,self.dim*2)
+        y=self.mlp(torch.cat((avg,maximum),dim=1))
+        return y.reshape(b,2,self.dim,1,1).permute(1,0,2,3,4)
+
+
+class CMXSpatialWeights2D(nn.Module):
+    """Author CMX SpatialWeights on an already aligned 2-D grid."""
+    def __init__(self,dim,reduction=1):
+        super().__init__();self.dim=dim
+        self.mlp=nn.Sequential(
+            nn.Conv2d(dim*2,dim//reduction,kernel_size=1),nn.ReLU(inplace=True),
+            nn.Conv2d(dim//reduction,2,kernel_size=1),nn.Sigmoid())
+
+    def forward(self,x1,x2):
+        b,_,h,w=x1.shape
+        value=self.mlp(torch.cat((x1,x2),dim=1))
+        return value.reshape(b,2,1,h,w).permute(1,0,2,3,4)
+
+
+class CMXFeatureRectify2D(nn.Module):
+    """Author FeatureRectifyModule on one shared 2-D grid."""
+    def __init__(self,dim,reduction=1,lambda_c=.5,lambda_s=.5):
+        super().__init__();self.lambda_c=lambda_c;self.lambda_s=lambda_s
+        self.channel_weights=CMXChannelWeights2D(dim,reduction)
+        self.spatial_weights=CMXSpatialWeights2D(dim,reduction)
+
+    def forward(self,x1,x2):
+        channel=self.channel_weights(x1,x2);spatial=self.spatial_weights(x1,x2)
+        return (
+            x1+self.lambda_c*channel[1]*x2+self.lambda_s*spatial[1]*x2,
+            x2+self.lambda_c*channel[0]*x1+self.lambda_s*spatial[0]*x1,
+        )
+
+
+class CMXCrossAttention(nn.Module):
+    """Author CMX cross-attention used inside FeatureFusionModule."""
+    def __init__(self,dim,num_heads):
+        super().__init__();positive_integer(num_heads,'heads',1)
+        if dim%num_heads:raise ValueError('CMX FFM dimension must divide into heads')
+        self.dim=dim;self.num_heads=num_heads;self.scale=(dim//num_heads)**-.5
+        self.kv1=nn.Linear(dim,dim*2,bias=False)
+        self.kv2=nn.Linear(dim,dim*2,bias=False)
+
+    def forward(self,x1,x2):
+        if x1.shape!=x2.shape or x1.ndim!=3:raise ValueError('CMX FFM aligned BNC tokens required')
+        b,n,c=x1.shape;h=self.num_heads;d=c//h
+        q1=x1.reshape(b,n,h,d).permute(0,2,1,3).contiguous()
+        q2=x2.reshape(b,n,h,d).permute(0,2,1,3).contiguous()
+        k1,v1=self.kv1(x1).reshape(b,n,2,h,d).permute(2,0,3,1,4).contiguous()
+        k2,v2=self.kv2(x2).reshape(b,n,2,h,d).permute(2,0,3,1,4).contiguous()
+        ctx1=(k1.transpose(-2,-1)@v1)*self.scale;ctx1=ctx1.softmax(dim=-2)
+        ctx2=(k2.transpose(-2,-1)@v2)*self.scale;ctx2=ctx2.softmax(dim=-2)
+        y1=(q1@ctx2).permute(0,2,1,3).reshape(b,n,c).contiguous()
+        y2=(q2@ctx1).permute(0,2,1,3).reshape(b,n,c).contiguous()
+        return y1,y2
+
+
+class CMXCrossPath(nn.Module):
+    """Source-faithful CMX CrossPath stage."""
+    def __init__(self,dim,reduction,num_heads):
+        super().__init__();positive_integer(reduction,'reduction',1)
+        inner=dim//reduction
+        if inner<1 or dim%reduction:raise ValueError('CMX FFM reduction must divide channels')
+        self.channel_proj1=nn.Linear(dim,inner*2)
+        self.channel_proj2=nn.Linear(dim,inner*2)
+        self.cross_attn=CMXCrossAttention(inner,num_heads)
+        self.end_proj1=nn.Linear(inner*2,dim)
+        self.end_proj2=nn.Linear(inner*2,dim)
+        self.norm1=nn.LayerNorm(dim);self.norm2=nn.LayerNorm(dim)
+
+    def forward(self,x1,x2):
+        y1,u1=torch.relu(self.channel_proj1(x1)).chunk(2,dim=-1)
+        y2,u2=torch.relu(self.channel_proj2(x2)).chunk(2,dim=-1)
+        v1,v2=self.cross_attn(u1,u2)
+        return (
+            self.norm1(x1+self.end_proj1(torch.cat((y1,v1),dim=-1))),
+            self.norm2(x2+self.end_proj2(torch.cat((y2,v2),dim=-1))),
+        )
+
+
+class CMXChannelEmbed(nn.Module):
+    """Source-faithful 2-D ChannelEmbed stage from CMX FFM."""
+    def __init__(self,in_channels,out_channels,reduction):
+        super().__init__();positive_integer(reduction,'reduction',1)
+        hidden=out_channels//reduction
+        if hidden<1 or out_channels%reduction:raise ValueError('CMX FFM reduction must divide channels')
+        self.residual=nn.Conv2d(in_channels,out_channels,kernel_size=1,bias=False)
+        self.channel_embed=nn.Sequential(
+            nn.Conv2d(in_channels,hidden,kernel_size=1,bias=True),
+            nn.Conv2d(hidden,hidden,kernel_size=3,stride=1,padding=1,bias=True,groups=hidden),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hidden,out_channels,kernel_size=1,bias=True),
+            nn.BatchNorm2d(out_channels),
+        )
+        self.norm=nn.BatchNorm2d(out_channels)
+
+    def forward(self,x):
+        return self.norm(self.residual(x)+self.channel_embed(x))
+
+
+class CMXFeatureFusion(nn.Module):
+    """CMX FeatureFusionModule on one shared 2-D grid."""
+    def __init__(self,dim,num_heads,reduction=1):
+        super().__init__()
+        self.cross=CMXCrossPath(dim,reduction,num_heads)
+        self.channel_emb=CMXChannelEmbed(dim*2,dim,reduction)
+        self.apply(self._init_weights)
+
+    @staticmethod
+    def _init_weights(module):
+        if isinstance(module,nn.Linear):
+            nn.init.trunc_normal_(module.weight,std=.02)
+            if module.bias is not None:nn.init.zeros_(module.bias)
+        elif isinstance(module,nn.LayerNorm):
+            nn.init.zeros_(module.bias);nn.init.ones_(module.weight)
+        elif isinstance(module,nn.Conv2d):
+            fan_out=module.kernel_size[0]*module.kernel_size[1]*module.out_channels
+            fan_out//=module.groups
+            nn.init.normal_(module.weight,0,math.sqrt(2.0/fan_out))
+            if module.bias is not None:nn.init.zeros_(module.bias)
+
+    def forward(self,x1,x2):
+        if x1.shape!=x2.shape or x1.ndim!=4:raise ValueError('CMX FFM requires aligned BCHW features')
+        b,c,h,w=x1.shape
+        t1,t2=self.cross(x1.flatten(2).transpose(1,2),x2.flatten(2).transpose(1,2))
+        merged=torch.cat((t1,t2),dim=-1).transpose(1,2).reshape(b,c*2,h,w).contiguous()
+        return self.channel_emb(merged)
+
+
+class CMXFullExchange(NativeExchange):
+    """Project adaptation of the CMX FRM+FFM communication core.
+
+    The author FRM and FFM math run on a deterministic shared square 2-D
+    lattice.  Returning the single author fused feature to two native branches
+    is project-specific and is isolated behind zero-initialized scalar gates.
+    This is the full CMX *communication core*, not the author's segmentation
+    decoder/system.
+    """
+    def __init__(self,specs,alignment_tokens,heads):
+        super().__init__(specs,'cmx_full')
+        positive_integer(alignment_tokens,'alignment_tokens',1);positive_integer(heads,'heads',1)
+        side=math.isqrt(alignment_tokens)
+        if side*side!=alignment_tokens:raise ValueError('CMX full FFM requires a square shared 2-D token lattice')
+        channels={s.channels for s in specs}
+        if len(channels)!=1:raise ValueError('CMX full core requires equal channel dimensions')
+        self.dim=next(iter(channels));self.alignment_tokens=alignment_tokens;self.alignment_side=side
+        self.frm=CMXFeatureRectify2D(self.dim,reduction=1,lambda_c=.5,lambda_s=.5)
+        self.ffm=CMXFeatureFusion(self.dim,heads,reduction=1)
+        self.return_gate=nn.Parameter(torch.zeros(2))
+        self.metadata.update(
+            alignment_tokens=alignment_tokens,alignment_shape=[side,side],heads=heads,reduction=1,
+            author_repository=CMXRectifyExchange.AUTHOR_REPOSITORY,author_commit=CMXRectifyExchange.AUTHOR_COMMIT,
+            author_net_utils_sha256=CMXRectifyExchange.AUTHOR_NET_UTILS_SHA256,
+            author_license='MIT',author_license_sha256=CMXRectifyExchange.AUTHOR_LICENSE_SHA256,
+            author_component='FeatureRectifyModule + FeatureFusionModule communication core; not full CMX segmentation system',
+            adaptation='align each native feature deterministically to one shared square 2-D lattice first; run author FeatureRectifyModule then FeatureFusionModule on that shared lattice; resize the single fused feature back to each native shape behind project-only zero-initialized return gates',
+            identity_initialization='project return_gate[2] initialized to 0; author FRM+FFM core remains trainable',
+            source_fidelity='FRM+FFM core retained; segmentation decoder and native RGB-X same-grid hierarchy are outside this classifier adaptation')
+        self.finish_metadata()
+
+    def _align_to_shared(self,feature):
+        tokens=CMXRectifyExchange._resize(feature.flatten(2),self.alignment_tokens)
+        return tokens.reshape(feature.shape[0],self.dim,self.alignment_side,self.alignment_side)
+
+    def core_forward_shared(self,x1,x2):
+        if x1.shape!=x2.shape or x1.ndim!=4:
+            raise ValueError('CMX full author core requires aligned equal-shape BCHW features')
+        if x1.shape[1]!=self.dim or tuple(x1.shape[2:])!=(self.alignment_side,self.alignment_side):
+            raise ValueError('CMX full shared-grid identity changed')
+        x1,x2=self.frm(x1,x2)
+        return self.ffm(x1,x2)
+
+    def core_from_native(self,*features):
+        self.check(features)
+        shared=[self._align_to_shared(feature) for feature in features]
+        return self.core_forward_shared(*shared)
+
+    def forward(self,*features):
+        fused=self.core_from_native(*features)
+        deltas=[]
+        for index,feature in enumerate(features):
+            returned=CMXRectifyExchange._resize(fused.flatten(2),math.prod(feature.shape[2:])).reshape_as(feature)
+            deltas.append(self.return_gate[index]*returned)
+        return self.packet(features,deltas)
