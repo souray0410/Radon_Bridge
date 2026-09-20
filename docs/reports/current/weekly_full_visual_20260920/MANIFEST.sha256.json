@@ -1,0 +1,30 @@
+{
+  "teacher_weekly_full_visual_v3.pptx": {
+    "sha256": "2c9bf8f3dd143da4b773ccc9c0bd3955894e4191114235565248c21f91e44fb2",
+    "bytes": 133096
+  },
+  "teacher_weekly_full_visual_v3.zip": {
+    "sha256": "3e6dd70d731655952da86b3c0b86ad91c07bd1d93126f482fb9594252ec54122",
+    "bytes": 2426893
+  },
+  "weekly_full_coverage.zh-CN.md": {
+    "sha256": "96c0ccc689ec095271e4ca20a8dfcbbcedd8a2b20e0daf83b51f1ba801fe6b0e",
+    "bytes": 10502
+  },
+  "weekly_full_design.json": {
+    "sha256": "6124fbf616c756bc7f45c2c4d6b89a67a3d664dad2b144a2cae0329715f5e604",
+    "bytes": 15698
+  },
+  "visual_qa_weekly_full_v3.json": {
+    "sha256": "3774b8db9783e783dd459b09f90c81739b1f328a9974319547e2f88d2b22ff73",
+    "bytes": 7008
+  },
+  "contact_31_v3.png": {
+    "sha256": "157d594a45b5072d79e27a89958268ed60e9982ea1ee96051a59ede89581681c",
+    "bytes": 453386
+  },
+  "README.zh-CN.md": {
+    "sha256": "aac1702059de5f5d29d63998ccf39a7db1b7cff7aed09adc08365bf04c40943f",
+    "bytes": 739
+  }
+}
