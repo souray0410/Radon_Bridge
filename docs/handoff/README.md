@@ -274,3 +274,10 @@ Historical full-lifecycle host peaks are checked against worker and allocation l
 The approved migration targets direct V5 execution and explicit artifact conversion.
 No V4 runtime fallback will be added. Existing healthy immutable sources remain
 unmodified until completed-step checkpoint handover and numerical acceptance.
+
+
+## 2026-09-22 实际 V5 权重迁移回放
+
+[核心六组与 attention 三组](../acceptance/v5_actual_cohorts_20260922.json)的18份选优/续训状态已离线转换并通过独立文件复核。每组完整296人dev、原16人批量连续两次更新的输出、中间状态、输入/参数梯度、优化器与buffer均按FP32既定容差比较；原生PyTorch对照和当前断点恢复后的下一步精确一致。执行源固定d38296e，框架c78cfbd、companion228b125。原训练仍记V4，完成实验没有重开。CMX及其余资产、依赖引用迁移、A100交接与正式切换仍开放。
+
+当前包移除两个没有现行调用方、构造接口已失效的历史CLI，原源码由Git/冻结快照保留。普通paired-native宿主加载补齐接受凭证、身份、V5格式和Node校验；不提供V4回退。

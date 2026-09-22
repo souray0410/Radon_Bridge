@@ -1,0 +1,254 @@
+{
+  "schema": "radon_v5_actual_cohort_acceptance_v1",
+  "state": "bounded_replay_verified",
+  "original_training_framework": "V4",
+  "current_framework_api": "V5",
+  "production_cutover": false,
+  "test_access": false,
+  "packages": {
+    "core": {
+      "schema": "radon_v5_actual_replay_acceptance_v1",
+      "state": "bounded_replay_verified",
+      "cases": 6,
+      "states": 12,
+      "rows": [
+        {
+          "case": "none_seed3416",
+          "receipt_sha256": "76cbbfd24807ab8458948ba250eeb03ced1ff4168e0473d5a030720d7ce7f1e7",
+          "states": {
+            "selected": {
+              "source_sha256": "2384b3868f03386bb4639c47b31df13f76a5124a752ce70abdb54ace9a4aef8d",
+              "target_sha256": "fb75e204a2b4828f1625084706c6b93133173b87062baf5e0717fc3423f4a872"
+            },
+            "resume": {
+              "source_sha256": "4dffaf7112becf0244cdc7f2d313a708386e5d42d36ea90b167e1d5f602ddfa3",
+              "target_sha256": "097a8a05b32f48efbe9154ccc3e105b81f149db9f5f106573d35623d51d2b03d"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 7.923828125
+        },
+        {
+          "case": "svd_seed3416",
+          "receipt_sha256": "8409cb46540bd7f3c9218d5e2fd13a4f3b253dbae7d8ed46c8e81efecffb1dca",
+          "states": {
+            "selected": {
+              "source_sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847",
+              "target_sha256": "874dda8f40d6f0f7060c9b1caeb4251815e4ad9a26b160c544b3d484e9bd736f"
+            },
+            "resume": {
+              "source_sha256": "2c7423f0c15308d96dd0dcf23dc9d10e8d8a00df644f9d0a9e15e3e6de6afa06",
+              "target_sha256": "5bc6741f2fe4a3d75690f7a7ee132a19080555e6c39437ba4152798c90abb1a0"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.15625
+        },
+        {
+          "case": "linear_seed3416",
+          "receipt_sha256": "07959c46576b269b7df7d7ae12c676ec5a45d645b672bdf719aafc204c51a30e",
+          "states": {
+            "selected": {
+              "source_sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f",
+              "target_sha256": "2efe1be770c06fdbadf1a308e147cdaba4018f4ef5283958f0958bf4235f70ea"
+            },
+            "resume": {
+              "source_sha256": "328a11437790a65e3814bf5167c1033313c7e589965d5988a802ed83550a53d4",
+              "target_sha256": "fcbf801a08b507ff9c26c52e5399f8a06662be78b22f64b2543f317b00fc67dc"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.111328125
+        },
+        {
+          "case": "self_seed3416",
+          "receipt_sha256": "25463a626166dd94f7072574c1c5c5cd0f5481cf5061cc2c2bd0ececbdce57d8",
+          "states": {
+            "selected": {
+              "source_sha256": "d1d9bd7640c09b2d746f3a21e5aa5e24d4471eb58aef822e049b690e39e944fb",
+              "target_sha256": "7fa4a3041d569c113a1658c38067717a721faf74e485e698cc252e3df21f0d99"
+            },
+            "resume": {
+              "source_sha256": "fb100cadabd7d1c10031883d1ce5b1905231b8f616716c5c3df58ef83ba65b2c",
+              "target_sha256": "0cb7bde9d912f9de788b8761e2e49c8a97c68f7078992fc42a72d2fcd330cf92"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.15625
+        },
+        {
+          "case": "mmtm_seed3416",
+          "receipt_sha256": "a904ff8b28b1c79aa9eccb5f356332c9ab7d414719470e98a2d0f084eac671a3",
+          "states": {
+            "selected": {
+              "source_sha256": "5c3a75ddd9ab22d7cf9c07d0e68673bf9284ff1efc16f428809e071c6d22ce07",
+              "target_sha256": "e6f95a4bfbc595be98db108357d74ada3b5b7bc09bc9e9a9f053b8a9ecf30250"
+            },
+            "resume": {
+              "source_sha256": "6917dfad663b14dd937b728baf3defc96009346a9b723a993d38af65d8fe13b2",
+              "target_sha256": "dc98bc79c69876859afce50a0d54069a3c1f72d722a89e8e67720b58ce992399"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.005859375
+        },
+        {
+          "case": "attention_seed3416",
+          "receipt_sha256": "1361979280d1c35207148cf4730348778fc67557157f05e5aa0e54f9d39b7f12",
+          "states": {
+            "selected": {
+              "source_sha256": "6ed873b7cdadd62fc0868ca62b1be6d0e087aad70396f3b4d3dc2b5b36802632",
+              "target_sha256": "71e5d8e11c0c1e962c9f17ae5e00898defd3d5d658351537725238ac589ad529"
+            },
+            "resume": {
+              "source_sha256": "4b78ab5427f4776b3af0d488ca57559078585488f65219adbeed903d1ee4402c",
+              "target_sha256": "f3062e5f4430da507d49f8d998b0de65d0fb136ab582ba96723c968b76f1cf5b"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.26953125
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "637f49743a449dabe439eaf9bd846a63f6c1ec904d173727e47d2a0ac8ccc234",
+      "audit_script_sha256": "2e5bfbc79f70a16bafd2d4a7b6713bf053b153834b87ece1bb9b904fe55e3958",
+      "verified_at": 1790099336.8755586,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    },
+    "attention": {
+      "schema": "radon_v5_actual_replay_acceptance_v1",
+      "state": "bounded_replay_verified",
+      "cases": 3,
+      "states": 6,
+      "rows": [
+        {
+          "case": "host_continue_seed3416",
+          "receipt_sha256": "3962f0956a8ef09ee219a1a52b3d4b93041f8817a2eac19a5a5e82202ee3a43a",
+          "states": {
+            "selected": {
+              "source_sha256": "605cd4fd294e50135cb1f43e5994dadc222d5cd76c7911d881b0ce8637abb139",
+              "target_sha256": "847e7bc6dfe1781292804a0b05dee10d504c7b12f2187f13cd8e51eeb55e4a92"
+            },
+            "resume": {
+              "source_sha256": "3c9828f0c03c592af1beade1b9c648872d4fe0218e9d99de1ac9827dde87e992",
+              "target_sha256": "8e1c5e3b5be450face9638219ea4d2629d42fa951ec238e4121206732c67e98d"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.26953125
+        },
+        {
+          "case": "host_radon_seed3416",
+          "receipt_sha256": "3853d7cfc7015e97e80199c4706251d96cc8d14c439e56a21ffe2de67cd321d7",
+          "states": {
+            "selected": {
+              "source_sha256": "1bd04a3a3760930ca35f8ae7842e215d0676681a44539b5ac5e0a4c8661bc5b2",
+              "target_sha256": "f00aa2ac33934ad93058ad89eef8efc4e54627f2dd226be3353404a7ff54d004"
+            },
+            "resume": {
+              "source_sha256": "aaf2653e2a03880fcf3ce1ed9c85bd754154d758d6eb6a1416b1061f705b51e0",
+              "target_sha256": "7b7b570eeb7bbe326662555ea5d7eb19ecaafc95516652f6730f61195630fdb0"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.380859375
+        },
+        {
+          "case": "host_linear_seed3416",
+          "receipt_sha256": "fade4c64a8fd0db5c6ac798ce2e976323896c8bff9dd14f3cecd139db7fb4a96",
+          "states": {
+            "selected": {
+              "source_sha256": "25681e472a66341e23c6984c89e35a09eea84a819fb0caed6f3f76eed1725584",
+              "target_sha256": "e73f3cf0921c02868a04dc52f4e7c2fe8bff61e1e22ac468b937184e1a4725a1"
+            },
+            "resume": {
+              "source_sha256": "4d50b2b82e64652857365a88c4b145717e63eb77828083a09048fe0c94192870",
+              "target_sha256": "cb79c56d93bb873b999fe974cde48dc65c0a1b9fb68cd9a85096ba55f59e92b4"
+            }
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.39453125
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "4f9b50bd4057fa8c352ff62f2eefa8ef7dac196baec79c61e1358a8a36686170",
+      "audit_script_sha256": "2e5bfbc79f70a16bafd2d4a7b6713bf053b153834b87ece1bb9b904fe55e3958",
+      "verified_at": 1790099814.7755933,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    }
+  },
+  "environment": {
+    "host": "ws02",
+    "gpu": "RTX 5000 Ada 32 GiB",
+    "torch": "2.8.0+cu128",
+    "single_device": true
+  },
+  "commands": [
+    "python replay_radon_core_v5.py --mode reference|check --case CASE --output ISOLATED_ROOT",
+    "python replay_radon_attention_v5.py --mode reference|check --case CASE --output ISOLATED_ROOT",
+    "python verify_radon_v5_replay.py --root ISOLATED_ROOT --converted CONVERTED_ROOT"
+  ],
+  "limits": [
+    "Nine actual selected models and nine resume states; other packages remain open",
+    "No original run reopened; two continued updates are migration diagnostics",
+    "Canonical dependency-reference migration, A100 handover and production cutover remain open"
+  ]
+}

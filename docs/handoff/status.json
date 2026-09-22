@@ -3,7 +3,7 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "Ibex canonical32已通过完整预检并正式推进147更新，继续核验训练/断点/资源和最终父模型；未来owner配置修复尚待独立绑定。LOOK融合阶段包已正式派发，两个宿主完成但拟合恢复与精确环境诊断仍未验收。既有WS02六包保持接受，R&B预算匹配、其他宿主及大队列范围保留。",
+  "next_acceptance": "完成V5当前资产依赖引用与其余模型回放、单卡完整流程及A100连续更新验收；六项Ibex资源恢复和LOOK永久管理交接仍开放。原科研结果与截止时间保留。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
@@ -187,6 +187,10 @@
     {
       "label": "V5 candidate migration status; production cutover incomplete",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/handoff/v5_migration.json"
+    },
+    {
+      "label": "Nine actual V5 model/resume migration replays; production cutover incomplete",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_actual_cohorts_20260922.json"
     }
   ]
 }

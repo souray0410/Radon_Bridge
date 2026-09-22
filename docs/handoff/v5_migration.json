@@ -11,5 +11,14 @@
     "scientific_configuration_changed": false,
     "binding_sha256": "cb468f93d1a4849d25d7b98166938889b97e9fd1f6bd3a0e1e9224225b659013",
     "incidents_closed": 0
+  },
+  "actual_cohort_replay": {
+    "cases": 9,
+    "states": 18,
+    "development_participants_per_case": 296,
+    "continued_updates_per_case": 2,
+    "source_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+    "evidence": "docs/acceptance/v5_actual_cohorts_20260922.json",
+    "production_cutover": false
   }
 }

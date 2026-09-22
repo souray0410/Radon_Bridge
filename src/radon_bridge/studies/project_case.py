@@ -26,6 +26,19 @@ from radon_bridge.training.paired_native import train,validate
 def read(p):return json.loads(Path(p).read_text())
 
 
+def load_host(spec, out, name, parents, shapes, bases):
+    """Validate the accepted host and current state before fitting or transfer."""
+    from radon_bridge.studies.project_units import verify_training
+    from radon_bridge.runtime.host_checkpoint import read_selected
+    receipt=verify_training(spec,out,name)
+    arm=next(a for a in spec['arms'] if a['id']==name)
+    model=build(parents,shapes,arm,bases,spec['seed'],'cpu')
+    state=read_selected(Path(out)/'arms'/name/'best.pt',
+                        identity=receipt['identity'],node_ids=model.node_identity())
+    model.load_state_dict(state['model'],strict=True)
+    return model,state
+
+
 def verify_arm(root,identity):
     root=Path(root);r=read(root/'accepted.json')
     if r.get('state')!='accepted' or r.get('identity')!=identity or not r.get('plateau') or r.get('test_access') is not False:raise ValueError('Arm receipt mismatch')
@@ -149,18 +162,17 @@ def execute(spec,output,device='cuda:0',*,unit='full'):
                 if arm.get('host'):
                     host_lock=stack.enter_context((out/('host_basis_'+arm['host']+'.lock')).open('a'))
                     fcntl.flock(host_lock,fcntl.LOCK_EX)
-                    host_arm=next(a for a in spec['arms'] if a['id']==arm['host'])
                     host_path=out/'arms'/arm['host']/'best.pt'
+                    host_model,host=load_host(spec,out,arm['host'],parents,shapes,bases)
                     host_identity=stable_hash(dict(case=identity,host=arm['host'],best_sha256=file_sha256(host_path)))
                     if not (out/'host_bases'/arm['host']/'accepted.json').exists():
-                        host_model=build(parents,shapes,host_arm,bases,spec['seed'],device)
-                        host_model.load_state_dict(torch.load(host_path,map_location='cpu',weights_only=False)['model'],strict=True)
+                        host_model.graph.to(device)
                         active_bases=fit(host_model,fit_data,[3],out/'host_bases'/arm['host'],host_identity,spec['seed'],device,paused)
-                        del host_model;gc.collect()
                     else:
                         record=read(out/'host_bases'/arm['host']/'accepted.json')
                         if record['identity']!=host_identity:raise ValueError('Host basis identity changed')
                         active_bases=record['bases']
+                    del host_model;gc.collect()
                     fcntl.flock(host_lock,fcntl.LOCK_UN)
                 arm_identity=stable_hash(dict(case=identity,arm=arm,bases=active_bases,host_best_sha256=file_sha256(out/'arms'/arm['host']/'best.pt') if arm.get('host') else None))
                 accepted[name]=arm_identity
@@ -172,7 +184,6 @@ def execute(spec,output,device='cuda:0',*,unit='full'):
                 torch.manual_seed(spec['seed']);np.random.seed(spec['seed']);random.seed(spec['seed'])
                 model=build(parents,shapes,arm,active_bases,spec['seed'],device)
                 if arm.get('host'):
-                    host=torch.load(out/'arms'/arm['host']/'best.pt',map_location='cpu',weights_only=False)
                     state=model.state_dict();missing=set(state)-set(host['model'])
                     if any('bridge_1_' not in k and 'bridge_parallel' not in k for k in missing):raise ValueError('Parallel host state changed')
                     extra=set(host['model'])-set(state)
