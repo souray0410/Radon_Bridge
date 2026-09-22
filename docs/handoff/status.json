@@ -183,13 +183,10 @@
     {
       "label": "Ibex 32层完整预检、正式训练和辅助控制器恢复边界",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_runtime_20260919.md"
+    },
+    {
+      "label": "V5 candidate migration status; production cutover incomplete",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/handoff/v5_migration.json"
     }
-  ],
-  "v5_migration": {
-    "state": "candidate_partial",
-    "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
-    "companion_commit": "b924a189ceb768310feaa0240adc95b51a33d07e",
-    "production_cutover": false,
-    "evidence": "docs/handoff/v5_rollout_20260922.md"
-  }
+  ]
 }
