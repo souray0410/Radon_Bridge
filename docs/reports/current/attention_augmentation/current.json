@@ -1,0 +1,148 @@
+{
+  "schema": "radon_attention_augmentation_public_report_v1",
+  "sequence_id": "attention_teacher_20260919_v1",
+  "scientific_scope": "WS02 single-seed development-set matched augmentation on one project cross-attention adapter",
+  "source_commit": "9cbb61648ba6ec8d0a699e36581f164415c9d26f",
+  "framework_commit": "3559caa8d596d4438533a69d39d8a2c32eb21e46",
+  "test_used": false,
+  "seed": 3416,
+  "train": 1264,
+  "development": 296,
+  "source_attention": {
+    "best_epoch": 7,
+    "stop_epoch": 13,
+    "best_sha256": "6ed873b7cdadd62fc0868ca62b1be6d0e087aad70396f3b4d3dc2b5b36802632",
+    "prediction_sha256": "27b36fd994018e963ce50d052c9a4be1393642b244bfee8fce77bed70351e79d"
+  },
+  "fresh_basis": {
+    "cfp_stage3": {
+      "sha256": "fad28ae0c92b98ea6615a15cd84b787bea1bfa7503a5b90f36e0e1415bd5d5b4",
+      "sampled_channel_vectors": 495488
+    },
+    "oct_stage3": {
+      "sha256": "6ef82b5b43bf1a3c6afba85b56cad34c50adf0db15ac39a88285067439c8c86c",
+      "sampled_channel_vectors": 728064
+    }
+  },
+  "results": [
+    {
+      "id": "host_continue",
+      "mean_macro_f1": 0.6925601639168274,
+      "best_epoch": 13,
+      "stop_epoch": 19,
+      "cfp": {
+        "macro_f1": 0.7094594594594594,
+        "log_loss": 1.4693534648709787,
+        "auroc": 0.751803323593864
+      },
+      "oct": {
+        "macro_f1": 0.6756608683741954,
+        "log_loss": 1.5491352181794835,
+        "auroc": 0.7317841490138788
+      }
+    },
+    {
+      "id": "host_radon",
+      "mean_macro_f1": 0.7111402617553388,
+      "best_epoch": 7,
+      "stop_epoch": 13,
+      "cfp": {
+        "macro_f1": 0.7195913941676654,
+        "log_loss": 1.354071156199229,
+        "auroc": 0.7675766983199415
+      },
+      "oct": {
+        "macro_f1": 0.7026891293430124,
+        "log_loss": 1.4376163846631373,
+        "auroc": 0.7420562454346238
+      }
+    },
+    {
+      "id": "host_linear",
+      "mean_macro_f1": 0.700669992503835,
+      "best_epoch": 8,
+      "stop_epoch": 14,
+      "cfp": {
+        "macro_f1": 0.6751417596488019,
+        "log_loss": 1.379550562025694,
+        "auroc": 0.7377647918188458
+      },
+      "oct": {
+        "macro_f1": 0.7261982253588681,
+        "log_loss": 1.3171776785101716,
+        "auroc": 0.7573502556610664
+      }
+    }
+  ],
+  "comparisons": {
+    "resamples": 10000,
+    "unit": "participant",
+    "metric": "mean branch macro-F1",
+    "contrasts": [
+      {
+        "method": "host_radon",
+        "reference": "host_continue",
+        "difference": 0.018580097838511445,
+        "ordinary95": [
+          -0.01659624599958154,
+          0.05298264954943401
+        ],
+        "simultaneous95": [
+          -0.023142879202906787,
+          0.060303074879929676
+        ]
+      },
+      {
+        "method": "host_linear",
+        "reference": "host_continue",
+        "difference": 0.008109828587007595,
+        "ordinary95": [
+          -0.02534921089252789,
+          0.041950120889170966
+        ],
+        "simultaneous95": [
+          -0.03206981743970892,
+          0.04828947461372411
+        ]
+      },
+      {
+        "method": "host_radon",
+        "reference": "host_linear",
+        "difference": 0.01047026925150385,
+        "ordinary95": [
+          -0.026938996883115626,
+          0.04793094595425088
+        ],
+        "simultaneous95": [
+          -0.034023492323412424,
+          0.054964030826420124
+        ]
+      }
+    ]
+  },
+  "costs": {
+    "host_continue": {
+      "bridge_parameters": 527360,
+      "peak_reserved_gib": 7.537109375,
+      "seconds_20_updates": 8.131174616981298
+    },
+    "host_radon": {
+      "bridge_parameters": 13110272,
+      "peak_reserved_gib": 7.427734375,
+      "seconds_20_updates": 9.389992789016105
+    },
+    "host_linear": {
+      "bridge_parameters": 13110272,
+      "peak_reserved_gib": 7.427734375,
+      "seconds_20_updates": 8.942004661017563
+    }
+  },
+  "independent_audit_sha256": "99ab7c52134d14d34f8501b503374d8e89686595a8d398725b0c278460fbeb47",
+  "limitations": [
+    "single_seed",
+    "same_development_selection_and_effect_estimation",
+    "project_cross_attention_adapter_not_external_author_system",
+    "not_equal_parameters_vs_continue",
+    "participant_bootstrap_excludes_training_seed_variability"
+  ]
+}

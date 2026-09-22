@@ -8,7 +8,9 @@ def bridges_for(parents,shapes,arm,bases,seed):
     if arm['family']=='none':return []
     channels={k:parents[k].graph.feature_channels for k in ('cfp','oct')}
     if arm.get('host'):
-        host=dict(arm,id=arm['host'],family='mmtm' if arm['host']=='mmtm256' else 'cross_attention')
+        host_families={'mmtm256':'mmtm','attention256':'cross_attention','cmx_frm64':'cmx_frm'}
+        if arm['host'] not in host_families:raise ValueError('Unknown existing-method host')
+        host=dict(arm,id=arm['host'],family=host_families[arm['host']])
         host.pop('host');host.pop('addition')
         configs=bridges_for(parents,shapes,host,bases,seed)
         if arm['addition']=='continue':return configs
@@ -24,6 +26,9 @@ def bridges_for(parents,shapes,arm,bases,seed):
             if int(ratio)!=ratio:raise ValueError('MMTM hidden256 cannot be exactly represented')
             config=dict(nodes=names,family='mmtm',reduction_ratio=int(ratio))
         elif arm['family']=='cross_attention':config=dict(nodes=names,family='cross_attention',attention_dimension=256,heads=4)
+        elif arm['family']=='cmx_frm':
+            if len(set(cs.values()))!=1:raise ValueError('CMX-FRM requires equal channels across participants')
+            config=dict(nodes=names,family='cmx_frm',alignment_tokens=arm.get('alignment_tokens',64))
         else:
             r=arm['r'];M=arm['M'];S=arm['S']
             if any(r>c for c in cs.values()):raise ValueError('Channel rank exceeds source channels')

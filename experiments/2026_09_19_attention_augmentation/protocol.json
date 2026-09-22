@@ -1,0 +1,87 @@
+{
+  "schema": "radon_attention_augmentation_preregistered_protocol_v1",
+  "task_id": "ws02-overnight-teacher-20260919-v1",
+  "question": "On the accepted cross-attention communication host, does Radon addition improve beyond matched continued training and ordinary communication?",
+  "source_core_sequence": "2026_09_18_11_32_21_119628",
+  "source_attention": {
+    "accepted_sha256": "fda477ede4ea5b6221f7566748d8e8b57aad4563cef09d979d7a9d4444e1b8d3",
+    "best_pt_sha256": "6ed873b7cdadd62fc0868ca62b1be6d0e087aad70396f3b4d3dc2b5b36802632",
+    "predictions_sha256": "27b36fd994018e963ce50d052c9a4be1393642b244bfee8fce77bed70351e79d",
+    "best_epoch": 7,
+    "stop_epoch": 13,
+    "config": {
+      "family": "cross_attention",
+      "nodes": [
+        "cfp_stage3",
+        "oct_stage3"
+      ],
+      "attention_dimension": 256,
+      "heads": 4
+    }
+  },
+  "native_parent_state_check": {
+    "cfp": {
+      "compared": 122,
+      "different": 122,
+      "max_abs": 0.7908878326416016
+    },
+    "oct": {
+      "compared": 122,
+      "different": 122,
+      "max_abs": 0.4174279570579529
+    },
+    "conclusion": "old parent SVD basis is not reusable"
+  },
+  "fresh_basis": {
+    "split": "train",
+    "participants": 1264,
+    "node": "Stage3 pre-write host inputs",
+    "centered": false,
+    "rank": 32
+  },
+  "fixed": {
+    "seed": 3416,
+    "train": 1264,
+    "development": 296,
+    "test": "sealed",
+    "stage": 3,
+    "r": 32,
+    "M": 32,
+    "S": 64,
+    "kernel": 3,
+    "group_count": 1,
+    "real_batch": 16,
+    "minimum_epochs": 8,
+    "maximum_epochs": 60,
+    "patience": 6,
+    "min_delta": 0.001
+  },
+  "arms": [
+    "host_continue",
+    "host_radon",
+    "host_linear"
+  ],
+  "contrasts": [
+    [
+      "host_radon",
+      "host_continue"
+    ],
+    [
+      "host_linear",
+      "host_continue"
+    ],
+    [
+      "host_radon",
+      "host_linear"
+    ]
+  ],
+  "selection": "development mean branch macro-F1; epoch0 eligible",
+  "statistics": "296 participant paired bootstrap, 10000 resamples, ordinary and 3-contrast simultaneous 95%",
+  "boundaries": {
+    "no_test": true,
+    "no_ibex": true,
+    "gpu": "WS02 GPU1",
+    "no_equal_parameter_claim": true,
+    "initial_predictions_must_replay_frozen_A": true
+  }
+}

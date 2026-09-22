@@ -1,0 +1,57 @@
+{
+  "schema": "radon_cmx_frm_adapter_protocol_v1",
+  "task_id": "ws02-overnight-teacher-20260919-v1",
+  "state": "implemented_cpu_acceptance_pending",
+  "method": {
+    "name": "CMX Feature Rectify Module (FRM)",
+    "full_system": "CMX: Cross-Modal Fusion for RGB-X Semantic Segmentation with Transformers",
+    "venue": "IEEE T-ITS 2023",
+    "repository": "huaaaliu/RGBX_Semantic_Segmentation",
+    "commit": "e251d860aebc2f583a6c4919877e6bebe7f1aff3",
+    "license": "MIT",
+    "source_sha256": {
+      "LICENSE": "a3fb69f7d2d7ab44ce80bba7f8c3a61f3c8a2775a2baac4bef815a60c4d8ba5e",
+      "README": "a05bb6f4e6ad6ad88f45693697db55c7d3d36ee2ebea8a0ad251acedb9a4abce",
+      "models/net_utils.py": "ada5e36e14d83c35d9230618c4eb84352a76ec2275a086a624b280e7638d8473",
+      "models/encoders/dual_segformer.py": "6d8994d0044929c97d318708223bf6fea48efce4575aa986c72e415ee017e755"
+    }
+  },
+  "author_component_contract": {
+    "channel_weights": "concat modalities -> global avg/max -> MLP(4C->4C->2C)->sigmoid",
+    "spatial_weights": "concat same-grid modalities -> 1x1 Conv(2C->C->2)->sigmoid",
+    "residual_formula": "x1 + 0.5*channel_weight_2*x2 + 0.5*spatial_weight_2*x2; symmetric for x2",
+    "default_reduction": 1,
+    "lambda_c": 0.5,
+    "lambda_s": 0.5
+  },
+  "project_adaptation": {
+    "name": "cmx_frm",
+    "scope": "FRM communication component only; not the full CMX segmentation system",
+    "native_endpoints": [
+      "cfp_stage3",
+      "oct_stage3"
+    ],
+    "channel_requirement": "equal channels; current R18 Stage3 is 256/256",
+    "dimensionality": "CFP is 2D feature grid and OCT is 3D feature grid",
+    "equal_grid_parity": "when grids match and alignment_tokens=H*W, implementation must numerically match author FRM",
+    "cross_dimensional_spatial_rule": "flatten native grids; linearly resample both to one fixed shared token lattice; apply author-equivalent kernel-1 spatial MLP; resample directional source feature and spatial weight back to each destination native grid",
+    "fixed_alignment_tokens": 64,
+    "scientific_boundary": "project adaptation of an author communication component; no claim of reproducing author SegFormer/decoder/system results",
+    "identity_initialization": "two trainable directional residual gates initialized to 0 for exact accepted-parent prediction replay; FRM internal author formula is recovered when gate=1",
+    "deterministic_resampling": "manual half-pixel linear gather equivalent to align_corners=False linear interpolation; chosen because CUDA interpolate1d backward is not deterministic"
+  },
+  "future_matched_A_plus_bridge": {
+    "A_train_count": 1,
+    "A": "one CMX-FRM Stage3 communication host trained under the existing small-cohort finite policy",
+    "after_acceptance": [
+      "CMX-FRM continue",
+      "CMX-FRM + Radon parallel residual",
+      "CMX-FRM + ordinary communication parallel residual"
+    ],
+    "same_A_start_required": true,
+    "fresh_basis_required_if_A_native_state_changed": true,
+    "metrics": "branch Macro-F1 plus probability metrics and participant-paired bootstrap",
+    "test": "sealed",
+    "training_now": false
+  }
+}
