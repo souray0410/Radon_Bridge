@@ -233,6 +233,635 @@
         "Preserved original dependency configuration; canonical reference migration remains open",
         "No completed research run was reopened; these are isolated continued-update checks"
       ]
+    },
+    "cmx_host": {
+      "schema": "radon_v5_actual_replay_acceptance_v2",
+      "lane_count": 1,
+      "state": "bounded_replay_verified",
+      "cases": 1,
+      "states": 2,
+      "rows": [
+        {
+          "case": "cmx_frm_seed3416",
+          "receipt_sha256": "717b13809e0582075c062d7efdab5d25256721987a2fd214d42d3b44e5d6da51",
+          "states": {
+            "selected": {
+              "source_sha256": "b2e22f75cf85867cd44bf4550e36e7f42c7a658927f8644acd99056fb084c846",
+              "target_sha256": "6a0c1f650e0cb55e24395fbd503325f318986331b72c4ebfa177d34f8a846d5f"
+            },
+            "resume": {
+              "source_sha256": "c4b1cafe27a2045646c4039d5e28ca57ef1f8e599dd3f197d670c3165f031fb9",
+              "target_sha256": "39568c461959ef95af21863e3801f9a783709359c454866eef0972810cf2bef4"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.076171875
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "f3b3e627ba0826fef73a81897c393bd12adda6cb060f51b38aff103f25aec3dc",
+      "audit_script_sha256": "94cb8d82bc887875ba05a400fab04f879dd922182d2c8d768d6e7293c010be28",
+      "verified_at": 1790100342.1161175,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    },
+    "cmx_aug": {
+      "schema": "radon_v5_actual_replay_acceptance_v2",
+      "lane_count": 2,
+      "state": "bounded_replay_verified",
+      "cases": 3,
+      "states": 6,
+      "rows": [
+        {
+          "case": "host_continue_seed3416",
+          "receipt_sha256": "a598b84e1a8c689ab79141120bf5945e96626e905c1727dd46ea75312ede9610",
+          "states": {
+            "selected": {
+              "source_sha256": "d4cb8125e0a7e1fee73c3f8253ccdc808b9b1e4af855d449b211de72faec4479",
+              "target_sha256": "80c8a66856d291014235bafcc6eba788b0afd09db2d859e4ea6052532a71875b"
+            },
+            "resume": {
+              "source_sha256": "dcf46851faf7b3f247f230903b72ed851bbd67b52b3c0f7ad771c0595a66779c",
+              "target_sha256": "20143c204d0cc51fce031cce6dda65027c6ee8b1b6f1865e03c92fe0680c7d80"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.076171875
+        },
+        {
+          "case": "host_radon_seed3416",
+          "receipt_sha256": "ce475d390686dd0f200761363180720cdf647ecaec80630f71ceb3e997ba640c",
+          "states": {
+            "selected": {
+              "source_sha256": "b467317d7462a395337ea7c3695536f6ce58bd83876fcb06d8410dd731e0f3d5",
+              "target_sha256": "a1935506bc7bdf18a77ecb623d582b0452eb927f1a879bcb789ab2ba735cf736"
+            },
+            "resume": {
+              "source_sha256": "e979611461ce17d9e0734fbbd1327878d1390da284d3ea00c49cbbf0bf7b96ea",
+              "target_sha256": "eab20ea7882dc1f90df2dfa3ef67a0bca215212091fcc23a56448265476dd9b5"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "6895624fd6d90f6431888d71752cb42949e62d0bf0cbce1bbb0726a64e2f57c2",
+            "check": "6895624fd6d90f6431888d71752cb42949e62d0bf0cbce1bbb0726a64e2f57c2"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.29296875
+        },
+        {
+          "case": "host_linear_seed3416",
+          "receipt_sha256": "f14c040d16079dd74ee064a600352fb917721f100764c6f91e3760d1461b77db",
+          "states": {
+            "selected": {
+              "source_sha256": "31be75e34771c7d11362b6f57c0d3d713a340999cbe6c9eb5fafa84fdf7f66cc",
+              "target_sha256": "85dde5f06766e22ab4b8b88664935f970f07512139e27ad54aef68f9dcf5c0b1"
+            },
+            "resume": {
+              "source_sha256": "d3a4933d44c7c6c15be9868029700e52390a9c0881ced34d78bea1666f1ddf72",
+              "target_sha256": "19eb826db5f4675b1c5f038a8e131c1c42acd00ba184478274b26eb030a1c536"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "7df363c0fef56195dbbb2808ad520b8fa54a37c14295937d3c9e24a8ae361ced",
+            "check": "7df363c0fef56195dbbb2808ad520b8fa54a37c14295937d3c9e24a8ae361ced"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.30078125
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "9faaef08dc8867531d581da5e2391438e459da4acc7a8f2523501a331170e923",
+      "audit_script_sha256": "94cb8d82bc887875ba05a400fab04f879dd922182d2c8d768d6e7293c010be28",
+      "verified_at": 1790100247.1269686,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    },
+    "channel": {
+      "schema": "radon_v5_actual_replay_acceptance_v2",
+      "lane_count": 2,
+      "state": "bounded_replay_verified",
+      "cases": 6,
+      "states": 12,
+      "rows": [
+        {
+          "case": "svd_seed3416",
+          "receipt_sha256": "15db7e89c44739bd67561d34aed310b6395aa7e0f23379801f0f6c9aa014f3d2",
+          "states": {
+            "selected": {
+              "source_sha256": "0cce1c19e8fd16a96b78bc3667a814fee567d320372caf42abeadb165bd08847",
+              "target_sha256": "874dda8f40d6f0f7060c9b1caeb4251815e4ad9a26b160c544b3d484e9bd736f"
+            },
+            "resume": {
+              "source_sha256": "2c7423f0c15308d96dd0dcf23dc9d10e8d8a00df644f9d0a9e15e3e6de6afa06",
+              "target_sha256": "5bc6741f2fe4a3d75690f7a7ee132a19080555e6c39437ba4152798c90abb1a0"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb",
+            "check": "e2df4ffb0ac226b799eab59f71c16ad3c7e15d83bf65c63b013df7716e0138eb"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.15625
+        },
+        {
+          "case": "linear_seed3416",
+          "receipt_sha256": "04de0506d2b42e0a1c695c0216de4a5f58d129b72779afcfa64d1fb074437d74",
+          "states": {
+            "selected": {
+              "source_sha256": "771b3f85d2591c851e63d050fb96ebb5a39cde147b8e7db38e9592882293a24f",
+              "target_sha256": "2efe1be770c06fdbadf1a308e147cdaba4018f4ef5283958f0958bf4235f70ea"
+            },
+            "resume": {
+              "source_sha256": "328a11437790a65e3814bf5167c1033313c7e589965d5988a802ed83550a53d4",
+              "target_sha256": "fcbf801a08b507ff9c26c52e5399f8a06662be78b22f64b2543f317b00fc67dc"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88",
+            "check": "4483ea6e05ce790fac2ce6c98c7713884fa6fa9c6c311a6bcbb90818a1776c88"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.111328125
+        },
+        {
+          "case": "qr_seed3416",
+          "receipt_sha256": "3203c0643cca1e392de4e460426edc9dc881b4c4afbcbf400ba47d9e9ec836d3",
+          "states": {
+            "selected": {
+              "source_sha256": "24fe7e0db1dfc3c06641d6c735653542d35f7436ddf74f83a76947088329084a",
+              "target_sha256": "e6d58d03a746e5ca59346178f54d92ae5b2699c468c33bfda5707e0ee733889d"
+            },
+            "resume": {
+              "source_sha256": "051fd82c2aabffb9c677ed3b7d1198e85af1909cf965442ad0e337a32947f5bc",
+              "target_sha256": "4c6c68a1decb12bd01a248c7ffed71326804039c9ec317f8234bb510ee8fd426"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "e996dccbd1f5b4e6bf821830e8516f0d1929abfc0ccd7a828738da71a4dd0192",
+            "check": "e996dccbd1f5b4e6bf821830e8516f0d1929abfc0ccd7a828738da71a4dd0192"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.15625
+        },
+        {
+          "case": "qr_linear_seed3416",
+          "receipt_sha256": "508003853a94ecff9dfc22c9711930de24f40fd10f50ba5f1148efca30a32dd7",
+          "states": {
+            "selected": {
+              "source_sha256": "d39b23faea9ea63b27d2f6b39d7480344b39c8ce826e5ebdaa53c930f2d4b79a",
+              "target_sha256": "b88cda26247a18ffb560ccaa9a70cec0bb11f213fdac2533fed5c17de636da5e"
+            },
+            "resume": {
+              "source_sha256": "861d7b244716b8481e028ebfe319713b139e4c9f4edc61c555760d01746fd35d",
+              "target_sha256": "20190e3007da9e00ddd40769d6e4f7805445c9128a2651ea07ab3e19968aa5be"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.111328125
+        },
+        {
+          "case": "learned_seed3416",
+          "receipt_sha256": "214f6cecc5cd0625596f5a9d2723d1262c1b3a4b01e2acb56c78ba03ad34025b",
+          "states": {
+            "selected": {
+              "source_sha256": "2fe167b2b814e4929a97917b81e1944560cc8386483fcc54a67984bcef898a18",
+              "target_sha256": "d6336d394644b42d61886a45b3b206fc1bc27ac8abd95f777e309bfd16e48c9c"
+            },
+            "resume": {
+              "source_sha256": "8aaf65f69a69a05abf4a28a173c157d0a69fe8af7ee479e000e98e91980f1fd7",
+              "target_sha256": "7c3cd40983844732411a7763843a7fbd135f1f0ebfca71221d277ddd7447eb2f"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "e099dc9fd79396098d724749996efcde70fe3d30406ec7a21c87314643102613",
+            "check": "e099dc9fd79396098d724749996efcde70fe3d30406ec7a21c87314643102613"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.15625
+        },
+        {
+          "case": "learned_linear_seed3416",
+          "receipt_sha256": "2d2eadd9f23e398a25d14efbf83055b3db3a20a9aa24ea238cad1f2536fd5fb4",
+          "states": {
+            "selected": {
+              "source_sha256": "e6fca5bf203596c517ef6263dc72f5bbb856efa7de8a7f759db761a018c35486",
+              "target_sha256": "f1fb08536df8b0dcbc1cd091b3d148d6bc25571ec5b6477f17a871b10c4c1f2a"
+            },
+            "resume": {
+              "source_sha256": "32b9ba6de21a444251d25c9870093188bf3428831bab75f9bf82b00e493e5fd4",
+              "target_sha256": "80d3fd50bc2f72007e02d547b294434cda2f3e203d107a9bd7bb7ba7109c8d8c"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.111328125
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "ae118e3550684c5dd52461b2f7594395e5580e4ed3ca92704fa341e2e3587e2c",
+      "audit_script_sha256": "94cb8d82bc887875ba05a400fab04f879dd922182d2c8d768d6e7293c010be28",
+      "verified_at": 1790100670.478671,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    },
+    "mmtm_aug": {
+      "schema": "radon_v5_actual_replay_acceptance_v2",
+      "lane_count": 2,
+      "state": "bounded_replay_verified",
+      "cases": 3,
+      "states": 6,
+      "rows": [
+        {
+          "case": "host_continue_seed3416",
+          "receipt_sha256": "a0062556d5de9e67c4439f9f119e9bdfa0969c9d38bad1d08ef496d37d1787e2",
+          "states": {
+            "selected": {
+              "source_sha256": "5c6e2385673057e8fc42b2bcc4a595fd646f66f4f9cc5af9795c829219673d52",
+              "target_sha256": "6b7b4fc249ff580aac58668c805f21f7798301b534f1f1ad36de00512fe5d466"
+            },
+            "resume": {
+              "source_sha256": "ca378370d163652114e69b6112f720c4263a961a8ff25634b01043b24223b462",
+              "target_sha256": "f45cfae3314657496e8318940179287c36e12c83346fef5f8e55638abac18bb5"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.005859375
+        },
+        {
+          "case": "host_radon_seed3416",
+          "receipt_sha256": "437b19102c541e5629f4b30cfffd094b4ede79422f38890b5e735e5fabe168e0",
+          "states": {
+            "selected": {
+              "source_sha256": "48047b6c8e73472cbb6894455ffff6c229224bf0381bfbd269250460842b9aa8",
+              "target_sha256": "af78911344c21d53c7bdd98e3673d8d70bd1af9e06452aef813d1f87b4a55197"
+            },
+            "resume": {
+              "source_sha256": "d288fd344e852b353d99df9ffc84c243ccbe42807a2ec607b3f10314196af0c5",
+              "target_sha256": "2937790806ec43c666bed4a0f1f9f44095efd13340ed2ad7ae997622066719fd"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "52ce759020198127d1deca29f1e48670b173b94de635db2026112844b4216723",
+            "check": "52ce759020198127d1deca29f1e48670b173b94de635db2026112844b4216723"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.22265625
+        },
+        {
+          "case": "host_linear_seed3416",
+          "receipt_sha256": "0cee5ed304ad56529605d7044fcfaa3ca2f06da9940f64c92ad2318f290b9338",
+          "states": {
+            "selected": {
+              "source_sha256": "b7c9128ba5e2fe419902df8691f32f69f39d441ead0dfbc231ba3ec0f73eed6f",
+              "target_sha256": "9042d0828a9621e90d846d53923e90e2fe08ec313f7803599f38e78941803073"
+            },
+            "resume": {
+              "source_sha256": "ec87d7b144ae36085cd894dd83dc19476ee88aa76fab76e30ec0eae27deb5e6c",
+              "target_sha256": "46f57522f004ef8401d99ec7f5a74a25ae599f8e6756968a92f1696b096a30b9"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2083c396b62741bbed58e39a05174c02d374958d39ea973e42ca9f69dc8b5ba7",
+            "check": "2083c396b62741bbed58e39a05174c02d374958d39ea973e42ca9f69dc8b5ba7"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.212890625
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "06ad1fa0bc7c1675ef7bd86e287cb82ca5e09a780f1693709b6136ce7df29664",
+      "audit_script_sha256": "94cb8d82bc887875ba05a400fab04f879dd922182d2c8d768d6e7293c010be28",
+      "verified_at": 1790100843.6938937,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
+    },
+    "grouped": {
+      "schema": "radon_v5_actual_replay_acceptance_v2",
+      "lane_count": 2,
+      "state": "bounded_replay_verified",
+      "cases": 8,
+      "states": 16,
+      "rows": [
+        {
+          "case": "grouped_g2_radon_seed3416",
+          "receipt_sha256": "14f4a23a80e8340dc2f080cf84d6a09d6f28fb6b4bf9da6e716d12a49a6b35c4",
+          "states": {
+            "selected": {
+              "source_sha256": "847fa93db534e114d35eab41a59626198a8f4d716010053a1a0dca76af001245",
+              "target_sha256": "fb9ac7fa1ad8203249ad2ec904e5757b861f7471d17b0448665d09d4d59d657a"
+            },
+            "resume": {
+              "source_sha256": "dec81286362aed6904eb734c94d9397eb779b92b4da987fa928c237901f1641d",
+              "target_sha256": "972840689e9c8f2af51a31483786d8bfdf4f42cc213c4a90d7b989de5e7174eb"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "4d4295a30842566897da584bb0c8fad7a836bac3280ae5145c78836ce188fdfe",
+            "check": "4d4295a30842566897da584bb0c8fad7a836bac3280ae5145c78836ce188fdfe"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.291015625
+        },
+        {
+          "case": "grouped_g2_linear_resample_seed3416",
+          "receipt_sha256": "063aa980a6e07c182127f7a5a619115e88fbcaad8b5a0ec1e1d3265dcdb262ee",
+          "states": {
+            "selected": {
+              "source_sha256": "eb502b4bea7c01683fbc07e6b47a175cc4f6089866772e448362d0e52f44d807",
+              "target_sha256": "e8df60dc64bd9c522a9f89c0815aa75bddf5cc936adfa1925595022872527dc9"
+            },
+            "resume": {
+              "source_sha256": "038d04fd3fb41c067937c4a6a6996318d05f2b9fffc045c7267e366b72523cdd",
+              "target_sha256": "6407395047831fe53066817145f93f55ffe785214582720a0208db4cb8f25d5c"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.119140625
+        },
+        {
+          "case": "grouped_g4_radon_seed3416",
+          "receipt_sha256": "c7802d46429d83dd91e9751218843c8f407c5697f85ed6445f99892a6db231c3",
+          "states": {
+            "selected": {
+              "source_sha256": "bf1df0371c9ee5ca49d93407437d2beb3ec638007171c066571e7ee335cbe656",
+              "target_sha256": "bc6c559ca45aaf8b8d0e080db9a7a812c9c878742b5506d4261b7caac797caf7"
+            },
+            "resume": {
+              "source_sha256": "483c3954b0dfbf26f41d22ab774efc319e838fb06719675c66e202ada0ceb18d",
+              "target_sha256": "2a930d1da69522b354382a4fe6c0567ee4eb743d0688964d00cb06a27fc9357d"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "1c61e902ffc0b3d180bf0c71ee750932dabe3af55e02d8500bd0e7497c1860c9",
+            "check": "1c61e902ffc0b3d180bf0c71ee750932dabe3af55e02d8500bd0e7497c1860c9"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.052734375
+        },
+        {
+          "case": "grouped_g4_linear_resample_seed3416",
+          "receipt_sha256": "600142710e19258358a204a7c40975e85faa67f1bd8e5b92e775b295611d1d9d",
+          "states": {
+            "selected": {
+              "source_sha256": "da6dd15bd511f3ea21598fa05cad35bd831222d26246349123f7583bb6b8676b",
+              "target_sha256": "fff08f84dd803943f995e15f4755e3b95f0b86d0d5e3df8dd0d62b6b615fac61"
+            },
+            "resume": {
+              "source_sha256": "f6998c23e588b4e4713d97b0cea5881902a533b2464d8e7b2d81b6c0c57eb853",
+              "target_sha256": "99be13ef21762f7ca08f11dfbf8434aee57ceb0cdb381350977c32947a74e1f8"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.087890625
+        },
+        {
+          "case": "grouped_g8_radon_seed3416",
+          "receipt_sha256": "82011f6c9870c494a04c882218b3c7f249b4d69c0534acfe67861ceb98c79043",
+          "states": {
+            "selected": {
+              "source_sha256": "b87222262fe0fecc807cb2a3fb28b24b19ef0045a7534f98875126501d413b28",
+              "target_sha256": "b2b9e2809979be339ad3934c25a2cb7b7495c5caf35a9a677b5506a3617cbae9"
+            },
+            "resume": {
+              "source_sha256": "77767851e1828ffed4b61a4311399f4d93eccb05281551ead130d179d0339f02",
+              "target_sha256": "4675c387745df21adf9621c7352543873b57d354c9d223824876ff56a8b47893"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "3b56200d1e9841b304de86336fe6eb8b1fedee38ef70f0b976e81f778f654d1f",
+            "check": "3b56200d1e9841b304de86336fe6eb8b1fedee38ef70f0b976e81f778f654d1f"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.009765625
+        },
+        {
+          "case": "grouped_g8_linear_resample_seed3416",
+          "receipt_sha256": "e736c647bcf5965a0a5b3ca795ccf90cfc042d3cd24763a09758a998b911f1a9",
+          "states": {
+            "selected": {
+              "source_sha256": "3c913c5d84e7bb6373284f587cc3416c518efe0d44fe86f9766ccaa61d9b5d03",
+              "target_sha256": "90d5631c7d4c730788619b9414d0a40d17e09bd14a28fdb4f5bc46b3f25da003"
+            },
+            "resume": {
+              "source_sha256": "f97d9d81c2ffb545eea81256e8d298f4f1e51792a4eeb92129cc9bce55509cd5",
+              "target_sha256": "60ecf9ad5662ecbf242412735ee0a722cc17c38a82ab6edcfd7435364080871c"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 8.03515625
+        },
+        {
+          "case": "grouped_g16_radon_seed3416",
+          "receipt_sha256": "18c872ea3ce2a45ab5ac31b0c6dee62514dee9d5e69b26c907b37800f8362221",
+          "states": {
+            "selected": {
+              "source_sha256": "de732259657c96736735e2edc6455a373aeeea78f99df12f83a8717b5c588112",
+              "target_sha256": "4784b43f08b21229d1ccbf5e26417550f45448773f66134ddf2cc13008ef6c35"
+            },
+            "resume": {
+              "source_sha256": "ee83db8339d4bf57156f9e1477c8b91cc1238eae40ee5b76dcb9d8f8c2be6eba",
+              "target_sha256": "5af4ca5a7955cf0e43ce9448f59e0a6f23f868a969ece64535e40e682bd6b4ab"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "a647a96bd9cfa4acbe1c87ec484628de3076a37d28bedeb9d819bdee1b48b098",
+            "check": "a647a96bd9cfa4acbe1c87ec484628de3076a37d28bedeb9d819bdee1b48b098"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 7.98046875
+        },
+        {
+          "case": "grouped_g16_linear_resample_seed3416",
+          "receipt_sha256": "fab69f6c7612e5d099f1a043216170efa69da87549871bffd937a8daacf656bd",
+          "states": {
+            "selected": {
+              "source_sha256": "39ff82887e74d1cebef05a135b69b617d1e8d318b053f2221c3cf811a804670c",
+              "target_sha256": "b16b4e379d32df44c6b0ae81afeff4489e4c88eb545584d3e89e119d9138a0c4"
+            },
+            "resume": {
+              "source_sha256": "8151f60dd25880d1e0faf1a99ff5b325649578f0dec4f2cb0ae9152854859e04",
+              "target_sha256": "5df73bb1843504e9a2f556371c751af3d8f42c543b65551c801db12ad6521c9d"
+            }
+          },
+          "prediction_sha256": {
+            "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+            "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+          },
+          "selected_development": 296,
+          "continued_updates": 2,
+          "intermediate_states_per_update": 8,
+          "native_reference_checked": true,
+          "current_checkpoint_next_update_exact": true,
+          "peak_reserved_gib": 7.759765625
+        }
+      ],
+      "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+      "project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+      "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+      "original_training_framework": "V4",
+      "test_access": false,
+      "production_cutover": false,
+      "rtol": 1e-05,
+      "atol": 1e-06,
+      "preparation_sha256": "6f65c1622e380fa0ff9fb36f56fd65cabb12606e1aaed22512c1837bc5cc6be4",
+      "audit_script_sha256": "94cb8d82bc887875ba05a400fab04f879dd922182d2c8d768d6e7293c010be28",
+      "verified_at": 1790100854.6775515,
+      "limitations": [
+        "Ada single-device diagnostics; A100 handover not certified",
+        "Preserved original dependency configuration; canonical reference migration remains open",
+        "No completed research run was reopened; these are isolated continued-update checks"
+      ]
     }
   },
   "environment": {
@@ -244,10 +873,11 @@
   "commands": [
     "python replay_radon_core_v5.py --mode reference|check --case CASE --output ISOLATED_ROOT",
     "python replay_radon_attention_v5.py --mode reference|check --case CASE --output ISOLATED_ROOT",
-    "python verify_radon_v5_replay.py --root ISOLATED_ROOT --converted CONVERTED_ROOT"
+    "python verify_radon_v5_replay.py --root ISOLATED_ROOT --converted CONVERTED_ROOT",
+    "python verify_radon_v5_replay_v2.py --root ISOLATED_ROOT --converted CONVERTED_ROOT --source-audit SOURCE_AUDIT --lane-count 1|2"
   ],
   "limits": [
-    "Nine actual selected models and nine resume states; other packages remain open",
+    "Thirty package replay entries, including reused channel-control entries; not thirty new independent research runs. Other packages and current consumers remain open.",
     "No original run reopened; two continued updates are migration diagnostics",
     "Canonical dependency-reference migration, A100 handover and production cutover remain open"
   ]

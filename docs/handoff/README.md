@@ -281,3 +281,5 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 [核心六组与 attention 三组](../acceptance/v5_actual_cohorts_20260922.json)的18份选优/续训状态已离线转换并通过独立文件复核。每组完整296人dev、原16人批量连续两次更新的输出、中间状态、输入/参数梯度、优化器与buffer均按FP32既定容差比较；原生PyTorch对照和当前断点恢复后的下一步精确一致。执行源固定d38296e，框架c78cfbd、companion228b125。原训练仍记V4，完成实验没有重开。CMX及其余资产、依赖引用迁移、A100交接与正式切换仍开放。
 
 当前包移除两个没有现行调用方、构造接口已失效的历史CLI，原源码由Git/冻结快照保留。普通paired-native宿主加载补齐接受凭证、身份、V5格式和Node校验；不提供V4回退。
+
+追加：CMX宿主1组/加桥3组、通道压缩6组、MMTM加桥3组、分组通信8组亦完成逐文件独立验收。现共30个包内回放条目/60个状态条目，含严格复用的对照，不是30次独立新增实验。v2审计额外从原预测文件独立复核296人输出和分类决定，并绑定当前预测SHA。原native父权重已严格转换，当前普通build入口的完整回放仍在单独验收中。
