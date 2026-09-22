@@ -61,9 +61,11 @@ def run(output,device,architecture='resnet18'):
         model.zero_grad(set_to_none=True);z,loss=model(batch);model.backward()
         mhd={n:p.grad.detach().clone() for n,p in model.named_parameters() if p.grad is not None}
         model.zero_grad(set_to_none=True);_,reference=model.native_forward(batch);reference.backward()
-        assert torch.allclose(loss,reference,atol=1e-5,rtol=1e-5),a['id']
+        torch.testing.assert_close(loss,reference,atol=1e-6,rtol=1e-5)
         for n,p in model.named_parameters():
-            if n in mhd:assert p.grad is not None and torch.allclose(p.grad,mhd[n],atol=3e-5,rtol=3e-4),(a['id'],n)
+            if n in mhd:
+                assert p.grad is not None, (a['id'], n)
+                torch.testing.assert_close(p.grad,mhd[n],atol=1e-6,rtol=1e-5,msg=lambda detail:f'{a["id"]}/{n}: {detail}')
         opt=torch.optim.AdamW(model.groups(3e-5,1e-4,1e-4),weight_decay=.01);opt.step();opt.zero_grad(set_to_none=True)
         for name,m in model.task.modules_by_name().items():
             if hasattr(m,'mixer'):assert torch.equal(m.mixer.conv.weight[m.mixer.mask==0],torch.zeros_like(m.mixer.conv.weight[m.mixer.mask==0]))
