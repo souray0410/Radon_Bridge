@@ -406,10 +406,6 @@ def execute_work(config_path,spec_path,run,kind,record):
     profile_root=Path(record).parent/'profile'
     environment=os.environ.copy()
     environment['CUBLAS_WORKSPACE_CONFIG']=':4096:8'
-    if kind=='radon' and config.get('legacy_project_pythonpath'):
-        environment['PYTHONPATH']=config['legacy_project_pythonpath']
-        os.execvpe(config['python'],[config['python'],'-m','radon_bridge.runtime.project_dispatch','--config',str(config_path),
-            '--execute',str(spec_path),'--run',str(run),'--kind','radon','--record',str(record)],environment)
     if kind=='native':
         binding=source_binding(spec,config)
         environment['PYTHONPATH']=binding['pythonpath']
