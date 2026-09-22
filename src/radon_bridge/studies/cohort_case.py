@@ -17,6 +17,7 @@ import sys
 import time
 import numpy as np
 import torch
+from radon_bridge.runtime.pilot_checkpoint import read as read_state, save as save_state
 from radon_bridge.data.dataset import PairedDataset
 from radon_bridge.models.model import PilotGraph
 from radon_bridge.training.optimization import configure_optimizer, clip_task_gradients
@@ -55,7 +56,7 @@ def build(cfg):
     g=PilotGraph(bridge_configs=cfg['bridges'],seed=cfg['seed'],device='cuda')
     for branch,ref in cfg['parents'].items():
         if sha(ref['path'])!=ref['sha256']:raise ValueError('Parent SHA mismatch')
-        p=torch.load(ref['path'],map_location='cpu',weights_only=False)
+        p=read_state(ref['path'],kind='native_parent')
         if p.get('branch')!=branch or p.get('seed')!=cfg['seed'] or p.get('stop_reason')!='validation_plateau':
             raise ValueError('Unaccepted parent')
         g.load_native_state(p['model'],branch)
@@ -95,7 +96,7 @@ def configure_device():
     # Historical parents used the cuDNN default TF32 convolution policy.
     # Match it explicitly; changing it breaks exact saved-prediction replay.
     torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=True
-    # Explicit historical workstation budget; never inherit this on Ibex.
+    # Configure from actual device occupancy; no platform-specific reserve.
     from mhd_models.scheduling.gpu_budget import configure_allocator
     configure_allocator(0)
 
@@ -173,9 +174,9 @@ def profile(cfg,data,out):
                 assert grad.abs().sum()==0
             else:assert grad.abs().sum()>0
     snapshot=dict(model=g.save_state(),optimizer=copy.deepcopy(opt.state_dict()),rng=rng())
-    atomic_save(snapshot,out/'resume.pt');update(g,opt,b)
+    save_state(snapshot,out/'resume.pt',kind='profile_resume');update(g,opt,b)
     expected=g.save_state();expected_opt=copy.deepcopy(opt.state_dict())
-    saved=torch.load(out/'resume.pt',map_location='cpu',weights_only=False)
+    saved=read_state(out/'resume.pt',kind='profile_resume')
     g.load_complete_state(saved['model']);opt.load_state_dict(saved['optimizer']);restore_rng(saved['rng']);update(g,opt,b)
     assert same(expected,g.save_state()) and same(expected_opt,opt.state_dict())
     assert ids=={n:g.by_name[n].id for n in ids}
@@ -183,7 +184,6 @@ def profile(cfg,data,out):
     grouped_structure=grouped_structure_probe(g,cfg)
     torch.cuda.synchronize();peak=torch.cuda.max_memory_reserved()/1024**3
     sample_physical()
-    if peak>9 or (physical and max(physical)>10):raise RuntimeError('Workstation project memory budget exceeded')
     receipt=dict(passed=True,scope='resource_and_MHD_development_only',test_used=False,
         formal_updates=0,seed=cfg['seed'],configuration=cfg,warmup=5,measured_updates=20,
         checkpoint_update_exact=True,node_ids_preserved=True,autograd_equivalence=True,
@@ -209,11 +209,11 @@ def train_case(cfg,data,out):
     monitor=Plateau(**policy);history=[];epoch=0
     identity=hashlib.sha256(json.dumps(cfg,sort_keys=True).encode()).hexdigest()
     def checkpoint():
-        atomic_save(dict(identity=identity,model=g.save_state(),optimizer=opt.state_dict(),rng=rng(),
+        save_state(dict(identity=identity,model=g.save_state(),optimizer=opt.state_dict(),rng=rng(),
             epoch=epoch,monitor=vars(monitor),history=history,configuration=cfg,
-            selected=torch.load(out/'best.pt',map_location='cpu',weights_only=False)),out/'resume.pt')
+            selected=read_state(out/'best.pt',kind='selected',configuration=cfg)),out/'resume.pt',kind='resume')
     if (out/'resume.pt').exists():
-        p=torch.load(out/'resume.pt',map_location='cpu',weights_only=False)
+        p=read_state(out/'resume.pt',kind='resume',configuration=cfg)
         if p['identity']!=identity:raise ValueError('Resume identity changed')
         g.load_complete_state(p['model']);opt.load_state_dict(p['optimizer']);restore_rng(p['rng'])
         epoch=p['epoch'];monitor.__dict__.update(p['monitor']);history=p['history']
@@ -231,7 +231,7 @@ def train_case(cfg,data,out):
                     assert np.array_equal(current['ids'],previous['ids']) and np.array_equal(current['y'],previous['y'])
                     np.testing.assert_allclose(current[key],previous[key],rtol=1e-5,atol=1e-6)
         monitor.update(initial['mean_task_macro_f1'],0)
-        atomic_save(dict(model=g.save_state(),epoch=0,metrics=initial,configuration=cfg),out/'best.pt');checkpoint()
+        save_state(dict(model=g.save_state(),epoch=0,metrics=initial,configuration=cfg),out/'best.pt',kind='selected');checkpoint()
         write_json(out/'initial_acceptance.json',dict(strict_parent_predictions=True,test_used=False,
             numerical_policy=dict(parameter_dtype="float32",autocast=False,matmul_tf32=False,cudnn_tf32=True)))
     converged=epoch>=8 and monitor.bad>=6
@@ -245,7 +245,7 @@ def train_case(cfg,data,out):
                 if seen%128==0:progress(state='training',epoch=current_epoch,participants=seen,loss=loss)
             scores=evaluate(g,dev,16,cfg['seed'],stop=lambda:stop[0] or check_resources())
             flags=monitor.update(scores['mean_task_macro_f1'],current_epoch)
-            if flags['improved']:atomic_save(dict(model=g.save_state(),epoch=current_epoch,metrics=scores,configuration=cfg),out/'best.pt')
+            if flags['improved']:save_state(dict(model=g.save_state(),epoch=current_epoch,metrics=scores,configuration=cfg),out/'best.pt',kind='selected')
             if flags['reduce_lr']:
                 for group in opt.param_groups:group['lr']*=.3
             epoch=current_epoch;converged=flags['plateau']
@@ -253,7 +253,7 @@ def train_case(cfg,data,out):
             checkpoint();write_json(out/'history.json',history);progress(state='training',epoch=epoch,metrics=scores)
         if not converged:
             progress(state='needs_review',reason='epoch_cap_without_plateau',epoch=epoch);return 2
-        selected=torch.load(out/'best.pt',map_location='cpu',weights_only=False);g.load_complete_state(selected['model'])
+        selected=read_state(out/'best.pt',kind='selected',configuration=cfg);g.load_complete_state(selected['model'])
         scores=evaluate(g,dev,16,cfg['seed'],out/'selected_predictions.npz',stop=lambda:stop[0] or check_resources())
         files=['best.pt','resume.pt','selected_predictions.npz','history.json','initial_acceptance.json']
         write_json(out/'accepted.json',dict(identity=identity,state='complete',converged_by_policy=True,
@@ -268,12 +268,8 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('mode',choices=['profile','train']);p.add_argument('--config',required=True)
     p.add_argument('--data',required=True);p.add_argument('--output',required=True);a=p.parse_args()
     cfg=json.loads(Path(a.config).read_text())
-    uuid=subprocess.check_output(['nvidia-smi','-i',os.environ['CUDA_VISIBLE_DEVICES'],'--query-gpu=uuid','--format=csv,noheader'],text=True).strip()
-    locks=Path(os.environ['RESEARCH_GPU_LOCK_ROOT']);locks.mkdir(parents=True,exist_ok=True)
-    device_lock=(locks/(uuid+'.lock')).open('a');fcntl.flock(device_lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    used=int(subprocess.check_output(['nvidia-smi','-i',os.environ['CUDA_VISIBLE_DEVICES'],'--query-gpu=memory.used','--format=csv,noheader,nounits'],text=True).strip())
-    total=int(subprocess.check_output(['nvidia-smi','-i',os.environ['CUDA_VISIBLE_DEVICES'],'--query-gpu=memory.total','--format=csv,noheader,nounits'],text=True).strip())
-    if total-used < 20*1024:raise MemoryError('Need 10GiB worker plus 10GiB reserve')
+    from radon_bridge.runtime.exclusive_gpu import acquire
+    device_lock=acquire()
     try:
         if a.mode=='profile':profile(cfg,a.data,Path(a.output))
         else:sys.exit(train_case(cfg,a.data,Path(a.output)))

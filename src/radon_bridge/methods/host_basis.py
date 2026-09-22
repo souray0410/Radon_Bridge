@@ -2,6 +2,7 @@
 import argparse,json,time
 from pathlib import Path
 import torch
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 from radon_bridge.runtime.artifacts import relocate, sha256
 from radon_bridge.models.model import PilotGraph
 from radon_bridge.data.dataset import PairedDataset
@@ -16,7 +17,7 @@ def main(cfg,out,data):
     from mhd_models.scheduling.gpu_budget import configure_allocator
     configure_allocator(0)
     cfg=relocate(cfg);ref=cfg['host_checkpoint'];assert sha256(ref['path'])==ref['sha256']
-    saved=torch.load(ref['path'],map_location='cpu',weights_only=False);c=relocate(saved['configuration'])
+    saved=read_state(ref['path'],kind='selected');c=relocate(saved['configuration'])
     g=PilotGraph(seed=c['seed'],bridge_configs=c['bridges'],task_fusion=c.get('task_fusion'),device='cuda')
     g.load_complete_state(saved['model']);del saved
     train=PairedDataset(data,'train',224);assert len(train)==1264

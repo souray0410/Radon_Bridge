@@ -1,4 +1,5 @@
 """Locked read-only evaluation. Training entry points retain their test prohibition."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse
 import json
 import os
@@ -40,7 +41,7 @@ def load_model(record):
         g=PilotGraph(seed=record['seed'],bridge_configs=[],device='cuda')
         for branch,ref in record['parent_checkpoints'].items():
             if sha256(ref['path'])!=ref['sha256']:raise ValueError('Parent SHA changed')
-            s=torch.load(resolve(ref['path']),map_location='cpu',weights_only=False)
+            s=read_state(resolve(ref['path']),kind='native_parent')
             if s['branch']!=branch or s['seed']!=record['seed'] or s['training_stage']!='independent':raise ValueError('Parent identity mismatch')
             g.load_native_state(s['model'],branch=branch)
     else:
@@ -48,7 +49,7 @@ def load_model(record):
         if c.get('task_fusion'):raise ValueError('Withdrawn learned fusion is excluded')
         if sha256(record['checkpoint_path'])!=record['checkpoint_sha256']:raise ValueError('Model SHA changed')
         g=PilotGraph(seed=c['seed'],bridge_configs=c['bridges'],device='cuda')
-        s=torch.load(resolve(record['checkpoint_path']),map_location='cpu',weights_only=False)
+        s=read_state(resolve(record['checkpoint_path']),kind='selected')
         g.load_complete_state(s['model'])
     g.graph.eval()
     return g

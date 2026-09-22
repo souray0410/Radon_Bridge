@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse, copy, fcntl, hashlib, json, os, subprocess
 from pathlib import Path
 
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 from radon_bridge.runtime.state import atomic_write_json
 from radon_bridge.studies.cohort_case import sha
 from radon_bridge.studies.cohort_augmentation import migrate
@@ -42,10 +43,10 @@ def _attention_case(core):
 def native_state_identity(trial,cfg):
     """Compare every native tensor represented in the accepted A against original parents."""
     import torch
-    frozen=torch.load(trial/"best.pt",map_location="cpu",weights_only=False)["model"]
+    frozen=read_state(trial/"best.pt",kind="selected",configuration=cfg)["model"]
     rows={}; exact=True
     for branch,ref in cfg["parents"].items():
-        parent=torch.load(ref["path"],map_location="cpu",weights_only=False)["model"]
+        parent=read_state(ref["path"],kind="native_parent")["model"]
         total=changed=0; max_abs=0.0
         for module,state in parent.items():
             if module not in frozen: continue
@@ -98,15 +99,8 @@ def prepare(core_root, output, sequence_id, source_commit, framework_commit, sou
 
 
 def _gpu_lock():
-    import psutil
-    if psutil.virtual_memory().available < .15*psutil.virtual_memory().total: raise MemoryError("Host reserve below 15 percent")
-    device=os.environ.get("CUDA_VISIBLE_DEVICES")
-    if not device or "," in device: raise ValueError("One explicit CUDA device required")
-    used,total=map(int,subprocess.check_output(["nvidia-smi","-i",device,"--query-gpu=memory.used,memory.total","--format=csv,noheader,nounits"],text=True).strip().split(","))
-    if total-used < 20*1024: raise MemoryError("Need 10GiB worker plus 10GiB reserve")
-    uuid=subprocess.check_output(["nvidia-smi","-i",device,"--query-gpu=uuid","--format=csv,noheader"],text=True).strip()
-    root=Path(os.environ["RESEARCH_GPU_LOCK_ROOT"]);root.mkdir(parents=True,exist_ok=True)
-    handle=(root/(uuid+".lock")).open("a");fcntl.flock(handle,fcntl.LOCK_EX|fcntl.LOCK_NB);return handle
+    from radon_bridge.runtime.exclusive_gpu import acquire
+    return acquire()
 
 
 def fit_basis(root):

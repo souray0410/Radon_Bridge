@@ -3,6 +3,7 @@
 Participant-indexed files stay in the authorized run directory. The public
 report contains only aggregate statistics and hashes, never cached features.
 """
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse,hashlib,json,os,subprocess,time
 from pathlib import Path
 import numpy as np
@@ -137,7 +138,7 @@ def main(cfg,out,data_path):
     configure_allocator(0)
     out=Path(out);out.mkdir(parents=True,exist_ok=True);assert not (out/'summary.json').exists()
     trial=Path(cfg['trial_directory']);config=json.loads((trial/'configuration.json').read_text());checkpoint=trial/cfg.get('selected_file','selected.pt');assert file_sha(checkpoint)==cfg['selected_sha256']
-    g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda');saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+    g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda');saved=read_state(checkpoint,kind='selected')
     assert set(saved['model'])==set(g.modules_by_name())
     for key,module in g.modules_by_name().items():module.load_state_dict(saved['model'][key],strict=True)
     del saved

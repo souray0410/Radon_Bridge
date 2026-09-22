@@ -1,4 +1,5 @@
 """Full-forward depth interventions and layer-specific train diagnostics."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse,contextlib,itertools,json,time
 from pathlib import Path
 import numpy as np
@@ -28,7 +29,7 @@ def depth_switch(g,enabled):
 def load_parents(g,c):
     for branch,ref in c['parent_checkpoints'].items():
         assert sha256(ref['path'])==ref['sha256']
-        saved=torch.load(ref['path'],map_location='cpu',weights_only=False)
+        saved=read_state(ref['path'],kind='native_parent')
         g.load_native_state(saved['model'],branch)
 
 def main(cfg,out,data_path):
@@ -39,7 +40,7 @@ def main(cfg,out,data_path):
     from mhd_models.scheduling.gpu_budget import configure_allocator
     configure_allocator(0)
     cfg=relocate(cfg);ref=cfg['checkpoint'];assert sha256(ref['path'])==ref['sha256']
-    saved=torch.load(ref['path'],map_location='cpu',weights_only=False);c=relocate(saved['configuration'])
+    saved=read_state(ref['path'],kind='selected');c=relocate(saved['configuration'])
     assert not c.get('task_fusion') and c['training_stage']=='communication'
     assert all(b['compression']=='fixed_svd_channel' and b['mode'] in ('radon','linear_resample') for b in c['bridges'])
     preflight=cfg.get('preflight',False);train=PairedDataset(data_path,'train',224)

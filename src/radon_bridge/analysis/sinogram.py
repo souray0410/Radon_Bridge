@@ -1,4 +1,5 @@
 """Read-only latent Radon atlas; individual examples stay in restricted storage."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse
 import json
 import os
@@ -141,7 +142,7 @@ def attach_collectors(g,agg,context,private):
 def initialize_reference(g,record):
     for branch,ref in record['configuration']['parent_checkpoints'].items():
         if sha256(ref['path'])!=ref['sha256']:raise ValueError('Parent checkpoint changed')
-        state=torch.load(resolve(ref['path']),map_location='cpu',weights_only=False)
+        state=read_state(resolve(ref['path']),kind='native_parent')
         g.load_native_state(state['model'],branch=branch)
     with torch.no_grad():
         for group in g.communication_groups:g.modules_by_name()[group['exchange_edge_name']].mixer.conv.weight.zero_()

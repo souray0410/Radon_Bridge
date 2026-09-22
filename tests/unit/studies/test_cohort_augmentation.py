@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import pytest
 import torch
+from radon_bridge.runtime.pilot_checkpoint import save as save_state
 from radon_bridge.studies.cohort_augmentation import migrate,load_host
 from radon_bridge.studies.cohort_case import sha
 
@@ -9,7 +10,7 @@ from radon_bridge.studies.cohort_case import sha
 def test_migration_and_exact_host_identity(tmp_path):
     src=tmp_path/'old';src.mkdir()
     cfg=dict(seed=3416,parents={'cfp':{'sha256':'a'},'oct':{'sha256':'b'}},bridges=[dict(family='mmtm',nodes=['cfp_stage3','oct_stage3'])])
-    torch.save(dict(configuration=cfg,model={'native':{'x':torch.ones(1)}}),src/'best.pt')
+    save_state(dict(configuration=cfg,model={'native':{'x':torch.ones(1)}}),src/'best.pt',kind='selected')
     (src/'selected_predictions.npz').write_bytes(b'fixture')
     (src/'accepted.json').write_text(json.dumps(dict(converged_by_policy=True,test_used=False,configuration=cfg,best_epoch=0,files={n:sha(src/n) for n in ('best.pt','selected_predictions.npz')})))
     dest=tmp_path/'canonical';migrate(src,dest)

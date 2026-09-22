@@ -1,4 +1,5 @@
 """Training-only, uncentered channel SVD bases, fitted once and then frozen."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 from functools import lru_cache
 import hashlib
 import json
@@ -231,7 +232,7 @@ def fit_training_bases(config, output, data):
     seed=config['seed'];g=PilotGraph(seed=seed,device='cuda');g.graph.eval()
     for branch,parent in config['parent_checkpoints'].items():
         assert file_sha(parent['path'])==parent['sha256']
-        saved=torch.load(parent['path'],map_location='cpu',weights_only=False)
+        saved=read_state(parent['path'],kind='native_parent')
         assert saved['branch']==branch and saved['seed']==seed and saved['training_stage']=='independent' and saved['stop_reason']=='validation_plateau'
         g.load_native_state(saved['model'],branch)
     assert set(config['parent_checkpoints'])=={'cfp','oct'}

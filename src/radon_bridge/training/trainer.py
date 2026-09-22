@@ -10,6 +10,7 @@ import traceback
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+from radon_bridge.runtime.pilot_checkpoint import read as read_state, save as save_state
 from radon_bridge.data.dataset import PairedDataset
 from radon_bridge.evaluation.metrics import classification_metrics
 from radon_bridge.models.model import PilotGraph
@@ -126,7 +127,7 @@ def main(args):
                 checkpoint=Path(parent['path'])
                 if hashlib.sha256(checkpoint.read_bytes()).hexdigest()!=parent['sha256']:
                     raise ValueError('Parent checkpoint hash mismatch')
-                saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+                saved=read_state(checkpoint,kind='native_parent')
                 if saved.get('branch')!=branch or saved.get('training_stage')!='independent' or saved.get('seed')!=seed or saved.get('stop_reason')!='validation_plateau':
                     raise ValueError('Not a matching independently trained modality checkpoint')
                 g.load_native_state(saved['model'],branch=branch)
@@ -135,7 +136,7 @@ def main(args):
             from radon_bridge.runtime.artifacts import sha256
             parent=cfg['host_checkpoint']; checkpoint=Path(parent['path'])
             if sha256(checkpoint)!=parent['sha256']: raise ValueError('Host checkpoint SHA mismatch')
-            saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+            saved=read_state(checkpoint,kind='selected')
             original=saved['configuration']
             for key in ('seed','backbone_lr','task_fusion','selection_metric'):
                 if original.get(key)!=cfg.get(key): raise ValueError('Host protocol mismatch: '+key)
@@ -208,7 +209,7 @@ def main(args):
                     'peak_allocated_mib':torch.cuda.max_memory_allocated()/1024**2,
                     'peak_reserved_mib':torch.cuda.max_memory_reserved()/1024**2,'passed':True,'nested_rhos':list(widths(g)) if widths(g) else None}
             if cfg.get('save_profile_checkpoint'):
-                torch.save({'model':g.save_state(),'configuration':cfg},out/'profile_selected.pt')
+                save_state({'model':g.save_state(),'configuration':cfg}, out/'profile_selected.pt', kind='selected')
                 if widths(g):
                     from radon_bridge.evaluation.export import export_widths
                     exports=export_widths(g.save_state(),cfg,out)
@@ -298,8 +299,8 @@ def main(args):
         train_final=evaluate(g,train,batch,seed,stop=lambda:stop_requested)
         if stop_requested: raise InterruptedError('Trial stopped before checkpoint')
         # Preserve stopping-point state separately from selected development checkpoint.
-        torch.save({'model':g.save_state(),'optimizer':opt.state_dict(),'configuration':cfg,'epoch':epoch,
-                    'stop_reason':'validation_plateau' if converged else 'epoch_cap'},out/'last.pt')
+        save_state({'model':g.save_state(),'optimizer':opt.state_dict(),'configuration':cfg,'epoch':epoch,
+                    'stop_reason':'validation_plateau' if converged else 'epoch_cap'}, out/'last.pt', kind='stopping')
         if independent:
             for branch in g.branches:g.load_native_state(selected_states[branch],branch)
         else:
@@ -307,7 +308,7 @@ def main(args):
         selected=evaluate(g,val,batch,seed,out/'selected_predictions.npz',stop=lambda:stop_requested)
         state=g.save_state()
         if frozen:assert parameter_hash(g)==initial_hash,'Selected frozen native state changed'
-        torch.save({'model':state,'configuration':cfg,'selection':{k:m.state() for k,m in monitors.items()}},out/'selected.pt')
+        save_state({'model':state,'configuration':cfg,'selection':{k:m.state() for k,m in monitors.items()}}, out/'selected.pt', kind='selected')
         modality_checkpoints={}
         if widths(g):
             from radon_bridge.evaluation.export import export_widths
@@ -315,10 +316,10 @@ def main(args):
         if independent and converged:
             for branch in g.branches:
                 path=out/(branch+'.pt')
-                torch.save({'model':{k:v for k,v in state.items() if k.startswith(branch+'_')},
+                save_state({'model':{k:v for k,v in state.items() if k.startswith(branch+'_')},
                             'branch':branch,'training_stage':'independent','seed':seed,
                             'epoch':monitors[branch].best_epoch,'stop_reason':'validation_plateau',
-                            'source_commit':cfg.get('source_commit')},path)
+                            'source_commit':cfg.get('source_commit')}, path, kind='native_parent')
                 modality_checkpoints[branch]={'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
         report={'state':'complete' if converged else 'incomplete','stop_reason':'validation_plateau' if converged else 'epoch_cap',
                 'converged_by_policy':converged,'epochs_ran':epoch,'epoch_seconds':epoch_times,
@@ -335,7 +336,7 @@ def main(args):
     except Exception as exc:
         oom=isinstance(exc,torch.cuda.OutOfMemoryError)
         if g is not None and opt is not None and not cfg.get('profile'):
-            try:torch.save({'model':g.save_state(),'optimizer':opt.state_dict(),'epoch':epoch,'incomplete':True,'configuration':cfg},out/'interrupted.pt')
+            try:save_state({'model':g.save_state(),'optimizer':opt.state_dict(),'epoch':epoch,'incomplete':True,'configuration':cfg}, out/'interrupted.pt', kind='interrupted')
             except Exception:pass
         write_json(out/'failure.json',{'state':'oom' if oom else 'failed','error':traceback.format_exc(),
                                       'epoch':epoch,'seconds':time.monotonic()-start})

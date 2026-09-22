@@ -2,6 +2,7 @@
 import copy,hashlib,json,math,shutil
 from pathlib import Path
 import torch
+from radon_bridge.runtime.pilot_checkpoint import save as save_state
 
 
 def name(rho):return 'rho1_'+str(round(1/rho))
@@ -34,7 +35,7 @@ def export_widths(state,cfg,out,selection=None):
         small['width_training_provenance']={'regime':'joint_nested','training_directory':str(out),'widths':cfg['bridges'][0]['nested_rhos'],
             'selection':'same joint checkpoint for every width; no per-width selection','bn':'shared averaged running updates'}
         write_json(directory/'configuration.json',small)
-        torch.save({'model':width_state(state,cfg,rho),'configuration':small,'selection':selection,'derived_view':True},directory/'selected.pt')
+        save_state({'model':width_state(state,cfg,rho),'configuration':small,'selection':selection,'derived_view':True},directory/'selected.pt',kind='selected')
         for phase in ('initial','selected','last'):
             src=out/(phase+'_predictions_'+name(rho)+'.npz')
             if src.exists():shutil.copyfile(src,directory/(phase+'_predictions.npz'))

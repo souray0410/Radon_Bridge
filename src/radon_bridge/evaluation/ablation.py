@@ -1,4 +1,5 @@
 """Read-only full-MHD component switches; no features or participant IDs exported."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse,contextlib,json,os,time
 from pathlib import Path
 import numpy as np
@@ -50,7 +51,7 @@ def run(cfg,out,data_path):
     from mhd_models.scheduling.gpu_budget import configure_allocator
     configure_allocator(0)
     cfg=relocate(cfg);checkpoint=Path(cfg['checkpoint']['path']);assert sha256(checkpoint)==cfg['checkpoint']['sha256']
-    saved=torch.load(checkpoint,map_location='cpu',weights_only=False);c=saved['configuration']
+    saved=read_state(checkpoint,kind='selected');c=saved['configuration']
     assert c['training_stage']=='host_augmentation' and not c.get('task_fusion') and len(c['bridges'])==2
     g=PilotGraph(bridge_configs=c['bridges'],seed=c['seed'],device='cuda');g.load_complete_state(saved['model'])
     original_ids={key:g.by_name[key].id for key in ('cfp_stage3','oct_stage3')}

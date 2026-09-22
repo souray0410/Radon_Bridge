@@ -1,4 +1,5 @@
 """Read-only, train-only checkpoint diagnostics; never updates an optimizer."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse
 from contextlib import contextmanager
 import hashlib
@@ -173,15 +174,15 @@ def main(cfg,out,data_path):
     g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda',task_fusion=config.get('task_fusion'))
     if config.get('training_stage')=='host_augmentation':
         parent=config['host_checkpoint'];assert file_sha(parent['path'])==parent['sha256']
-        saved=torch.load(parent['path'],map_location='cpu',weights_only=False)
+        saved=read_state(parent['path'],kind='selected')
         g.load_complete_state(saved['model'],allow_new_bridge=len(config['bridges'])==2)
     for branch,parent in ({} if config.get('training_stage')=='host_augmentation' else config['parent_checkpoints']).items():
-        assert file_sha(parent['path'])==parent['sha256'];saved=torch.load(parent['path'],map_location='cpu',weights_only=False);g.load_native_state(saved['model'],branch)
+        assert file_sha(parent['path'])==parent['sha256'];saved=read_state(parent['path'],kind='native_parent');g.load_native_state(saved['model'],branch)
     results={};preflight=cfg.get('preflight',False)
     for phase in ['initial','selected']:
         if phase=='selected':
             checkpoint=trial/cfg.get('selected_file','selected.pt');expected=cfg['selected_sha256'];assert file_sha(checkpoint)==expected
-            saved=torch.load(checkpoint,map_location='cpu',weights_only=False)
+            saved=read_state(checkpoint,kind='selected')
             assert set(saved['model'])==set(g.modules_by_name())
             for key,module in g.modules_by_name().items():module.load_state_dict(saved['model'][key],strict=True)
             del saved

@@ -1,4 +1,5 @@
 """Strict read-only replay on the fixed development cohort. No test entry point."""
+from radon_bridge.runtime.pilot_checkpoint import read as read_state
 import argparse
 import hashlib
 import json
@@ -73,7 +74,7 @@ def run(record, data_root, out):
         for branch, ref in record['parent_checkpoints'].items():
             if sha256(ref['path']) != ref['sha256']:
                 raise ValueError('Parent checkpoint SHA changed')
-            saved = torch.load(resolve(ref['path']), map_location='cpu', weights_only=False)
+            saved = read_state(resolve(ref['path']),kind='native_parent')
             if saved['branch'] != branch or saved['seed'] != seed or saved['training_stage'] != 'independent':
                 raise ValueError('Unexpected independent parent metadata')
             g.load_native_state(saved['model'], branch=branch)
@@ -95,7 +96,7 @@ def run(record, data_root, out):
         if sha256(record['checkpoint_path']) != record['checkpoint_sha256']:
             raise ValueError('Selected checkpoint SHA changed')
         g = PilotGraph(seed=seed, bridge_configs=cfg['bridges'], device='cuda')
-        saved = torch.load(resolve(record['checkpoint_path']), map_location='cpu', weights_only=False)
+        saved = read_state(resolve(record['checkpoint_path']),kind='selected')
         g.load_complete_state(saved['model'])
         del saved
         expected_path = resolve(record['development_prediction_path'])
