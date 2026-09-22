@@ -283,3 +283,5 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 当前包移除两个没有现行调用方、构造接口已失效的历史CLI，原源码由Git/冻结快照保留。普通paired-native宿主加载补齐接受凭证、身份、V5格式和Node校验；不提供V4回退。
 
 追加：CMX宿主1组/加桥3组、通道压缩6组、MMTM加桥3组、分组通信8组亦完成逐文件独立验收。现共30个包内回放条目/60个状态条目，含严格复用的对照，不是30次独立新增实验。v2审计额外从原预测文件独立复核296人输出和分类决定，并绑定当前预测SHA。原native父权重已严格转换，当前普通build入口的完整回放仍在单独验收中。
+
+21个当前父引用修订（含复用条目）已由独立审计接受：新配置经普通V5 build读入转换父权重，选优296人输出、实际resume后两次16人更新、原生PyTorch对照及当前断点下一步精确一致。研究run/case ID保留，配置/资产SHA更新；[凭证](../acceptance/v5_current_references_20260922.json)。此为候选修订接受，未发布V5或切换现有调度；augmentation宿主引用、其余资产、A100和完整项目流程仍开放。

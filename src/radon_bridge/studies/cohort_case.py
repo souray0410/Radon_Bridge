@@ -140,16 +140,17 @@ def grouped_structure_probe(g,cfg):
 
 def profile(cfg,data,out):
     out.mkdir(parents=True,exist_ok=False);configure_device();train,dev=datasets(data)
+    torch.cuda.reset_peak_memory_stats();tick=time.monotonic()
     g,opt=build(cfg);b=next(iter(loader(train,16,cfg['seed'],0)))
     ids={n:g.by_name[n].id for n in ('cfp_stage3','oct_stage3')}
     g.graph.eval()
     with torch.no_grad(): initial,_=g.forward(b[0].cuda(),b[1].cuda(),b[2].cuda());initial={k:v.cpu() for k,v in initial.items()}
-    torch.cuda.reset_peak_memory_stats();tick=time.monotonic()
     physical=[]
     def sample_physical():
         text=subprocess.check_output(['nvidia-smi','--query-compute-apps=pid,used_memory','--format=csv,noheader,nounits'],text=True)
         values=[float(line.split(',')[1].strip())/1024 for line in text.splitlines() if line.split(',')[0].strip()==str(os.getpid())]
         if values:physical.append(max(values))
+    sample_physical()
     for _ in range(5+20):
         update(g,opt,b);sample_physical()
     g.graph.eval()
@@ -162,7 +163,8 @@ def profile(cfg,data,out):
     for node in g.graph.nodes:node.reset()
     opt.zero_grad(set_to_none=True);_,loss=g.native_forward(b[0].cuda(),b[1].cuda(),b[2].cuda());loss.backward()
     for before,p in zip(actual,g.graph.parameters()):
-        if before is not None:torch.testing.assert_close(before,p.grad.cpu(),atol=3e-5,rtol=3e-4)
+        if (before is None)!=(p.grad is None):raise AssertionError('Native gradient participation differs')
+        if before is not None:torch.testing.assert_close(before,p.grad.cpu(),atol=1e-6,rtol=1e-5)
     if cfg['bridges']:
         g.graph.eval();g.forward(b[0][:2].cuda(),b[1][:2].cuda(),b[2][:2].cuda())
         for dst,src in [('cfp','oct'),('oct','cfp')]:
@@ -174,7 +176,7 @@ def profile(cfg,data,out):
                 assert grad.abs().sum()==0
             else:assert grad.abs().sum()>0
     snapshot=dict(model=g.save_state(),optimizer=copy.deepcopy(opt.state_dict()),rng=rng())
-    save_state(snapshot,out/'resume.pt',kind='profile_resume');update(g,opt,b)
+    save_state(snapshot,out/'resume.pt',kind='profile_resume');sample_physical();update(g,opt,b)
     expected=g.save_state();expected_opt=copy.deepcopy(opt.state_dict())
     saved=read_state(out/'resume.pt',kind='profile_resume')
     g.load_complete_state(saved['model']);opt.load_state_dict(saved['optimizer']);restore_rng(saved['rng']);update(g,opt,b)
@@ -187,6 +189,7 @@ def profile(cfg,data,out):
     receipt=dict(passed=True,scope='resource_and_MHD_development_only',test_used=False,
         formal_updates=0,seed=cfg['seed'],configuration=cfg,warmup=5,measured_updates=20,
         checkpoint_update_exact=True,node_ids_preserved=True,autograd_equivalence=True,
+        gradient_rtol=1e-5,gradient_atol=1e-6,allocator_peak_scope='model_build_through_final_evaluation',
         full_development_participants=296,peak_reserved_gib=peak,peak_process_sampled_gib=max(physical) if physical else None,seconds=time.monotonic()-tick,
         bridge_parameters=sum(p.numel() for n,m in g.modules_by_name().items() if n.startswith('bridge_') for p in m.parameters()),
         torch=str(torch.__version__),cuda=torch.version.cuda,device=torch.cuda.get_device_name(0),

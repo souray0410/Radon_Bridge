@@ -1,0 +1,41 @@
+{
+  "schema": "radon_v5_native_parent_replay_v1",
+  "state": "bounded_parent_replay_verified",
+  "parents": {
+    "cfp": {
+      "source_sha256": "d7228d326c3739380eee3d6710c299d6687a6551137033472013b923c13b730e",
+      "target_sha256": "10ed6b8e4a57d5d0697514fd644c63d758e03dca8b094857a963f99e22e2a92c",
+      "conversion_sha256": "e2c132aed5230d64544149728a24e2814472d81c73136ac11e417069629e133a"
+    },
+    "oct": {
+      "source_sha256": "10dca6b8599f1472cf50320e9f0e2dffc3434ccdedc839af82bc7c5d506a54f5",
+      "target_sha256": "efd33e45b1af4cb5af2565f853af5a931bc8cd4871b02e8651cdafcc814ac862",
+      "conversion_sha256": "bd65e1fa89a48575fdf8d2b8d7970865f80a0dee870d1f205204409abc3ab715"
+    }
+  },
+  "source_project_commit": "c08f92259f8a1b682935e8e0e1d14d2479a36bb6",
+  "source_framework_commit": "8f6651ce9af96f54585bf32bbfd70afe0315867d",
+  "current_project_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10",
+  "current_framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+  "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+  "selected_development": 296,
+  "continued_updates": 2,
+  "optimizer_initialization": "new_diagnostic_from_selected_parents",
+  "historical_resume": false,
+  "normal_v5_build_checked": true,
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "production_cutover": false,
+  "test_access": false,
+  "prediction_sha256": {
+    "reference": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906",
+    "check": "2858f087207b5105660c0c821acd6fae7bccfb1ad4c2bc220999c0127e698906"
+  },
+  "receipts": {
+    "reference": "b9116d7a790146d7522db1ada270515753b449c363df243952ce942d072d9206",
+    "check": "caaad564020807c3fdf36cc8862ecdc4206627470f26aab4e199dc91f9ddac55"
+  },
+  "preparation_sha256": "8a78dc4dcc38bbcdfcc40b80fd4a26642daee81ac6fd0e2049eb54033bd4bc63",
+  "audit_script_sha256": "96cbf7f78e1fb2517eca962c566fb7a4492b4b64caa1beff8284a227012f4c82",
+  "verified_at": 1790101087.9149673
+}
