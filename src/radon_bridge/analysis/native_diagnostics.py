@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import DataLoader,Subset
 from radon_bridge.data.observed_pair import collate_observed
 from radon_bridge.evaluation.paired_native import move,evaluate
-from radon_bridge.runtime.host_checkpoint import capture_rng,restore_rng,cpu_tree
+from radon_bridge.runtime.host_checkpoint import capture_rng,restore_rng,cpu_tree,read_selected
 from radon_bridge.runtime.state import atomic_write_json,file_sha256,stable_hash
 from radon_bridge.studies.project_build import build
 
@@ -118,7 +118,12 @@ def diagnose(spec,root,parents,shapes,bases,train,dev,device,paused,*,arm_ids=No
         active=bases
         if arm.get('host'):active=json.loads((root/'host_bases'/arm['host']/'accepted.json').read_text())['bases']
         model=build(parents,shapes,arm,active,spec['seed'],device)
-        model.load_state_dict(torch.load(root/'arms'/name/'best.pt',map_location='cpu',weights_only=False)['model'],strict=True)
+        arm_identity=stable_hash(dict(case=stable_hash(spec),arm=arm,bases=active,
+            host_best_sha256=file_sha256(root/'arms'/arm['host']/'best.pt') if arm.get('host') else None))
+        from radon_bridge.studies.project_case import verify_arm
+        verify_arm(root/'arms'/name,arm_identity)
+        selected_state=read_selected(root/'arms'/name/'best.pt',identity=arm_identity,node_ids=model.node_identity())
+        model.load_state_dict(selected_state['model'],strict=True)
         model.eval();before=tensor_state(model);rng=capture_rng()
         exchanges={k:m for k,m in model.task.modules_by_name().items() if k.endswith('_exchange')}
         sums={k:[0.,0.,0.,0.] for k in exchanges};energies={k:[0.,0.,0.,0.] for k in exchanges}

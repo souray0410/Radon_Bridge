@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader,Subset
 from radon_bridge.data.observed_pair import collate_observed
 from radon_bridge.evaluation.paired_native import evaluate,move,replay_matches
-from radon_bridge.runtime.host_checkpoint import save,load,atomic_save,cpu_tree
+from radon_bridge.runtime.host_checkpoint import save,load,atomic_save,cpu_tree,save_selected,read_selected
 from radon_bridge.runtime.state import atomic_write_json,file_sha256
 from radon_bridge.training.convergence import Plateau
 
@@ -59,7 +59,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
     if not (out/'best.pt').exists():
         result=evaluate(model,loader(dev),device,out/'development_predictions.npz',should_pause)
         sch.step(result['mean_macro_f1'],0)
-        atomic_save(out/'best.pt',dict(identity=identity,epoch=0,model=cpu_tree(model.state_dict()),node_ids=nodes));checkpoint()
+        save_selected(out/'best.pt',identity=identity,epoch=0,model=model,node_ids=nodes);checkpoint()
     launch_updates=0
     try:
         while progress['epoch']<=cfg['maximum_epochs']:
@@ -81,7 +81,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
             status('validating');result=evaluate(model,loader(dev),device,out/'candidate_predictions.npz',should_pause)
             decision=sch.step(result['mean_macro_f1'],epoch)
             if decision['improved']:
-                atomic_save(out/'best.pt',dict(identity=identity,epoch=epoch,model=cpu_tree(model.state_dict()),node_ids=nodes))
+                save_selected(out/'best.pt',identity=identity,epoch=epoch,model=model,node_ids=nodes)
                 (out/'candidate_predictions.npz').replace(out/'development_predictions.npz')
             progress['history'].append(dict(epoch=epoch,loss=progress['epoch_loss']/progress['epoch_seen'],metrics=result,plateau=sch.rule.state()))
             progress.update(epoch=epoch+1,offset=0,epoch_loss=0.,epoch_seen=0)
@@ -90,7 +90,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
         checkpoint();status('paused');return {'state':'paused'}
     if sch.rule.bad<cfg['patience']:
         status('needs_review_epoch_cap');return {'state':'needs_review_epoch_cap'}
-    state=torch.load(out/'best.pt',map_location='cpu',weights_only=False)
+    state=read_selected(out/'best.pt',identity=identity,node_ids=nodes)
     if state['identity']!=identity or state['node_ids']!=nodes:raise ValueError('Selected identity changed')
     model.load_state_dict(state['model'],strict=True);model.eval();check_frozen()
     result=evaluate(model,loader(dev),device,out/'replay_predictions.npz',should_pause)
