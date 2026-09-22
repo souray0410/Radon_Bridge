@@ -38,7 +38,7 @@ def permutations(dataset,out):
 
 
 def paired_messages(model,dev,out,device,paused):
-    from expanded.native import metrics
+    from mhd_models.workflows.native import metrics
     from radon_bridge.analysis.communication import block_messages
     ex=model.task.modules_by_name()['bridge_0_exchange']
     if not hasattr(ex,'channel_bases') or len(ex.keys)!=2:raise ValueError('Paired diagnostic requires fixed channel bridge')

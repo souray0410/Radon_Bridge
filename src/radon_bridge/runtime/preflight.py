@@ -30,7 +30,7 @@ def main():
             from radon_bridge.models.graph import MHDBuilder
             report['torch'] = torch.__version__
             report['torch_cuda_build'] = torch.version.cuda
-            report['framework_api'] = 'V4'
+            report['framework_api'] = 'V5'
             checks['framework_import'] = True
         except Exception as e:
             checks['framework_import'] = False

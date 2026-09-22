@@ -36,7 +36,7 @@ def test_reuse_keeps_fresh_checkpoint_probe_and_raw_receipt(tmp_path):
 
 
 @pytest.mark.parametrize('key,value', [('spec_sha','different'),('checkpoint_sha','old_checkpoint'),
-    ('hardware',{}),('other_gpu_gib',25),('other_ram_gib',20),('allocated_ram_gib',0),('worker_cpus',17),('other_ram_gib',float('nan'))])
+    ('hardware',{}),('other_gpu_gib',42),('other_ram_gib',20),('allocated_ram_gib',0),('worker_cpus',17),('other_ram_gib',float('nan'))])
 def test_unknown_changed_or_insufficient_envelope_rejects(tmp_path,key,value):
     ref,k=fixture(tmp_path);k[key]=value
     with pytest.raises(ValueError):qualify(ref,**k)

@@ -1,4 +1,4 @@
-"""Reusable MHD V4 execution/checkpoint layer, independent of network architecture.
+"""Reusable MHD V5 execution/checkpoint layer, independent of network architecture.
 
 This delegates to the existing MHD graph. It is not a second autograd engine.
 """

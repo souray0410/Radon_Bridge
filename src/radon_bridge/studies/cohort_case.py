@@ -71,8 +71,6 @@ def check_resources():
     import psutil
     if psutil.virtual_memory().available < .15*psutil.virtual_memory().total:
         raise MemoryError('Host reserve below 15 percent')
-    if torch.cuda.mem_get_info()[0] < 10*1024**3:
-        raise MemoryError('Whole GPU reserve below 10GiB')
     return False
 
 

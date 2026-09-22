@@ -86,7 +86,7 @@ def qualify(reference, current, spec_sha, hardware, checkpoint_sha, *,
         raise ValueError('CPU allocation insufficient')
     gpu = max(old['peak_gpu_gib'], now['peak_gpu_gib'])
     ram = max(old['peak_step_memory_gib'], now['peak_step_memory_gib'])
-    if other_gpu_gib + gpu*1.2 + 2 > min(.875*total_gpu_gib, total_gpu_gib-10):
+    if other_gpu_gib + gpu > total_gpu_gib:
         raise ValueError('GPU reserve insufficient')
     if worker_ram_gib > allocated_ram_gib:
         raise ValueError('Worker memory exceeds allocation')

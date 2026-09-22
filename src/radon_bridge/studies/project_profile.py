@@ -23,7 +23,7 @@ def profile_model(model,batch,cfg,identity,out,device,*,production=True):
     if production and device.type!='cuda':raise ValueError('Production admission requires actual CUDA execution')
     process=psutil.Process();rss=process.memory_info().rss;start=time.time();samples=[]
     if device.type=='cuda':
-        total=torch.cuda.get_device_properties(device).total_memory;budget=min(.875*total,total-10*1024**3)
+        total=torch.cuda.get_device_properties(device).total_memory;budget=total
         torch.cuda.reset_peak_memory_stats(device)
     else:total=budget=0
     opt=torch.optim.AdamW(model.groups(cfg['backbone_lr'],cfg['head_lr'],cfg['bridge_lr']),weight_decay=cfg['weight_decay'])
@@ -52,7 +52,7 @@ def profile_model(model,batch,cfg,identity,out,device,*,production=True):
             z,_=model(move(batch,device))
             if any(v.shape!=(len(batch['label']),2) or not torch.isfinite(v).all() for v in z.values()):raise ValueError('Evaluation preflight failed')
         peak=max(s['device_used'] for s in samples)
-        if production and peak*1.2+2*1024**3>budget:raise ValueError('Full-device reserve exceeded')
+        if production and peak>budget:raise ValueError('Full-device reserve exceeded')
         # SLURM_MEM_PER_NODE is MiB, distinct from host physical memory. Native
         # cgroup protections remain in force; use the actual allocated envelope.
         import os

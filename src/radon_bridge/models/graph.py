@@ -1,4 +1,4 @@
-"""Minimal builder for the pinned MHD V4 node/edge topology, not another backend."""
+"""Minimal builder for the pinned MHD V5 node/edge topology, not another backend."""
 import torch
 from mhd_framework.core import MHD_Node,MHD_Edge,MHD_Topo,MHD_Graph
 
@@ -6,7 +6,7 @@ class MHDBuilder:
     def __init__(self):self.nodes=[];self.edges=[];self.steps=[];self.by_name={};self.level_groups={}
     def node(self,name):
         if name in self.by_name:raise ValueError(name)
-        n=MHD_Node(len(self.nodes),name,MHD_Node.Message(torch.zeros(1)),aggregation="replace")
+        n=MHD_Node(len(self.nodes),name,MHD_Node.Message(torch.zeros(1)),aggregation="sum", memory=False)
         self.nodes.append(n);self.by_name[name]=n;return n.id
     def edge(self,name,fn,heads,tails,level_group=None):
         eid=len(self.edges);self.edges.append(MHD_Edge(eid,name,[MHD_Edge.Operation(fn)]));self.steps.append((eid,heads,tails));self.level_groups[eid]=level_group

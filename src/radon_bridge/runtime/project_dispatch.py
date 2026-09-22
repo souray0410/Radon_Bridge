@@ -24,6 +24,10 @@ def read(path,default=None):
 
 
 def source_binding(spec,config):
+    if 'workflows/native.py' not in spec.get('trainer_source_sha256',{}):
+        raise ValueError('Current package native source required')
+    if spec.get('framework',{}).get('api')!='V5':
+        raise ValueError('Current V5 specification required; convert historical runs explicitly')
     framework = config['framework_pythonpaths'][spec['framework']['commit']]
     if any(not (Path(framework)/'mhd_framework'/name).is_file() or
            file_sha256(Path(framework)/'mhd_framework'/name)!=digest
@@ -32,7 +36,7 @@ def source_binding(spec,config):
     for source in config['native_sources']:
         if all((Path(source)/name).is_file() and file_sha256(Path(source)/name)==digest
                for name,digest in spec['trainer_source_sha256'].items()):
-            return dict(source=source,pythonpath=source+':'+framework+':'+config['dependency_pythonpath'])
+            return dict(source=source,pythonpath=str(Path(source).parent)+':'+framework+':'+config['dependency_pythonpath'])
     raise ValueError('No immutable source matches the selected native specification')
 
 
@@ -71,14 +75,18 @@ def work(config):
     return sorted(result,key=lambda t:(t['execution']=='native',t.get('priority',0)))
 
 
-def eligible(task,claims):
+def eligible(task,claims,*,reservation_token=None):
     state=read(claims.path(task['run_dir']));status=read(Path(task['run_dir'])/'status.json')
-    if state.get('state') in ('claimed','running','failed','completed','liveness_needs_review'):return False
-    if status.get('state') in ('needs_review','needs_review_epoch_cap','failed'):return False
+    if reservation_token is not None:
+        if state.get('state')!='claimed' or any(state.get(k)!=reservation_token.get(k)
+                for k in ('owner','generation','spec_sha256','job_id')):
+            raise RuntimeError('Priority reservation ownership changed')
+    elif state.get('state') in ('claimed','running','failed','completed','liveness_needs_review'):return False
+    if status.get('state') in ('needs_review','needs_review_epoch_cap','failed','completed'):return False
     if (Path(task['run_dir'])/'accepted.json').exists():
         spec=read(task['spec'])
         if task['execution']=='native':
-            from runtime.training_state import verify_completion
+            from mhd_models.runtime.training_state import verify_completion
             verify_completion(task['run_dir'],spec)
         elif task['execution']=='radon_unit':
             from radon_bridge.studies.project_units import verify_unit
@@ -134,10 +142,7 @@ def admissible_work(config,claims,reservation=None):
     for task in work(config):
         reserved=reservation is not None and task['run_dir']==reservation[0]['run_dir']
         if reserved:
-            current=read(claims.path(task['run_dir']));token=reservation[1]
-            if current.get('state')!='claimed' or any(current.get(k)!=token.get(k)
-                    for k in ('owner','generation','spec_sha256','job_id')):
-                raise RuntimeError('Priority reservation ownership changed')
+            if not eligible(task,claims,reservation_token=reservation[1]):continue
         elif not eligible(task,claims):continue
         try:hold=resource_wait(task,config)
         except (OSError,ValueError,KeyError) as error:
@@ -153,7 +158,7 @@ def admissible_work(config,claims,reservation=None):
 
 def reserve_priority(qualified, claims, owner, job, native):
     """Claim before pausing; a failed handover leaves native work untouched."""
-    from scheduling.project_priority import request_pause,sha
+    from mhd_models.scheduling.project_priority import request_pause,sha
     target,profile,identity,root=qualified
     token=claims.acquire(target['run_dir'],target['spec_sha256'],owner,job)
     receipt=None
@@ -184,8 +189,8 @@ def failed_before_submission(record):
 
 
 def reconcile_expired(config):
-    from scheduling.policy import Claims
-    from scheduling.quota_guard import snapshot
+    from mhd_models.scheduling.policy import Claims
+    from mhd_models.scheduling.quota_guard import snapshot
     claims=Claims(config['claims']);snap=snapshot();events=[]
     for task in work(config):
         run=Path(task['run_dir']);record=read(claims.path(run))
@@ -215,9 +220,9 @@ def reconcile_expired(config):
     return events
 
 def submit_one(config,path,journal):
-    from scheduling.quota_guard import snapshot
-    from scheduling.renewal import job_from_log
-    from scheduling.policy import Claims
+    from mhd_models.scheduling.quota_guard import snapshot
+    from mhd_models.scheduling.renewal import job_from_log
+    from mhd_models.scheduling.policy import Claims
     claims=Claims(config['claims'])
     candidates=admissible_work(config,claims)
     if not candidates:return 'waiting_dependencies'
@@ -239,7 +244,7 @@ def submit_one(config,path,journal):
                 if any(not str(r.get('job_id','')).isdigit() and not failed_before_submission(r) for r in value['requests']):
                     return 'prior_submission_identity_needs_review'
         active=sum(str(e['job_id']) in snap['jobs'] for e in journal['requests'])
-        from scheduling.project_priority import project_limit
+        from mhd_models.scheduling.project_priority import project_limit
         maximum=project_limit(config,config['maximum_workflow_allocations'],'Radon_Bridge')
         if active>=maximum:return 'workflow_allocations_active'
         if snap['total_gpus']>=snap['limit']:return 'waiting_account_capacity'
@@ -274,7 +279,7 @@ def daemon(config_path):
         while not (out/'stop.json').exists():
             try:
                 if config.get('session_guard_receipts'):
-                    from scheduling.project_priority import verify_session_guards
+                    from mhd_models.scheduling.project_priority import verify_session_guards
                     verify_session_guards(config)
                 reconcile_expired(config)
                 state=submit_one(config,config_path,journal);error=None
@@ -305,8 +310,8 @@ def worker_memory_gib(config):
 
 def gpu_owner(config_path):
     import torch
-    from scheduling.policy import Claims
-    from scheduling.slurm_liveness import step_presence
+    from mhd_models.scheduling.policy import Claims
+    from mhd_models.scheduling.slurm_liveness import step_presence
     config=read(config_path);job=os.environ['SLURM_JOB_ID'];end=float(os.environ['RADON_ALLOCATION_END'])
     if torch.cuda.device_count()!=1 or torch.cuda.get_device_properties(0).total_memory<78*1024**3:raise ValueError('A10080 single-device binding required')
     root=Path(config['output'])/job;root.mkdir(exist_ok=True);claims=Claims(config['claims']);owner='radon-workflow-'+job
@@ -334,12 +339,18 @@ def gpu_owner(config_path):
             '--config',str(config_path),'--execute',task['spec'],'--run',str(run),
             '--kind',task['execution'],'--record',str(record)]
         (run/'pause.json').unlink(missing_ok=True)
-        with (attempt/'worker.log').open('x') as log:
-            child=subprocess.Popen(command,env=environment,stdout=log,stderr=subprocess.STDOUT)
+        try:
+            with (attempt/'worker.log').open('x') as log:
+                child=subprocess.Popen(command,env=environment,stdout=log,stderr=subprocess.STDOUT)
+        except OSError as error:
+            claims.release(run,owner,'failed',step_dead=True)
+            atomic_write_json(dict(reason='worker_launch_failed',run=str(run),error=repr(error),
+                time=time.time()),attempt/'failure.json')
+            continue
         step=None
         priority=None
         if config.get('project_priority_enabled'):
-            from scheduling.project_priority import PriorityProbe
+            from mhd_models.scheduling.project_priority import PriorityProbe
             priority=PriorityProbe(config_path,config,job,attempt,task,'radon_bridge')
         while child.poll() is None:
             r=read(record)
@@ -371,7 +382,7 @@ def gpu_owner(config_path):
         state=read(run/'status.json').get('state')
         if state=='completed':
             if task['execution']=='native':
-                from runtime.training_state import verify_completion
+                from mhd_models.runtime.training_state import verify_completion
                 verify_completion(run,spec)
             elif task['execution']=='radon_unit':
                 from radon_bridge.studies.project_units import verify_unit
@@ -416,7 +427,7 @@ def execute_work(config_path,spec_path,run,kind,record):
         checkpoint_sha=file_sha256(checkpoint) if checkpoint.exists() else None
         if checkpoint.exists(): command.extend(['--checkpoint',str(checkpoint)])
         subprocess.run(command,env=environment,check=True)
-        from scheduling.prepared_owner import complete_profile
+        from mhd_models.scheduling.prepared_owner import complete_profile
         receipt=read(profile_root/'accepted.json')
         if reuse:
             if (file_sha256(checkpoint) if checkpoint.exists() else None)!=checkpoint_sha:
@@ -431,8 +442,8 @@ def execute_work(config_path,spec_path,run,kind,record):
             canonical.parent.mkdir(parents=True,exist_ok=True)
             atomic_write_json(reference,canonical)
         # A single exclusive workflow worker; the remaining allocation RAM is reserved.
-        if receipt.get('peak_gpu_gib',float('inf'))*1.2+2>70:raise ValueError('Native GPU reserve failed')
-        command=[config['python'],'-m','expanded.native','--spec',str(spec_path),'--output',str(run),'--mode','train']
+        if receipt.get('peak_gpu_gib',float('inf'))>torch.cuda.get_device_properties(0).total_memory/1024**3:raise ValueError('Native GPU reserve failed')
+        command=[config['python'],'-m','mhd_models.workflows.native','--spec',str(spec_path),'--output',str(run),'--mode','train']
         os.execvpe(config['python'],command,environment)
     elif kind=='radon_unit':
         from radon_bridge.studies.project_units import load_unit,execute
@@ -446,7 +457,8 @@ def execute_work(config_path,spec_path,run,kind,record):
             if receipt.get('status')!='accepted' or receipt.get('case_identity')!=stable_hash(case):
                 raise ValueError('Project unit resource receipt mismatch')
         total=torch.cuda.get_device_properties(0).total_memory
-        torch.cuda.set_per_process_memory_fraction((min(.875*total,total-10*1024**3)-2*1024**3)/total)
+        from mhd_models.scheduling.gpu_budget import configure_allocator
+        configure_allocator()
         execute(spec,run)
     else:
         # Profiling runs in a subprocess so its optimizer, CUDA cache and limits
@@ -457,7 +469,8 @@ def execute_work(config_path,spec_path,run,kind,record):
         if receipt.get('status')!='accepted' or receipt.get('case_identity')!=stable_hash(spec):raise ValueError('Project resource receipt mismatch')
         from radon_bridge.studies.project_case import execute
         total=torch.cuda.get_device_properties(0).total_memory
-        torch.cuda.set_per_process_memory_fraction((min(.875*total,total-10*1024**3)-2*1024**3)/total)
+        from mhd_models.scheduling.gpu_budget import configure_allocator
+        configure_allocator()
         execute(spec,run)
 
 
@@ -473,14 +486,16 @@ def standby(config_path):
 
 
 def configure_control_imports(config):
-    # Add only new management modules; keep expanded.native and scientific data
-    # adapters bound to the existing immutable dependency source.
+    if config.get('legacy_project_pythonpath'):
+        raise ValueError('Historical execution settings require independent migration')
     if config.get('control_source'):
-        import scheduling
-        control=str(Path(config['control_source'])/'scheduling')
-        for row in config.get('control_source_pins',[]):
-            if file_sha256(Path(row['path']))!=row['sha256']:raise ValueError('Management snapshot changed')
-        if control not in scheduling.__path__:scheduling.__path__.append(control)
+        import mhd_models.scheduling as scheduling
+        expected=Path(config['control_source']).resolve()/'scheduling'
+        if Path(scheduling.__file__).resolve().parent!=expected:
+            raise ValueError('Installed current scheduling package differs from control source')
+    for row in config.get('control_source_pins',[]):
+        if file_sha256(Path(row['path']))!=row['sha256']:
+            raise ValueError('Management snapshot changed')
 
 
 def main():

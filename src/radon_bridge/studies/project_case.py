@@ -69,15 +69,15 @@ def verify_case(root,spec):
 
 def prepare(spec,out,device,should_pause):
     from mhd_framework.models import create_model
-    from expanded.native import Inputs,collate
+    from mhd_models.workflows.native import Inputs,collate
     validate_spec(spec);parents={};ps={}
     for role in ('cfp','oct'):
         root=Path(spec['parents'][role]['path']);ps[role]=read(root/'spec.json')
-        model=load_selected(root,create_model,device='cpu',allow_inference_equivalence=True)
+        model=load_selected(root,create_model,device='cpu')
         replay=out/'parents'/role/'replay.json'
         if replay.exists():
             r=read(replay)
-            if r['best_sha256']!=file_sha256(root/'best.pt') or r.get('inference_compatibility')!=model.inference_compatibility or r.get('status')!='accepted':raise ValueError('Replay evidence changed')
+            if r['best_sha256']!=file_sha256(root/'best.pt') or r.get('execution_provenance')!=model.execution_provenance or r.get('status')!='accepted':raise ValueError('Replay evidence changed')
         else:
             if should_pause():raise InterruptedError('Pause before parent replay')
             model.to(device)
