@@ -97,6 +97,79 @@ def eligible(task,claims):
     return True
 
 
+def resource_wait(task,config):
+    """Check recorded whole-lifecycle peaks before spending a worker probe."""
+    if task.get('execution')!='native':return None
+    canonical=Path(task['run_dir'])/'resource_qualification/full_reference.json'
+    references=[read(canonical),config.get('native_profile_references',{}).get(task['spec_sha256'])]
+    peaks=[]
+    for reference in references:
+        if not reference:continue
+        path=Path(reference['path'])
+        if file_sha256(path)!=reference['sha256']:
+            raise ValueError('Historical resource receipt changed')
+        row=read(path)
+        import math
+        peak=row.get('peak_step_memory_gib')
+        if (row.get('spec_sha256')!=task['spec_sha256'] or row.get('status')!='accepted'
+                or type(peak) not in (int,float) or not math.isfinite(peak) or peak<=0):
+            raise ValueError('Invalid historical resource identity or peak')
+        peaks.append(peak)
+    if not peaks:return None  # Unknown resources still require the full bounded probe.
+    peak=max(peaks);worker=worker_memory_gib(config)
+    allocation=config.get('allocation_memory_gib',128)
+    other=config.get('other_reserved_memory_gib',2)
+    if (type(allocation) not in (int,float) or type(other) not in (int,float)
+            or not math.isfinite(allocation) or not math.isfinite(other)
+            or allocation<=0 or other<0):raise ValueError('Unknown allocation memory envelope')
+    if peak>worker or other+peak>.85*allocation:
+        return dict(state='waiting_resource_configuration',peak_step_memory_gib=peak,
+                    worker_memory_gib=worker,allocation_memory_gib=allocation,
+                    other_reserved_memory_gib=other,test_access=False)
+    return None
+
+
+def admissible_work(config,claims,reservation=None):
+    candidates=[];waiting=[]
+    for task in work(config):
+        reserved=reservation is not None and task['run_dir']==reservation[0]['run_dir']
+        if reserved:
+            current=read(claims.path(task['run_dir']));token=reservation[1]
+            if current.get('state')!='claimed' or any(current.get(k)!=token.get(k)
+                    for k in ('owner','generation','spec_sha256','job_id')):
+                raise RuntimeError('Priority reservation ownership changed')
+        elif not eligible(task,claims):continue
+        try:hold=resource_wait(task,config)
+        except (OSError,ValueError,KeyError) as error:
+            hold=dict(state='resource_evidence_needs_review',error=repr(error),test_access=False)
+        if hold:
+            waiting.append(dict(run=task['run_dir'],**hold));continue
+        candidates.append(task)
+    if config.get('output'):
+        atomic_write_json(dict(ready=len(candidates),waiting=waiting,updated_at=time.time(),
+                               test_access=False),Path(config['output'])/'resource_admission.json')
+    return candidates
+
+
+def reserve_priority(qualified, claims, owner, job, native):
+    """Claim before pausing; a failed handover leaves native work untouched."""
+    from scheduling.project_priority import request_pause,sha
+    target,profile,identity,root=qualified
+    token=claims.acquire(target['run_dir'],target['spec_sha256'],owner,job)
+    receipt=None
+    try:
+        receipt=request_pause(target,native['run_dir'],profile,sha(profile),identity,root)
+        claims.update(target['run_dir'],owner,priority_handover=receipt,
+                      source_native_run=native['run_dir'])
+    except Exception:
+        claims.release(target['run_dir'],owner,'paused',step_dead=True)
+        pause=Path(native['run_dir'])/'pause.json'
+        if receipt is not None and read(pause)==receipt:
+            pause.unlink(missing_ok=True)
+        raise
+    return target,token,native
+
+
 def allocation_command(config_path,name,python):
     return ['salloc','--account=pi-mengy','--nodes=1','--ntasks=1','--cpus-per-task=16',
         '--mem=128G','--gres=gpu:a100:1','--constraint=gpu_a100','--time=48:00:00',
@@ -146,7 +219,7 @@ def submit_one(config,path,journal):
     from scheduling.renewal import job_from_log
     from scheduling.policy import Claims
     claims=Claims(config['claims'])
-    candidates=[t for t in work(config) if eligible(t,claims)]
+    candidates=admissible_work(config,claims)
     if not candidates:return 'waiting_dependencies'
     lock=Path(config['account_submission_lock'])
     with lock.open('a') as handle:
@@ -237,11 +310,22 @@ def gpu_owner(config_path):
     config=read(config_path);job=os.environ['SLURM_JOB_ID'];end=float(os.environ['RADON_ALLOCATION_END'])
     if torch.cuda.device_count()!=1 or torch.cuda.get_device_properties(0).total_memory<78*1024**3:raise ValueError('A10080 single-device binding required')
     root=Path(config['output'])/job;root.mkdir(exist_ok=True);claims=Claims(config['claims']);owner='radon-workflow-'+job
+    reservation=None;resume_native=None
     while time.time()<end-1800:
-        candidates=[t for t in work(config) if eligible(t,claims)]
+        candidates=admissible_work(config,claims,reservation=reservation)
+        if reservation and not any(t['run_dir']==reservation[0]['run_dir'] for t in candidates):
+            claims.release(reservation[0]['run_dir'],owner,'paused',step_dead=True)
+            resume_native=reservation[2];reservation=None
         if not candidates:break
-        task=candidates[0];run=Path(task['run_dir']);spec=read(task['spec'])
-        try:token=claims.acquire(run,task['spec_sha256'],owner,job)
+        fallback=next((t for t in candidates if resume_native and t['run_dir']==resume_native['run_dir']),None)
+        task=reservation[0] if reservation else fallback or candidates[0]
+        run=Path(task['run_dir']);spec=read(task['spec'])
+        try:
+            if reservation:
+                token=reservation[1];resume_native=reservation[2];reservation=None
+            else:
+                token=claims.acquire(run,task['spec_sha256'],owner,job)
+                if fallback:resume_native=None
         except RuntimeError:continue
         attempt=root/(run.name+'_'+str(token['generation']));attempt.mkdir()
         record=attempt/'step.json';environment=os.environ.copy()
@@ -262,7 +346,10 @@ def gpu_owner(config_path):
             if r.get('step') and step is None:
                 step=r['step'];claims.update(run,owner,state='running',step=step)
             if priority is not None:
-                try:priority.poll([t for t in work(config) if t['execution']!='native' and eligible(t,claims)])
+                try:
+                    qualified=priority.poll([t for t in admissible_work(config,claims) if t['execution']!='native'])
+                    if qualified is not None and reservation is None:
+                        reservation=reserve_priority(qualified,claims,owner,job,task)
                 except Exception as exc:atomic_write_json(dict(state='priority_deferred',error=repr(exc)),attempt/'priority_error.json')
             if time.time()>end-900:
                 atomic_write_json(dict(reason='allocation_expiry_checkpoint'),run/'pause.json')
@@ -270,8 +357,17 @@ def gpu_owner(config_path):
             time.sleep(10)
         if priority is not None:priority.finish()
         # A terminated client is not proof that its remote step is dead.
+        step=step or read(record).get('step')
         if step is None or step_presence(job,step) is not False:
             claims.update(run,owner,state='liveness_needs_review');raise RuntimeError('Cannot prove worker step exit')
+        if child.returncode not in (0,75):
+            claims.release(run,owner,'failed',step_dead=True)
+            atomic_write_json(dict(reason='worker_failed',run=str(run),job=job,step=step,
+                returncode=child.returncode,log=str(attempt/'worker.log'),time=time.time()),attempt/'failure.json')
+            if reservation:
+                claims.release(reservation[0]['run_dir'],owner,'paused',step_dead=True)
+                reservation=None
+            continue
         state=read(run/'status.json').get('state')
         if state=='completed':
             if task['execution']=='native':
@@ -286,6 +382,7 @@ def gpu_owner(config_path):
             claims.release(run,owner,'completed',step_dead=True)
         elif state=='paused':claims.release(run,owner,'paused',step_dead=True)
         else:claims.release(run,owner,'failed',step_dead=True)
+    if reservation:claims.release(reservation[0]['run_dir'],owner,'paused',step_dead=True)
     atomic_write_json(dict(state='owner_finished',updated_at=time.time()),root/'status.json')
 
 

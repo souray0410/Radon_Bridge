@@ -1,12 +1,12 @@
 {
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
-  "goal": "结构化跨来源通信与可迁移专家协作",
+  "goal": "\u7ed3\u6784\u5316\u8de8\u6765\u6e90\u901a\u4fe1\u4e0e\u53ef\u8fc1\u79fb\u4e13\u5bb6\u534f\u4f5c",
   "phase": "eye_stage_one",
-  "next_acceptance": "Ibex canonical32已通过完整预检并正式推进147更新，继续核验训练/断点/资源和最终父模型；未来owner配置修复尚待独立绑定。LOOK融合阶段包已正式派发，两个宿主完成但拟合恢复与精确环境诊断仍未验收。既有WS02六包保持接受，R&B预算匹配、其他宿主及大队列范围保留。",
+  "next_acceptance": "Ibex canonical32\u5df2\u901a\u8fc7\u5b8c\u6574\u9884\u68c0\u5e76\u6b63\u5f0f\u63a8\u8fdb147\u66f4\u65b0\uff0c\u7ee7\u7eed\u6838\u9a8c\u8bad\u7ec3/\u65ad\u70b9/\u8d44\u6e90\u548c\u6700\u7ec8\u7236\u6a21\u578b\uff1b\u672a\u6765owner\u914d\u7f6e\u4fee\u590d\u5c1a\u5f85\u72ec\u7acb\u7ed1\u5b9a\u3002LOOK\u878d\u5408\u9636\u6bb5\u5305\u5df2\u6b63\u5f0f\u6d3e\u53d1\uff0c\u4e24\u4e2a\u5bbf\u4e3b\u5b8c\u6210\u4f46\u62df\u5408\u6062\u590d\u4e0e\u7cbe\u786e\u73af\u5883\u8bca\u65ad\u4ecd\u672a\u9a8c\u6536\u3002\u65e2\u6709WS02\u516d\u5305\u4fdd\u6301\u63a5\u53d7\uff0cR&B\u9884\u7b97\u5339\u914d\u3001\u5176\u4ed6\u5bbf\u4e3b\u53ca\u5927\u961f\u5217\u8303\u56f4\u4fdd\u7559\u3002",
   "dependencies": [
-    "三维父模型",
-    "逐实验臂执行与线性补充验收"
+    "\u4e09\u7ef4\u7236\u6a21\u578b",
+    "\u9010\u5b9e\u9a8c\u81c2\u6267\u884c\u4e0e\u7ebf\u6027\u8865\u5145\u9a8c\u6536"
   ],
   "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
   "evidence_cutoff": "2026-09-18T22:38:30.538052+00:00",
@@ -21,48 +21,49 @@
   },
   "results": [
     {
-      "summary": "小队列1264train/296dev、3416、R18二维/三维完整六臂，全部文件SHA与有序参与者及sklearn F1独立复核通过。分支均值F1：无通信66.0129%、SVD-Radon71.7858%、普通通信67.5262%、自身处理66.0129%、MMTM适配66.0129%、注意力适配66.5317%。Radon−普通通信+4.2596pp，普通95%[0.1673,8.29297]，五项同时95%[-0.4785,8.9978]，后者跨零。非test或多种子结论。",
+      "summary": "\u5c0f\u961f\u52171264train/296dev\u30013416\u3001R18\u4e8c\u7ef4/\u4e09\u7ef4\u5b8c\u6574\u516d\u81c2\uff0c\u5168\u90e8\u6587\u4ef6SHA\u4e0e\u6709\u5e8f\u53c2\u4e0e\u8005\u53casklearn F1\u72ec\u7acb\u590d\u6838\u901a\u8fc7\u3002\u5206\u652f\u5747\u503cF1\uff1a\u65e0\u901a\u4fe166.0129%\u3001SVD-Radon71.7858%\u3001\u666e\u901a\u901a\u4fe167.5262%\u3001\u81ea\u8eab\u5904\u740666.0129%\u3001MMTM\u9002\u914d66.0129%\u3001\u6ce8\u610f\u529b\u9002\u914d66.5317%\u3002Radon\u2212\u666e\u901a\u901a\u4fe1+4.2596pp\uff0c\u666e\u901a95%[0.1673,8.29297]\uff0c\u4e94\u9879\u540c\u65f695%[-0.4785,8.9978]\uff0c\u540e\u8005\u8de8\u96f6\u3002\u975etest\u6216\u591a\u79cd\u5b50\u7ed3\u8bba\u3002",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     },
     {
-      "summary": "历史小队列全局分解24/24（3416/3417/3418），本次全部科研产物/父权重SHA、有序296人及分支F1重核后补入累计页，非新增训练。三种子均值：SVD69.4681%、无通信65.0211%；分解R256/R512/R1024分别66.2036/67.3709/67.3270%，同R普通通信65.2999/65.7675/66.5128%；几何差值同时区间均跨零。该分解包本身不覆盖分组卷积；grouped现已由独立WS02有限包接受，全部大队列机制仍未由小队列替代。",
+      "summary": "\u5386\u53f2\u5c0f\u961f\u5217\u5168\u5c40\u5206\u89e324/24\uff083416/3417/3418\uff09\uff0c\u672c\u6b21\u5168\u90e8\u79d1\u7814\u4ea7\u7269/\u7236\u6743\u91cdSHA\u3001\u6709\u5e8f296\u4eba\u53ca\u5206\u652fF1\u91cd\u6838\u540e\u8865\u5165\u7d2f\u8ba1\u9875\uff0c\u975e\u65b0\u589e\u8bad\u7ec3\u3002\u4e09\u79cd\u5b50\u5747\u503c\uff1aSVD69.4681%\u3001\u65e0\u901a\u4fe165.0211%\uff1b\u5206\u89e3R256/R512/R1024\u5206\u522b66.2036/67.3709/67.3270%\uff0c\u540cR\u666e\u901a\u901a\u4fe165.2999/65.7675/66.5128%\uff1b\u51e0\u4f55\u5dee\u503c\u540c\u65f6\u533a\u95f4\u5747\u8de8\u96f6\u3002\u8be5\u5206\u89e3\u5305\u672c\u8eab\u4e0d\u8986\u76d6\u5206\u7ec4\u5377\u79ef\uff1bgrouped\u73b0\u5df2\u7531\u72ec\u7acbWS02\u6709\u9650\u5305\u63a5\u53d7\uff0c\u5168\u90e8\u5927\u961f\u5217\u673a\u5236\u4ecd\u672a\u7531\u5c0f\u961f\u5217\u66ff\u4ee3\u3002",
       "scope": "accepted_matched_group",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
     },
     {
-      "summary": "通道压缩六项完整匹配已独立验收：SVD、QR、可学习通道的Radon分支均值F1为71.7858/70.2317/69.5840%，普通通信为67.5262/66.0129/66.0129%；SVD−QR和SVD−可学习通道普通区间跨零，7项同时区间全部跨零。四新执行、两项复用；当前三包去重32次执行，不是全项目完成。",
+      "summary": "\u901a\u9053\u538b\u7f29\u516d\u9879\u5b8c\u6574\u5339\u914d\u5df2\u72ec\u7acb\u9a8c\u6536\uff1aSVD\u3001QR\u3001\u53ef\u5b66\u4e60\u901a\u9053\u7684Radon\u5206\u652f\u5747\u503cF1\u4e3a71.7858/70.2317/69.5840%\uff0c\u666e\u901a\u901a\u4fe1\u4e3a67.5262/66.0129/66.0129%\uff1bSVD\u2212QR\u548cSVD\u2212\u53ef\u5b66\u4e60\u901a\u9053\u666e\u901a\u533a\u95f4\u8de8\u96f6\uff0c7\u9879\u540c\u65f6\u533a\u95f4\u5168\u90e8\u8de8\u96f6\u3002\u56db\u65b0\u6267\u884c\u3001\u4e24\u9879\u590d\u7528\uff1b\u5f53\u524d\u4e09\u5305\u53bb\u91cd32\u6b21\u6267\u884c\uff0c\u4e0d\u662f\u5168\u9879\u76ee\u5b8c\u6210\u3002",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/channel_compression/README.md"
     },
     {
-      "summary": "MMTM同宿主加桥三臂3/3完成并独立重核文件SHA、296人顺序及sklearn分支F1：继续训练66.0129%、加Radon70.8636%、加普通通信66.3750%；Radon相对继续+4.8507pp、相对普通+4.4886pp，三项同时95%区间均跨零。CFP/OCT概率损失均变差；宿主第一阶段选中第0轮，仅支持该身份初始化适配的单种子dev探索结论。",
+      "summary": "MMTM\u540c\u5bbf\u4e3b\u52a0\u6865\u4e09\u81c23/3\u5b8c\u6210\u5e76\u72ec\u7acb\u91cd\u6838\u6587\u4ef6SHA\u3001296\u4eba\u987a\u5e8f\u53casklearn\u5206\u652fF1\uff1a\u7ee7\u7eed\u8bad\u7ec366.0129%\u3001\u52a0Radon70.8636%\u3001\u52a0\u666e\u901a\u901a\u4fe166.3750%\uff1bRadon\u76f8\u5bf9\u7ee7\u7eed+4.8507pp\u3001\u76f8\u5bf9\u666e\u901a+4.4886pp\uff0c\u4e09\u9879\u540c\u65f695%\u533a\u95f4\u5747\u8de8\u96f6\u3002CFP/OCT\u6982\u7387\u635f\u5931\u5747\u53d8\u5dee\uff1b\u5bbf\u4e3b\u7b2c\u4e00\u9636\u6bb5\u9009\u4e2d\u7b2c0\u8f6e\uff0c\u4ec5\u652f\u6301\u8be5\u8eab\u4efd\u521d\u59cb\u5316\u9002\u914d\u7684\u5355\u79cd\u5b50dev\u63a2\u7d22\u7ed3\u8bba\u3002",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/augmentation/README.md"
     },
     {
-      "summary": "固定SVD grouped WS02单种子包已由左侧独立接受：G1两项严格复用核心，G2/4/8/16×Radon/普通通信8个新增执行；89个源码文件、54份科研资产、296人有序F1与10,000次五项区间重核通过。Radon−普通点差随G增大在本seed上变小，但五项同时95%全跨0，且G同时降低参数量，不能作为单调拓扑机制证据。",
+      "summary": "\u56fa\u5b9aSVD grouped WS02\u5355\u79cd\u5b50\u5305\u5df2\u7531\u5de6\u4fa7\u72ec\u7acb\u63a5\u53d7\uff1aG1\u4e24\u9879\u4e25\u683c\u590d\u7528\u6838\u5fc3\uff0cG2/4/8/16\u00d7Radon/\u666e\u901a\u901a\u4fe18\u4e2a\u65b0\u589e\u6267\u884c\uff1b89\u4e2a\u6e90\u7801\u6587\u4ef6\u300154\u4efd\u79d1\u7814\u8d44\u4ea7\u3001296\u4eba\u6709\u5e8fF1\u4e0e10,000\u6b21\u4e94\u9879\u533a\u95f4\u91cd\u6838\u901a\u8fc7\u3002Radon\u2212\u666e\u901a\u70b9\u5dee\u968fG\u589e\u5927\u5728\u672cseed\u4e0a\u53d8\u5c0f\uff0c\u4f46\u4e94\u9879\u540c\u65f695%\u5168\u8de80\uff0c\u4e14G\u540c\u65f6\u964d\u4f4e\u53c2\u6570\u91cf\uff0c\u4e0d\u80fd\u4f5c\u4e3a\u5355\u8c03\u62d3\u6251\u673a\u5236\u8bc1\u636e\u3002",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/grouped_linear/README.md"
     },
     {
-      "summary": "centered-SVD WS02单种子包已由左侧独立接受：未中心化Radon/ordinary分支均值F1为71.7858/67.5262%，中心化Radon/ordinary为73.9582/66.0129%。中心化Radon−未中心化Radon+2.1724pp、centered ordinary−uncentered ordinary−1.5132pp，两项普通/三项同时95%均跨0；同centered basis下Radon−ordinary+7.9453pp且三项同时95%[2.8982,12.9923]。centered Radon两分支log-loss变差、AUROC下降，F1与概率质量结论不一致。仅WS02单seed/dev、test未用。",
+      "summary": "centered-SVD WS02\u5355\u79cd\u5b50\u5305\u5df2\u7531\u5de6\u4fa7\u72ec\u7acb\u63a5\u53d7\uff1a\u672a\u4e2d\u5fc3\u5316Radon/ordinary\u5206\u652f\u5747\u503cF1\u4e3a71.7858/67.5262%\uff0c\u4e2d\u5fc3\u5316Radon/ordinary\u4e3a73.9582/66.0129%\u3002\u4e2d\u5fc3\u5316Radon\u2212\u672a\u4e2d\u5fc3\u5316Radon+2.1724pp\u3001centered ordinary\u2212uncentered ordinary\u22121.5132pp\uff0c\u4e24\u9879\u666e\u901a/\u4e09\u9879\u540c\u65f695%\u5747\u8de80\uff1b\u540ccentered basis\u4e0bRadon\u2212ordinary+7.9453pp\u4e14\u4e09\u9879\u540c\u65f695%[2.8982,12.9923]\u3002centered Radon\u4e24\u5206\u652flog-loss\u53d8\u5dee\u3001AUROC\u4e0b\u964d\uff0cF1\u4e0e\u6982\u7387\u8d28\u91cf\u7ed3\u8bba\u4e0d\u4e00\u81f4\u3002\u4ec5WS02\u5355seed/dev\u3001test\u672a\u7528\u3002",
       "scope": "preliminary_single_seed",
       "acceptance_url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/centered_basis/README.md"
     }
   ],
   "limitations": [
-    "309是逻辑位置而不是已完成训练",
-    "三维父模型及逐臂执行等门槛尚未全部关闭",
+    "309\u662f\u903b\u8f91\u4f4d\u7f6e\u800c\u4e0d\u662f\u5df2\u5b8c\u6210\u8bad\u7ec3",
+    "\u4e09\u7ef4\u7236\u6a21\u578b\u53ca\u9010\u81c2\u6267\u884c\u7b49\u95e8\u69db\u5c1a\u672a\u5168\u90e8\u5173\u95ed",
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
-    "本次刷新核验管理实现、节点及计算进程；既有数值结果保留原evidence_cutoff，不作为本次新增结果。",
-    "2026-09-19 canonical32已完整预检并正式训练；父模型最终接受与项目六臂仍未完成。",
-    "本次补刊核验仅ws02历史分解和当前报告覆盖；Ibex运行状态仍以原核验日期为准，不能按本页提交时间刷新。更早历史档案未全量迁移。",
-    "2026-09-18 grouped接受仅限WS02单种子开发集固定SVD包；不代表Ibex、test、无压缩预算匹配或全项目接受。",
-    "2026-09-18 status verification_scope 按共同PHD契约保持枚举 runtime_and_evidence；说明文字不再塞入枚举字段。既有 evidence_cutoff 仍保持原科研截止时间，不因发布清理刷新。",
-    "centered Radon相对未中心化Radon的F1点估计+2.17pp，但普通/三项同时区间均跨0；同时两分支log-loss变差且AUROC下降，不能将中心化概括为稳定或全面更好。",
-    "2026-09-19 centered接受仅限WS02单seed3416开发集basis方向包；不代表Ibex、test、多种子、运行时去均值或全项目接受。",
-    "2026-09-19 centered包使用其真实manager完成时刻作为本status evidence_cutoff；更早已接受包的各自科学截止时间仍保留在对应报告/资产中，不因本次发布重写。"
+    "\u672c\u6b21\u5237\u65b0\u6838\u9a8c\u7ba1\u7406\u5b9e\u73b0\u3001\u8282\u70b9\u53ca\u8ba1\u7b97\u8fdb\u7a0b\uff1b\u65e2\u6709\u6570\u503c\u7ed3\u679c\u4fdd\u7559\u539fevidence_cutoff\uff0c\u4e0d\u4f5c\u4e3a\u672c\u6b21\u65b0\u589e\u7ed3\u679c\u3002",
+    "2026-09-19 canonical32\u5df2\u5b8c\u6574\u9884\u68c0\u5e76\u6b63\u5f0f\u8bad\u7ec3\uff1b\u7236\u6a21\u578b\u6700\u7ec8\u63a5\u53d7\u4e0e\u9879\u76ee\u516d\u81c2\u4ecd\u672a\u5b8c\u6210\u3002",
+    "\u672c\u6b21\u8865\u520a\u6838\u9a8c\u4ec5ws02\u5386\u53f2\u5206\u89e3\u548c\u5f53\u524d\u62a5\u544a\u8986\u76d6\uff1bIbex\u8fd0\u884c\u72b6\u6001\u4ecd\u4ee5\u539f\u6838\u9a8c\u65e5\u671f\u4e3a\u51c6\uff0c\u4e0d\u80fd\u6309\u672c\u9875\u63d0\u4ea4\u65f6\u95f4\u5237\u65b0\u3002\u66f4\u65e9\u5386\u53f2\u6863\u6848\u672a\u5168\u91cf\u8fc1\u79fb\u3002",
+    "2026-09-18 grouped\u63a5\u53d7\u4ec5\u9650WS02\u5355\u79cd\u5b50\u5f00\u53d1\u96c6\u56fa\u5b9aSVD\u5305\uff1b\u4e0d\u4ee3\u8868Ibex\u3001test\u3001\u65e0\u538b\u7f29\u9884\u7b97\u5339\u914d\u6216\u5168\u9879\u76ee\u63a5\u53d7\u3002",
+    "2026-09-18 status verification_scope \u6309\u5171\u540cPHD\u5951\u7ea6\u4fdd\u6301\u679a\u4e3e runtime_and_evidence\uff1b\u8bf4\u660e\u6587\u5b57\u4e0d\u518d\u585e\u5165\u679a\u4e3e\u5b57\u6bb5\u3002\u65e2\u6709 evidence_cutoff \u4ecd\u4fdd\u6301\u539f\u79d1\u7814\u622a\u6b62\u65f6\u95f4\uff0c\u4e0d\u56e0\u53d1\u5e03\u6e05\u7406\u5237\u65b0\u3002",
+    "centered Radon\u76f8\u5bf9\u672a\u4e2d\u5fc3\u5316Radon\u7684F1\u70b9\u4f30\u8ba1+2.17pp\uff0c\u4f46\u666e\u901a/\u4e09\u9879\u540c\u65f6\u533a\u95f4\u5747\u8de80\uff1b\u540c\u65f6\u4e24\u5206\u652flog-loss\u53d8\u5dee\u4e14AUROC\u4e0b\u964d\uff0c\u4e0d\u80fd\u5c06\u4e2d\u5fc3\u5316\u6982\u62ec\u4e3a\u7a33\u5b9a\u6216\u5168\u9762\u66f4\u597d\u3002",
+    "2026-09-19 centered\u63a5\u53d7\u4ec5\u9650WS02\u5355seed3416\u5f00\u53d1\u96c6basis\u65b9\u5411\u5305\uff1b\u4e0d\u4ee3\u8868Ibex\u3001test\u3001\u591a\u79cd\u5b50\u3001\u8fd0\u884c\u65f6\u53bb\u5747\u503c\u6216\u5168\u9879\u76ee\u63a5\u53d7\u3002",
+    "2026-09-19 centered\u5305\u4f7f\u7528\u5176\u771f\u5b9emanager\u5b8c\u6210\u65f6\u523b\u4f5c\u4e3a\u672cstatus evidence_cutoff\uff1b\u66f4\u65e9\u5df2\u63a5\u53d7\u5305\u7684\u5404\u81ea\u79d1\u5b66\u622a\u6b62\u65f6\u95f4\u4ecd\u4fdd\u7559\u5728\u5bf9\u5e94\u62a5\u544a/\u8d44\u4ea7\u4e2d\uff0c\u4e0d\u56e0\u672c\u6b21\u53d1\u5e03\u91cd\u5199\u3002",
+    "V5 rollout candidate repairs are not deployed; framework/asset migration is in progress."
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -74,36 +75,37 @@
     "Corrected modality-specific DenseNet/Swin route lookup and duplicate family counting; 16 isolated Ibex tests passed",
     "Read-only verified all 18 route group keys against live 73-candidate catalog",
     "Healthy LOOK and native scientific snapshots unchanged; no new allocation or test access",
-    "共同采用PHD完整交付优先与真实依赖并行准则；本地和Ibex独立代码测试通过，新队列准备不等于正式派发已验收。",
-    "六臂case拆为9个执行单元，55臂拆为58个；6/55次训练数量不变。核心验收不代表49臂补充完成。85项本地单元测试及15项Ibex针对测试通过。",
-    "修复当前父模型审计忽略registered_groups导致Dense/Swin清单失败；Ibex20项针对测试及真实73候选/18组验收通过（54 accepted，无校验异常）。",
-    "已核验终止的旧profiler导入失败claim恢复到原任务候选池，dispatcher API就绪14→15；仍待实际GPU接续。",
-    "完整资源证据严格身份复用实现完成，强制保留新断点与最大眼数GPU预检；Ibex31项针对及98项完整单元测试通过，生产尚未激活。",
+    "\u5171\u540c\u91c7\u7528PHD\u5b8c\u6574\u4ea4\u4ed8\u4f18\u5148\u4e0e\u771f\u5b9e\u4f9d\u8d56\u5e76\u884c\u51c6\u5219\uff1b\u672c\u5730\u548cIbex\u72ec\u7acb\u4ee3\u7801\u6d4b\u8bd5\u901a\u8fc7\uff0c\u65b0\u961f\u5217\u51c6\u5907\u4e0d\u7b49\u4e8e\u6b63\u5f0f\u6d3e\u53d1\u5df2\u9a8c\u6536\u3002",
+    "\u516d\u81c2case\u62c6\u4e3a9\u4e2a\u6267\u884c\u5355\u5143\uff0c55\u81c2\u62c6\u4e3a58\u4e2a\uff1b6/55\u6b21\u8bad\u7ec3\u6570\u91cf\u4e0d\u53d8\u3002\u6838\u5fc3\u9a8c\u6536\u4e0d\u4ee3\u886849\u81c2\u8865\u5145\u5b8c\u6210\u300285\u9879\u672c\u5730\u5355\u5143\u6d4b\u8bd5\u53ca15\u9879Ibex\u9488\u5bf9\u6d4b\u8bd5\u901a\u8fc7\u3002",
+    "\u4fee\u590d\u5f53\u524d\u7236\u6a21\u578b\u5ba1\u8ba1\u5ffd\u7565registered_groups\u5bfc\u81f4Dense/Swin\u6e05\u5355\u5931\u8d25\uff1bIbex20\u9879\u9488\u5bf9\u6d4b\u8bd5\u53ca\u771f\u5b9e73\u5019\u9009/18\u7ec4\u9a8c\u6536\u901a\u8fc7\uff0854 accepted\uff0c\u65e0\u6821\u9a8c\u5f02\u5e38\uff09\u3002",
+    "\u5df2\u6838\u9a8c\u7ec8\u6b62\u7684\u65e7profiler\u5bfc\u5165\u5931\u8d25claim\u6062\u590d\u5230\u539f\u4efb\u52a1\u5019\u9009\u6c60\uff0cdispatcher API\u5c31\u7eea14\u219215\uff1b\u4ecd\u5f85\u5b9e\u9645GPU\u63a5\u7eed\u3002",
+    "\u5b8c\u6574\u8d44\u6e90\u8bc1\u636e\u4e25\u683c\u8eab\u4efd\u590d\u7528\u5b9e\u73b0\u5b8c\u6210\uff0c\u5f3a\u5236\u4fdd\u7559\u65b0\u65ad\u70b9\u4e0e\u6700\u5927\u773c\u6570GPU\u9884\u68c0\uff1bIbex31\u9879\u9488\u5bf9\u53ca98\u9879\u5b8c\u6574\u5355\u5143\u6d4b\u8bd5\u901a\u8fc7\uff0c\u751f\u4ea7\u5c1a\u672a\u6fc0\u6d3b\u3002",
     "2026-09-17: activated7d1a723 CPU dispatcher and rebound9 unlaunched pending owners; existing healthy GPU steps preserved. Account has3 running+21 pending GPUs at deployment, not24 running GPUs.",
-    "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812→9817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model.",
-    "2026-09-17 17:53UTC：MHD_Models090c906/715866a有限canonical32接续已绑定9旧待批及未来R&B申请，实际CPU/watcher周期通过，原journal SHA不变。现有GPU/128层科学快照未停止；新32正式更新0，完整profile/claim/训练仍获批门控。",
-    "2026-09-18 05:34UTC：旧DenseNet121-3D原run推进epoch5/updates15064，last.pt137秒新；未作为父模型接受。R&B CPU短时squeue20秒超时后原周期恢复error=null。共用watcher由LOOK owner_v7安全接替，9R&B和1native条目不变；新32仍无正式更新，实际GPU/profile/claim仍待批。",
-    "2026-09-18：独立c3a832c源码与项目原pin3559caa部署，5项方法/报告CPU测试通过；GPU1普通通信完整dev/梯度/下一更新恢复profile通过，父预测严格重放通过，正式epoch4/1024人已推进。其余新臂同卡顺序预检后派发。",
-    "磁盘准入拒绝后，核验唯一CPU manager无活GPU并停止，只迁移本批未训练产物至有约250GiB余量的授权存储；原路径symlink及文件SHA保持，旧副本保留。重新接续后正式训练推进，未降低空间门槛。",
-    "后续核验：普通通信按原plateau到15轮已完成，finite owner自动通过self profile并启动正式训练；累计publication自动从2臂增加到3臂，非完整六臂结论。",
-    "09:12UTC维护：四新臂profile/full-dev/恢复后自动连续完成。独立验收所有6臂预测SHA/顺序/F1、父模型初始化、历史轮次；none/self/MMTM最佳epoch0且预测与初始完全相同，实际均训练8轮，训练后最佳仍低于初始。不是未训练或方法等效。完成后GPU自动空闲，无失败日志。",
-    "2026-09-18：修复已完成分解补充漏展示、总入口暂无结果和摘要四臂未齐的矛盾。显式coverage登记8个研究包/范围与49个机制臂，发布前及CI校验遗漏/重复/身份/复用SHA；24+6去重为28执行。原科研截止不刷新；此次没有复核Ibex进程或启动训练。",
-    "2026-09-18：通道方向六项有限匹配包已登记并实际启动，source52b469f、run15_50_35；SVD两项核验复用，QR-Radon预检全296dev/梯度/恢复通过后正式epoch4推进。QR普通通信及可学习两项同一GPU1原manager后继；不是完整压缩比较接受。CFP/OCT名称与参数解释同步累计页和生成器。",
-    "2026-09-18 13:40UTC现场：ws02有限任务已正常结束且GPU空闲，独立最终核验并用新显示生成器发布；不是新任务在训练。Ibex两CPU进程及新周期error=null，1allocation运行/23待批；LOOK原残差内存保护失败仍待充足资源，Dense3D暂停epoch5/15319updates，新32仍4登记文件无正式更新。",
-    "新ws02 run2026_09_18_17_04_31_666766：MMTM继续训练／MMTM+Radon／MMTM+普通通信三臂，同种子3416同验收宿主和原停止规则。c0211ac独立源码，11项迁移/报告/覆盖检查通过；第一臂完整GPU恢复预检通过，正式训练已至epoch3，其他按原manager有限顺序接续。原MMTM best_epoch0与原生父状态逐项一致才允许本包复用SVD基。",
-    "2026-09-18 14:52UTC：三臂自动profile→训练→报告全部完成，独立audit通过；无活GPU进程且manager正常结束。远端active旧running已按完成证据修正，不重启已完成队列。Ibex14:50UTC两个dispatcher新鲜error=null，squeue为1运行allocation/23待批；不等于项目GPU正在训练。",
-    "2026-09-18 grouped completion：源码450a122、WS02 run2026_09_18_22_01_54；G1严格复用，G2/4/8/16×Radon/普通通信8个新臂全部完成，failed=0。右侧final audit核296人顺序、独立sklearn F1、8个profile/resume与全部资产SHA通过，publication complete=true，结束后GPU1空闲；正式handoff为docs/handoff/ws02_grouped_completion_20260918.md。当前等待左侧按原产物最终独立验收，不追加种子/骨干/比较。",
-    "2026-09-18 左侧独立复核grouped completion：89个源码文件与450a122一致、54份资产SHA、296人F1、8个profile恢复及10k五项区间全部通过；coverage批准accepted，G1精确复用core，公开仅保留脱敏摘要。",
-    "2026-09-18 跨仓同步修复：PHD project_status 现行契约只接受 runtime_and_evidence/source_review_only；本页本次已有远端原产物核验，故使用 runtime_and_evidence。自由说明移入 actions/limitations/evidence，未改 evidence_cutoff。",
-    "2026-09-19 centered-v1：scientific source27aafca、validator15b0242、WS02 run2026_09_19_01_19_02_633840；独立数值gate从sums/moments/counts重算1264顺序、fingerprint、mean/second/cov、Q/eigen/energy后通过；两新臂2/2按原GPU1唯一manager完成，right audit SHA 3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397，结束后GPU1空闲。",
-    "2026-09-19 左侧独立复核centered-v1原始WS02产物：91个源码文件、3160份科研资产/输入文件、1264训练basis数值关系、296人四行指标、两份profile/恢复、停止历史与3项10k区间全部通过；审计SHA43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd。",
-    "2026-09-19 02:13UTC：Ibex canonical32线程2/fulltrain/full-dev/精确恢复预检通过，正式93→147更新和last.pt核验。辅助控制器train_sizes缺失在原锁下独立新配置恢复至稳定基线采集，主训练未中断；生成器6fbaf28经9项CPU测试，未来owner快照未热切换。LOOK融合新结果仍待恢复验收，科学evidence_cutoff保持。"
+    "2026-09-17 16:53 Saudi: parent catalog54/73 accepted (CFP54/58; OCT3D0/15). DenseNet121-3D AMD3416 updates9812\u21929817, checkpoint fresh; formal_project_dispatch_ready=false. Epoch2 dev macro-F1 49.65%, AUROC52.97%, all threshold predictions negative; not an accepted model.",
+    "2026-09-17 17:53UTC\uff1aMHD_Models090c906/715866a\u6709\u9650canonical32\u63a5\u7eed\u5df2\u7ed1\u5b9a9\u65e7\u5f85\u6279\u53ca\u672a\u6765R&B\u7533\u8bf7\uff0c\u5b9e\u9645CPU/watcher\u5468\u671f\u901a\u8fc7\uff0c\u539fjournal SHA\u4e0d\u53d8\u3002\u73b0\u6709GPU/128\u5c42\u79d1\u5b66\u5feb\u7167\u672a\u505c\u6b62\uff1b\u65b032\u6b63\u5f0f\u66f4\u65b00\uff0c\u5b8c\u6574profile/claim/\u8bad\u7ec3\u4ecd\u83b7\u6279\u95e8\u63a7\u3002",
+    "2026-09-18 05:34UTC\uff1a\u65e7DenseNet121-3D\u539frun\u63a8\u8fdbepoch5/updates15064\uff0clast.pt137\u79d2\u65b0\uff1b\u672a\u4f5c\u4e3a\u7236\u6a21\u578b\u63a5\u53d7\u3002R&B CPU\u77ed\u65f6squeue20\u79d2\u8d85\u65f6\u540e\u539f\u5468\u671f\u6062\u590derror=null\u3002\u5171\u7528watcher\u7531LOOK owner_v7\u5b89\u5168\u63a5\u66ff\uff0c9R&B\u548c1native\u6761\u76ee\u4e0d\u53d8\uff1b\u65b032\u4ecd\u65e0\u6b63\u5f0f\u66f4\u65b0\uff0c\u5b9e\u9645GPU/profile/claim\u4ecd\u5f85\u6279\u3002",
+    "2026-09-18\uff1a\u72ec\u7acbc3a832c\u6e90\u7801\u4e0e\u9879\u76ee\u539fpin3559caa\u90e8\u7f72\uff0c5\u9879\u65b9\u6cd5/\u62a5\u544aCPU\u6d4b\u8bd5\u901a\u8fc7\uff1bGPU1\u666e\u901a\u901a\u4fe1\u5b8c\u6574dev/\u68af\u5ea6/\u4e0b\u4e00\u66f4\u65b0\u6062\u590dprofile\u901a\u8fc7\uff0c\u7236\u9884\u6d4b\u4e25\u683c\u91cd\u653e\u901a\u8fc7\uff0c\u6b63\u5f0fepoch4/1024\u4eba\u5df2\u63a8\u8fdb\u3002\u5176\u4f59\u65b0\u81c2\u540c\u5361\u987a\u5e8f\u9884\u68c0\u540e\u6d3e\u53d1\u3002",
+    "\u78c1\u76d8\u51c6\u5165\u62d2\u7edd\u540e\uff0c\u6838\u9a8c\u552f\u4e00CPU manager\u65e0\u6d3bGPU\u5e76\u505c\u6b62\uff0c\u53ea\u8fc1\u79fb\u672c\u6279\u672a\u8bad\u7ec3\u4ea7\u7269\u81f3\u6709\u7ea6250GiB\u4f59\u91cf\u7684\u6388\u6743\u5b58\u50a8\uff1b\u539f\u8def\u5f84symlink\u53ca\u6587\u4ef6SHA\u4fdd\u6301\uff0c\u65e7\u526f\u672c\u4fdd\u7559\u3002\u91cd\u65b0\u63a5\u7eed\u540e\u6b63\u5f0f\u8bad\u7ec3\u63a8\u8fdb\uff0c\u672a\u964d\u4f4e\u7a7a\u95f4\u95e8\u69db\u3002",
+    "\u540e\u7eed\u6838\u9a8c\uff1a\u666e\u901a\u901a\u4fe1\u6309\u539fplateau\u523015\u8f6e\u5df2\u5b8c\u6210\uff0cfinite owner\u81ea\u52a8\u901a\u8fc7self profile\u5e76\u542f\u52a8\u6b63\u5f0f\u8bad\u7ec3\uff1b\u7d2f\u8ba1publication\u81ea\u52a8\u4ece2\u81c2\u589e\u52a0\u52303\u81c2\uff0c\u975e\u5b8c\u6574\u516d\u81c2\u7ed3\u8bba\u3002",
+    "09:12UTC\u7ef4\u62a4\uff1a\u56db\u65b0\u81c2profile/full-dev/\u6062\u590d\u540e\u81ea\u52a8\u8fde\u7eed\u5b8c\u6210\u3002\u72ec\u7acb\u9a8c\u6536\u6240\u67096\u81c2\u9884\u6d4bSHA/\u987a\u5e8f/F1\u3001\u7236\u6a21\u578b\u521d\u59cb\u5316\u3001\u5386\u53f2\u8f6e\u6b21\uff1bnone/self/MMTM\u6700\u4f73epoch0\u4e14\u9884\u6d4b\u4e0e\u521d\u59cb\u5b8c\u5168\u76f8\u540c\uff0c\u5b9e\u9645\u5747\u8bad\u7ec38\u8f6e\uff0c\u8bad\u7ec3\u540e\u6700\u4f73\u4ecd\u4f4e\u4e8e\u521d\u59cb\u3002\u4e0d\u662f\u672a\u8bad\u7ec3\u6216\u65b9\u6cd5\u7b49\u6548\u3002\u5b8c\u6210\u540eGPU\u81ea\u52a8\u7a7a\u95f2\uff0c\u65e0\u5931\u8d25\u65e5\u5fd7\u3002",
+    "2026-09-18\uff1a\u4fee\u590d\u5df2\u5b8c\u6210\u5206\u89e3\u8865\u5145\u6f0f\u5c55\u793a\u3001\u603b\u5165\u53e3\u6682\u65e0\u7ed3\u679c\u548c\u6458\u8981\u56db\u81c2\u672a\u9f50\u7684\u77db\u76fe\u3002\u663e\u5f0fcoverage\u767b\u8bb08\u4e2a\u7814\u7a76\u5305/\u8303\u56f4\u4e0e49\u4e2a\u673a\u5236\u81c2\uff0c\u53d1\u5e03\u524d\u53caCI\u6821\u9a8c\u9057\u6f0f/\u91cd\u590d/\u8eab\u4efd/\u590d\u7528SHA\uff1b24+6\u53bb\u91cd\u4e3a28\u6267\u884c\u3002\u539f\u79d1\u7814\u622a\u6b62\u4e0d\u5237\u65b0\uff1b\u6b64\u6b21\u6ca1\u6709\u590d\u6838Ibex\u8fdb\u7a0b\u6216\u542f\u52a8\u8bad\u7ec3\u3002",
+    "2026-09-18\uff1a\u901a\u9053\u65b9\u5411\u516d\u9879\u6709\u9650\u5339\u914d\u5305\u5df2\u767b\u8bb0\u5e76\u5b9e\u9645\u542f\u52a8\uff0csource52b469f\u3001run15_50_35\uff1bSVD\u4e24\u9879\u6838\u9a8c\u590d\u7528\uff0cQR-Radon\u9884\u68c0\u5168296dev/\u68af\u5ea6/\u6062\u590d\u901a\u8fc7\u540e\u6b63\u5f0fepoch4\u63a8\u8fdb\u3002QR\u666e\u901a\u901a\u4fe1\u53ca\u53ef\u5b66\u4e60\u4e24\u9879\u540c\u4e00GPU1\u539fmanager\u540e\u7ee7\uff1b\u4e0d\u662f\u5b8c\u6574\u538b\u7f29\u6bd4\u8f83\u63a5\u53d7\u3002CFP/OCT\u540d\u79f0\u4e0e\u53c2\u6570\u89e3\u91ca\u540c\u6b65\u7d2f\u8ba1\u9875\u548c\u751f\u6210\u5668\u3002",
+    "2026-09-18 13:40UTC\u73b0\u573a\uff1aws02\u6709\u9650\u4efb\u52a1\u5df2\u6b63\u5e38\u7ed3\u675f\u4e14GPU\u7a7a\u95f2\uff0c\u72ec\u7acb\u6700\u7ec8\u6838\u9a8c\u5e76\u7528\u65b0\u663e\u793a\u751f\u6210\u5668\u53d1\u5e03\uff1b\u4e0d\u662f\u65b0\u4efb\u52a1\u5728\u8bad\u7ec3\u3002Ibex\u4e24CPU\u8fdb\u7a0b\u53ca\u65b0\u5468\u671ferror=null\uff0c1allocation\u8fd0\u884c/23\u5f85\u6279\uff1bLOOK\u539f\u6b8b\u5dee\u5185\u5b58\u4fdd\u62a4\u5931\u8d25\u4ecd\u5f85\u5145\u8db3\u8d44\u6e90\uff0cDense3D\u6682\u505cepoch5/15319updates\uff0c\u65b032\u4ecd4\u767b\u8bb0\u6587\u4ef6\u65e0\u6b63\u5f0f\u66f4\u65b0\u3002",
+    "\u65b0ws02 run2026_09_18_17_04_31_666766\uff1aMMTM\u7ee7\u7eed\u8bad\u7ec3\uff0fMMTM+Radon\uff0fMMTM+\u666e\u901a\u901a\u4fe1\u4e09\u81c2\uff0c\u540c\u79cd\u5b503416\u540c\u9a8c\u6536\u5bbf\u4e3b\u548c\u539f\u505c\u6b62\u89c4\u5219\u3002c0211ac\u72ec\u7acb\u6e90\u7801\uff0c11\u9879\u8fc1\u79fb/\u62a5\u544a/\u8986\u76d6\u68c0\u67e5\u901a\u8fc7\uff1b\u7b2c\u4e00\u81c2\u5b8c\u6574GPU\u6062\u590d\u9884\u68c0\u901a\u8fc7\uff0c\u6b63\u5f0f\u8bad\u7ec3\u5df2\u81f3epoch3\uff0c\u5176\u4ed6\u6309\u539fmanager\u6709\u9650\u987a\u5e8f\u63a5\u7eed\u3002\u539fMMTM best_epoch0\u4e0e\u539f\u751f\u7236\u72b6\u6001\u9010\u9879\u4e00\u81f4\u624d\u5141\u8bb8\u672c\u5305\u590d\u7528SVD\u57fa\u3002",
+    "2026-09-18 14:52UTC\uff1a\u4e09\u81c2\u81ea\u52a8profile\u2192\u8bad\u7ec3\u2192\u62a5\u544a\u5168\u90e8\u5b8c\u6210\uff0c\u72ec\u7acbaudit\u901a\u8fc7\uff1b\u65e0\u6d3bGPU\u8fdb\u7a0b\u4e14manager\u6b63\u5e38\u7ed3\u675f\u3002\u8fdc\u7aefactive\u65e7running\u5df2\u6309\u5b8c\u6210\u8bc1\u636e\u4fee\u6b63\uff0c\u4e0d\u91cd\u542f\u5df2\u5b8c\u6210\u961f\u5217\u3002Ibex14:50UTC\u4e24\u4e2adispatcher\u65b0\u9c9cerror=null\uff0csqueue\u4e3a1\u8fd0\u884callocation/23\u5f85\u6279\uff1b\u4e0d\u7b49\u4e8e\u9879\u76eeGPU\u6b63\u5728\u8bad\u7ec3\u3002",
+    "2026-09-18 grouped completion\uff1a\u6e90\u7801450a122\u3001WS02 run2026_09_18_22_01_54\uff1bG1\u4e25\u683c\u590d\u7528\uff0cG2/4/8/16\u00d7Radon/\u666e\u901a\u901a\u4fe18\u4e2a\u65b0\u81c2\u5168\u90e8\u5b8c\u6210\uff0cfailed=0\u3002\u53f3\u4fa7final audit\u6838296\u4eba\u987a\u5e8f\u3001\u72ec\u7acbsklearn F1\u30018\u4e2aprofile/resume\u4e0e\u5168\u90e8\u8d44\u4ea7SHA\u901a\u8fc7\uff0cpublication complete=true\uff0c\u7ed3\u675f\u540eGPU1\u7a7a\u95f2\uff1b\u6b63\u5f0fhandoff\u4e3adocs/handoff/ws02_grouped_completion_20260918.md\u3002\u5f53\u524d\u7b49\u5f85\u5de6\u4fa7\u6309\u539f\u4ea7\u7269\u6700\u7ec8\u72ec\u7acb\u9a8c\u6536\uff0c\u4e0d\u8ffd\u52a0\u79cd\u5b50/\u9aa8\u5e72/\u6bd4\u8f83\u3002",
+    "2026-09-18 \u5de6\u4fa7\u72ec\u7acb\u590d\u6838grouped completion\uff1a89\u4e2a\u6e90\u7801\u6587\u4ef6\u4e0e450a122\u4e00\u81f4\u300154\u4efd\u8d44\u4ea7SHA\u3001296\u4ebaF1\u30018\u4e2aprofile\u6062\u590d\u53ca10k\u4e94\u9879\u533a\u95f4\u5168\u90e8\u901a\u8fc7\uff1bcoverage\u6279\u51c6accepted\uff0cG1\u7cbe\u786e\u590d\u7528core\uff0c\u516c\u5f00\u4ec5\u4fdd\u7559\u8131\u654f\u6458\u8981\u3002",
+    "2026-09-18 \u8de8\u4ed3\u540c\u6b65\u4fee\u590d\uff1aPHD project_status \u73b0\u884c\u5951\u7ea6\u53ea\u63a5\u53d7 runtime_and_evidence/source_review_only\uff1b\u672c\u9875\u672c\u6b21\u5df2\u6709\u8fdc\u7aef\u539f\u4ea7\u7269\u6838\u9a8c\uff0c\u6545\u4f7f\u7528 runtime_and_evidence\u3002\u81ea\u7531\u8bf4\u660e\u79fb\u5165 actions/limitations/evidence\uff0c\u672a\u6539 evidence_cutoff\u3002",
+    "2026-09-19 centered-v1\uff1ascientific source27aafca\u3001validator15b0242\u3001WS02 run2026_09_19_01_19_02_633840\uff1b\u72ec\u7acb\u6570\u503cgate\u4ecesums/moments/counts\u91cd\u7b971264\u987a\u5e8f\u3001fingerprint\u3001mean/second/cov\u3001Q/eigen/energy\u540e\u901a\u8fc7\uff1b\u4e24\u65b0\u81c22/2\u6309\u539fGPU1\u552f\u4e00manager\u5b8c\u6210\uff0cright audit SHA 3fdf5014921f575e42e43eb1e95bbedff3a6379468de42044246dc42ad5a6397\uff0c\u7ed3\u675f\u540eGPU1\u7a7a\u95f2\u3002",
+    "2026-09-19 \u5de6\u4fa7\u72ec\u7acb\u590d\u6838centered-v1\u539f\u59cbWS02\u4ea7\u7269\uff1a91\u4e2a\u6e90\u7801\u6587\u4ef6\u30013160\u4efd\u79d1\u7814\u8d44\u4ea7/\u8f93\u5165\u6587\u4ef6\u30011264\u8bad\u7ec3basis\u6570\u503c\u5173\u7cfb\u3001296\u4eba\u56db\u884c\u6307\u6807\u3001\u4e24\u4efdprofile/\u6062\u590d\u3001\u505c\u6b62\u5386\u53f2\u4e0e3\u987910k\u533a\u95f4\u5168\u90e8\u901a\u8fc7\uff1b\u5ba1\u8ba1SHA43a11f9c322e84c3e7501d487bb0c74d1c4c86542b5f248e3d91624afc58f5bd\u3002",
+    "2026-09-19 02:13UTC\uff1aIbex canonical32\u7ebf\u7a0b2/fulltrain/full-dev/\u7cbe\u786e\u6062\u590d\u9884\u68c0\u901a\u8fc7\uff0c\u6b63\u5f0f93\u2192147\u66f4\u65b0\u548clast.pt\u6838\u9a8c\u3002\u8f85\u52a9\u63a7\u5236\u5668train_sizes\u7f3a\u5931\u5728\u539f\u9501\u4e0b\u72ec\u7acb\u65b0\u914d\u7f6e\u6062\u590d\u81f3\u7a33\u5b9a\u57fa\u7ebf\u91c7\u96c6\uff0c\u4e3b\u8bad\u7ec3\u672a\u4e2d\u65ad\uff1b\u751f\u6210\u56686fbaf28\u7ecf9\u9879CPU\u6d4b\u8bd5\uff0c\u672a\u6765owner\u5feb\u7167\u672a\u70ed\u5207\u6362\u3002LOOK\u878d\u5408\u65b0\u7ed3\u679c\u4ecd\u5f85\u6062\u590d\u9a8c\u6536\uff0c\u79d1\u5b66evidence_cutoff\u4fdd\u6301\u3002",
+    "Historical full-lifecycle host peaks are checked against worker and allocation limits before a new probe. Worker nonzero exit cannot be mistaken for a paused successful run. Priority uses exclusive claims. Runtime suite 82 passed against the original pinned V4. Candidate only; six contained runs not yet recovered."
   ],
   "decisions": [
-    "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
-    "grouped解释边界：同G Radon/普通是参数匹配几何对照；跨G同时改变直接连接拓扑和mixer参数量，不能把点估计趋势归因于拓扑。下一候选问题为中心化basis或无压缩预算匹配，先由左侧按辨识性/成本裁决，不自动扩矩阵。",
-    "centered解释边界：两个直接“中心化效应”比较区间均跨0；同centered basis下Radon−普通为+7.95pp且本三项同时区间不跨0，但仍是单seed/dev。F1与log-loss/AUROC方向不一致，不能据此宣称中心化稳定提升，也不能把basis拟合中心化解释成运行时输入去均值。",
-    "centered最终决策：两个直接中心化效应区间均跨0，且centered Radon的F1点估计提高同时伴随两分支log-loss变差和AUROC下降；不继续为centered追加r/种子/骨干，不删除原正式对照。后继核心优先LOOK融合阶段，但等待左侧正式任务包后才执行。"
+    "\u7ed3\u679c\u53cd\u9988\uff1a\u4e0d\u56e0\u53553416\u4e0e\u9ed8\u8ba4\u9002\u914d\u914d\u65b9\u5426\u5b9aMMTM/\u6ce8\u610f\u529b\uff1b\u4e0d\u7ee7\u7eed\u5806\u8fd1\u4f3c\u9aa8\u5e72\u3002\u4f18\u5148\u56de\u7b54\u540c\u4e00A\u4e0eA+\u6865\u7684\u9644\u52a0\u6027\uff0c\u5148\u6838\u5bf9\u9002\u914d\u548c\u5339\u914d\u8bad\u7ec3\u8eab\u4efd\uff1b\u5df2\u67096\u81c2\u4e0e\u539f\u7236\u6a21\u578b\u4e25\u683c\u590d\u7528\u3002\u6b63\u5f0f\u9501\u5b9a\u79cd\u5b50/\u5927\u961f\u5217\u4e0d\u6309\u5f53\u524d\u4f18\u52bf\u5220\u51cf\u3002",
+    "grouped\u89e3\u91ca\u8fb9\u754c\uff1a\u540cG Radon/\u666e\u901a\u662f\u53c2\u6570\u5339\u914d\u51e0\u4f55\u5bf9\u7167\uff1b\u8de8G\u540c\u65f6\u6539\u53d8\u76f4\u63a5\u8fde\u63a5\u62d3\u6251\u548cmixer\u53c2\u6570\u91cf\uff0c\u4e0d\u80fd\u628a\u70b9\u4f30\u8ba1\u8d8b\u52bf\u5f52\u56e0\u4e8e\u62d3\u6251\u3002\u4e0b\u4e00\u5019\u9009\u95ee\u9898\u4e3a\u4e2d\u5fc3\u5316basis\u6216\u65e0\u538b\u7f29\u9884\u7b97\u5339\u914d\uff0c\u5148\u7531\u5de6\u4fa7\u6309\u8fa8\u8bc6\u6027/\u6210\u672c\u88c1\u51b3\uff0c\u4e0d\u81ea\u52a8\u6269\u77e9\u9635\u3002",
+    "centered\u89e3\u91ca\u8fb9\u754c\uff1a\u4e24\u4e2a\u76f4\u63a5\u201c\u4e2d\u5fc3\u5316\u6548\u5e94\u201d\u6bd4\u8f83\u533a\u95f4\u5747\u8de80\uff1b\u540ccentered basis\u4e0bRadon\u2212\u666e\u901a\u4e3a+7.95pp\u4e14\u672c\u4e09\u9879\u540c\u65f6\u533a\u95f4\u4e0d\u8de80\uff0c\u4f46\u4ecd\u662f\u5355seed/dev\u3002F1\u4e0elog-loss/AUROC\u65b9\u5411\u4e0d\u4e00\u81f4\uff0c\u4e0d\u80fd\u636e\u6b64\u5ba3\u79f0\u4e2d\u5fc3\u5316\u7a33\u5b9a\u63d0\u5347\uff0c\u4e5f\u4e0d\u80fd\u628abasis\u62df\u5408\u4e2d\u5fc3\u5316\u89e3\u91ca\u6210\u8fd0\u884c\u65f6\u8f93\u5165\u53bb\u5747\u503c\u3002",
+    "centered\u6700\u7ec8\u51b3\u7b56\uff1a\u4e24\u4e2a\u76f4\u63a5\u4e2d\u5fc3\u5316\u6548\u5e94\u533a\u95f4\u5747\u8de80\uff0c\u4e14centered Radon\u7684F1\u70b9\u4f30\u8ba1\u63d0\u9ad8\u540c\u65f6\u4f34\u968f\u4e24\u5206\u652flog-loss\u53d8\u5dee\u548cAUROC\u4e0b\u964d\uff1b\u4e0d\u7ee7\u7eed\u4e3acentered\u8ffd\u52a0r/\u79cd\u5b50/\u9aa8\u5e72\uff0c\u4e0d\u5220\u9664\u539f\u6b63\u5f0f\u5bf9\u7167\u3002\u540e\u7ee7\u6838\u5fc3\u4f18\u5148LOOK\u878d\u5408\u9636\u6bb5\uff0c\u4f46\u7b49\u5f85\u5de6\u4fa7\u6b63\u5f0f\u4efb\u52a1\u5305\u540e\u624d\u6267\u884c\u3002"
   ],
   "evidence": [
     {
@@ -135,51 +137,51 @@
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/current_parent_progress_20260917.md"
     },
     {
-      "label": "32层独立阶段的配方、资源预检和实际获批接续边界",
+      "label": "32\u5c42\u72ec\u7acb\u9636\u6bb5\u7684\u914d\u65b9\u3001\u8d44\u6e90\u9884\u68c0\u548c\u5b9e\u9645\u83b7\u6279\u63a5\u7eed\u8fb9\u754c",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_activation_20260917.md"
     },
     {
-      "label": "ws02单种子核心累计结果",
+      "label": "ws02\u5355\u79cd\u5b50\u6838\u5fc3\u7d2f\u8ba1\u7ed3\u679c",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/small_cohort/README.md"
     },
     {
-      "label": "累计覆盖审查、24项保留与未完成清单",
+      "label": "\u7d2f\u8ba1\u8986\u76d6\u5ba1\u67e5\u300124\u9879\u4fdd\u7559\u4e0e\u672a\u5b8c\u6210\u6e05\u5355",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/coverage.md"
     },
     {
-      "label": "历史24项分解的独立重核与资产引用",
+      "label": "\u5386\u53f224\u9879\u5206\u89e3\u7684\u72ec\u7acb\u91cd\u6838\u4e0e\u8d44\u4ea7\u5f15\u7528",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/factorized/README.md"
     },
     {
-      "label": "SVD/QR/learned通道压缩有限匹配与实际接续",
+      "label": "SVD/QR/learned\u901a\u9053\u538b\u7f29\u6709\u9650\u5339\u914d\u4e0e\u5b9e\u9645\u63a5\u7eed",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/channel_compression/README.md"
     },
     {
-      "label": "2026-09-18：同一MMTM宿主加桥三臂已正式接入",
+      "label": "2026-09-18\uff1a\u540c\u4e00MMTM\u5bbf\u4e3b\u52a0\u6865\u4e09\u81c2\u5df2\u6b63\u5f0f\u63a5\u5165",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/augmentation/README.md"
     },
     {
-      "label": "WS02固定SVD grouped单种子完整报告",
+      "label": "WS02\u56fa\u5b9aSVD grouped\u5355\u79cd\u5b50\u5b8c\u6574\u62a5\u544a",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/grouped_linear/README.md"
     },
     {
-      "label": "grouped后续中心化/预算匹配研究依据",
+      "label": "grouped\u540e\u7eed\u4e2d\u5fc3\u5316/\u9884\u7b97\u5339\u914d\u7814\u7a76\u4f9d\u636e",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/grouped_next_evidence_20260918.md"
     },
     {
-      "label": "当前项目状态契约与证据入口",
+      "label": "\u5f53\u524d\u9879\u76ee\u72b6\u6001\u5951\u7ea6\u4e0e\u8bc1\u636e\u5165\u53e3",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/status.json"
     },
     {
-      "label": "WS02 centered-SVD单种子方向包独立接受结果",
+      "label": "WS02 centered-SVD\u5355\u79cd\u5b50\u65b9\u5411\u5305\u72ec\u7acb\u63a5\u53d7\u7ed3\u679c",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/reports/current/centered_basis/README.md"
     },
     {
-      "label": "centered机制结论、反例与下一研究决策",
+      "label": "centered\u673a\u5236\u7ed3\u8bba\u3001\u53cd\u4f8b\u4e0e\u4e0b\u4e00\u7814\u7a76\u51b3\u7b56",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/centered_decision_20260919.md"
     },
     {
-      "label": "Ibex 32层完整预检、正式训练和辅助控制器恢复边界",
+      "label": "Ibex 32\u5c42\u5b8c\u6574\u9884\u68c0\u3001\u6b63\u5f0f\u8bad\u7ec3\u548c\u8f85\u52a9\u63a7\u5236\u5668\u6062\u590d\u8fb9\u754c",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/main/docs/handoff/fast32_runtime_20260919.md"
     }
   ]

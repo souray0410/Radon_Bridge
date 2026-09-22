@@ -259,3 +259,12 @@ Independent review found and fixed a per-step RAM admission gap before deploymen
 通道压缩六项完整匹配已独立验收：SVD、QR、可学习通道的Radon分支均值F1为71.7858/70.2317/69.5840%，普通通信为67.5262/66.0129/66.0129%；SVD−QR和SVD−可学习通道普通区间跨零，7项同时区间全部跨零。四新执行、两项复用；当前三包去重32次执行，不是全项目完成。
 
 ws02本批有限流程已正常结束，GPU空闲；下一个研究包尚未运行。Ibex当前1运行allocation/23待批，两个派发器活跃且周期无错误；LOOK原内存保护故障等待资源，Dense3D暂停，新32无正式更新。不能把管理器健康当GPU科研任务正在运行。
+
+
+## 2026-09-22 V5 rollout repair candidate
+
+Historical full-lifecycle host peaks are checked against worker and allocation limits before a new probe. Worker nonzero exit cannot be mistaken for a paused successful run. Priority uses exclusive claims. Runtime suite 82 passed against the original pinned V4. Candidate only; six contained runs not yet recovered.
+
+The approved migration targets direct V5 execution and explicit artifact conversion.
+No V4 runtime fallback will be added. Existing healthy immutable sources remain
+unmodified until completed-step checkpoint handover and numerical acceptance.
