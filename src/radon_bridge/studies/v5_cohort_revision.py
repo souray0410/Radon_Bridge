@@ -24,7 +24,8 @@ def configuration_identity(configuration):
 
 
 def revise_parent_references(converted, output, *, run_id, case_id,
-                             parent_acceptance, acceptance_sha256):
+                             parent_acceptance, acceptance_sha256,
+                             host_conversion=None, host_conversion_sha256=None):
     """Derive best/resume/configuration together; never overwrite source assets."""
     for identity in (run_id, case_id):
         if not isinstance(identity, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', identity):
@@ -57,8 +58,10 @@ def revise_parent_references(converted, output, *, run_id, case_id,
             or states['resume']['identity'] != old_identity
             or not equal(states['resume']['selected'], states['selected'])):
         raise ValueError('Selected/resume boundary or configuration mismatch')
-    if 'augmentation_host' in configuration:
+    if 'augmentation_host' in configuration and (host_conversion is None or host_conversion_sha256 is None):
         raise ValueError('Augmented runs require host-reference migration as well')
+    if 'augmentation_host' not in configuration and (host_conversion is not None or host_conversion_sha256 is not None):
+        raise ValueError('Unexpected host mapping for a non-augmented run')
     if configuration.get('name') != case_id or set(configuration.get('parents', {})) != {'cfp', 'oct'}:
         raise ValueError('Case or parent branches changed')
     target = copy.deepcopy(configuration)
@@ -82,6 +85,12 @@ def revise_parent_references(converted, output, *, run_id, case_id,
         parent_inputs[path] = parent['target_sha256']
         parent_inputs[conversion] = parent['conversion_sha256']
         target['parents'][branch].update(path=str(path), sha256=parent['target_sha256'])
+    if 'augmentation_host' in configuration:
+        from radon_bridge.studies.v5_augmentation_migration import mapped_host
+        ref, host_inputs = mapped_host(configuration, target['parents'], host_conversion,
+                                       host_conversion_sha256, proof['current_framework_commit'])
+        target['augmentation_host'] = ref
+        parent_inputs.update(host_inputs)
     target_identity = configuration_identity(target)
     if target_identity == old_identity:
         raise ValueError('No parent reference migration requested')
@@ -124,6 +133,9 @@ def revise_parent_references(converted, output, *, run_id, case_id,
                           state='awaiting_current_reference_replay', dispatch_allowed=False,
                           test_access=False, artifacts={n: sha(stage/n) for n in
                               ('best.pt', 'resume.pt', 'configuration.json')})
+            if 'augmentation_host' in configuration:
+                record['changed_fields'].append('configuration.augmentation_host')
+                record['host_conversion_sha256'] = host_conversion_sha256
             # Recheck sources before publishing this one complete revision.
             if sha(acceptance) != acceptance_sha256:
                 raise ValueError('Acceptance changed during revision')

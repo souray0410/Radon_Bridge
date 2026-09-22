@@ -285,3 +285,6 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 追加：CMX宿主1组/加桥3组、通道压缩6组、MMTM加桥3组、分组通信8组亦完成逐文件独立验收。现共30个包内回放条目/60个状态条目，含严格复用的对照，不是30次独立新增实验。v2审计额外从原预测文件独立复核296人输出和分类决定，并绑定当前预测SHA。原native父权重已严格转换，当前普通build入口的完整回放仍在单独验收中。
 
 21个当前父引用修订（含复用条目）已由独立审计接受：新配置经普通V5 build读入转换父权重，选优296人输出、实际resume后两次16人更新、原生PyTorch对照及当前断点下一步精确一致。研究run/case ID保留，配置/资产SHA更新；[凭证](../acceptance/v5_current_references_20260922.json)。此为候选修订接受，未发布V5或切换现有调度；augmentation宿主引用、其余资产、A100和完整项目流程仍开放。
+
+
+2026-09-22追加：19个唯一当前配置的严格单卡profile已独立接受（覆盖21个含复用的条目）：初始化、5次预热、20次更新、完整296dev、保存重载及下一次更新一致；原生梯度容差1e-5/1e-6。最大allocator reserved 7.87890625GiB，进程显存采样最大8.30078125GiB。物理显存是阶段采样，不宣称连续捕获全部峰值；这些小队列结果不认证Ibex大队列或全项目完成。 详见../acceptance/v5_strict_profiles_20260922.json；生产切换仍未完成。

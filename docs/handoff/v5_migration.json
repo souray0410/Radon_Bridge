@@ -29,5 +29,10 @@
     "source_commit": "3ad29749d46611f7534338054274cc36a3c93119",
     "evidence": "docs/acceptance/v5_current_references_20260922.json",
     "dispatch_allowed": false
+  },
+  "strict_single_gpu_profiles": {
+    "state": "accepted",
+    "evidence": "docs/acceptance/v5_strict_profiles_20260922.json",
+    "production_cutover": false
   }
 }
