@@ -56,5 +56,15 @@
     "radon_bridge.resolution": "radon_bridge.studies.resolution"
   },
   "internal_imports": "canonical absolute imports",
-  "framework_changed": false
+  "framework_changed": false,
+  "retired_current_modules": {
+    "radon_bridge.analysis.cli": {
+      "reason": "Historical shared-head and positional PilotGraph API; unsupported by current model. Reproduce through exact archived experiment source.",
+      "last_present_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10"
+    },
+    "radon_bridge.training.pretrain": {
+      "reason": "Historical fixed-epoch positional PilotGraph pilot; current independent and cohort training use explicit V5 trainers.",
+      "last_present_commit": "d38296e4a1d111f1f458653151c4afa273dfbc10"
+    }
+  }
 }

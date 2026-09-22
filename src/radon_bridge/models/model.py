@@ -1,4 +1,4 @@
-"""Legacy CFP/OCT calling convention backed by the reusable MHD task runtime."""
+"""CFP/OCT convenience interface backed by the reusable MHD V5 task runtime."""
 from radon_bridge.models.networks import build_cfp_oct, TaskLoss
 from radon_bridge.models.task import MHDTaskGraph
 
