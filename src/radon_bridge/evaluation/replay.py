@@ -61,7 +61,8 @@ def run(record, data_root, out):
     torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3 / torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     data = PairedDataset(str(resolve(data_root)), 'validation', 224)
     if len(data) != 296 or any(r['split'] != 'validation' for r in data.rows):
         raise ValueError('Only the fixed development set is permitted')

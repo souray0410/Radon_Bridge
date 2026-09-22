@@ -72,7 +72,8 @@ def run(job,lock,out,split):
     cfg=verify_lock(lock,split);start=time.monotonic()
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     root=Path(cfg['data_directory'] if split=='test' else cfg['development_data_directory'])
     expected_sha=json.loads((lock/'data_acceptance.json').read_text())['selected_sha256'] if split=='test' else '4285250208dd1496a6912ed6e072abf9d2aa87e05216e78be6ad405e9ea7d24c'
     if sha256(root/'selected.csv')!=expected_sha:raise ValueError('Evaluation cohort changed')

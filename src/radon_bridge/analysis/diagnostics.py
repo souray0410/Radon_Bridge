@@ -163,7 +163,8 @@ def analyze_graph(g,data,basis_refs,batch=16,probe_count=128,energy_limit=None,e
 def main(cfg,out,data_path):
     start=time.monotonic();torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     if (out/'summary.json').exists():raise RuntimeError('Diagnostic already exists')
     from radon_bridge.runtime.artifacts import relocate

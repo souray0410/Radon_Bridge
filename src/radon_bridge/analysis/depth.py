@@ -36,7 +36,8 @@ def main(cfg,out,data_path):
     if (out/'summary.json').exists():raise RuntimeError('Refuse to overwrite completed diagnostic')
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     cfg=relocate(cfg);ref=cfg['checkpoint'];assert sha256(ref['path'])==ref['sha256']
     saved=torch.load(ref['path'],map_location='cpu',weights_only=False);c=relocate(saved['configuration'])
     assert not c.get('task_fusion') and c['training_stage']=='communication'

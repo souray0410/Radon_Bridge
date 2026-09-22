@@ -133,7 +133,8 @@ def latency(g,data):
 
 def main(cfg,out,data_path):
     tick=time.monotonic();torch.set_num_threads(3);torch.use_deterministic_algorithms(True);torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     out=Path(out);out.mkdir(parents=True,exist_ok=True);assert not (out/'summary.json').exists()
     trial=Path(cfg['trial_directory']);config=json.loads((trial/'configuration.json').read_text());checkpoint=trial/cfg.get('selected_file','selected.pt');assert file_sha(checkpoint)==cfg['selected_sha256']
     g=PilotGraph(seed=config['seed'],bridge_configs=config['bridges'],device='cuda');saved=torch.load(checkpoint,map_location='cpu',weights_only=False)

@@ -90,7 +90,8 @@ def main(args):
     os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
     torch.set_num_threads(3); torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False; torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     from radon_bridge.runtime.artifacts import relocate
     cfg=relocate(json.loads(Path(args.config).read_text())); out=Path(args.output); out.mkdir(parents=True,exist_ok=True)
     if (out/'summary.json').exists(): raise RuntimeError('Completed trial must not be overwritten')

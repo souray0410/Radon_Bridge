@@ -222,7 +222,8 @@ def fit_training_bases(config, output, data):
     from radon_bridge.models.model import PilotGraph
     from torch.utils.data import Subset
     start=time.monotonic();torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
     output=Path(output);output.mkdir(parents=True,exist_ok=True)
     if (output/'summary.json').exists():raise RuntimeError('Basis fit already completed')

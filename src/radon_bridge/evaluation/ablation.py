@@ -47,7 +47,8 @@ def predict(g,data,limit=None):
 def run(cfg,out,data_path):
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     cfg=relocate(cfg);checkpoint=Path(cfg['checkpoint']['path']);assert sha256(checkpoint)==cfg['checkpoint']['sha256']
     saved=torch.load(checkpoint,map_location='cpu',weights_only=False);c=saved['configuration']
     assert c['training_stage']=='host_augmentation' and not c.get('task_fusion') and len(c['bridges'])==2

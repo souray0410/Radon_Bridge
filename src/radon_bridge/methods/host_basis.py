@@ -13,7 +13,8 @@ def main(cfg,out,data):
     start=time.monotonic();out=Path(out);out.mkdir(parents=True,exist_ok=True)
     if (out/'summary.json').exists():raise RuntimeError('Basis fit already complete')
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     cfg=relocate(cfg);ref=cfg['host_checkpoint'];assert sha256(ref['path'])==ref['sha256']
     saved=torch.load(ref['path'],map_location='cpu',weights_only=False);c=relocate(saved['configuration'])
     g=PilotGraph(seed=c['seed'],bridge_configs=c['bridges'],task_fusion=c.get('task_fusion'),device='cuda')

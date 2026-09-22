@@ -19,7 +19,8 @@ from radon_bridge.data.dataset import PairedDataset
 
 def main(args):
     torch.set_num_threads(3)
-    torch.cuda.set_per_process_memory_fraction(8*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     def loader(split):return DataLoader(PairedDataset(args.data,split,config.get("cfp_size",96)),batch_size=4,num_workers=2)
     report={}
     with torch.no_grad():

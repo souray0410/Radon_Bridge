@@ -21,7 +21,8 @@ def main(args):
         raise ValueError("New runs require explicit sum losses and per_task clipping; use archived source for experiment005")
     torch.set_num_threads(3);torch.manual_seed(seed);np.random.seed(seed)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True;torch.use_deterministic_algorithms(True)
-    torch.cuda.set_per_process_memory_fraction(8*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     train=PairedDataset(args.data,"train",224);val=PairedDataset(args.data,"validation",224)
     assert not ({r["participant_id"] for r in train.rows}&{r["participant_id"] for r in val.rows})
     weight=Path(os.environ["TORCH_HOME"])/"hub/checkpoints/resnet18-f37072fd.pth"

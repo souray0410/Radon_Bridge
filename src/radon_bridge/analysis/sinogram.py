@@ -159,7 +159,8 @@ def process(job,lock,out,preflight):
     if status['state']!='complete':raise ValueError('Predecessor test and statistics have not completed')
     torch.set_num_threads(3);torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
     all_aggregates={};prediction_files={};evidence=[]
     for phase in ('constructed_initial','selected'):
         g=load_model(job['model'])

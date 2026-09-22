@@ -96,7 +96,8 @@ def configure_device():
     # Match it explicitly; changing it breaks exact saved-prediction replay.
     torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=True
     # Explicit historical workstation budget; never inherit this on Ibex.
-    torch.cuda.set_per_process_memory_fraction(9*1024**3/torch.cuda.get_device_properties(0).total_memory)
+    from mhd_models.scheduling.gpu_budget import configure_allocator
+    configure_allocator(0)
 
 
 def grouped_structure_probe(g,cfg):
