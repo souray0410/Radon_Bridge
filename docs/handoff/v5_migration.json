@@ -1,7 +1,9 @@
 {
   "state": "candidate_partial",
-  "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
-  "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "framework_tag": "V5",
+  "framework_wheel_sha256": "c022b4f4b0fa1f29458ad1bf9e0d04f6773e9454ab3bd8c07d416294483aab48",
+  "companion_commit": "cc16e74a8cfc705d69b3d31efe2daeec9404471f",
   "production_cutover": false,
   "evidence": "docs/handoff/v5_rollout_20260922.md",
   "resource_recovery": {
@@ -50,6 +52,13 @@
     "development_participants_per_case": 296,
     "continued_updates_per_case": 2,
     "evidence": "docs/acceptance/v5_factorized_centered_20260923.json",
+    "dispatch_allowed": false,
+    "production_cutover": false
+  },
+  "formal_release_pin": {
+    "state": "accepted_representative_release_replay",
+    "evidence": "docs/acceptance/v5_formal_release_pin_20260923.json",
+    "runtime_source_changed_from_candidate": false,
     "dispatch_allowed": false,
     "production_cutover": false
   }

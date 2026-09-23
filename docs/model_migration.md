@@ -6,7 +6,8 @@ Server location does not select a loader. Old study releases finish their locked
 work using their own code; conversion happens outside normal project runtime.
 
 MHD_Models owns explicit source-to-canonical migration and its strict reader.
-MHD_Framework retains exact architecture and API pins; no V5 upgrade is implied.
+MHD_Framework retains exact architecture and API pins; this project now uses the
+formal V5 identity in `framework.lock.json`, without a V4 runtime fallback.
 The project retains its own derived weights and an immutable parent-artifact map.
 
 Transition acceptance requires: source completion and hashes, state-preserving

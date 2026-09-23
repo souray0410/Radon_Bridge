@@ -1,0 +1,55 @@
+{
+  "schema": "radon_formal_v5_release_pin_acceptance_v1",
+  "state": "published_release_pin_verified",
+  "framework": {
+    "tag": "V5",
+    "commit": "1287681c08846e11364c81653048435482e772a7",
+    "wheel_sha256": "c022b4f4b0fa1f29458ad1bf9e0d04f6773e9454ab3bd8c07d416294483aab48",
+    "api": "V5",
+    "package_version": "5"
+  },
+  "companion": {
+    "repository": "souray0410/MHD_Models",
+    "commit": "cc16e74a8cfc705d69b3d31efe2daeec9404471f",
+    "package_tree_sha256": "4559d5dffcacb14df4064eaebef6a08a7b71427556fc06ed77e36ed4af295d7e",
+    "candidate_source_tree": "e3bc9d830d36f83da7bc1b9f7605e30184d6dcc0",
+    "formal_source_tree": "e3bc9d830d36f83da7bc1b9f7605e30184d6dcc0",
+    "runtime_source_changed": false
+  },
+  "candidate_evidence_inheritance": {
+    "candidate_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+    "candidate_source_tree": "1f9cc4184f5bd106493a0333fa6f98d8ebd5ce33",
+    "formal_source_tree": "1f9cc4184f5bd106493a0333fa6f98d8ebd5ce33",
+    "runtime_source_changed": false,
+    "historical_acceptance_records_rewritten": false
+  },
+  "representative_replay": {
+    "case": "factorized_R1024_radon_seed3416",
+    "state": "published_wheel_replay_verified",
+    "selected_development": 296,
+    "continued_updates": 2,
+    "real_batch": 16,
+    "outputs_and_class_decisions": true,
+    "intermediate_states": 8,
+    "input_and_parameter_gradients": true,
+    "optimizer_and_buffers": true,
+    "native_eager_reference": true,
+    "current_checkpoint_next_update_exact": true,
+    "reference_predictions_sha256": "ce511181666b53263401bf0a9b4d180a5306044d5a97279411d7c81919659dad",
+    "check_predictions_sha256": "ce511181666b53263401bf0a9b4d180a5306044d5a97279411d7c81919659dad",
+    "remote_acceptance_sha256": "d4739bdd9b5f35f28d0aade8390535977e60195bddde51a944fd1370dd7df49c",
+    "independent_reviewer_sha256": "47f1570b48689622ba59e606fd8fc5eaf6f462117ece9ba50d21efb4e69ac6a8",
+    "maximum_allocator_reserved_gib": 8.64453125,
+    "rtol": 1e-05,
+    "atol": 1e-06
+  },
+  "normal_runtime_v4_fallback": false,
+  "test_access": false,
+  "dispatch_allowed": false,
+  "production_cutover": false,
+  "limitations": [
+    "The release replay is a representative single-device RTX 5000 Ada migration check.",
+    "A100, complete UK Biobank workflow and production-owner handover remain open.",
+    "Existing candidate acceptance files retain the commits that actually produced their evidence."
+  ]
+}

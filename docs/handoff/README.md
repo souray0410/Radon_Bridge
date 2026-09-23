@@ -295,3 +295,5 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 2026-09-23：V5 centered-SVD 当前拟合入口移除残留的固定10+10GiB显存门槛，复用实际占用与独占GPU锁；本地247项CPU测试通过，尚未在GPU完整流程验收或切换生产。Ibex现场11运行、13待批GPU请求占满24槽；六项原内存事件仍保留 `operational_hold`，未观察到新正式更新，事件继续开放。详见 [V5 rollout ledger](v5_rollout_20260922.md)。
 
 factorized 历史24项及 centered 2项已完成原来源审计、52份状态的独立转换和逐项原 V4→直接 V5 真实开发集回放；输出、中间状态、输入/参数梯度、优化器、buffer、两次原批量更新及断点下一步均通过既定容差和独立复核。当前 V5 候选代码恢复了原 factorized 全局因子卷积构图，254项CPU单元测试通过。此接受仅限单卡 Ada 迁移诊断，当前依赖引用、A100、完整 UKB 协议和生产切换仍开放。[逐项边界](v5_rollout_20260922.md)与[脱敏凭证](../acceptance/v5_factorized_centered_20260923.json)。
+
+正式 MHD `V5=1287681c08846e11364c81653048435482e772a7` 发布后，本候选的 submodule、源锁和当前交接引用已统一更新，运行 companion 同步固定为 `MHD_Models=cc16e74a8cfc705d69b3d31efe2daeec9404471f`；正常运行仍无 V4 回退。正式 wheel 摘要复核及最大 factorized 配置的隔离 ws02 真实回放通过，框架与 companion 的候选/正式运行源码 tree 分别相同。此项只关闭正式依赖身份门槛；A100、完整 UKB 流程、生产 owner 切换及六项 Ibex RAM 事件仍开放。[正式发布pin凭证](../acceptance/v5_formal_release_pin_20260923.json)。

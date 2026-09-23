@@ -1,6 +1,6 @@
 # Expanded UK Biobank preparation (not a locked training protocol)
 
-The user selected ResNet50 for the next LOOK and R&B preparation, superseding the ResNet34 proposal. Keep infrastructure acceptance on the already accepted reference architectures. Two-rank validation must pass before new architecture resource checks. Both applications pin the new MHD_Framework V4 API.
+The user selected ResNet50 for the next LOOK and R&B preparation, superseding the ResNet34 proposal. Keep infrastructure acceptance on the already accepted reference architectures. Two-rank validation must pass before new architecture resource checks. The earlier V4 preparation pin has been superseded for current Radon_Bridge work by the formal V5 identity in `framework.lock.json`; historical V4 runs retain their original source.
 
 ## Data and disease definitions
 
@@ -16,7 +16,7 @@ Start with independent disease-specific binary models using the same architectur
 
 R&B needs 2D/3D ResNet50 bottleneck support and new native checkpoints; old ResNet18 checkpoints and SVD bases are not interchangeable. ResNet50 stage3 has a different channel dimension, so derive explicit r/h and bridge costs rather than blindly reusing rho. Fit bases only on the new training features after independent native training.
 
-Both projects use two-rank training sequentially on the two-GPU allocation. Determine real device memory from the allocated GPUs, retain approximately 10 GiB free per GPU plus transient safety allowance, and report project process peak separately from other workloads. Similar allocated budgets do not imply identical parameter count or actual memory usage. Choose common effective batch targets from measured representative workloads; microbatch and accumulation may differ, with BN differences recorded. RETFound is a later adapter/weight/3D-input audit, not assumed to be a drop-in 3D network.
+Both projects use two-rank training sequentially on the two-GPU allocation. Determine real device memory from the allocated GPUs and admit against measured complete-lifecycle peaks, current co-resident use and evidenced transient overhead; there is no fixed 10 GiB reserve. Report project process peak separately from other workloads. Similar allocated budgets do not imply identical parameter count or actual memory usage. Choose common effective batch targets from measured representative workloads; microbatch and accumulation may differ, with BN differences recorded. RETFound is a later adapter/weight/3D-input audit, not assumed to be a drop-in 3D network.
 
 ## Retuning and evaluation
 

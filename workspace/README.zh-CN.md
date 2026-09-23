@@ -11,6 +11,6 @@ Ibex、ws02 是 registry.json 与 configs/deployment 中的可选实例。应用
 
 main 是通过验证的统一开发结构。新研究用时间戳标识协议与结果；修改前的旧版本在历史分支复现。GitHub 不存受限原始数据、逐参与者预测或大型检查点。
 
-依赖从项目自己的 third_party/MHD_Framework 固定提交独立安装。当前两应用使用 V4 包，不随 MHD main 的 V5 开发自动变化。更新必须核对版本、源 SHA、输出、梯度和 state_dict；旧 Python 整对象模型仍使用原环境。
+依赖从项目自己的 third_party/MHD_Framework 固定提交独立安装。当前项目使用正式 V5 包，不随 MHD main 的后续开发自动变化；各应用仍分别记录自己的精确依赖。更新必须核对版本、源 SHA、输出、梯度和 state_dict；旧 Python 整对象模型仍使用原环境。
 
 项目整理不会自动提交 GPU、运行训练或解封 test。目录检查不代表数据或实验已验收。

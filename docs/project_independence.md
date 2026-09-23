@@ -1,6 +1,6 @@
 # Project independence
 
-LOOK and Radon_Bridge are independent research applications. Shared standards do not create shared mutable scientific state. MHD_Framework stays a generic, independently versioned dependency; both applications currently pin its stable V4 release.
+LOOK and Radon_Bridge are independent research applications. Shared standards do not create shared mutable scientific state. MHD_Framework stays a generic, independently versioned dependency; each application pins its own exact release. Radon_Bridge currently pins the formal V5 release recorded in `framework.lock.json`.
 
 | Asset | Ownership |
 |---|---|

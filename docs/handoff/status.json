@@ -3,7 +3,7 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "正式V5发布身份确定后修订当前资产依赖引用，完成A100连续更新与完整UKB流程验收；六项Ibex资源恢复和LOOK永久管理交接仍开放。原科研结果与截止时间保留。",
+  "next_acceptance": "完成A100连续更新、完整UKB流程及生产owner交接验收；六项Ibex资源恢复和LOOK永久管理交接仍开放。原科研结果与截止时间保留。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
@@ -63,7 +63,7 @@
     "centered Radon相对未中心化Radon的F1点估计+2.17pp，但普通/三项同时区间均跨0；同时两分支log-loss变差且AUROC下降，不能将中心化概括为稳定或全面更好。",
     "2026-09-19 centered接受仅限WS02单seed3416开发集basis方向包；不代表Ibex、test、多种子、运行时去均值或全项目接受。",
     "2026-09-19 centered包使用其真实manager完成时刻作为本status evidence_cutoff；更早已接受包的各自科学截止时间仍保留在对应报告/资产中，不因本次发布重写。",
-    "V5 rollout candidate repairs are not deployed; framework/asset migration is in progress."
+    "Formal V5 is pinned and representative Ada replay passed; production owner cutover and complete workflow acceptance remain open."
   ],
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
@@ -104,7 +104,8 @@
     "三种宿主和九个加桥配置的当前父/宿主引用已独立接受：正常V5 build，296人初始化宿主预测及选优预测，两次原16批量更新、原生梯度/状态及当前断点下一步完全一致。仅保留原科研结果；原来源、Tensor和选优epoch不变。证据docs/acceptance/v5_augmentation_references_20260922.json。factorized/centered、A100、完整下游及生产切换仍未完成。",
     "2026-09-23 V5 centered basis current entrypoint removed the stale fixed 10+10GiB GPU check and reuses the physical-GPU exclusive lock with actual occupancy; 247 local CPU tests passed. Original scientific source and artifacts remain pinned. Ibex 24 requested slots are full (11 running, 13 pending); the six historical 104GiB incidents still show operational_hold and no verified new formal update. Candidate code is not production migration.",
     "2026-09-23 factorized24 and centered2 original V4 source/selected/resume assets independently described read-only; current V5 factorized global BKA operator restored in candidate source with 254 local CPU tests.",
-    "2026-09-23 factorized24 and centered2 completed 52-state independent conversion and per-case original-V4/direct-V5 Ada replay: 296 development participants, two original16 updates, outputs, eight intermediate states, input/parameter gradients, optimizer, buffers and exact checkpoint next update. FP32 rtol1e-5/atol1e-6; test unused; no research run reopened or production consumer switched. Evidence docs/acceptance/v5_factorized_centered_20260923.json."
+    "2026-09-23 factorized24 and centered2 completed 52-state independent conversion and per-case original-V4/direct-V5 Ada replay: 296 development participants, two original16 updates, outputs, eight intermediate states, input/parameter gradients, optimizer, buffers and exact checkpoint next update. FP32 rtol1e-5/atol1e-6; test unused; no research run reopened or production consumer switched. Evidence docs/acceptance/v5_factorized_centered_20260923.json.",
+    "2026-09-23 formal V5 pin: submodule and source lock now bind V5 commit1287681 and wheel SHA c022b4f4; companion lock binds MHD_Models cc16e74. Candidate/formal runtime source trees are identical for both dependencies. A fresh published-wheel replay of factorized_R1024_radon_seed3416 passed dev296, two original16 updates, gradients, eight intermediate states, optimizer/buffers and exact checkpoint next update. Test unused; dispatch and production cutover remain false."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -204,6 +205,10 @@
     {
       "label": "V5 factorized and centered bounded real-data migration replay; production cutover incomplete",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_factorized_centered_20260923.json"
+    },
+    {
+      "label": "Formal V5 release pin and representative published-wheel replay",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_formal_release_pin_20260923.json"
     }
   ]
 }
