@@ -40,6 +40,7 @@ def validate(lease, now=None):
         "schema", "lease_id", "project", "mode", "requested_gpus",
         "packet_sha256", "expires_at", "test_access", "account_limit",
         "return_entitlement", "role_policy_sha256", "control_sha256",
+        "previous_role_policy_sha256",
         "account_lock_inode", "account_lock_device", "account_lock_ctime_ns",
         "journal_initial_sha256", "intent_initial_sha256",
     }
@@ -52,6 +53,7 @@ def validate(lease, now=None):
     if (not isinstance(lease["lease_id"], str) or not lease["lease_id"]
             or not HEX.fullmatch(lease["packet_sha256"])
             or not HEX.fullmatch(lease["role_policy_sha256"])
+            or not HEX.fullmatch(lease["previous_role_policy_sha256"])
             or not HEX.fullmatch(lease["control_sha256"])
             or not HEX.fullmatch(lease["journal_initial_sha256"])
             or not HEX.fullmatch(lease["intent_initial_sha256"])
@@ -87,6 +89,7 @@ def decide(lease, account, journal, *, now=None):
 
 
 def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
+                 role_policy_proposal_path, policy_transition_receipt_path,
                  account_lock, journal_path, intent_path, snapshot, submit, now=None):
     """Submit once after revalidating every identity under the shared lock."""
     from radon_bridge.runtime.state import file_sha256
@@ -107,7 +110,39 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
                 lease["account_lock_inode"], lease["account_lock_device"],
                 lease["account_lock_ctime_ns"]):
             raise ValueError("Account lock identity changed")
-        if file_sha256(role_policy_path) != lease["role_policy_sha256"]:
+        live_policy_sha = file_sha256(role_policy_path)
+        proposal_sha = file_sha256(role_policy_proposal_path)
+        if proposal_sha != lease["role_policy_sha256"]:
+            raise ValueError("Role policy proposal changed")
+        transition_path = Path(policy_transition_receipt_path)
+        if live_policy_sha == lease["previous_role_policy_sha256"]:
+            if transition_path.exists():
+                raise ValueError("Unexpected prior role transition receipt")
+            # Install the exact reviewed bytes while the same account lock is held.
+            proposal = Path(role_policy_proposal_path).read_bytes()
+            target = Path(role_policy_path)
+            fd, temporary = tempfile.mkstemp(prefix=target.name+".",suffix=".partial",dir=target.parent)
+            try:
+                with os.fdopen(fd,"wb") as stream:
+                    stream.write(proposal);stream.flush();os.fsync(stream.fileno())
+                os.replace(temporary,target)
+            finally:
+                if os.path.exists(temporary):os.unlink(temporary)
+            receipt={"schema":"radon_v5_role_policy_transition_v1",
+                "lease_id":lease["lease_id"],"previous_sha256":live_policy_sha,
+                "installed_sha256":file_sha256(target),"time":now}
+            if receipt["installed_sha256"]!=lease["role_policy_sha256"]:
+                raise ValueError("Installed role policy bytes changed")
+            write(transition_path,receipt)
+        elif live_policy_sha == lease["role_policy_sha256"]:
+            if not transition_path.is_file():raise ValueError("Missing role transition receipt")
+            receipt=read(transition_path)
+            if (receipt.get("schema")!="radon_v5_role_policy_transition_v1"
+                    or receipt.get("lease_id")!=lease["lease_id"]
+                    or receipt.get("previous_sha256")!=lease["previous_role_policy_sha256"]
+                    or receipt.get("installed_sha256")!=lease["role_policy_sha256"]):
+                raise ValueError("Role transition receipt changed")
+        else:
             raise ValueError("Role policy changed")
         if file_sha256(control_path) != lease["control_sha256"]:
             raise ValueError("Refiller control changed")

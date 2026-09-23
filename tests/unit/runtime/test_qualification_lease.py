@@ -9,6 +9,7 @@ from radon_bridge.runtime.state import file_sha256
 def fixture(tmp_path, now=100):
     tmp_path.mkdir(parents=True,exist_ok=True)
     role=tmp_path/'role.json';role.write_text('{}\n')
+    proposed=tmp_path/'role.proposed.json';proposed.write_text('{"qualification":true}\n')
     control=tmp_path/'control.json';control.write_text('{"stop_future_requests":true}\n')
     packet=tmp_path/'packet.json';packet.write_text(json.dumps({
         'schema':'radon_v5_next_update_packet_v1','test_access':False,'requested_gpus':1,
@@ -19,12 +20,14 @@ def fixture(tmp_path, now=100):
     lease={'schema':'radon_v5_qualification_lease_v1','lease_id':'rb-once','project':'Radon_Bridge',
         'mode':'qualification','requested_gpus':1,'packet_sha256':file_sha256(packet),'expires_at':now+60,
         'test_access':False,'account_limit':24,'return_entitlement':{'project':'Uncertainty_Lab','gpus':2},
-        'role_policy_sha256':file_sha256(role),'control_sha256':file_sha256(control)}
+        'role_policy_sha256':file_sha256(proposed),'previous_role_policy_sha256':file_sha256(role),
+        'control_sha256':file_sha256(control)}
     st=lock.stat();lease.update(account_lock_inode=st.st_ino,account_lock_device=st.st_dev,
         account_lock_ctime_ns=st.st_ctime_ns,journal_initial_sha256=file_sha256(journal),
         intent_initial_sha256=file_sha256(intent))
     leasep=tmp_path/'lease.json';leasep.write_text(json.dumps(lease))
-    return lease,dict(lease_path=leasep,role_policy_path=role,control_path=control,packet_path=packet,
+    return lease,dict(lease_path=leasep,role_policy_path=role,role_policy_proposal_path=proposed,
+        policy_transition_receipt_path=tmp_path/'transition.json',control_path=control,packet_path=packet,
         account_lock=lock,journal_path=journal,intent_path=intent)
 
 
@@ -60,7 +63,7 @@ def test_busy_shared_lock_does_not_snapshot_or_submit(tmp_path):
     assert result['state']=='waiting_account_lock'
 
 
-@pytest.mark.parametrize('field,pattern',[('role_policy_path','Role policy'),('control_path','Refiller control'),('packet_path','packet')])
+@pytest.mark.parametrize('field,pattern',[('role_policy_proposal_path','Role policy proposal'),('control_path','Refiller control'),('packet_path','packet')])
 def test_identity_drift_fails_closed(tmp_path,field,pattern):
     _,paths=fixture(tmp_path);paths[field].write_text('changed\n')
     with pytest.raises(ValueError,match=pattern):
@@ -73,6 +76,18 @@ def test_unidentified_submission_is_terminal_and_not_retried(tmp_path):
     assert result['state']=='identity_drift'
     assert q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
         submit=lambda cmd,timeout:pytest.fail('retry'),now=101)['state']=='submission_intent_needs_review'
+
+
+def test_scheduler_timeout_keeps_intent_and_never_retries(tmp_path):
+    _,paths=fixture(tmp_path);calls=[]
+    def timeout(command,timeout):
+        calls.append((command,timeout));raise TimeoutError('ambiguous scheduler RPC')
+    with pytest.raises(TimeoutError):
+        q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},submit=timeout,now=100)
+    assert len(calls)==1 and json.loads(paths['intent_path'].read_text())['attempt']['state']=='intent'
+    again=q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
+        submit=lambda c,timeout:pytest.fail('retry'),now=101)
+    assert again['state']=='submission_intent_needs_review'
 
 
 def test_missing_or_replaced_account_lock_fails_closed(tmp_path):
