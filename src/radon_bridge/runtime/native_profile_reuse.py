@@ -128,7 +128,24 @@ def live_envelope(torch, job, step):
         return value
     ram=gib(tres.get('mem')); cpus=int(tres['cpu']);other_ram=0;other_cpus=0;worker_cpus=None;worker_ram=None
     if cpus <= 0:raise ValueError('Unknown Slurm CPU limit')
-    lines=subprocess.check_output(['scontrol','show','step',str(job),'-o'],text=True,timeout=20)
+    # ``scontrol show step JOB`` can enumerate a large historical step set and
+    # has timed out in production before the profile could start.  Ask Slurm
+    # for the currently accounted step identities, then inspect each identity
+    # explicitly.  Unknown or malformed identities remain fail closed.
+    listed=subprocess.check_output(
+        ['sstat','-j',str(job),'--noheader','--parsable2','--format=JobID'],
+        text=True,timeout=20)
+    step_ids=[]
+    prefix=str(job)+'.'
+    for line in listed.splitlines():
+        identity=line.split('|',1)[0].strip()
+        if not identity or identity.endswith(('.extern','.batch')):continue
+        if not identity.startswith(prefix):raise ValueError('Foreign Slurm step identity')
+        if identity not in step_ids:step_ids.append(identity)
+    if not step_ids:raise ValueError('Actual Slurm step identities unknown')
+    lines='\n'.join(subprocess.check_output(
+        ['scontrol','show','step',identity,'-o'],text=True,timeout=20).strip()
+        for identity in step_ids)
     for line in lines.splitlines():
         row=fields(line)
         if row.get('State')!='RUNNING' or row.get('StepId','').endswith(('.extern','.batch')):continue

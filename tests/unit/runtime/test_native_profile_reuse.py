@@ -60,7 +60,9 @@ def test_live_envelope_uses_slurm_limits_and_rejects_scientific_companion(monkey
     steps=['StepId=42.1 State=RUNNING CPUs=14 TRES=cpu=14,mem=100G',
            'StepId=42.0 State=RUNNING CPUs=1 TRES=cpu=1,mem=2G']
     def output(command,**_):
-        return 'AllocTRES=cpu=16,mem=128G' if 'job' in command else '\n'.join(steps)
+        if 'job' in command:return 'AllocTRES=cpu=16,mem=128G'
+        if command[0]=='sstat':return '42.1|\n42.0|'
+        return next(row for row in steps if row.startswith('StepId='+command[3]+' '))
     monkeypatch.setattr(subprocess,'check_output',output)
     row=live_envelope(gpu,'42','1')
     assert row['allocated_ram_gib']==128 and row['other_ram_gib']==2
@@ -107,10 +109,38 @@ def test_live_envelope_requires_finite_positive_worker_memory(monkeypatch, memor
     def output(command, **_):
         if 'job' in command:
             return 'AllocTRES=cpu=16,mem=128G'
+        if command[0]=='sstat':return '42.1|'
         return f'StepId=42.1 State=RUNNING CPUs=14 TRES=cpu=14,{memory}'
     monkeypatch.setattr(subprocess, 'check_output', output)
     with pytest.raises(ValueError):
         live_envelope(None, '42', '1')
+
+
+def test_live_envelope_queries_exact_current_steps_and_rejects_foreign_identity(monkeypatch):
+    from types import SimpleNamespace
+    from radon_bridge.runtime.native_profile_reuse import live_envelope
+    import subprocess
+    gpu=SimpleNamespace(cuda=SimpleNamespace(mem_get_info=lambda _: (79*1024**3,80*1024**3)))
+    commands=[]
+    def output(command, **_):
+        commands.append(command)
+        if 'job' in command:return 'AllocTRES=cpu=16,mem=128G'
+        if command[0]=='sstat':return '42.1|\n42.0|'
+        rows={'42.1':'StepId=42.1 State=RUNNING CPUs=14 TRES=cpu=14,mem=106G',
+              '42.0':'StepId=42.0 State=RUNNING CPUs=1 TRES=cpu=1,mem=2G'}
+        return rows[command[3]]
+    monkeypatch.setattr(subprocess,'check_output',output)
+    assert live_envelope(gpu,'42','1')['worker_ram_gib']==106
+    assert ['scontrol','show','step','42','-o'] not in commands
+    assert ['scontrol','show','step','42.1','-o'] in commands
+    assert ['scontrol','show','step','42.0','-o'] in commands
+    def foreign(command, **_):
+        if 'job' in command:return 'AllocTRES=cpu=16,mem=128G'
+        if command[0]=='sstat':return '99.1|'
+        raise AssertionError('foreign identity must fail before query')
+    monkeypatch.setattr(subprocess,'check_output',foreign)
+    with pytest.raises(ValueError,match='Foreign Slurm step identity'):
+        live_envelope(gpu,'42','1')
 
 
 @pytest.mark.parametrize('key', ['peak_step_memory_gib', 'peak_gpu_gib'])
