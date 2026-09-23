@@ -68,7 +68,8 @@
   "blockers": [
     "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
     "Active parent controller lacks accepted project runtime binding",
-    "A100 complete-pair replay, full UKB protocol and production GPU integration acceptance remain required"
+    "A100 complete-pair replay, full UKB protocol and production GPU integration acceptance remain required",
+    "Existing generation5 macular cache is 2-D only; OCT3D extension awaits explicit adoption by its original single writer and complete independent cache acceptance"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -107,7 +108,8 @@
     "2026-09-23 factorized24 and centered2 completed 52-state independent conversion and per-case original-V4/direct-V5 Ada replay: 296 development participants, two original16 updates, outputs, eight intermediate states, input/parameter gradients, optimizer, buffers and exact checkpoint next update. FP32 rtol1e-5/atol1e-6; test unused; no research run reopened or production consumer switched. Evidence docs/acceptance/v5_factorized_centered_20260923.json.",
     "2026-09-23 formal V5 pin: submodule and source lock now bind V5 commit1287681 and wheel SHA c022b4f4; companion lock binds MHD_Models cc16e74. Candidate/formal runtime source trees are identical for both dependencies. A fresh published-wheel replay of factorized_R1024_radon_seed3416 passed dev296, two original16 updates, gradients, eight intermediate states, optimizer/buffers and exact checkpoint next update. Test unused; dispatch and production cutover remain false.",
     "2026-09-23 Ibex memory-incident re-audit: all six full-cohort V4 runs remain needs_review with failed claims and no formal update beyond the contained failure. The reviewed 106/128/2 GiB recovery owner is alive and nine bound requests await the existing rotation; no recovery owner has started. Three unrelated full-data trainings have fresh running claims/status and were preserved. Verified manifests contain 58,365-58,403 train and 12,503-12,510 development samples with test unused. Direct-V5 production requires explicit full-state conversion, immutable V5 specs, A100 full-route replay, atomic owner/claim handoff and downstream verification; incident remains open. Evidence docs/acceptance/ibex_memory_recovery_audit_20260923.json.",
-    "2026-09-23 first full-cohort optimizer-boundary conversion: a stable read-only DenseNet3D snapshot from a healthy V4 owner was converted with the explicit source-bound scheduler adapter. Model, SGD optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, epoch/offset/update cursor, selected state and Node IDs were preserved exactly; strict CPU model/optimizer/scheduler load passed. A100 one-GPU RNG restore, exact next update, complete train/development replay and owner handoff remain pending; dispatch is disabled and the healthy source was unchanged. Evidence docs/acceptance/v5_full_resume_static_20260923.json."
+    "2026-09-23 first full-cohort optimizer-boundary conversion: a stable read-only DenseNet3D snapshot from a healthy V4 owner was converted with the explicit source-bound scheduler adapter. Model, SGD optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, epoch/offset/update cursor, selected state and Node IDs were preserved exactly; strict CPU model/optimizer/scheduler load passed. A100 one-GPU RNG restore, exact next update, complete train/development replay and owner handoff remain pending; dispatch is disabled and the healthy source was unchanged. Evidence docs/acceptance/v5_full_resume_static_20260923.json.",
+    "2026-09-23 OCT3D cache extension candidate: the current generation5 macular engine/overlay is explicitly 2-D and cannot materialize oct_volume_3d.npy. A separate immutable operation/output/lock candidate binds the same 70,885-row bundle, train/development manifests, recipe and per-participant OCT3D hashes. Full canonical proposal adoption by the existing writer is required and the staged zero-SHA contract fails closed. One-eye and two-eye read-only recipe replays were byte-identical to frozen references and the old derived cache; CPU 257 tests passed. No writer/output/GPU was started. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -219,6 +221,10 @@
     {
       "label": "First full-cohort optimizer-boundary static V5 conversion",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_full_resume_static_20260923.json"
+    },
+    {
+      "label": "Single-owner OCT3D cache extension candidate; not adopted or executed",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/oct3d_cache_extension_candidate_20260923.json"
     }
   ]
 }
