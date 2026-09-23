@@ -4,6 +4,7 @@ This is an adapter for the established R&B dispatcher journal, not a daemon or
 refiller.  A separately accepted role-policy receipt must grant the lease.
 """
 import fcntl
+import copy
 import json
 import os
 from pathlib import Path
@@ -118,22 +119,14 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
         if live_policy_sha == lease["previous_role_policy_sha256"]:
             if transition_path.exists():
                 raise ValueError("Unexpected prior role transition receipt")
-            # Install the exact reviewed bytes while the same account lock is held.
-            proposal = Path(role_policy_proposal_path).read_bytes()
-            target = Path(role_policy_path)
-            fd, temporary = tempfile.mkstemp(prefix=target.name+".",suffix=".partial",dir=target.parent)
-            try:
-                with os.fdopen(fd,"wb") as stream:
-                    stream.write(proposal);stream.flush();os.fsync(stream.fileno())
-                os.replace(temporary,target)
-            finally:
-                if os.path.exists(temporary):os.unlink(temporary)
-            receipt={"schema":"radon_v5_role_policy_transition_v1",
-                "lease_id":lease["lease_id"],"previous_sha256":live_policy_sha,
-                "installed_sha256":file_sha256(target),"time":now}
-            if receipt["installed_sha256"]!=lease["role_policy_sha256"]:
-                raise ValueError("Installed role policy bytes changed")
-            write(transition_path,receipt)
+            current=read(role_policy_path);expected=copy.deepcopy(current)
+            journals=expected.get("projects",{}).get("Uncertainty_Lab",{}).get("request_journals")
+            if not isinstance(journals,list) or str(journal_path) in journals:
+                raise ValueError("Borrowed journal transition is not unique")
+            journals.append(str(journal_path))
+            if read(role_policy_proposal_path)!=expected:
+                raise ValueError("Proposal must only register the borrowed journal under Uncertainty_Lab")
+            install_required=True
         elif live_policy_sha == lease["role_policy_sha256"]:
             if not transition_path.is_file():raise ValueError("Missing role transition receipt")
             receipt=read(transition_path)
@@ -142,6 +135,7 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
                     or receipt.get("previous_sha256")!=lease["previous_role_policy_sha256"]
                     or receipt.get("installed_sha256")!=lease["role_policy_sha256"]):
                 raise ValueError("Role transition receipt changed")
+            install_required=False
         else:
             raise ValueError("Role policy changed")
         if file_sha256(control_path) != lease["control_sha256"]:
@@ -176,6 +170,24 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
                 or command[0] != "sbatch" or "--parsable" not in command
                 or not any(x == "--gres=gpu:a100:1" for x in command)):
             raise ValueError("Invalid qualification packet")
+        if install_required:
+            # All static, journal and capacity gates passed. Install the exact
+            # reviewed bytes immediately before the durable intent and sbatch.
+            proposal = Path(role_policy_proposal_path).read_bytes()
+            target = Path(role_policy_path)
+            fd, temporary = tempfile.mkstemp(prefix=target.name+".",suffix=".partial",dir=target.parent)
+            try:
+                with os.fdopen(fd,"wb") as stream:
+                    stream.write(proposal);stream.flush();os.fsync(stream.fileno())
+                os.replace(temporary,target)
+            finally:
+                if os.path.exists(temporary):os.unlink(temporary)
+            receipt={"schema":"radon_v5_role_policy_transition_v1",
+                "lease_id":lease["lease_id"],"previous_sha256":live_policy_sha,
+                "installed_sha256":file_sha256(target),"time":now}
+            if receipt["installed_sha256"]!=lease["role_policy_sha256"]:
+                raise ValueError("Installed role policy bytes changed")
+            write(transition_path,receipt)
         entry = {"lease_id": lease["lease_id"], "packet_sha256": lease["packet_sha256"],
                  "state": "intent", "requested_gpus": 1, "time": now}
         intent["attempt"] = entry; write(intent_path, intent)

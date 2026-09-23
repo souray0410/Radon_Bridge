@@ -8,14 +8,17 @@ from radon_bridge.runtime.state import file_sha256
 
 def fixture(tmp_path, now=100):
     tmp_path.mkdir(parents=True,exist_ok=True)
-    role=tmp_path/'role.json';role.write_text('{}\n')
-    proposed=tmp_path/'role.proposed.json';proposed.write_text('{"qualification":true}\n')
+    policy={'schema':'research_gpu_roles_v1','account_ceiling':24,'native_max_gpus':0,
+        'projects':{'Uncertainty_Lab':{'reserved_gpus':2,'request_journals':[]}}}
+    role=tmp_path/'role.json';role.write_text(json.dumps(policy)+'\n')
     control=tmp_path/'control.json';control.write_text('{"stop_future_requests":true}\n')
     packet=tmp_path/'packet.json';packet.write_text(json.dumps({
         'schema':'radon_v5_next_update_packet_v1','test_access':False,'requested_gpus':1,
         'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch']})+'\n')
     lock=tmp_path/'account.lock';lock.touch()
     journal=tmp_path/'requests.json';journal.write_text(json.dumps({'schema':'radon_v5_qualification_requests_v1','requests':[]}))
+    policy['projects']['Uncertainty_Lab']['request_journals'].append(str(journal))
+    proposed=tmp_path/'role.proposed.json';proposed.write_text(json.dumps(policy)+'\n')
     intent=tmp_path/'intent.json';intent.write_text(json.dumps({'schema':'radon_v5_qualification_intent_v1','attempt':None}))
     lease={'schema':'radon_v5_qualification_lease_v1','lease_id':'rb-once','project':'Radon_Bridge',
         'mode':'qualification','requested_gpus':1,'packet_sha256':file_sha256(packet),'expires_at':now+60,
@@ -88,6 +91,16 @@ def test_scheduler_timeout_keeps_intent_and_never_retries(tmp_path):
     again=q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
         submit=lambda c,timeout:pytest.fail('retry'),now=101)
     assert again['state']=='submission_intent_needs_review'
+
+
+def test_failed_static_gate_does_not_install_role_policy(tmp_path):
+    lease,paths=fixture(tmp_path);before=paths['role_policy_path'].read_bytes()
+    paths['packet_path'].write_text('changed\n')
+    with pytest.raises(ValueError,match='packet'):
+        q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
+            submit=lambda c,timeout:pytest.fail('submit'),now=100)
+    assert paths['role_policy_path'].read_bytes()==before
+    assert not paths['policy_transition_receipt_path'].exists()
 
 
 def test_missing_or_replaced_account_lock_fails_closed(tmp_path):
