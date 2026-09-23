@@ -22,11 +22,13 @@
     "nonblocking_single_writer_lock": true,
     "finite_participant_and_time_budgets": true,
     "owner_adoption_receipt_required": true,
+    "owner_adoption_binds_complete_proposal_digest": true,
+    "state_cursor_type_and_range_checked": true,
     "test_access": false
   },
   "validation": {
-    "targeted_tests": "2 passed",
-    "full_cpu_tests": "256 passed",
+    "targeted_tests": "3 passed",
+    "full_cpu_tests": "257 passed",
     "restricted_data_executed": false,
     "gpu_executed": false
   },

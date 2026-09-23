@@ -63,6 +63,13 @@ def load_contract(path: Path) -> dict:
     return contract
 
 
+def proposal_digest(contract: dict) -> str:
+    """Hash the complete proposal without its later owner-receipt reference."""
+    proposal = {key: value for key, value in contract.items() if key != "owner_adoption_sha256"}
+    encoded = json.dumps(proposal, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def validate_adoption(contract: dict, receipt_path: Path) -> dict:
     if sha(receipt_path) != contract["owner_adoption_sha256"]:
         raise ValueError("owner adoption receipt changed")
@@ -75,6 +82,7 @@ def validate_adoption(contract: dict, receipt_path: Path) -> dict:
         "single_writer": True,
         "source_operation_immutable": True,
         "test_access": False,
+        "proposal_sha256": proposal_digest(contract),
     }
     if any(receipt.get(key) != value for key, value in expected.items()):
         raise ValueError("owner adoption contract is not accepted")
@@ -227,11 +235,16 @@ def run(contract_path: Path, adoption_path: Path, max_participants: int, max_sec
                   "contract_sha256": sha(contract_path), "owner_adoption_sha256": sha(adoption_path),
                   "next_index": 0, "completed": 0, "state": "initialized", "test_access": False}
                  if not state_path.exists() else json.loads(state_path.read_text()))
-        if (state.get("contract_sha256") != sha(contract_path)
+        index = state.get("next_index")
+        if (state.get("schema") != "oct3d_cache_extension_state_v1"
+                or state.get("operation_id") != contract["operation_id"]
+                or state.get("test_access") is not False
+                or type(index) is not int or not 0 <= index <= len(rows)
+                or state.get("completed") != index
+                or state.get("contract_sha256") != sha(contract_path)
                 or state.get("owner_adoption_sha256") != contract["owner_adoption_sha256"]):
             raise ValueError("extension state identity changed")
         started = time.monotonic()
-        index = state["next_index"]
         limit = min(len(rows), index + max_participants)
         while index < limit and time.monotonic() - started < max_seconds:
             materialize(rows[index], Path(contract["raw_root"]), output, contract["recipe"])
