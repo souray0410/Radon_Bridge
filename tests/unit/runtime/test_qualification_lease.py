@@ -15,15 +15,17 @@ def fixture(tmp_path, now=100):
         'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch']})+'\n')
     lock=tmp_path/'account.lock';lock.touch()
     journal=tmp_path/'requests.json';journal.write_text(json.dumps({'schema':'radon_v5_qualification_requests_v1','requests':[]}))
+    intent=tmp_path/'intent.json';intent.write_text(json.dumps({'schema':'radon_v5_qualification_intent_v1','attempt':None}))
     lease={'schema':'radon_v5_qualification_lease_v1','lease_id':'rb-once','project':'Radon_Bridge',
         'mode':'qualification','requested_gpus':1,'packet_sha256':file_sha256(packet),'expires_at':now+60,
         'test_access':False,'account_limit':24,'return_entitlement':{'project':'Uncertainty_Lab','gpus':2},
         'role_policy_sha256':file_sha256(role),'control_sha256':file_sha256(control)}
     st=lock.stat();lease.update(account_lock_inode=st.st_ino,account_lock_device=st.st_dev,
-        account_lock_ctime_ns=st.st_ctime_ns,journal_initial_sha256=file_sha256(journal))
+        account_lock_ctime_ns=st.st_ctime_ns,journal_initial_sha256=file_sha256(journal),
+        intent_initial_sha256=file_sha256(intent))
     leasep=tmp_path/'lease.json';leasep.write_text(json.dumps(lease))
     return lease,dict(lease_path=leasep,role_policy_path=role,control_path=control,packet_path=packet,
-        account_lock=lock,journal_path=journal)
+        account_lock=lock,journal_path=journal,intent_path=intent)
 
 
 def test_ready_only_below_global_limit(tmp_path):
@@ -70,7 +72,7 @@ def test_unidentified_submission_is_terminal_and_not_retried(tmp_path):
     result=q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},submit=lambda cmd,timeout:'unknown',now=100)
     assert result['state']=='identity_drift'
     assert q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
-        submit=lambda cmd,timeout:pytest.fail('retry'),now=101)['state']=='terminal_identity_drift'
+        submit=lambda cmd,timeout:pytest.fail('retry'),now=101)['state']=='submission_intent_needs_review'
 
 
 def test_missing_or_replaced_account_lock_fails_closed(tmp_path):

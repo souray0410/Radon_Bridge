@@ -41,7 +41,7 @@ def validate(lease, now=None):
         "packet_sha256", "expires_at", "test_access", "account_limit",
         "return_entitlement", "role_policy_sha256", "control_sha256",
         "account_lock_inode", "account_lock_device", "account_lock_ctime_ns",
-        "journal_initial_sha256",
+        "journal_initial_sha256", "intent_initial_sha256",
     }
     if set(lease) != required or lease["schema"] != "radon_v5_qualification_lease_v1":
         raise ValueError("Unknown qualification lease")
@@ -54,6 +54,7 @@ def validate(lease, now=None):
             or not HEX.fullmatch(lease["role_policy_sha256"])
             or not HEX.fullmatch(lease["control_sha256"])
             or not HEX.fullmatch(lease["journal_initial_sha256"])
+            or not HEX.fullmatch(lease["intent_initial_sha256"])
             or any(type(lease[k]) is not int or lease[k] <= 0 for k in
                    ("account_lock_inode", "account_lock_device", "account_lock_ctime_ns"))):
         raise ValueError("Lease identity is incomplete")
@@ -86,7 +87,7 @@ def decide(lease, account, journal, *, now=None):
 
 
 def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
-                 account_lock, journal_path, snapshot, submit, now=None):
+                 account_lock, journal_path, intent_path, snapshot, submit, now=None):
     """Submit once after revalidating every identity under the shared lock."""
     from radon_bridge.runtime.state import file_sha256
     now = time.time() if now is None else now
@@ -123,6 +124,13 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
         decision = decide(lease, snapshot(), journal, now=now)
         if decision["action"] != "submit_once":
             return decision
+        intent = read(intent_path)
+        if intent.get("schema") != "radon_v5_qualification_intent_v1":
+            raise ValueError("Unknown qualification intent journal")
+        if intent.get("attempt") is not None:
+            return {"action": "none", "state": "submission_intent_needs_review"}
+        if file_sha256(intent_path) != lease["intent_initial_sha256"]:
+            raise ValueError("Initial qualification intent changed")
         packet = read(packet_path)
         command = packet.get("command")
         if (packet.get("schema") != "radon_v5_next_update_packet_v1"
@@ -135,13 +143,15 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
             raise ValueError("Invalid qualification packet")
         entry = {"lease_id": lease["lease_id"], "packet_sha256": lease["packet_sha256"],
                  "state": "intent", "requested_gpus": 1, "time": now}
-        journal["requests"].append(entry); write(journal_path, journal)
+        intent["attempt"] = entry; write(intent_path, intent)
         job_id = str(submit(command, timeout=20))
         if not job_id.isdigit():
             entry.update(state="identity_drift", observed_job_id=job_id)
+            write(intent_path, intent)
         else:
             entry.update(state="submitted", job_id=job_id)
-        write(journal_path, journal)
+            journal["requests"].append(dict(entry)); write(journal_path, journal)
+            write(intent_path, intent)
         return {"action": "none", "state": entry["state"], "job_id": entry.get("job_id")}
 
 
