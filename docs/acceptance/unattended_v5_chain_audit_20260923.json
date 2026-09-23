@@ -1,0 +1,159 @@
+{
+  "schema": "radon_unattended_v5_chain_audit_v1",
+  "observed_at_utc": "2026-09-23T17:38:03Z",
+  "scope": "ibex_v4_owner_rotation_v5_candidate_and_ws02_oct3d_cache",
+  "test_access": false,
+  "ibex_control_plane": {
+    "finite_dispatcher": {
+      "pid": 3555102,
+      "process_start": "2026-09-22T15:33:42Z",
+      "host": "vsc509-03-l",
+      "state": "waiting_dependencies",
+      "error": null,
+      "heartbeat_fresh": true,
+      "single_dispatch_lock": true
+    },
+    "account_refiller": {
+      "pid": 3274578,
+      "process_start": "2026-09-22T12:41:06Z",
+      "host": "vsc509-03-l",
+      "state": "future_requests_paused",
+      "stop_future_requests": true,
+      "reason": "authorized_Liu_two_A100_project_rotation; preserve_existing_allocations",
+      "existing_allocations_preserved": true,
+      "single_global_lock": true
+    },
+    "interpretation": "Both persistent processes are live on their recorded login host. The global refiller intentionally creates no future native requests while current allocations continue; this is a policy gate, not a crashed daemon."
+  },
+  "historical_v4_runs": {
+    "running": [
+      {
+        "run_id": "2026_09_10_14_34_24_788954",
+        "job_id": "52332277",
+        "step": "1",
+        "claim_generation": 184
+      },
+      {
+        "run_id": "2026_09_10_22_53_17_826487",
+        "job_id": "52346748",
+        "step": "1",
+        "claim_generation": 311
+      },
+      {
+        "run_id": "2026_09_12_11_23_31_757494",
+        "job_id": "52347745",
+        "step": "1",
+        "claim_generation": 105
+      },
+      {
+        "run_id": "2026_09_12_11_23_32_710666",
+        "job_id": "52333813",
+        "step": "1",
+        "claim_generation": 177
+      },
+      {
+        "run_id": "2026_09_12_11_23_32_754476",
+        "job_id": "52336187",
+        "step": "1",
+        "claim_generation": 182
+      }
+    ],
+    "running_contract": "Each run has one matching durable claim, allocation owner, Slurm step and fresh owner status. The owner checkpoints on its established native schedule and requests pause before allocation expiry. Completion is verified before the claim is released completed; failed or unprovably dead steps remain protected.",
+    "held": {
+      "run_id": "2026_09_12_11_23_31_715620",
+      "job_id": "52347024",
+      "claim_generation": 110,
+      "claim_state": "failed",
+      "allocation_state": "COMPLETED",
+      "allocation_exit_code": "0:0",
+      "worker_returncode": 1,
+      "failure": "The worker timed out while running the aggregate `scontrol show step JOB -o` query in live_envelope before formal continuation. The checkpoint remains held and is not automatically eligible for another claim."
+    }
+  },
+  "implemented_repair": {
+    "commit": "aaa3d07a7728ae502d8e6828b2f0b1e00b606dbd",
+    "behavior": "Resource-envelope discovery now obtains current step identities with sstat and queries each exact JOB.STEP. It rejects empty, foreign or malformed identities and still accounts for the small allocation-control owner and rejects unmeasured scientific companions.",
+    "deployment": "candidate_only",
+    "safe_handoff": "Do not hot-swap the five healthy owners. Stage this exact source only in a formal-V5 candidate runtime after an old owner naturally releases; independently review the failed claim and checkpoint, convert its immutable V4 optimizer boundary, pass strict CPU and isolated A100 next-update replay, then acquire a new V5 claim through the existing Claims and finite dispatcher. Never re-admit it as V4."
+  },
+  "v5_migration_chain": {
+    "converter_available": true,
+    "converter_commit": "2dc57c49715d96c7b691ed302879bc579103406b",
+    "normal_loader_v4_fallback": false,
+    "automatic_trigger_present": false,
+    "production_dispatch_enabled": false,
+    "blocker": "The five checkpoints are mutable under their V4 owners. No accepted control-plane watcher freezes a released optimizer boundary, constructs its independent source description, runs conversion and replay, or atomically revises downstream references.",
+    "required_sequence": [
+      "old owner reaches and publishes a complete optimizer boundary",
+      "old step death and claim release are independently verified",
+      "immutable source snapshot and description bind checkpoint, spec, writer, model, optimizer groups, scheduler, RNG and data cursor",
+      "offline V4 to formal V5 conversion and strict CPU load",
+      "isolated single-A100 CUDA RNG restore and exact next update",
+      "new V5 claim is acquired through the existing controller",
+      "current downstream references and publication receipts are atomically revised"
+    ],
+    "first_isolated_candidate": {
+      "source_run": "2026_09_12_11_23_31_757494",
+      "source_checkpoint_sha256": "960317ac0d974ea9527160482692ab2ed78ee4204ba5b28100ccb7267a0a83fc",
+      "source_progress": {
+        "epoch": 9,
+        "offset": 256,
+        "updates": 29200
+      },
+      "target_checkpoint_sha256": "7b0166cad8c2e8f23da366d7d9bcd070b861b34351a904f12357a8cf2da4345a",
+      "target_selected_sha256": "c4354aee1f474560aac6bd29b74001cd87d4e2fc5f4da5639c1cdeecc913b98a",
+      "target_spec_sha256": "10b510461e61b70e92a9704fa62377a713bf9952562d55363354e7bfcf0558e5",
+      "acceptance_receipt_sha256": "c8ea1591cfc5fa2747271236978e24e52bcabc27abb545c646a2afd4a72364fa",
+      "mhd_models_commit": "7513dac6fa9fe54850b4301909deee9b02ee2c8e",
+      "mhd_framework_commit": "1287681c08846e11364c81653048435482e772a7",
+      "mhd_framework_wheel_sha256": "c022b4f4b0fa1f29458ad1bf9e0d04f6773e9454ab3bd8c07d416294483aab48",
+      "preserved": [
+        "model and shared-parameter identity",
+        "364-entry SGD optimizer state",
+        "scheduler state",
+        "Python/NumPy/Torch/CUDA RNG",
+        "epoch/offset/update data cursor",
+        "selected checkpoint"
+      ],
+      "cpu_strict_load": true,
+      "source_owner_stopped": false,
+      "gpu_next_update_replay": false,
+      "dispatch_allowed": false,
+      "production_handoff": false,
+      "interpretation": "This immutable copy is the latest safely published boundary captured for conversion, not the later mutable V4 owner state. CPU structural equivalence passed; it cannot replace the healthy owner until isolated A100 exact-next-update replay and a natural ownership handoff pass."
+    }
+  },
+  "ws02_oct3d_cache": {
+    "operation_id": "scope-v5-existing-raw-macular-oct3d-extension-v2-20260923",
+    "writer_identity": "generation5_original_ukb_raw_cache_science_writer",
+    "state": "paused_finite",
+    "completed": 1,
+    "next_index": 1,
+    "target_count": 70885,
+    "lock_holders": 0,
+    "writer_process_present": false,
+    "test_access": false,
+    "automatic_trigger_present": false,
+    "interpretation": "The one-participant accepted prefix is intact, but no process currently owns the operation. Starting another writer or extending the finite contract from the R&B controller would violate the accepted single-writer contract.",
+    "next_gate": "The original generation5 writer must adopt and launch the next immutable finite range under the same contract, lock and per-participant verification; R&B may consume only independently accepted outputs."
+  },
+  "downstream_publication": {
+    "v4_completion_verifier_present": true,
+    "v5_reference_revision_tools_present": true,
+    "automatic_cross_version_publisher_present": false,
+    "test_release_authorized": false,
+    "conclusion": "Current V4 training is unattended within an allocation, but the end-to-end V4-release to V5-replay to downstream-publication chain is not unattended. The explicit migration and publication gates are intentionally closed rather than silently treating a V4 result as V5."
+  },
+  "safe_automatic_progress": [
+    "Preserve the five healthy V4 owners until a natural complete optimizer boundary and independently verified release.",
+    "For every subsequent execution, freeze the released V4 source, convert to formal V5, pass CPU and isolated A100 replay, and acquire a new V5 claim through the existing controller.",
+    "Keep the failed sixth claim closed; review and convert its immutable checkpoint under the exact query-fixed V5 candidate before any new claim.",
+    "Keep future account refill paused while the current cross-project role policy requires it.",
+    "Keep OCT3D generation5 paused until the original writer resumes it."
+  ],
+  "limits": [
+    "No job, claim, owner, cache, production config or test split was modified.",
+    "The code repair is not deployed into running owners.",
+    "This audit does not claim production V5 cutover or complete OCT3D cache materialization."
+  ]
+}
