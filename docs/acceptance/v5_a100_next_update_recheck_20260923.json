@@ -1,0 +1,68 @@
+{
+  "schema": "radon_v5_next_update_independent_recheck_v1",
+  "state": "accepted_engineering_only",
+  "test_access": false,
+  "dispatch_allowed": false,
+  "production_cutover": false,
+  "source_run_id": "2026_09_12_11_23_31_715620",
+  "scheduler": {
+    "gpu_job_id": "52387276",
+    "gpu_terminal_state": "FAILED",
+    "gpu_exit_code": "1:0",
+    "elapsed_seconds": 43,
+    "finalizer_job_id": "52387277",
+    "finalizer_terminal_state": "COMPLETED",
+    "finalizer_exit_code": "0:0",
+    "requested_resources": {
+      "gpus": "a100:1",
+      "memory_gib": 160,
+      "cpus": 16,
+      "time": "48:00:00"
+    }
+  },
+  "original_automatic_receipt": {
+    "state": "failed",
+    "preserved": true,
+    "reason": "Comparator used scalar inequality for a NumPy RNG array and raised ambiguous truth-value before writing an accepted receipt.",
+    "gpu_stdout_sha256": "92ff5830bc94f3173d21d8dbf92ea6082bdb99c4ff02d71551241f64b826eede",
+    "finalizer_stdout_sha256": "19c45a11f6dc438cbdb4a4ccab8ea82b4343233651b18167b1de7f996d39b895",
+    "journal_sha256": "83363b3b04b09ed1bc26b1430fbdba84ce9b5f26389ed83d9f4037b1b577fe4f",
+    "intent_sha256": "974ce92b28c02220a7a7cf53aad843d45643c29d90114a07b49a2d2ec45d6f72",
+    "status_sha256": "c3058ee11aa998c2e90f75891ef48e39938a8e7220ce723be9db5f52447cd233"
+  },
+  "independent_read_only_recheck": {
+    "comparison": "recursive exact structure, dtype and value comparison; progress excludes wall-clock seconds",
+    "model_optimizer_scheduler_rng_node_ids_world_size": true,
+    "progress": {
+      "epoch": 8,
+      "offset": 21568,
+      "updates": 26905
+    },
+    "tensor_leaves": 1093,
+    "tensor_exact": 1093,
+    "tensor_close_only": 0,
+    "maximum_tensor_absolute_difference": 0.0,
+    "numpy_rng_arrays": 1,
+    "numpy_rng_exact": 1,
+    "errors": 0,
+    "v4_output_checkpoint_sha256": "6086ca471de37ec6578dba5c152d365350c2ceebfe73b41707ce41a2cb1c649a",
+    "v5_output_checkpoint_sha256": "bb5438f72b17a3ee4189106d04f22d50bcacb3fb1b11114a47fe8a56233b1dac",
+    "implementation": "src/radon_bridge/runtime/next_update_replay.py::compare_state (equivalent inline read-only invocation; no receipt was written into the immutable attempt)"
+  },
+  "fix": {
+    "commit": "d1ffcb72b8cf60508a5abac339e8399f254ceb1e",
+    "ci_run": 35906366177,
+    "ci_conclusion": "success",
+    "changes": [
+      "NumPy-aware replay comparison",
+      "future SBATCH directive-order validation"
+    ],
+    "targeted_tests": "23 passed"
+  },
+  "decision": {
+    "gpu_rerun_required_for_this_update": false,
+    "basis": "Both real A100 updates completed and the independent read-only comparison found exact complete-state equality.",
+    "remaining_gate": "Independent acceptance of this appended audit, then a separate formal V5 production claim and owner handoff. The failed finalizer is not rewritten."
+  },
+  "public_safety": "No participant identifiers, host paths, model tensors, credentials or sealed-test data are recorded."
+}

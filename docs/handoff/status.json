@@ -63,12 +63,13 @@
     "centered Radon相对未中心化Radon的F1点估计+2.17pp，但普通/三项同时区间均跨0；同时两分支log-loss变差且AUROC下降，不能将中心化概括为稳定或全面更好。",
     "2026-09-19 centered接受仅限WS02单seed3416开发集basis方向包；不代表Ibex、test、多种子、运行时去均值或全项目接受。",
     "2026-09-19 centered包使用其真实manager完成时刻作为本status evidence_cutoff；更早已接受包的各自科学截止时间仍保留在对应报告/资产中，不因本次发布重写。",
-    "Formal V5 is pinned and representative Ada replay passed; production owner cutover and complete workflow acceptance remain open."
+    "Formal V5 is pinned and representative Ada replay passed; production owner cutover and complete workflow acceptance remain open.",
+    "The original A100 qualification finalizer remains failed and was not rewritten; acceptance of the completed one-update equivalence comes from an append-only independent CPU recheck. This does not authorize production dispatch, full train/development replay, or owner cutover."
   ],
   "blockers": [
     "Five of six contained V4 parent runs are training again, but three live steps report MaxRSS effectively at the 106 GiB request and one run remains held; terminal full-lifecycle resource acceptance is incomplete",
     "Active parent controller lacks accepted project runtime binding",
-    "A100 complete-pair replay, full UKB protocol and production GPU integration acceptance remain required",
+    "A100 single-update equivalence has an append-only independent recheck; complete train/development replay, formal V5 production claim and production owner integration remain required",
     "Generation5 OCT3D V2 has only a one-participant accepted prefix; complete cache and independent acceptance remain required"
   ],
   "actions": [
@@ -111,7 +112,8 @@
     "2026-09-23 first full-cohort optimizer-boundary conversion: a stable read-only DenseNet3D snapshot from a healthy V4 owner was converted with the explicit source-bound scheduler adapter. Model, SGD optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, epoch/offset/update cursor, selected state and Node IDs were preserved exactly; strict CPU model/optimizer/scheduler load passed. A100 one-GPU RNG restore, exact next update, complete train/development replay and owner handoff remain pending; dispatch is disabled and the healthy source was unchanged. Evidence docs/acceptance/v5_full_resume_static_20260923.json.",
     "2026-09-23 OCT3D cache extension candidate: the current generation5 macular engine/overlay is explicitly 2-D and cannot materialize oct_volume_3d.npy. A separate immutable operation/output/lock candidate binds the same 70,885-row bundle, train/development manifests, recipe and per-participant OCT3D hashes. Full canonical proposal adoption by the existing writer is required and the staged zero-SHA contract fails closed. One-eye and two-eye read-only recipe replays were byte-identical to frozen references and the old derived cache; CPU 257 tests passed. No writer/output/GPU was started. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json.",
     "2026-09-23 OCT3D extension V2: the original generation5 writer independently rejected V1 for three missing launch identities. V2 now binds and verifies runner source SHA, Python/NumPy/Pillow, complete root manifest/status/verified-SQLite/verifier identities, file/byte totals, and the current raw-view symlink mapping before any output, lock or state mutation. CPU 258 tests and pinned-runtime one-eye/two-eye byte-exact replays passed. V2 still has an invalid adoption SHA and is not executed; it awaits another independent review by the original writer. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json.",
-    "2026-09-23 correction to the immutable Ibex memory audit: five of the six contained full-cohort V4 runs now have matching dispatcher task, Slurm job/step PID and fresh training status, with 1,342/2,199/2,407/1,281/1,269 formal updates after qualification; the sixth remains paused at update 26,904. Three live steps report MaxRSS effectively at their 106 GiB request, so the resource incident remains open pending terminal full-lifecycle peak and checkpoint integrity. Current checkpoints are mutable and cannot be converted until each owner publishes and releases an optimizer boundary. The strict offline converter is pinned at 2dc57c49715d96c7b691ed302879bc579103406b with CI 35893802569 successful; normal V5 loading has no V4 fallback. Evidence docs/acceptance/ibex_v4_recovery_progress_20260923.json."
+    "2026-09-23 correction to the immutable Ibex memory audit: five of the six contained full-cohort V4 runs now have matching dispatcher task, Slurm job/step PID and fresh training status, with 1,342/2,199/2,407/1,281/1,269 formal updates after qualification; the sixth remains paused at update 26,904. Three live steps report MaxRSS effectively at their 106 GiB request, so the resource incident remains open pending terminal full-lifecycle peak and checkpoint integrity. Current checkpoints are mutable and cannot be converted until each owner publishes and releases an optimizer boundary. The strict offline converter is pinned at 2dc57c49715d96c7b691ed302879bc579103406b with CI 35893802569 successful; normal V5 loading has no V4 fallback. Evidence docs/acceptance/ibex_v4_recovery_progress_20260923.json.",
+    "2026-09-23 A100 formal-V5 next-update qualification jobs 52387276/52387277 closed automatically as failed because the comparator used scalar inequality on a NumPy RNG array. The immutable failure receipt remains failed. A read-only independent recomputation over the completed outputs found all 1,093 Tensor leaves and the NumPy RNG array exactly equal, with epoch8/offset21568/updates26905 identical; no second GPU update is required for this equivalence check. The fixed comparator and future SBATCH header-order check are in d1ffcb7. Evidence docs/acceptance/v5_a100_next_update_recheck_20260923.json."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -231,6 +233,10 @@
     {
       "label": "Current Ibex five-running/one-held V4 recovery snapshot and V5 conversion gate",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/ibex_v4_recovery_progress_20260923.json"
+    },
+    {
+      "label": "Ibex A100 formal-V5 next-update failure and append-only independent exact recheck",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_a100_next_update_recheck_20260923.json"
     }
   ]
 }
