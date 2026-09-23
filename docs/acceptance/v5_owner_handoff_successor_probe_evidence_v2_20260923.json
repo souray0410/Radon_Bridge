@@ -1,0 +1,57 @@
+{
+  "schema": "radon_v5_owner_handoff_successor_probe_evidence_v2",
+  "state": "integration_gate_confirmed_not_deployed",
+  "predecessor": "docs/acceptance/v5_owner_handoff_successor_probe_20260923.json",
+  "live_control": {
+    "host": "vsc509-03-l",
+    "pid": 3555102,
+    "process_start_local": "2026-09-22T18:33:42",
+    "module": "mhd_models.scheduling.finite_dispatch",
+    "binding_sha256": "cb468f93d1a4849d25d7b98166938889b97e9fd1f6bd3a0e1e9224225b659013",
+    "management_finite_dispatch_sha256": "35904dba90bff44c224679c256e4a80b3b0b50bdc129156f7d93775ea9d399b5",
+    "frozen_radon_project_dispatch_sha256": "cbaf09eaaba700c6a05bc5fbf73c46dda60d89a1836163ff3f24e0e6c20391a6",
+    "dispatcher_lock": {
+      "inode": 16129423173954961433,
+      "device": 3372352463,
+      "mtime_epoch": 1789373234,
+      "ctime_epoch": 1789373234,
+      "holder_pid": 3555102
+    }
+  },
+  "rejected_isolated_candidate": {
+    "packet_sha256": "1c455b6639b5d3d74ecff922138325d0ff7fa2ad222f1a65a51f56dcab562666",
+    "validation_sha256": "025743dcc2e6cb032c70c922d4e5a6a0e3730d9a7584896396a034a10f23e929",
+    "static_binding_passed": true,
+    "legacy_work_passed": false,
+    "expected_rejection": "Direct-V5 Radon configure_control_imports rejects historical V4 dispatcher settings.",
+    "started": false
+  },
+  "minimum_wrapper_guard_interface": {
+    "location": "mhd_models.scheduling.finite_dispatch.submit_with_admission",
+    "binding_fields": [
+      "handoff_registry path",
+      "initial registry SHA256",
+      "guard schema/version"
+    ],
+    "behavior": [
+      "validate external registry before every admission publication",
+      "exclude an ACTIVE entry before calling frozen legacy eligible",
+      "revalidate the same entry immediately before delegating original_submit or fail closed",
+      "retain the exact frozen legacy executor and all scientific pins",
+      "publish ready receipt binding PID/start/binding/registry/lock identities",
+      "use existing standby armed gate, graceful old stop and same dispatcher lock handoff",
+      "publish active deployment receipt only after old PID death, old lock release, new PID lock ownership and fresh status"
+    ],
+    "rollback": [
+      "before any entry is armed, stop successor via its gate and restore the exact old binding",
+      "after any entry is armed, never restore an unguarded wrapper; keep a guard-capable owner or hold all new claims"
+    ]
+  },
+  "safety": {
+    "owners_modified": false,
+    "claims_modified": false,
+    "jobs_submitted": 0,
+    "armed": false,
+    "test_access": false
+  }
+}
