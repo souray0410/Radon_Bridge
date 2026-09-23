@@ -61,7 +61,7 @@ def test_live_envelope_uses_slurm_limits_and_rejects_scientific_companion(monkey
            'StepId=42.0 State=RUNNING CPUs=1 TRES=cpu=1,mem=2G']
     def output(command,**_):
         if 'job' in command:return 'AllocTRES=cpu=16,mem=128G'
-        if command[0]=='sstat':return '42.1|\n42.0|'
+        if command[0]=='sstat':return '\n'.join(row.split()[0].split('=',1)[1]+'|' for row in steps)
         return next(row for row in steps if row.startswith('StepId='+command[3]+' '))
     monkeypatch.setattr(subprocess,'check_output',output)
     row=live_envelope(gpu,'42','1')
