@@ -1,0 +1,130 @@
+{
+  "schema": "radon_ibex_live_memory_diagnostic_v1",
+  "observed_at_utc": "2026-09-23T17:24:23Z",
+  "scope": "read_only_three_live_steps_and_one_checkpoint_contract",
+  "test_access": false,
+  "steps": [
+    {
+      "run_id": "2026_09_10_14_34_24_788954",
+      "job_id": "52332277",
+      "step": "1",
+      "node": "gpu201-16-r",
+      "step_requested_memory_gib": 106,
+      "allocation_requested_memory_gib": 128,
+      "max_rss_kib": 111150656,
+      "ave_rss_kib": 107267656,
+      "slurm_state": "RUNNING",
+      "exit_code": "0:0",
+      "elapsed": "07:39:59"
+    },
+    {
+      "run_id": "2026_09_12_11_23_31_757494",
+      "job_id": "52347745",
+      "step": "1",
+      "node": "gpu109-02-r",
+      "step_requested_memory_gib": 106,
+      "allocation_requested_memory_gib": 128,
+      "max_rss_kib": 111150780,
+      "ave_rss_kib": 111009528,
+      "slurm_state": "RUNNING",
+      "exit_code": "0:0",
+      "elapsed": "07:02:20"
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_710666",
+      "job_id": "52333813",
+      "step": "1",
+      "node": "gpu109-16-l",
+      "step_requested_memory_gib": 106,
+      "allocation_requested_memory_gib": 128,
+      "max_rss_kib": 111150772,
+      "ave_rss_kib": 111000068,
+      "slurm_state": "RUNNING",
+      "exit_code": "0:0",
+      "elapsed": "07:27:50"
+    }
+  ],
+  "accounting_interpretation": {
+    "step_limit_kib": 111149056,
+    "finding": "All three MaxRSS values are about 1.5 MiB above the binary 106 GiB value, and two AveRSS values are also near that value. The repeated ceiling-shaped values are consistent with a Slurm jobacct or cgroup-scoped measurement at the step limit, but the available interface cannot distinguish a censored cgroup peak from aggregate resident pages with sufficient confidence.",
+    "process_rss_available": false,
+    "cgroup_memory_events_available": false,
+    "reason": "Direct SSH to compute nodes is denied. No extra Slurm step was created because that would perturb the running allocation. Therefore per-process RSS, memory.current, memory.peak, memory.events and kernel OOM counters were not read.",
+    "oom_evidence": "No terminal Slurm OOM state, nonzero exit code or stale scientific status was observed. This is absence of exposed evidence, not proof that memory.events oom/oom_kill counters are zero."
+  },
+  "freshness": [
+    {
+      "run_id": "2026_09_10_14_34_24_788954",
+      "observed_state": "training",
+      "epoch": 3,
+      "offset": 36672,
+      "updates": 9588,
+      "status_mtime_ns": 1790184328545096555,
+      "checkpoint_bytes": 554371445,
+      "checkpoint_mtime_ns": 1790184084765343286
+    },
+    {
+      "run_id": "2026_09_12_11_23_31_757494",
+      "observed_state": "validating",
+      "epoch": 8,
+      "status_mtime_ns": 1790184325480552943,
+      "checkpoint_bytes": 90651538,
+      "checkpoint_mtime_ns": 1790183497036614047
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_710666",
+      "observed_state": "training",
+      "epoch": 5,
+      "offset": 45136,
+      "updates": 17413,
+      "status_mtime_ns": 1790184317236342788,
+      "checkpoint_bytes": 369650105,
+      "checkpoint_mtime_ns": 1790184063756120286
+    }
+  ],
+  "continuation_decision": {
+    "current_jobs": "continue_to_natural_boundary_under_existing_owner",
+    "basis": "All three steps are live, have fresh status/checkpoint activity and expose no terminal failure. Interrupting them would discard healthy progress and would not improve the measurement. This is permission to preserve the current owners, not acceptance of a safe memory margin.",
+    "incident_closed": false,
+    "required_terminal_evidence": [
+      "natural boundary or terminal step state",
+      "final uncensored peak or independently accepted explanation of the ceiling-shaped accounting value",
+      "checkpoint integrity and strict reload",
+      "no OOM or oom_kill event evidence when the existing owner can expose it without a new step"
+    ]
+  },
+  "next_request_recommendation": {
+    "step_memory_gib": 128,
+    "allocation_memory_gib": 160,
+    "owner_memory_gib": 2,
+    "basis": "The observed 106 GiB peak is censored at the present limit. A 128 GiB worker request gives at least 20.75 percent headroom over 106 GiB, while a 160 GiB allocation retains room for the owner and lifecycle variance. Re-profile the complete lifecycle before reducing this request.",
+    "admission": "Use the existing dispatcher, lock, Claims and rotation. Do not cancel healthy jobs or introduce a competing controller."
+  },
+  "v5_replay_input_audit": {
+    "run_id": "2026_09_10_14_34_24_788954",
+    "freezeable_current_boundary_available": false,
+    "reason": "The only current full-resume file remains mutable under the live V4 owner; its mtime advanced during this audit. It was not copied, hashed or loaded.",
+    "immutable_spec_sha256": "91d7ff995509ebb9b4921f6e234ef2b07c3d22e32f4ab8f97bd8d0ed5d09715c",
+    "source_framework_api": "V4",
+    "source_framework_commit": "3559caa8d596d4438533a69d39d8a2c32eb21e46",
+    "model": "resnet50 inflated_3d",
+    "training_identity": "seed3416 fp32 microbatch1 effective_batch16 with distinct backbone/head learning rates; optimizer class and exact group order must be bound from the released checkpoint and pinned writer source",
+    "minimum_inputs_after_owner_release": [
+      "atomic immutable copy of the complete optimizer-boundary checkpoint and SHA256",
+      "independent source description bound to checkpoint, spec, writer and model-definition SHA256",
+      "model parameters and buffers plus exact optimizer parameter-group order/state",
+      "scheduler class/source/state",
+      "Python, NumPy, Torch and one-device CUDA RNG",
+      "epoch, offset, update, epoch_seen, epoch_loss, history and sampler/data cursor",
+      "selected-model state and Node IDs",
+      "formal V5 commit and wheel lock"
+    ],
+    "next_replay_gate": "After the old owner publishes and releases an immutable optimizer boundary, perform offline conversion, strict CPU load, then an isolated single-A100 CUDA-RNG restore and exact next-update comparison before any claim handoff."
+  },
+  "limits": [
+    "No job, step, owner, claim, configuration or production file was changed.",
+    "No extra Slurm step or GPU request was created.",
+    "The snapshot does not certify full-lifecycle memory safety or V5 production continuation.",
+    "No sealed test data was accessed."
+  ]
+}
