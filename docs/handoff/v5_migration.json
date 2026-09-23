@@ -42,5 +42,15 @@
     "evidence": "docs/acceptance/v5_augmentation_references_20260922.json",
     "source_commit": "3b08fd75c02a4643e77a60fdc32105ef0fd428f9",
     "production_cutover": false
+  },
+  "factorized_centered_replay": {
+    "state": "accepted_bounded_diagnostic",
+    "cases": 26,
+    "states": 52,
+    "development_participants_per_case": 296,
+    "continued_updates_per_case": 2,
+    "evidence": "docs/acceptance/v5_factorized_centered_20260923.json",
+    "dispatch_allowed": false,
+    "production_cutover": false
   }
 }

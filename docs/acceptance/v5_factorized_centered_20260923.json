@@ -1,0 +1,71 @@
+{
+  "schema": "radon_factorized_centered_v5_acceptance_v1",
+  "state": "bounded_real_data_replay_verified",
+  "project_commit": "df7bcd7161b1312e8a422995c9cbdfe02b327b72",
+  "framework_commit": "c78cfbdc9ec01e4dc1dc8ee04d04b2e6a8446808",
+  "companion_commit": "228b1254b1be5c1209831b93f7262962fe5222b7",
+  "original_training_framework": "V4",
+  "current_framework_api": "V5",
+  "totals": {
+    "cases": 26,
+    "converted_states": 52,
+    "replayed_states": 52,
+    "development_participants_per_case": 296,
+    "continued_updates_per_case": 2,
+    "real_batch": 16
+  },
+  "packages": [
+    {
+      "name": "factorized",
+      "cases": 24,
+      "states": 48,
+      "conversion_proof_sha256": "f1b73d22516e3d4f1551d998cbd83c7dfde31c470b24c05bcc3538dd1c89439f",
+      "replay_proof_sha256": "8c37b47a30087b0562695f1b862f60f92a1b48de27416191d9a9259abfdbb694",
+      "batch_receipt_sha256": [
+        "fa110ffd1fa7fb75c35fe14471b479665b1a02a5157fc4840bf13430209efdc1",
+        "4275616862acb359224ac1043fed051342456a77eeaa9cd3c00491c921ab6149"
+      ],
+      "replay_script_sha256": [
+        "61a235876b97f54a32b03ef0b51e363c2e5dd12e7b4bdf728da1fddc8f932d65"
+      ],
+      "independent_reviewer_sha256": "def5907193c9fbb2575f7d07a78d3f4e5dcb09cfacb1b3969fb38b4b22515c57",
+      "maximum_allocator_reserved_gib": 8.64453125
+    },
+    {
+      "name": "centered",
+      "cases": 2,
+      "states": 4,
+      "conversion_proof_sha256": "37c50b07fc8698b3daccd04a63157ec9a093f183c4364b4c39e3df5836e64c68",
+      "replay_proof_sha256": "969d73cfbe13b379a64b758779efe2d21ee4e113caa2c0d96bf643e4b2993eeb",
+      "batch_receipt_sha256": [
+        "410ac72426130b38609b8c2e3a7db5b35a25c9039c2006fa4dc334b4dfca7836"
+      ],
+      "replay_script_sha256": [
+        "ff2900bf916e9d72e49a933e4671cb262d6366c86c1414fd7f7bca1eb25d5094",
+        "61a235876b97f54a32b03ef0b51e363c2e5dd12e7b4bdf728da1fddc8f932d65"
+      ],
+      "independent_reviewer_sha256": "819218b2083eeb2ba4cedcbdbc355a73bae3adbcc6286b29b234bd13953d0886",
+      "maximum_allocator_reserved_gib": 8.15625
+    }
+  ],
+  "comparisons": {
+    "selected_development_outputs": true,
+    "intermediate_states": true,
+    "input_gradients": true,
+    "parameter_gradients": true,
+    "optimizer_and_buffers": true,
+    "native_eager_reference": true,
+    "current_checkpoint_next_update_exact": true,
+    "rtol": 1e-05,
+    "atol": 1e-06
+  },
+  "test_access": false,
+  "dispatch_allowed": false,
+  "production_cutover": false,
+  "limitations": [
+    "Single-device RTX 5000 Ada migration diagnostics; A100 handover remains open.",
+    "The 296-participant development replay is not the complete UK Biobank study protocol.",
+    "Original scientific runs and assets were not modified or reopened.",
+    "Current dependency references and production consumers remain unchanged pending the formal V5 release identity."
+  ]
+}
