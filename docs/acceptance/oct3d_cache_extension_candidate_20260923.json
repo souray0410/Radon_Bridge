@@ -29,7 +29,17 @@
   "validation": {
     "targeted_tests": "3 passed",
     "full_cpu_tests": "257 passed",
-    "restricted_data_executed": false,
+    "read_only_recipe_replay": {
+      "cases": 2,
+      "one_eye_shape": [1, 1, 128, 224, 224],
+      "two_eye_shape": [2, 1, 128, 224, 224],
+      "dtype": "uint8",
+      "rebuilt_npy_bytes_equal_frozen_reference_and_old_derived_cache": true,
+      "one_eye_sha256": "9f510a7d5d3345ecbc882d0d5bc87b34b41686431d092d689126b84ab5157c7d",
+      "two_eye_sha256": "11990002ce80e3fb187e38ed4bf7cc6ad1fff44bd06162b10df25ca2a23857ab"
+    },
+    "restricted_data_read_only_cases": 2,
+    "restricted_data_written": false,
     "gpu_executed": false
   },
   "deployment_gate": "The existing generation5 writer must publish and pin the owner-adoption receipt SHA. Until then the private contract deliberately contains an invalid zero SHA and execution fails closed.",
