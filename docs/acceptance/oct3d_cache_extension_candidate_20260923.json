@@ -1,0 +1,39 @@
+{
+  "schema": "radon_oct3d_cache_extension_candidate_receipt_v1",
+  "state": "implemented_not_adopted_not_executed",
+  "purpose": "Materialize the frozen train/development OCT3D arrays required by the direct-V5 DenseNet3D route.",
+  "source_cache_contract": {
+    "operation_id": "scope-v5-existing-raw-macular-cache-v2-20260922",
+    "rows": 70885,
+    "train_rows": 58380,
+    "development_rows": 12505,
+    "train_manifest_sha256": "d15ddfcba1ea210ab5d4d85e952c876fc05d288fc687bf104da65ef14682871e",
+    "development_manifest_sha256": "1958f4472933cccc5c3cb4b9d3d42315118e0703673eff086505b3949a1a863e",
+    "raw_row_bundle_sha256": "c690bde018b33c848c37ae0b55c4621ea12265fed12f624388b70cd63d966fd5",
+    "engine_sha256": "aa59ac0fbe6b6ee0de5f0e3fc84e667a9a5143ebc12fc834ca8364c1adda0e8d",
+    "overlay_sha256": "5d2def4c47624cb4546dfde7ab8d579543ba62d688bffe3957a3f83deeb9c2c0",
+    "materialized_modalities": ["cfp_2d.npy", "oct_bscan_2d.npy"]
+  },
+  "extension_contract": {
+    "separate_operation_identity": true,
+    "separate_output_root": true,
+    "source_operation_immutable": true,
+    "exact_oct_volume_sha_per_participant": true,
+    "nonblocking_single_writer_lock": true,
+    "finite_participant_and_time_budgets": true,
+    "owner_adoption_receipt_required": true,
+    "test_access": false
+  },
+  "validation": {
+    "targeted_tests": "2 passed",
+    "full_cpu_tests": "256 passed",
+    "restricted_data_executed": false,
+    "gpu_executed": false
+  },
+  "deployment_gate": "The existing generation5 writer must publish and pin the owner-adoption receipt SHA. Until then the private contract deliberately contains an invalid zero SHA and execution fails closed.",
+  "limitations": [
+    "This is a candidate extension, not a completed cache or runtime acceptance.",
+    "The existing 2-D cache writer is not modified or replaced.",
+    "A completed extension still requires independent full-cache validation before any GPU retry."
+  ]
+}
