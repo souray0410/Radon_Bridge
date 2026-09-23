@@ -19,7 +19,8 @@ def fixture(tmp_path, now=100):
         'mode':'qualification','requested_gpus':1,'packet_sha256':file_sha256(packet),'expires_at':now+60,
         'test_access':False,'account_limit':24,'return_entitlement':{'project':'Uncertainty_Lab','gpus':2},
         'role_policy_sha256':file_sha256(role),'control_sha256':file_sha256(control)}
-    lease.update(account_lock_inode=lock.stat().st_ino,journal_initial_sha256=file_sha256(journal))
+    st=lock.stat();lease.update(account_lock_inode=st.st_ino,account_lock_device=st.st_dev,
+        account_lock_ctime_ns=st.st_ctime_ns,journal_initial_sha256=file_sha256(journal))
     leasep=tmp_path/'lease.json';leasep.write_text(json.dumps(lease))
     return lease,dict(lease_path=leasep,role_policy_path=role,control_path=control,packet_path=packet,
         account_lock=lock,journal_path=journal)

@@ -40,7 +40,8 @@ def validate(lease, now=None):
         "schema", "lease_id", "project", "mode", "requested_gpus",
         "packet_sha256", "expires_at", "test_access", "account_limit",
         "return_entitlement", "role_policy_sha256", "control_sha256",
-        "account_lock_inode", "journal_initial_sha256",
+        "account_lock_inode", "account_lock_device", "account_lock_ctime_ns",
+        "journal_initial_sha256",
     }
     if set(lease) != required or lease["schema"] != "radon_v5_qualification_lease_v1":
         raise ValueError("Unknown qualification lease")
@@ -53,7 +54,8 @@ def validate(lease, now=None):
             or not HEX.fullmatch(lease["role_policy_sha256"])
             or not HEX.fullmatch(lease["control_sha256"])
             or not HEX.fullmatch(lease["journal_initial_sha256"])
-            or type(lease["account_lock_inode"]) is not int or lease["account_lock_inode"] <= 0):
+            or any(type(lease[k]) is not int or lease[k] <= 0 for k in
+                   ("account_lock_inode", "account_lock_device", "account_lock_ctime_ns"))):
         raise ValueError("Lease identity is incomplete")
     returned = lease["return_entitlement"]
     if returned != {"project": "Uncertainty_Lab", "gpus": 2}:
@@ -99,7 +101,10 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
         except BlockingIOError:
             return {"action": "none", "state": "waiting_account_lock"}
         lease = validate(read(lease_path), now)
-        if os.fstat(handle.fileno()).st_ino != lease["account_lock_inode"]:
+        lock_stat = os.fstat(handle.fileno())
+        if (lock_stat.st_ino, lock_stat.st_dev, lock_stat.st_ctime_ns) != (
+                lease["account_lock_inode"], lease["account_lock_device"],
+                lease["account_lock_ctime_ns"]):
             raise ValueError("Account lock identity changed")
         if file_sha256(role_policy_path) != lease["role_policy_sha256"]:
             raise ValueError("Role policy changed")
