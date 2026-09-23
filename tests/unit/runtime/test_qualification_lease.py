@@ -12,10 +12,12 @@ def fixture(tmp_path, now=100):
         'projects':{'Uncertainty_Lab':{'reserved_gpus':2,'request_journals':[]}}}
     role=tmp_path/'role.json';role.write_text(json.dumps(policy)+'\n')
     control=tmp_path/'control.json';control.write_text('{"stop_future_requests":true}\n')
-    packet=tmp_path/'packet.json';packet.write_text(json.dumps({
+    attempt_root=tmp_path/'attempts';packet=tmp_path/'packet.json';packet.write_text(json.dumps({
         'schema':'radon_v5_next_update_packet_v1','test_access':False,'requested_gpus':1,
         'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch'],
-        'finalizer_command_template':['sbatch','--parsable','--dependency=afterany:{gpu_job_id}','final.sbatch']})+'\n')
+        'finalizer_command_template':['sbatch','--parsable','--dependency=afterany:{gpu_job_id}','final.sbatch'],
+        'receipt_expectation':{'attempt_root':str(attempt_root),'source_commit':'abc123',
+            'inputs_sha256':{'v4_checkpoint':'a'*64,'v5_checkpoint':'b'*64}}})+'\n')
     lock=tmp_path/'account.lock';lock.touch()
     journal=tmp_path/'requests.json';journal.write_text(json.dumps({'schema':'radon_v5_qualification_requests_v1','requests':[]}))
     policy['projects']['Uncertainty_Lab']['request_journals'].append(str(journal))
@@ -94,6 +96,23 @@ def test_scheduler_timeout_keeps_intent_and_never_retries(tmp_path):
     assert again['state']=='submission_intent_needs_review'
 
 
+def test_gpu_is_role_registered_before_finalizer_submission(tmp_path):
+    _,paths=fixture(tmp_path);calls=[]
+    def submit(command,timeout):
+        calls.append(command)
+        if len(calls)==1:return '123'
+        journal=json.loads(paths['journal_path'].read_text())
+        assert journal['requests'][0]['job_id']=='123'
+        assert journal['requests'][0]['state']=='gpu_submitted_pending_finalizer'
+        raise TimeoutError('ambiguous finalizer RPC')
+    with pytest.raises(TimeoutError):
+        q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},submit=submit,now=100)
+    entry=json.loads(paths['journal_path'].read_text())['requests'][0]
+    assert entry['state']=='finalizer_submission_needs_review'
+    assert q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
+        submit=lambda c,timeout:pytest.fail('GPU must not be retried'),now=101)['state']=='already_submitted'
+
+
 def test_failed_static_gate_does_not_install_role_policy(tmp_path):
     lease,paths=fixture(tmp_path);before=paths['role_policy_path'].read_bytes()
     paths['packet_path'].write_text('changed\n')
@@ -124,12 +143,34 @@ def test_afterany_finalizer_closes_journal_and_keeps_dispatch_closed(tmp_path):
     lease,paths=fixture(tmp_path);submitted=[]
     q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
         submit=lambda c,timeout:submitted.append(c) or str(122+len(submitted)),now=100)
-    receipt=tmp_path/'receipt.json';receipt.write_text(json.dumps({'schema':'radon_v5_exact_next_update_replay_v1',
-        'status':'accepted_engineering_only','dispatch_allowed':False}))
+    packet=json.loads(paths['packet_path'].read_text());receipt=tmp_path/'attempts'/'attempt_123'/'receipt.json'
+    receipt.parent.mkdir(parents=True);receipt.write_text(json.dumps({'schema':'radon_v5_exact_next_update_replay_v1',
+        'status':'accepted_engineering_only','dispatch_allowed':False,'gpu_job_id':'123',
+        'packet_sha256':file_sha256(paths['packet_path']),'source_commit':'abc123',
+        'inputs_sha256':packet['receipt_expectation']['inputs_sha256']}))
     status=tmp_path/'status.json'
     result=q.finalize_once(lease_path=paths['lease_path'],account_lock=paths['account_lock'],
         journal_path=paths['journal_path'],intent_path=paths['intent_path'],finalizer_job_id='124',
         gpu_job_id='123',slurm_state='COMPLETED',exit_code='0:0',qualification_receipt_path=receipt,
-        status_path=status,now=101)
+        packet_path=paths['packet_path'],status_path=status,now=101)
     assert result['state']=='completed'
     assert json.loads(status.read_text())['dispatch_allowed'] is False
+
+
+@pytest.mark.parametrize('field,value',[('gpu_job_id','999'),('packet_sha256','c'*64),
+    ('source_commit','wrong'),('inputs_sha256',{'v4_checkpoint':'d'*64})])
+def test_finalizer_rejects_stale_or_wrong_receipt_identity(tmp_path,field,value):
+    _,paths=fixture(tmp_path);calls=[]
+    q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
+        submit=lambda c,timeout:calls.append(c) or str(122+len(calls)),now=100)
+    packet=json.loads(paths['packet_path'].read_text());receipt=tmp_path/'attempts'/'attempt_123'/'receipt.json'
+    receipt.parent.mkdir(parents=True);body={'schema':'radon_v5_exact_next_update_replay_v1',
+        'status':'accepted_engineering_only','dispatch_allowed':False,'gpu_job_id':'123',
+        'packet_sha256':file_sha256(paths['packet_path']),'source_commit':'abc123',
+        'inputs_sha256':packet['receipt_expectation']['inputs_sha256']};body[field]=value
+    receipt.write_text(json.dumps(body))
+    with pytest.raises(ValueError,match='not accepted'):
+        q.finalize_once(lease_path=paths['lease_path'],account_lock=paths['account_lock'],
+            journal_path=paths['journal_path'],intent_path=paths['intent_path'],finalizer_job_id='124',
+            gpu_job_id='123',slurm_state='COMPLETED',exit_code='0:0',qualification_receipt_path=receipt,
+            packet_path=paths['packet_path'],status_path=tmp_path/'status.json',now=101)

@@ -175,6 +175,18 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
                 or sum(x.count("{gpu_job_id}") for x in finalizer)!=1
                 or any("--gres=" in x for x in finalizer)):
             raise ValueError("Invalid qualification packet")
+        expectation = packet.get("receipt_expectation")
+        if (not isinstance(expectation, dict)
+                or set(expectation) != {"attempt_root", "source_commit", "inputs_sha256"}
+                or not isinstance(expectation["attempt_root"], str)
+                or not expectation["attempt_root"]
+                or not isinstance(expectation["source_commit"], str)
+                or not expectation["source_commit"]
+                or not isinstance(expectation["inputs_sha256"], dict)
+                or not expectation["inputs_sha256"]
+                or any(not isinstance(k, str) or not HEX.fullmatch(v)
+                       for k, v in expectation["inputs_sha256"].items())):
+            raise ValueError("Qualification receipt expectation is incomplete")
         if install_required:
             # All static, journal and capacity gates passed. Install the exact
             # reviewed bytes immediately before the durable intent and sbatch.
@@ -202,15 +214,27 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
             write(intent_path, intent)
         else:
             entry.update(state="gpu_submitted_pending_finalizer",job_id=job_id)
+            # Register the numeric GPU identity immediately.  The role-budget
+            # reader does not need a finalizer id, and this closes the window in
+            # which a live GPU could be absent from the borrowed UL journal.
+            journal["requests"].append(dict(entry));write(journal_path,journal)
             write(intent_path, intent)
             final_command=[x.replace("{gpu_job_id}",job_id) for x in finalizer]
-            finalizer_id=str(submit(final_command,timeout=20))
+            try:
+                finalizer_id=str(submit(final_command,timeout=20))
+            except BaseException as error:
+                entry.update(state="finalizer_submission_needs_review",
+                             finalizer_error_type=type(error).__name__)
+                journal["requests"][-1]=dict(entry);write(journal_path,journal)
+                write(intent_path,intent)
+                raise
             if not finalizer_id.isdigit():
                 entry.update(state="finalizer_identity_drift",observed_finalizer_job_id=finalizer_id)
+                journal["requests"][-1]=dict(entry);write(journal_path,journal)
                 write(intent_path,intent)
             else:
                 entry.update(state="submitted",finalizer_job_id=finalizer_id)
-                journal["requests"].append(dict(entry)); write(journal_path,journal)
+                journal["requests"][-1]=dict(entry); write(journal_path,journal)
                 write(intent_path,intent)
         return {"action": "none", "state": entry["state"], "job_id": entry.get("job_id")}
 
@@ -231,7 +255,7 @@ def terminal_transition(entry, *, slurm_state, exit_code):
 
 def finalize_once(*, lease_path, account_lock, journal_path, intent_path,
                   finalizer_job_id, gpu_job_id, slurm_state, exit_code,
-                  qualification_receipt_path, status_path, now=None):
+                  packet_path, qualification_receipt_path, status_path, now=None):
     """Close the registered lease from its zero-GPU afterany finalizer."""
     now=time.time() if now is None else now;lease=read(lease_path)
     validate(lease,min(now,lease.get("expires_at",now)-1))
@@ -251,10 +275,22 @@ def finalize_once(*, lease_path, account_lock, journal_path, intent_path,
         if entry.get("state") in TERMINAL:return entry
         if entry.get("state")!="submitted":raise ValueError("Qualification is not submitted")
         if slurm_state.split()[0]=="COMPLETED" and exit_code=="0:0":
+            from radon_bridge.runtime.state import file_sha256
+            if file_sha256(packet_path)!=lease["packet_sha256"]:
+                raise ValueError("Qualification packet changed before finalization")
+            packet=read(packet_path);expected=packet.get("receipt_expectation",{})
+            expected_path=(Path(expected.get("attempt_root", ""))/
+                           ("attempt_"+str(gpu_job_id))/"receipt.json")
+            if Path(qualification_receipt_path)!=expected_path:
+                raise ValueError("Qualification receipt attempt path changed")
             receipt=read(qualification_receipt_path)
             if (receipt.get("schema")!="radon_v5_exact_next_update_replay_v1"
                     or receipt.get("status")!="accepted_engineering_only"
-                    or receipt.get("dispatch_allowed") is not False):
+                    or receipt.get("dispatch_allowed") is not False
+                    or receipt.get("gpu_job_id")!=str(gpu_job_id)
+                    or receipt.get("packet_sha256")!=lease["packet_sha256"]
+                    or receipt.get("source_commit")!=expected.get("source_commit")
+                    or receipt.get("inputs_sha256")!=expected.get("inputs_sha256")):
                 raise ValueError("Qualification completion receipt is not accepted")
         terminal_transition(entry,slurm_state=slurm_state,exit_code=exit_code)
         intent=read(intent_path);intent["attempt"]=dict(entry)
