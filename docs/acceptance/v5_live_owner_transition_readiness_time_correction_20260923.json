@@ -1,0 +1,18 @@
+{
+  "schema": "radon_v5_live_owner_transition_readiness_time_correction_v1",
+  "state": "append_only_correction",
+  "superseded_receipt": "docs/acceptance/v5_live_owner_transition_readiness_20260923.json",
+  "superseded_commit": "916590c65e236b4a3c0208cc5056cdc2be89a69c",
+  "incorrect_field": {
+    "observed_at_utc": "2026-09-23T21:50:00Z",
+    "reason": "Asia/Riyadh wall-clock hour was incorrectly labelled UTC."
+  },
+  "recoverable_time_bounds": {
+    "latest_embedded_owner_status_utc": "2026-09-23T19:09:55.568942Z",
+    "receipt_commit_utc": "2026-09-23T19:11:46Z",
+    "exact_sampling_time_preserved": false
+  },
+  "scientific_and_runtime_fields_affected": false,
+  "original_receipt_modified": false,
+  "test_access": false
+}

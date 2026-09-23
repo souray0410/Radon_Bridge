@@ -1,0 +1,44 @@
+{
+  "schema": "radon_v5_owner_handoff_guard_candidate_v1",
+  "state": "implemented_not_deployed_not_armed",
+  "scope_run_id": "2026_09_10_14_34_24_788954",
+  "formal_v5": {
+    "commit": "1287681c08846e11364c81653048435482e772a7",
+    "wheel_sha256": "c022b4f4b0fa1f29458ad1bf9e0d04f6773e9454ab3bd8c07d416294483aab48"
+  },
+  "behavior": {
+    "arm_before_natural_release": true,
+    "dispatcher_excludes_armed_run": true,
+    "immediate_preclaim_recheck": true,
+    "account_submission_lock_required": true,
+    "exact_live_claim_identity_required": true,
+    "active_guarded_dispatcher_deployment_receipt_required": true,
+    "mutable_checkpoint_conversion_allowed": false,
+    "normal_v5_loader_v4_fallback": false,
+    "test_access": false,
+    "dispatch_allowed": false
+  },
+  "required_sequence": [
+    "Deploy the exact guarded dispatcher source and configure one shared registry while preserving all live owners.",
+    "Publish an active deployment receipt binding source commit and registry path.",
+    "Under the existing account submission lock, arm only the reviewed running claim identity.",
+    "Let the V4 owner naturally checkpoint, exit and release; never pause or cancel it for migration.",
+    "The guarded dispatcher keeps the released run excluded and rechecks immediately before any claim acquisition.",
+    "A migration owner acquires the released claim generation, freezes and hashes the complete optimizer boundary, converts with the one-time strict tool and performs CPU strict load.",
+    "A separately admitted one-A100 qualification performs the exact next update.",
+    "Only an independently accepted replay may create a formal V5 production claim and revise downstream references."
+  ],
+  "current_read_only_gate": {
+    "observed_at_utc": "2026-09-23T19:41:19Z",
+    "run_job_id": "52332277",
+    "slurm_state": "RUNNING",
+    "legacy_dispatcher_process_observed": false,
+    "can_arm_now": false,
+    "reason": "No live dispatcher process using the new guard was observed; arming a registry before guarded deployment would leave the paused-run reacquisition race unresolved."
+  },
+  "tests": "targeted owner-handoff and dispatch admission tests",
+  "owners_modified": false,
+  "claims_modified": false,
+  "jobs_submitted": 0,
+  "gpu_used": false
+}

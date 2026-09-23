@@ -140,6 +140,10 @@ def resource_wait(task,config):
 def admissible_work(config,claims,reservation=None):
     candidates=[];waiting=[]
     for task in work(config):
+        from radon_bridge.runtime.v5_owner_handoff import protected
+        if protected(task, claims, config.get('v5_handoff_registry')):
+            waiting.append(dict(run=task['run_dir'],state='waiting_formal_v5_handoff',test_access=False))
+            continue
         reserved=reservation is not None and task['run_dir']==reservation[0]['run_dir']
         if reserved:
             if not eligible(task,claims,reservation_token=reservation[1]):continue
@@ -329,6 +333,9 @@ def gpu_owner(config_path):
             if reservation:
                 token=reservation[1];resume_native=reservation[2];reservation=None
             else:
+                from radon_bridge.runtime.v5_owner_handoff import protected
+                if protected(task, claims, config.get('v5_handoff_registry')):
+                    continue  # Recheck immediately before the per-run claim lock.
                 token=claims.acquire(run,task['spec_sha256'],owner,job)
                 if fallback:resume_native=None
         except RuntimeError:continue
