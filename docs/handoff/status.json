@@ -9,8 +9,8 @@
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
-  "evidence_cutoff": "2026-09-18T22:38:30.538052+00:00",
-  "verified_at": "2026-09-19T02:13:00+00:00",
+  "evidence_cutoff": "2026-09-23 20:13 Asia/Riyadh",
+  "verified_at": "2026-09-23T20:13:00+03:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -66,10 +66,10 @@
     "Formal V5 is pinned and representative Ada replay passed; production owner cutover and complete workflow acceptance remain open."
   ],
   "blockers": [
-    "3D parent acceptance incomplete; several checkpointed runs await allocation recovery",
+    "Five of six contained V4 parent runs are training again, but three live steps report MaxRSS effectively at the 106 GiB request and one run remains held; terminal full-lifecycle resource acceptance is incomplete",
     "Active parent controller lacks accepted project runtime binding",
     "A100 complete-pair replay, full UKB protocol and production GPU integration acceptance remain required",
-    "Existing generation5 macular cache is 2-D only; OCT3D extension awaits explicit adoption by its original single writer and complete independent cache acceptance"
+    "Generation5 OCT3D V2 has only a one-participant accepted prefix; complete cache and independent acceptance remain required"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -110,7 +110,8 @@
     "2026-09-23 Ibex memory-incident re-audit: all six full-cohort V4 runs remain needs_review with failed claims and no formal update beyond the contained failure. The reviewed 106/128/2 GiB recovery owner is alive and nine bound requests await the existing rotation; no recovery owner has started. Three unrelated full-data trainings have fresh running claims/status and were preserved. Verified manifests contain 58,365-58,403 train and 12,503-12,510 development samples with test unused. Direct-V5 production requires explicit full-state conversion, immutable V5 specs, A100 full-route replay, atomic owner/claim handoff and downstream verification; incident remains open. Evidence docs/acceptance/ibex_memory_recovery_audit_20260923.json.",
     "2026-09-23 first full-cohort optimizer-boundary conversion: a stable read-only DenseNet3D snapshot from a healthy V4 owner was converted with the explicit source-bound scheduler adapter. Model, SGD optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, epoch/offset/update cursor, selected state and Node IDs were preserved exactly; strict CPU model/optimizer/scheduler load passed. A100 one-GPU RNG restore, exact next update, complete train/development replay and owner handoff remain pending; dispatch is disabled and the healthy source was unchanged. Evidence docs/acceptance/v5_full_resume_static_20260923.json.",
     "2026-09-23 OCT3D cache extension candidate: the current generation5 macular engine/overlay is explicitly 2-D and cannot materialize oct_volume_3d.npy. A separate immutable operation/output/lock candidate binds the same 70,885-row bundle, train/development manifests, recipe and per-participant OCT3D hashes. Full canonical proposal adoption by the existing writer is required and the staged zero-SHA contract fails closed. One-eye and two-eye read-only recipe replays were byte-identical to frozen references and the old derived cache; CPU 257 tests passed. No writer/output/GPU was started. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json.",
-    "2026-09-23 OCT3D extension V2: the original generation5 writer independently rejected V1 for three missing launch identities. V2 now binds and verifies runner source SHA, Python/NumPy/Pillow, complete root manifest/status/verified-SQLite/verifier identities, file/byte totals, and the current raw-view symlink mapping before any output, lock or state mutation. CPU 258 tests and pinned-runtime one-eye/two-eye byte-exact replays passed. V2 still has an invalid adoption SHA and is not executed; it awaits another independent review by the original writer. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json."
+    "2026-09-23 OCT3D extension V2: the original generation5 writer independently rejected V1 for three missing launch identities. V2 now binds and verifies runner source SHA, Python/NumPy/Pillow, complete root manifest/status/verified-SQLite/verifier identities, file/byte totals, and the current raw-view symlink mapping before any output, lock or state mutation. CPU 258 tests and pinned-runtime one-eye/two-eye byte-exact replays passed. V2 still has an invalid adoption SHA and is not executed; it awaits another independent review by the original writer. Evidence docs/acceptance/oct3d_cache_extension_candidate_20260923.json.",
+    "2026-09-23 correction to the immutable Ibex memory audit: five of the six contained full-cohort V4 runs now have matching dispatcher task, Slurm job/step PID and fresh training status, with 1,342/2,199/2,407/1,281/1,269 formal updates after qualification; the sixth remains paused at update 26,904. Three live steps report MaxRSS effectively at their 106 GiB request, so the resource incident remains open pending terminal full-lifecycle peak and checkpoint integrity. Current checkpoints are mutable and cannot be converted until each owner publishes and releases an optimizer boundary. The strict offline converter is pinned at 2dc57c49715d96c7b691ed302879bc579103406b with CI 35893802569 successful; normal V5 loading has no V4 fallback. Evidence docs/acceptance/ibex_v4_recovery_progress_20260923.json."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -226,6 +227,10 @@
     {
       "label": "Single-owner OCT3D cache extension candidate; not adopted or executed",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/oct3d_cache_extension_candidate_20260923.json"
+    },
+    {
+      "label": "Current Ibex five-running/one-held V4 recovery snapshot and V5 conversion gate",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/ibex_v4_recovery_progress_20260923.json"
     }
   ]
 }

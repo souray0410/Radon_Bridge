@@ -1,0 +1,132 @@
+{
+  "schema": "radon_ibex_v4_recovery_progress_snapshot_v1",
+  "observed_at_utc": "2026-09-23T17:13:00Z",
+  "scope": "read_only_status_slurm_and_checkpoint_identity_review",
+  "historical_receipt_immutable": "docs/acceptance/ibex_memory_recovery_audit_20260923.json",
+  "summary": {
+    "historical_cases": 6,
+    "formal_training_running": 5,
+    "held": 1,
+    "test_access": false
+  },
+  "running": [
+    {
+      "run_id": "2026_09_10_14_34_24_788954",
+      "job_id": "52332277",
+      "step": "1",
+      "state": "training",
+      "epoch": 3,
+      "offset": 36032,
+      "updates": 9548,
+      "qualification_boundary_updates": 8206,
+      "formal_updates_after_qualification": 1342,
+      "status_sha256": "ee00a50253936b081c68e4eef08e8b7ee23a7e94c0d58d3106ff2492388ad964",
+      "status_mtime_ns": 1790183576269398693,
+      "slurm_state": "RUNNING",
+      "test_used": false
+    },
+    {
+      "run_id": "2026_09_10_22_53_17_826487",
+      "job_id": "52346748",
+      "step": "1",
+      "state": "training",
+      "epoch": 8,
+      "offset": 10624,
+      "updates": 26200,
+      "qualification_boundary_updates": 24001,
+      "formal_updates_after_qualification": 2199,
+      "status_sha256": "557bb62743ee2fb743ee08dcbfb99db62651c9fcba1a4c4b8cdf3af13190303d",
+      "status_mtime_ns": 1790183577318307077,
+      "slurm_state": "RUNNING",
+      "test_used": false
+    },
+    {
+      "run_id": "2026_09_12_11_23_31_757494",
+      "job_id": "52347745",
+      "step": "1",
+      "state": "training",
+      "epoch": 8,
+      "offset": 58352,
+      "updates": 29183,
+      "qualification_boundary_updates": 26776,
+      "formal_updates_after_qualification": 2407,
+      "status_sha256": "225e103a81e5fa5702de698d91905deb0e035d24f7f36c04c0092122216fb3d9",
+      "status_mtime_ns": 1790183573875406755,
+      "slurm_state": "RUNNING",
+      "test_used": false
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_710666",
+      "job_id": "52333813",
+      "step": "1",
+      "state": "training",
+      "epoch": 5,
+      "offset": 44528,
+      "updates": 17375,
+      "qualification_boundary_updates": 16094,
+      "formal_updates_after_qualification": 1281,
+      "status_sha256": "89d39790c512ec266060952632088074f6f6a8738d22a561948ebcd4613a9f74",
+      "status_mtime_ns": 1790183569195493500,
+      "slurm_state": "RUNNING",
+      "test_used": false
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_754476",
+      "job_id": "52336187",
+      "step": "1",
+      "state": "training",
+      "epoch": 5,
+      "offset": 47536,
+      "updates": 17567,
+      "qualification_boundary_updates": 16298,
+      "formal_updates_after_qualification": 1269,
+      "status_sha256": "e95d21172facd94edea852395d0dc11c1d4528f67a1b1e9ce49ffd9cf91436cc",
+      "status_mtime_ns": 1790183575906398741,
+      "slurm_state": "RUNNING",
+      "test_used": false
+    }
+  ],
+  "held": {
+    "run_id": "2026_09_12_11_23_31_715620",
+    "state": "paused",
+    "epoch": 8,
+    "offset": 21552,
+    "updates": 26904,
+    "checkpoint_sha256": "792748f7a1c0c4896ca84617b1f9b9712a18392d279dc70dd42b8b76a2c1c0f5",
+    "status_sha256": "ce6fe3d10edebb5433b53aa5475284d76a2e377fc6c063d29a3184cb126ae348",
+    "status_mtime_ns": 1790158984536882561,
+    "current_job": null,
+    "test_used": false
+  },
+  "converter": {
+    "commit": "2dc57c49715d96c7b691ed302879bc579103406b",
+    "ci_run": 35893802569,
+    "ci_conclusion": "success",
+    "normal_loader_v4_fallback": false,
+    "dispatch_allowed_by_conversion": false
+  },
+  "live_memory_risk": {
+    "requested_step_memory_gib": 106,
+    "steps_at_or_effectively_at_limit": [
+      {"job_id": "52332277", "step": "1", "max_rss_kib": 111150656, "ave_rss_kib": 105939880},
+      {"job_id": "52347745", "step": "1", "max_rss_kib": 111150780, "ave_rss_kib": 111088200},
+      {"job_id": "52333813", "step": "1", "max_rss_kib": 111150772, "ave_rss_kib": 110978764}
+    ],
+    "other_observed_steps": [
+      {"job_id": "52336187", "step": "1", "max_rss_kib": 93286308, "ave_rss_kib": 77544228},
+      {"job_id": "52346748", "step": "1", "max_rss_kib": 83812412, "ave_rss_kib": 70567892}
+    ],
+    "step_state": "RUNNING",
+    "exit_code": "0:0",
+    "interpretation": "Slurm MaxRSS for three live steps is effectively the complete 106 GiB request. It may include cgroup/accounting behavior rather than one Python process, but the available read-only evidence cannot establish positive full-lifecycle margin. No OOM terminal state is present while the steps remain running."
+  },
+  "limits": [
+    "This snapshot supersedes the old no-new-update statement for current status; it does not rewrite the historical incident receipt.",
+    "The five running jobs are still V4 owners. Their changing checkpoints cannot be converted until an optimizer boundary is published and the owner releases it.",
+    "The filesystem inspection did not expose a separate current Claims receipt. Dispatcher task, Slurm job and step PID matched each running run, but independent Claims acceptance remains unverified.",
+    "Running updates do not establish completion, selected-model acceptance, downstream publication or V5 production cutover.",
+    "Three live steps report MaxRSS effectively equal to the 106 GiB request. The resource incident remains open until terminal state, full-lifecycle peak and checkpoint integrity prove safe margin or an intentional exact-cap policy is independently accepted.",
+    "No sealed test data was accessed."
+  ],
+  "next_gate": "Let the five healthy V4 owners reach a published optimizer boundary; independently bind the final checkpoint and source description, then run offline V5 conversion, strict load, next-update replay and atomic owner handoff. Re-admit the held sixth run separately."
+}
