@@ -34,5 +34,13 @@
     "state": "accepted",
     "evidence": "docs/acceptance/v5_strict_profiles_20260922.json",
     "production_cutover": false
+  },
+  "current_augmentation_reference_replay": {
+    "state": "accepted",
+    "host_envelopes": 3,
+    "entries": 9,
+    "evidence": "docs/acceptance/v5_augmentation_references_20260922.json",
+    "source_commit": "3b08fd75c02a4643e77a60fdc32105ef0fd428f9",
+    "production_cutover": false
   }
 }
