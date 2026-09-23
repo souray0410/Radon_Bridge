@@ -15,7 +15,8 @@ def fixture(tmp_path, now=100):
     attempt_root=tmp_path/'attempts';packet=tmp_path/'packet.json';packet.write_text(json.dumps({
         'schema':'radon_v5_next_update_packet_v1','test_access':False,'requested_gpus':1,
         'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch'],
-        'finalizer_command_template':['sbatch','--parsable','--dependency=afterany:{gpu_job_id}','final.sbatch'],
+        'finalizer_command_template':['sbatch','--parsable','--dependency=afterany:{gpu_job_id}',
+            '--export=ALL,RADON_GPU_JOB_ID={gpu_job_id}','final.sbatch'],
         'receipt_expectation':{'attempt_root':str(attempt_root),'source_commit':'abc123',
             'inputs_sha256':{'v4_checkpoint':'a'*64,'v5_checkpoint':'b'*64}}})+'\n')
     lock=tmp_path/'account.lock';lock.touch()

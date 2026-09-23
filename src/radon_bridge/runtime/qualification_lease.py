@@ -172,7 +172,9 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
                 or not any(x == "--gres=gpu:a100:1" for x in command)
                 or not isinstance(finalizer,list) or not finalizer
                 or finalizer[0]!="sbatch" or "--parsable" not in finalizer
-                or sum(x.count("{gpu_job_id}") for x in finalizer)!=1
+                or sum(x.count("{gpu_job_id}") for x in finalizer)!=2
+                or not any(x=="--dependency=afterany:{gpu_job_id}" for x in finalizer)
+                or not any("RADON_GPU_JOB_ID={gpu_job_id}" in x for x in finalizer)
                 or any("--gres=" in x for x in finalizer)):
             raise ValueError("Invalid qualification packet")
         expectation = packet.get("receipt_expectation")
