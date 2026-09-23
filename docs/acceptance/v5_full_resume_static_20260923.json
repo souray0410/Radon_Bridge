@@ -1,0 +1,38 @@
+{
+  "schema": "radon_v5_full_resume_static_acceptance_v1",
+  "state": "cpu_static_conversion_accepted_gpu_replay_pending",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "converter_commit": "d0e5e406625adc6e93be84c61b5d7882ce31ad56",
+  "source": {
+    "framework_api": "V4",
+    "role": "healthy_full_cohort_optimizer_boundary",
+    "model_family": "densenet121_3d",
+    "progress": {"epoch": 7, "offset": 9296, "updates": 22475},
+    "selected_epoch": 0,
+    "test_used": false
+  },
+  "verified": {
+    "model_state_keys": 727,
+    "parameter_alias_groups": 364,
+    "optimizer_group_sizes": [364],
+    "node_ids": 71,
+    "model_optimizer_scheduler_rng_progress_exact": true,
+    "selected_model_epoch_metrics_exact": true,
+    "strict_cpu_model_optimizer_scheduler_load": true,
+    "pending_gradients": "absent_at_optimizer_boundary"
+  },
+  "scheduler_adapter": {
+    "source_type": "expanded.family_recipe.Schedule",
+    "target_type": "mhd_models.workflows.family_recipe.Schedule",
+    "source_and_target_sha256_bound": true,
+    "state_fields": ["best", "best_epoch", "material_best", "position", "stall"]
+  },
+  "gpu_replay": false,
+  "dispatch_allowed": false,
+  "production_handoff": false,
+  "source_owner_modified": false,
+  "limitations": [
+    "The exact one-GPU RNG topology, next update and complete train/development route still require isolated A100 acceptance.",
+    "This candidate does not migrate or close the six contained host-memory incidents."
+  ]
+}
