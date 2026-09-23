@@ -1,0 +1,229 @@
+{
+  "schema": "radon_v5_live_owner_transition_readiness_v1",
+  "observed_at_utc": "2026-09-23T21:50:00Z",
+  "scope": "bounded_read_only_identity_boundary_owner_and_one_to_one_transition_preparation",
+  "test_access": false,
+  "runs": [
+    {
+      "run_id": "2026_09_10_14_34_24_788954",
+      "job_id": "52332277",
+      "step": "1",
+      "claim_generation": 184,
+      "owner_state": "RUNNING",
+      "framework_api": "V4",
+      "model_family": "resnet50_inflated_3d",
+      "disease": "glaucoma",
+      "spec_sha256": "91d7ff995509ebb9b4921f6e234ef2b07c3d22e32f4ab8f97bd8d0ed5d09715c",
+      "latest_owner_status": {
+        "state": "training",
+        "epoch": 3,
+        "offset": 42016,
+        "updates": 9922,
+        "test_used": false
+      },
+      "owner_published_last_pt": {
+        "exists": true,
+        "size_bytes": 554371445,
+        "mtime_epoch_seconds": 1790190481,
+        "stat_unchanged_over_seconds": 3,
+        "immutable": false,
+        "sha256_recorded": false
+      },
+      "conversion_readiness": {
+        "one_to_one_target": "formal MHD V5 1287681c08846e11364c81653048435482e772a7",
+        "normal_loader_v4_fallback": false,
+        "current_boundary_convertible_now": false,
+        "blocker": "The owner and claim remain live; the observed last.pt may be replaced after this audit and cannot be promoted to an immutable source boundary."
+      },
+      "next_update_acceptance": {
+        "required": true,
+        "reuse_held_run_gpu_result": false,
+        "required_state": "model, optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, node IDs, data cursor and selected state",
+        "tolerance": "exact where deterministic; FP32 rtol=1e-5 atol=1e-6 otherwise"
+      }
+    },
+    {
+      "run_id": "2026_09_10_22_53_17_826487",
+      "job_id": "52346748",
+      "step": "1",
+      "claim_generation": 311,
+      "owner_state": "RUNNING",
+      "framework_api": "V4",
+      "model_family": "monai_densenet121_3d",
+      "disease": "glaucoma",
+      "spec_sha256": "7ebcc1c75ebb112c694dcf7a17e796b316f99ecce831fddafa19ed79c6a3ccb7",
+      "latest_owner_status": {
+        "state": "training",
+        "epoch": 8,
+        "offset": 21424,
+        "updates": 26875,
+        "test_used": false
+      },
+      "owner_published_last_pt": {
+        "exists": true,
+        "size_bytes": 135824314,
+        "mtime_epoch_seconds": 1790190592,
+        "stat_unchanged_over_seconds": 3,
+        "immutable": false,
+        "sha256_recorded": false
+      },
+      "conversion_readiness": {
+        "one_to_one_target": "formal MHD V5 1287681c08846e11364c81653048435482e772a7",
+        "normal_loader_v4_fallback": false,
+        "current_boundary_convertible_now": false,
+        "blocker": "The owner and claim remain live; the observed last.pt may be replaced after this audit and cannot be promoted to an immutable source boundary."
+      },
+      "next_update_acceptance": {
+        "required": true,
+        "reuse_held_run_gpu_result": false,
+        "required_state": "model, optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, node IDs, data cursor and selected state",
+        "tolerance": "exact where deterministic; FP32 rtol=1e-5 atol=1e-6 otherwise"
+      }
+    },
+    {
+      "run_id": "2026_09_12_11_23_31_757494",
+      "job_id": "52347745",
+      "step": "1",
+      "claim_generation": 105,
+      "owner_state": "RUNNING",
+      "framework_api": "V4",
+      "model_family": "monai_densenet121_3d",
+      "disease": "glaucoma",
+      "spec_sha256": "c8e37d16b260f5d11858045ccb22fb1746e451e97397a4fcb39fc71a45b45a63",
+      "latest_owner_status": {
+        "state": "training",
+        "epoch": 9,
+        "offset": 8432,
+        "updates": 29711,
+        "test_used": false
+      },
+      "owner_published_last_pt": {
+        "exists": true,
+        "size_bytes": 90651858,
+        "mtime_epoch_seconds": 1790190487,
+        "stat_unchanged_over_seconds": 3,
+        "immutable": false,
+        "sha256_recorded": false
+      },
+      "conversion_readiness": {
+        "one_to_one_target": "formal MHD V5 1287681c08846e11364c81653048435482e772a7",
+        "normal_loader_v4_fallback": false,
+        "current_boundary_convertible_now": false,
+        "blocker": "The owner and claim remain live; the observed last.pt may be replaced after this audit and cannot be promoted to an immutable source boundary."
+      },
+      "next_update_acceptance": {
+        "required": true,
+        "reuse_held_run_gpu_result": false,
+        "required_state": "model, optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, node IDs, data cursor and selected state",
+        "tolerance": "exact where deterministic; FP32 rtol=1e-5 atol=1e-6 otherwise"
+      },
+      "prior_isolated_candidate": {
+        "source_updates": 29200,
+        "source_checkpoint_sha256": "960317ac0d974ea9527160482692ab2ed78ee4204ba5b28100ccb7267a0a83fc",
+        "target_checkpoint_sha256": "7b0166cad8c2e8f23da366d7d9bcd070b861b34351a904f12357a8cf2da4345a",
+        "cpu_strict_load": true,
+        "note": "This older immutable candidate does not include the subsequent live V4 updates and cannot replace the current owner."
+      }
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_710666",
+      "job_id": "52333813",
+      "step": "1",
+      "claim_generation": 177,
+      "owner_state": "RUNNING",
+      "framework_api": "V4",
+      "model_family": "resnet50_inflated_3d",
+      "disease": "glaucoma",
+      "spec_sha256": "fa3a6c818bb0a38677b51cf66e05b091e603ed8993f8ae4f279ff70b5c419988",
+      "latest_owner_status": {
+        "state": "training",
+        "epoch": 5,
+        "offset": 50272,
+        "updates": 17734,
+        "test_used": false
+      },
+      "owner_published_last_pt": {
+        "exists": true,
+        "size_bytes": 369650105,
+        "mtime_epoch_seconds": 1790190420,
+        "stat_unchanged_over_seconds": 3,
+        "immutable": false,
+        "sha256_recorded": false
+      },
+      "conversion_readiness": {
+        "one_to_one_target": "formal MHD V5 1287681c08846e11364c81653048435482e772a7",
+        "normal_loader_v4_fallback": false,
+        "current_boundary_convertible_now": false,
+        "blocker": "The owner and claim remain live; the observed last.pt may be replaced after this audit and cannot be promoted to an immutable source boundary."
+      },
+      "next_update_acceptance": {
+        "required": true,
+        "reuse_held_run_gpu_result": false,
+        "required_state": "model, optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, node IDs, data cursor and selected state",
+        "tolerance": "exact where deterministic; FP32 rtol=1e-5 atol=1e-6 otherwise"
+      }
+    },
+    {
+      "run_id": "2026_09_12_11_23_32_754476",
+      "job_id": "52336187",
+      "step": "1",
+      "claim_generation": 182,
+      "owner_state": "RUNNING",
+      "framework_api": "V4",
+      "model_family": "resnet50_inflated_3d",
+      "disease": "macular_degeneration",
+      "spec_sha256": "8c78b30255e3d90efc8f858b0c66edb02e2307ef3950627cd4122ea057e4cbae",
+      "latest_owner_status": {
+        "state": "training",
+        "epoch": 5,
+        "offset": 53248,
+        "updates": 17924,
+        "test_used": false
+      },
+      "owner_published_last_pt": {
+        "exists": true,
+        "size_bytes": 369650105,
+        "mtime_epoch_seconds": 1790190440,
+        "stat_unchanged_over_seconds": 3,
+        "immutable": false,
+        "sha256_recorded": false
+      },
+      "conversion_readiness": {
+        "one_to_one_target": "formal MHD V5 1287681c08846e11364c81653048435482e772a7",
+        "normal_loader_v4_fallback": false,
+        "current_boundary_convertible_now": false,
+        "blocker": "The owner and claim remain live; the observed last.pt may be replaced after this audit and cannot be promoted to an immutable source boundary."
+      },
+      "next_update_acceptance": {
+        "required": true,
+        "reuse_held_run_gpu_result": false,
+        "required_state": "model, optimizer, scheduler, Python/NumPy/Torch/CUDA RNG, node IDs, data cursor and selected state",
+        "tolerance": "exact where deterministic; FP32 rtol=1e-5 atol=1e-6 otherwise"
+      }
+    }
+  ],
+  "common_release_sequence": [
+    "owner publishes a complete optimizer-boundary checkpoint",
+    "Slurm step death and exact claim release are independently verified",
+    "freeze checkpoint/spec/source/optimizer-group and cursor identities without modifying the old run",
+    "convert once with the strict V4-to-formal-V5 tool; no normal-loader fallback",
+    "strict CPU load then one isolated A100 exact-next-update replay",
+    "acquire a new formal-V5 claim through the existing dispatcher and revise downstream references"
+  ],
+  "summary": {
+    "healthy_v4_owners": 5,
+    "current_mutable_last_files_observed": 5,
+    "current_immutable_boundaries_available": 0,
+    "older_immutable_candidate_available": 1,
+    "owners_modified": false,
+    "jobs_submitted": 0,
+    "claims_modified": false,
+    "production_cutovers": 0
+  },
+  "limits": [
+    "A three-second unchanged stat is only a read-only observation, not an immutable checkpoint or owner release.",
+    "No mutable checkpoint was hashed, copied or loaded.",
+    "The held sixth run is covered by its separate A100 independent-recheck receipt and is outside these five live owners.",
+    "No sealed test data was accessed."
+  ]
+}
