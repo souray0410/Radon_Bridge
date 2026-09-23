@@ -67,7 +67,24 @@
       "allocation_state": "COMPLETED",
       "allocation_exit_code": "0:0",
       "worker_returncode": 1,
-      "failure": "The worker timed out while running the aggregate `scontrol show step JOB -o` query in live_envelope before formal continuation. The checkpoint remains held and is not automatically eligible for another claim."
+      "failure": "The worker timed out while running the aggregate `scontrol show step JOB -o` query in live_envelope before formal continuation. The checkpoint remains held and is not automatically eligible for another claim.",
+      "formal_v5_candidate": {
+        "source_checkpoint_sha256": "792748f7a1c0c4896ca84617b1f9b9712a18392d279dc70dd42b8b76a2c1c0f5",
+        "source_progress": {
+          "epoch": 8,
+          "offset": 21552,
+          "updates": 26904
+        },
+        "target_checkpoint_sha256": "6773ecdb2db522a86289dfbe70cd15a450839fb8d604b2dc94019b4760ff020b",
+        "target_selected_sha256": "3598c0564d1f80c80ba0c3d5e0d2b86a929e698781898d05d3ecad7128cd0d71",
+        "target_spec_sha256": "36e941c0629023cef8e6571207849b94c53a9649816deec1efc8aa94dd8c53dc",
+        "acceptance_receipt_sha256": "6a35c1428c054bf901c7d13dc2ea828cb81f35ab3f79cebc15a86d8028759ddf",
+        "cpu_strict_load": true,
+        "source_owner_active": false,
+        "gpu_next_update_replay": false,
+        "dispatch_allowed": false,
+        "next_gate": "Acquire an isolated R&B qualification slot through the existing global role lock without consuming protected project entitlements; pass exact next-update replay before a new V5 claim."
+      }
     }
   },
   "implemented_repair": {
@@ -154,6 +171,7 @@
   "limits": [
     "No job, claim, owner, cache, production config or test split was modified.",
     "The code repair is not deployed into running owners.",
-    "This audit does not claim production V5 cutover or complete OCT3D cache materialization."
+    "This audit does not claim production V5 cutover or complete OCT3D cache materialization.",
+    "At the latest slot audit, future native refill remained intentionally paused for the protected project rotation and another project qualification was already pending; no R&B A100 request was created outside that control plane."
   ]
 }
