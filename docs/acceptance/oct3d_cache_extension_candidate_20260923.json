@@ -31,6 +31,17 @@
     "state_cursor_type_and_range_checked": true,
     "test_access": false
   },
+  "v2_launch_identity": {
+    "runner_sha256": "db18f905734db6678647f02286257eac73c0d868aa07614df35a3699db3cc3bf",
+    "runtime_pins": {"python": "3.12.3", "numpy": "2.2.6", "pillow": "11.3.0"},
+    "root_manifest_sha256": "4ab283b33b69406b7c953118e85fb1aff21c42aa83a7e43ddbfef71437421d1c",
+    "root_status_sha256": "b235dc1598ea7ad18b95b4b6bc6ab6104a224959b6c3b967430e64c441dded45",
+    "root_verified_sqlite_sha256": "b271fedbdfb5300b7773209bf12b08ab49e06f7098dc728216d5c4e7bf9fb118",
+    "root_verifier_sha256": "025cc24811bed336d9037179bb5608c66f2930168ca9d2467b8297619f8f59a0",
+    "verified_files": 175214,
+    "verified_bytes": 5178813443447,
+    "raw_view_mapping_checked": true
+  },
   "validation": {
     "targeted_tests": "4 passed",
     "full_cpu_tests": "258 passed",
