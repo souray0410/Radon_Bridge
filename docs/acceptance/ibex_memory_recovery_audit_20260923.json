@@ -1,0 +1,63 @@
+{
+  "schema": "radon_ibex_memory_recovery_audit_v1",
+  "state": "incident_open_awaiting_requalified_owner",
+  "audited_at": "2026-09-23",
+  "scope": {
+    "historical_runs": 6,
+    "incident": "recorded host-RAM peak exceeded the former 104 GiB worker envelope",
+    "remote_mutation": false,
+    "gpu_job_mutation": false,
+    "scientific_asset_mutation": false
+  },
+  "containment": {
+    "run_states": {"needs_review": 6},
+    "claim_states": {"failed": 6},
+    "old_steps_terminal": 6,
+    "new_formal_update_observed": 0,
+    "crossed_original_failure_point": 0
+  },
+  "reviewed_reentry": {
+    "allocation_memory_gib": 128,
+    "worker_memory_gib": 106,
+    "other_reserved_memory_gib": 2,
+    "historical_peak_range_gib": [104.0167, 104.0190],
+    "reviewed_cases": 6,
+    "cpu_gate_tests_passed": 9,
+    "standby_owner_alive": true,
+    "shared_claim_and_request_journal_reused": true,
+    "new_competing_controller": false,
+    "recovery_bound_requests_pending": 9,
+    "recovery_owner_started": 0
+  },
+  "unrelated_live_work": {
+    "active_allocations": 3,
+    "claims_running": 3,
+    "training_status_fresh": 3,
+    "preserved_unchanged": true
+  },
+  "complete_data_route": {
+    "scope": "expanded_cohort_native_screening",
+    "track": "oct_volume_3d",
+    "train_sample_counts": [58365, 58365, 58403, 58365, 58365, 58380],
+    "development_sample_counts": [12503, 12503, 12510, 12503, 12503, 12505],
+    "manifest_hashes_verified": true,
+    "test_used": false,
+    "source_framework_api": "V4",
+    "bounded_dev296_replay_is_complete_route": false
+  },
+  "direct_v5_handoff": {
+    "candidate_framework_commit": "1287681c08846e11364c81653048435482e772a7",
+    "candidate_companion_commit": "cc16e74a8cfc705d69b3d31efe2daeec9404471f",
+    "normal_runtime_v4_fallback": false,
+    "historical_v4_resume_admitted_by_candidate": false,
+    "production_cutover": false,
+    "required_gates": [
+      "Create separate V5 checkpoint conversions for each historical full-resume state, including optimizer, scheduler, RNG, sampler/data position and accumulated gradients when present.",
+      "Issue immutable V5 specifications and current asset identities that strictly load the converted states; do not rewrite the V4 histories.",
+      "Replay the complete train/development route on A100 with the original manifests and test_access=false.",
+      "At an update boundary, release the old owner and atomically acquire the existing claim before changing the production binding.",
+      "Verify a continued formal update and every downstream reference before closing the incident."
+    ]
+  },
+  "conclusion": "The 106 GiB recovery configuration is CPU-qualified and queued through the existing rotation, but no recovery owner has started and none of the six runs has advanced. The incident remains open. The current direct-V5 candidate correctly rejects these unconverted V4 resumes."
+}
