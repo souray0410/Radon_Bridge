@@ -14,7 +14,8 @@ def fixture(tmp_path, now=100):
     control=tmp_path/'control.json';control.write_text('{"stop_future_requests":true}\n')
     packet=tmp_path/'packet.json';packet.write_text(json.dumps({
         'schema':'radon_v5_next_update_packet_v1','test_access':False,'requested_gpus':1,
-        'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch']})+'\n')
+        'submit_timeout_seconds':20,'command':['sbatch','--parsable','--gres=gpu:a100:1','one.sbatch'],
+        'finalizer_command_template':['sbatch','--parsable','--dependency=afterany:{gpu_job_id}','final.sbatch']})+'\n')
     lock=tmp_path/'account.lock';lock.touch()
     journal=tmp_path/'requests.json';journal.write_text(json.dumps({'schema':'radon_v5_qualification_requests_v1','requests':[]}))
     policy['projects']['Uncertainty_Lab']['request_journals'].append(str(journal))
@@ -50,8 +51,8 @@ def test_lease_preserves_liu_entitlement_and_expiry(tmp_path):
 def test_publish_rechecks_lock_policy_packet_and_journal(tmp_path):
     _,paths=fixture(tmp_path);submitted=[]
     result=q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
-        submit=lambda cmd,timeout:submitted.append((cmd,timeout)) or '123',now=100)
-    assert result=={'action':'none','state':'submitted','job_id':'123'} and len(submitted)==1
+        submit=lambda cmd,timeout:submitted.append((cmd,timeout)) or str(122+len(submitted)),now=100)
+    assert result=={'action':'none','state':'submitted','job_id':'123'} and len(submitted)==2
     again=q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
         submit=lambda cmd,timeout:pytest.fail('duplicate submit'),now=101)
     assert again['state']=='already_submitted'
@@ -117,3 +118,18 @@ def test_terminal_states_return_entitlement():
     assert complete['state']=='completed' and 'return_entitlement' in complete['result']
     failed=q.terminal_transition({'state':'submitted','job_id':'13'},slurm_state='OUT_OF_MEMORY',exit_code='0:125')
     assert failed['state']=='failed' and failed['slurm_state']=='OUT_OF_MEMORY'
+
+
+def test_afterany_finalizer_closes_journal_and_keeps_dispatch_closed(tmp_path):
+    lease,paths=fixture(tmp_path);submitted=[]
+    q.publish_once(**paths,snapshot=lambda:{'limit':24,'total_gpus':19},
+        submit=lambda c,timeout:submitted.append(c) or str(122+len(submitted)),now=100)
+    receipt=tmp_path/'receipt.json';receipt.write_text(json.dumps({'schema':'radon_v5_exact_next_update_replay_v1',
+        'status':'accepted_engineering_only','dispatch_allowed':False}))
+    status=tmp_path/'status.json'
+    result=q.finalize_once(lease_path=paths['lease_path'],account_lock=paths['account_lock'],
+        journal_path=paths['journal_path'],intent_path=paths['intent_path'],finalizer_job_id='124',
+        gpu_job_id='123',slurm_state='COMPLETED',exit_code='0:0',qualification_receipt_path=receipt,
+        status_path=status,now=101)
+    assert result['state']=='completed'
+    assert json.loads(status.read_text())['dispatch_allowed'] is False

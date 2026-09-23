@@ -162,13 +162,18 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
             raise ValueError("Initial qualification intent changed")
         packet = read(packet_path)
         command = packet.get("command")
+        finalizer = packet.get("finalizer_command_template")
         if (packet.get("schema") != "radon_v5_next_update_packet_v1"
                 or packet.get("test_access") is not False
                 or packet.get("requested_gpus") != 1 or packet.get("submit_timeout_seconds") != 20
                 or not isinstance(command, list) or not command
                 or not all(isinstance(x, str) and x for x in command)
                 or command[0] != "sbatch" or "--parsable" not in command
-                or not any(x == "--gres=gpu:a100:1" for x in command)):
+                or not any(x == "--gres=gpu:a100:1" for x in command)
+                or not isinstance(finalizer,list) or not finalizer
+                or finalizer[0]!="sbatch" or "--parsable" not in finalizer
+                or sum(x.count("{gpu_job_id}") for x in finalizer)!=1
+                or any("--gres=" in x for x in finalizer)):
             raise ValueError("Invalid qualification packet")
         if install_required:
             # All static, journal and capacity gates passed. Install the exact
@@ -196,9 +201,17 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
             entry.update(state="identity_drift", observed_job_id=job_id)
             write(intent_path, intent)
         else:
-            entry.update(state="submitted", job_id=job_id)
-            journal["requests"].append(dict(entry)); write(journal_path, journal)
+            entry.update(state="gpu_submitted_pending_finalizer",job_id=job_id)
             write(intent_path, intent)
+            final_command=[x.replace("{gpu_job_id}",job_id) for x in finalizer]
+            finalizer_id=str(submit(final_command,timeout=20))
+            if not finalizer_id.isdigit():
+                entry.update(state="finalizer_identity_drift",observed_finalizer_job_id=finalizer_id)
+                write(intent_path,intent)
+            else:
+                entry.update(state="submitted",finalizer_job_id=finalizer_id)
+                journal["requests"].append(dict(entry)); write(journal_path,journal)
+                write(intent_path,intent)
         return {"action": "none", "state": entry["state"], "job_id": entry.get("job_id")}
 
 
@@ -214,6 +227,45 @@ def terminal_transition(entry, *, slurm_state, exit_code):
     else:
         raise ValueError("Slurm state is not terminal")
     return entry
+
+
+def finalize_once(*, lease_path, account_lock, journal_path, intent_path,
+                  finalizer_job_id, gpu_job_id, slurm_state, exit_code,
+                  qualification_receipt_path, status_path, now=None):
+    """Close the registered lease from its zero-GPU afterany finalizer."""
+    now=time.time() if now is None else now;lease=read(lease_path)
+    validate(lease,min(now,lease.get("expires_at",now)-1))
+    descriptor=os.open(account_lock,os.O_RDWR|os.O_NOFOLLOW)
+    with os.fdopen(descriptor,"r+") as handle:
+        fcntl.flock(handle,fcntl.LOCK_EX)
+        st=os.fstat(handle.fileno())
+        if (st.st_ino,st.st_dev,st.st_ctime_ns)!=(lease["account_lock_inode"],
+                lease["account_lock_device"],lease["account_lock_ctime_ns"]):
+            raise ValueError("Account lock identity changed")
+        journal=read(journal_path);matches=[e for e in journal.get("requests",[])
+            if e.get("lease_id")==lease["lease_id"]]
+        if len(matches)!=1:raise ValueError("Qualification journal identity changed")
+        entry=matches[0]
+        if entry.get("job_id")!=str(gpu_job_id) or entry.get("finalizer_job_id")!=str(finalizer_job_id):
+            raise ValueError("Qualification/finalizer job identity changed")
+        if entry.get("state") in TERMINAL:return entry
+        if entry.get("state")!="submitted":raise ValueError("Qualification is not submitted")
+        if slurm_state.split()[0]=="COMPLETED" and exit_code=="0:0":
+            receipt=read(qualification_receipt_path)
+            if (receipt.get("schema")!="radon_v5_exact_next_update_replay_v1"
+                    or receipt.get("status")!="accepted_engineering_only"
+                    or receipt.get("dispatch_allowed") is not False):
+                raise ValueError("Qualification completion receipt is not accepted")
+        terminal_transition(entry,slurm_state=slurm_state,exit_code=exit_code)
+        intent=read(intent_path);intent["attempt"]=dict(entry)
+        write(journal_path,journal);write(intent_path,intent)
+        status={"schema":"radon_v5_qualification_status_v1","lease_id":lease["lease_id"],
+            "state":entry["state"],"gpu_job_id":str(gpu_job_id),
+            "finalizer_job_id":str(finalizer_job_id),"updated_at":now,
+            "test_access":False,"dispatch_allowed":False,
+            "next_gate":"independent replay review before a formal V5 production claim"}
+        write(status_path,status)
+        return entry
 
 
 def submit_sbatch(command, *, timeout):
