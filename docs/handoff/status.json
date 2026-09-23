@@ -116,7 +116,8 @@
     "2026-09-23 A100 formal-V5 next-update qualification jobs 52387276/52387277 closed automatically as failed because the comparator used scalar inequality on a NumPy RNG array. The immutable failure receipt remains failed. A read-only independent recomputation over the completed outputs found all 1,093 Tensor leaves and the NumPy RNG array exactly equal, with epoch8/offset21568/updates26905 identical; no second GPU update is required for this equivalence check. The fixed comparator and future SBATCH header-order check are in d1ffcb7. Evidence docs/acceptance/v5_a100_next_update_recheck_20260923.json.",
     "2026-09-23 bounded formal-V5 transition readiness audit registered all five healthy live V4 owners one-to-one by full run, Slurm job/step, claim generation, exact spec, model/disease and latest progress. All five owner-published last.pt files existed and had unchanged stat over three seconds, but remain mutable while their owners run; none was hashed, copied, loaded or called an immutable handoff. One older DenseNet candidate remains structurally accepted but predates later V4 updates. Evidence docs/acceptance/v5_live_owner_transition_readiness_20260923.json.",
     "2026-09-23 append-only correction: the prior five-owner readiness receipt labelled a Riyadh wall-clock hour as UTC. The original file remains immutable; embedded owner timestamps and commit time bound the actual sample between 19:09:55Z and 19:11:46Z, but the exact sampling instant was not preserved. Evidence docs/acceptance/v5_live_owner_transition_readiness_time_correction_20260923.json.",
-    "2026-09-23 formal-V5 owner handoff guard candidate blocks an armed run in normal admission and rechecks immediately before claim acquisition. Arming requires the existing account lock, exact live claim and an active deployment receipt proving the dispatcher consumes the guard. At 19:41:19Z job52332277 remained RUNNING and no guarded dispatcher process was present, so nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_guard_candidate_20260923.json."
+    "2026-09-23 formal-V5 owner handoff guard candidate blocks an armed run in normal admission and rechecks immediately before claim acquisition. Arming requires the existing account lock, exact live claim and an active deployment receipt proving the dispatcher consumes the guard. At 19:41:19Z job52332277 remained RUNNING and no guarded dispatcher process was present, so nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_guard_candidate_20260923.json.",
+    "2026-09-23 successor probe corrected the control-plane assumption: the unique live dispatcher is MHD_Models finite_dispatch, which owns the original lock and loads the frozen legacy Radon executor. Replacing that executor with direct-V5 Radon was rejected in isolated validation because historical V4 config is intentionally unsupported. No process, owner, claim, job or guard changed. The management wrapper must consume the registry before an active deployment receipt can legally arm 1ce. Evidence docs/acceptance/v5_owner_handoff_successor_probe_20260923.json."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -252,6 +253,10 @@
     {
       "label": "Formal-V5 natural-release owner-handoff guard candidate",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_owner_handoff_guard_candidate_20260923.json"
+    },
+    {
+      "label": "Rejected successor probe and exact MHD management integration gate",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_owner_handoff_successor_probe_20260923.json"
     }
   ]
 }

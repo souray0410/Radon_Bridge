@@ -1,0 +1,31 @@
+{
+  "schema": "radon_v5_owner_handoff_successor_probe_v1",
+  "state": "rejected_not_deployable",
+  "observed_at_utc": "2026-09-23T19:45:00Z",
+  "live_unique_dispatcher": {
+    "module": "mhd_models.scheduling.finite_dispatch",
+    "host": "vsc509-03-l",
+    "pid": 3555102,
+    "holds_original_dispatcher_lock": true,
+    "loads_frozen_legacy_radon_executor": true
+  },
+  "isolated_candidate": {
+    "packet_sha256": "1c455b6639b5d3d74ecff922138325d0ff7fa2ad222f1a65a51f56dcab562666",
+    "private_validation_sha256": "025743dcc2e6cb032c70c922d4e5a6a0e3730d9a7584896396a034a10f23e929",
+    "binding_static_validation": true,
+    "legacy_work_validation": false,
+    "failure": "Direct-V5 Radon source correctly rejects the historical V4 dispatcher configuration; it cannot replace the frozen legacy executor used by live V4 owners.",
+    "started": false
+  },
+  "required_integration": "The MHD_Models finite_dispatch management wrapper must consume the external handoff registry while retaining the frozen legacy Radon executor. Only its existing standby-ready, graceful-old-stop, lock-release, successor-lock protocol may publish the active guard deployment receipt required by arm_once.",
+  "safety": {
+    "old_dispatcher_modified": false,
+    "old_owner_modified": false,
+    "claims_modified": false,
+    "jobs_submitted": 0,
+    "gpu_used": false,
+    "armed": false,
+    "test_access": false
+  },
+  "interpretation": "The 1ce Radon guard implementation is a required project-side consumer but is not by itself a deployable successor to the actual MHD_Models control plane."
+}
