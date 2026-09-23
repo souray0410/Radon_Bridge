@@ -1,7 +1,6 @@
 """Finite WS02 centered-SVD basis supplement; two new arms plus strict core reuse."""
 import argparse
 import copy
-import fcntl
 import json
 import os
 import subprocess
@@ -12,6 +11,7 @@ import numpy as np
 import torch
 
 from radon_bridge.methods.basis import BASIS_VERSION, CENTERED_VERSION, _load_basis, fit_training_bases, load_statistics_state, same_parent_identity
+from radon_bridge.runtime.exclusive_gpu import acquire as acquire_exclusive_gpu
 from radon_bridge.studies.cohort_case import sha, write_json
 from radon_bridge.studies.cohort_grouped import (
     _accepted_reference_package,
@@ -124,18 +124,7 @@ def prepare_package(reference_root,output,sequence_id,source_commit,framework_co
 
 
 def _resource_lock():
-    import psutil
-    if psutil.virtual_memory().available < .15*psutil.virtual_memory().total:
-        raise MemoryError('Host reserve below 15 percent')
-    device=os.environ.get('CUDA_VISIBLE_DEVICES')
-    if not device or ',' in device:raise ValueError('Centered basis fit requires one explicit CUDA device')
-    used,total=map(int,subprocess.check_output(['nvidia-smi','-i',device,'--query-gpu=memory.used,memory.total',
-        '--format=csv,noheader,nounits'],text=True).strip().split(','))
-    if total-used < 20*1024:raise MemoryError('Need 10GiB worker plus 10GiB reserve')
-    uuid=subprocess.check_output(['nvidia-smi','-i',device,'--query-gpu=uuid','--format=csv,noheader'],text=True).strip()
-    locks=Path(os.environ['RESEARCH_GPU_LOCK_ROOT']);locks.mkdir(parents=True,exist_ok=True)
-    handle=(locks/(uuid+'.lock')).open('a');fcntl.flock(handle,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    return handle
+    return acquire_exclusive_gpu()
 
 
 def validate_basis_fit(root):

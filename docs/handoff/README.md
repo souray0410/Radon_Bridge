@@ -291,3 +291,5 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 
 
 2026-09-22追加：三种宿主和九个加桥配置的当前父/宿主引用已独立接受：正常V5 build，296人初始化宿主预测及选优预测，两次原16批量更新、原生梯度/状态及当前断点下一步完全一致。仅保留原科研结果；原来源、Tensor和选优epoch不变。证据docs/acceptance/v5_augmentation_references_20260922.json。factorized/centered、A100、完整下游及生产切换仍未完成。
+
+2026-09-23：V5 centered-SVD 当前拟合入口移除残留的固定10+10GiB显存门槛，复用实际占用与独占GPU锁；本地247项CPU测试通过，尚未在GPU完整流程验收或切换生产。Ibex现场11运行、13待批GPU请求占满24槽；六项原内存事件仍保留 `operational_hold`，未观察到新正式更新，事件继续开放。详见 [V5 rollout ledger](v5_rollout_20260922.md)。
