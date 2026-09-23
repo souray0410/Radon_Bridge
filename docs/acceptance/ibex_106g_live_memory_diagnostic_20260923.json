@@ -97,7 +97,7 @@
     "step_memory_gib": 128,
     "allocation_memory_gib": 160,
     "owner_memory_gib": 2,
-    "basis": "The observed 106 GiB peak is censored at the present limit. A 128 GiB worker request gives at least 20.75 percent headroom over 106 GiB, while a 160 GiB allocation retains room for the owner and lifecycle variance. Re-profile the complete lifecycle before reducing this request.",
+    "basis": "The observed 106 GiB peak may be censored at the present limit. A 128 GiB worker request is nominally 20.75 percent higher than that limit, but the true workload peak and therefore the real margin are unknown until another complete lifecycle is profiled. The 160/128/2 GiB allocation, worker and owner values are a candidate for independent admission review, not an accepted resource configuration.",
     "admission": "Use the existing dispatcher, lock, Claims and rotation. Do not cancel healthy jobs or introduce a competing controller."
   },
   "v5_replay_input_audit": {
