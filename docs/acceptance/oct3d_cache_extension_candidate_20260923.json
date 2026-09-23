@@ -1,5 +1,5 @@
 {
-  "schema": "radon_oct3d_cache_extension_candidate_receipt_v1",
+  "schema": "radon_oct3d_cache_extension_candidate_receipt_v2",
   "state": "implemented_not_adopted_not_executed",
   "purpose": "Materialize the frozen train/development OCT3D arrays required by the direct-V5 DenseNet3D route.",
   "source_cache_contract": {
@@ -15,6 +15,7 @@
     "materialized_modalities": ["cfp_2d.npy", "oct_bscan_2d.npy"]
   },
   "extension_contract": {
+    "operation_schema": "oct3d_cache_extension_contract_v2",
     "separate_operation_identity": true,
     "separate_output_root": true,
     "source_operation_immutable": true,
@@ -23,12 +24,16 @@
     "finite_participant_and_time_budgets": true,
     "owner_adoption_receipt_required": true,
     "owner_adoption_binds_complete_proposal_digest": true,
+    "runner_source_sha256_launch_gate": true,
+    "python_numpy_pillow_launch_gate": true,
+    "full_raw_root_audit_launch_gate": true,
+    "raw_view_symlink_mapping_launch_gate": true,
     "state_cursor_type_and_range_checked": true,
     "test_access": false
   },
   "validation": {
-    "targeted_tests": "3 passed",
-    "full_cpu_tests": "257 passed",
+    "targeted_tests": "4 passed",
+    "full_cpu_tests": "258 passed",
     "read_only_recipe_replay": {
       "cases": 2,
       "one_eye_shape": [1, 1, 128, 224, 224],
@@ -42,7 +47,12 @@
     "restricted_data_written": false,
     "gpu_executed": false
   },
-  "deployment_gate": "The existing generation5 writer must publish and pin the owner-adoption receipt SHA. Until then the private contract deliberately contains an invalid zero SHA and execution fails closed.",
+  "review_predecessor": {
+    "receipt_sha256": "5da0535c217b0b4476bfa4d4f72345d213aac64a36818dfd8f2e4b31a3734d14",
+    "v1_adopted": false,
+    "high_findings_closed_in_v2": 3
+  },
+  "deployment_gate": "The existing generation5 writer must independently review V2, publish and pin the owner-adoption receipt SHA. Until then the private V2 contract deliberately contains an invalid zero SHA and execution fails closed.",
   "limitations": [
     "This is a candidate extension, not a completed cache or runtime acceptance.",
     "The existing 2-D cache writer is not modified or replaced.",

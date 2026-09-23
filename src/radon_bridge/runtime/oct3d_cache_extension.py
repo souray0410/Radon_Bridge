@@ -14,6 +14,8 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import sqlite3
+import sys
 import time
 import zipfile
 
@@ -45,9 +47,10 @@ def load_contract(path: Path) -> dict:
     required = {
         "schema", "operation_id", "source_operation_id", "source_root",
         "output_root", "raw_root", "bundle", "bundle_sha256", "manifests",
-        "expected_rows", "recipe", "owner_adoption_sha256", "test_access",
+        "expected_rows", "recipe", "runner", "runtime_pins", "root_audit",
+        "raw_view_mapping", "owner_adoption_sha256", "test_access",
     }
-    if set(contract) != required or contract["schema"] != "oct3d_cache_extension_contract_v1":
+    if set(contract) != required or contract["schema"] != "oct3d_cache_extension_contract_v2":
         raise ValueError("unknown or incomplete extension contract")
     if contract["operation_id"] == contract["source_operation_id"]:
         raise ValueError("extension must have a separate operation identity")
@@ -61,6 +64,81 @@ def load_contract(path: Path) -> dict:
     if not isinstance(adoption, str) or len(adoption) != 64 or set(adoption) == {"0"}:
         raise ValueError("an exact accepted owner adoption receipt is required")
     return contract
+
+
+def validate_runner(contract: dict) -> None:
+    runner = contract["runner"]
+    if set(runner) != {"path", "sha256"} or sha(Path(runner["path"])) != runner["sha256"]:
+        raise ValueError("executable runner source changed")
+
+
+def validate_runtime(contract: dict) -> dict:
+    import numpy
+    import PIL
+    observed = {"python": ".".join(map(str, sys.version_info[:3])),
+                "numpy": numpy.__version__, "pillow": PIL.__version__}
+    if observed != contract["runtime_pins"]:
+        raise ValueError(f"cache runtime changed: {observed}")
+    return observed
+
+
+def _stat_identity(status) -> str:
+    return json.dumps([status.st_dev, status.st_ino, status.st_size,
+                       status.st_mtime_ns, status.st_ctime_ns])
+
+
+def validate_root_audit(contract: dict) -> dict:
+    audit = contract["root_audit"]
+    required = {"manifest", "manifest_sha256", "status", "status_sha256", "verified_sqlite",
+                "verified_sqlite_sha256", "verifier", "verifier_sha256", "expected_files",
+                "expected_bytes"}
+    if set(audit) != required:
+        raise ValueError("incomplete root audit contract")
+    for name in ("manifest", "status", "verified_sqlite", "verifier"):
+        if sha(Path(audit[name])) != audit[name + "_sha256"]:
+            raise ValueError("root audit artifact changed: " + name)
+    status = json.loads(Path(audit["status"]).read_text())
+    if (status.get("state") != "complete_verified" or status.get("root") != contract["raw_root"]
+            or status.get("manifest_sha256") != audit["manifest_sha256"]
+            or status.get("verified_files") != audit["expected_files"]
+            or status.get("verified_bytes") != audit["expected_bytes"]
+            or status.get("test_scientific_access") is not False):
+        raise ValueError("root audit completion identity changed")
+    raw = Path(contract["raw_root"])
+    mapping = contract["raw_view_mapping"]
+    if not isinstance(mapping, dict) or not mapping:
+        raise ValueError("raw-view mapping missing")
+    for name, target in mapping.items():
+        link = raw / safe_relative(name)
+        if not link.is_symlink() or os.readlink(link) != target or str(link.resolve(strict=True)) != target:
+            raise ValueError("raw-view mapping changed: " + name)
+    database = sqlite3.connect(f"file:{audit['verified_sqlite']}?mode=ro", uri=True)
+    try:
+        database.execute("BEGIN")
+        verified = {row[0]: row[1:] for row in
+                    database.execute("SELECT path,expected,actual,identity,bytes FROM verified")}
+        database.execute("COMMIT")
+    finally:
+        database.close()
+    if len(verified) != audit["expected_files"]:
+        raise ValueError("root audit SQLite row count changed")
+    count = total = 0
+    with Path(audit["manifest"]).open() as stream:
+        for line in stream:
+            row = json.loads(line); relative = safe_relative(row["path"])
+            saved = verified.get(relative)
+            if saved is None:
+                raise ValueError("root audit missing verified path")
+            expected, actual, identity, size = saved
+            target = raw / relative; current = target.stat()
+            if (expected != row["sha256"] or actual != row["sha256"]
+                    or int(size) != int(row["bytes"]) or current.st_size != int(row["bytes"])
+                    or _stat_identity(current) != identity):
+                raise ValueError("raw identity changed after full verification")
+            count += 1; total += int(row["bytes"])
+    if count != audit["expected_files"] or total != audit["expected_bytes"]:
+        raise ValueError("root manifest totals changed")
+    return {"files": count, "bytes": total, "accepted": True}
 
 
 def proposal_digest(contract: dict) -> str:
@@ -222,6 +300,11 @@ def run(contract_path: Path, adoption_path: Path, max_participants: int, max_sec
     if max_participants < 1 or max_seconds < 1:
         raise ValueError("finite positive execution budgets required")
     contract = load_contract(contract_path)
+    # All executable/runtime/raw identities are checked before output parent,
+    # lock, state, or participant files can be created or mutated.
+    validate_runner(contract)
+    validate_runtime(contract)
+    validate_root_audit(contract)
     adoption = validate_adoption(contract, adoption_path)
     rows = load_rows(contract)
     output = Path(contract["output_root"])
