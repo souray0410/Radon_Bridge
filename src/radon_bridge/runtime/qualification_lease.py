@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import tempfile
 import time
 
@@ -39,6 +40,7 @@ def validate(lease, now=None):
         "schema", "lease_id", "project", "mode", "requested_gpus",
         "packet_sha256", "expires_at", "test_access", "account_limit",
         "return_entitlement", "role_policy_sha256", "control_sha256",
+        "account_lock_inode", "journal_initial_sha256",
     }
     if set(lease) != required or lease["schema"] != "radon_v5_qualification_lease_v1":
         raise ValueError("Unknown qualification lease")
@@ -49,11 +51,13 @@ def validate(lease, now=None):
     if (not isinstance(lease["lease_id"], str) or not lease["lease_id"]
             or not HEX.fullmatch(lease["packet_sha256"])
             or not HEX.fullmatch(lease["role_policy_sha256"])
-            or not HEX.fullmatch(lease["control_sha256"])):
+            or not HEX.fullmatch(lease["control_sha256"])
+            or not HEX.fullmatch(lease["journal_initial_sha256"])
+            or type(lease["account_lock_inode"]) is not int or lease["account_lock_inode"] <= 0):
         raise ValueError("Lease identity is incomplete")
     returned = lease["return_entitlement"]
-    if returned != {"project": "Liu", "gpus": 2}:
-        raise ValueError("Lease must preserve and return the Liu two-GPU entitlement")
+    if returned != {"project": "Uncertainty_Lab", "gpus": 2}:
+        raise ValueError("Lease must preserve and return the Uncertainty_Lab two-GPU entitlement")
     if type(lease["expires_at"]) not in (int, float) or lease["expires_at"] <= now:
         raise ValueError("Qualification lease expired")
     return lease
@@ -85,12 +89,18 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
     from radon_bridge.runtime.state import file_sha256
     now = time.time() if now is None else now
     lock = Path(account_lock)
-    with lock.open("a") as handle:
+    try:
+        descriptor = os.open(lock, os.O_RDWR | os.O_NOFOLLOW)
+    except FileNotFoundError as error:
+        raise ValueError("Established account lock is missing") from error
+    with os.fdopen(descriptor, "r+") as handle:
         try:
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return {"action": "none", "state": "waiting_account_lock"}
         lease = validate(read(lease_path), now)
+        if os.fstat(handle.fileno()).st_ino != lease["account_lock_inode"]:
+            raise ValueError("Account lock identity changed")
         if file_sha256(role_policy_path) != lease["role_policy_sha256"]:
             raise ValueError("Role policy changed")
         if file_sha256(control_path) != lease["control_sha256"]:
@@ -101,8 +111,10 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
         if file_sha256(packet_path) != lease["packet_sha256"]:
             raise ValueError("Qualification packet changed")
         journal = read(journal_path)
-        if journal.get("schema") != "radon_bridge_workflow_requests_v1":
-            raise ValueError("Unknown R&B dispatcher journal")
+        if journal.get("schema") != "radon_v5_qualification_requests_v1":
+            raise ValueError("Qualification requires its dedicated role-registered journal")
+        if not journal.get("requests") and file_sha256(journal_path) != lease["journal_initial_sha256"]:
+            raise ValueError("Initial qualification journal changed")
         decision = decide(lease, snapshot(), journal, now=now)
         if decision["action"] != "submit_once":
             return decision
@@ -110,13 +122,16 @@ def publish_once(*, lease_path, role_policy_path, control_path, packet_path,
         command = packet.get("command")
         if (packet.get("schema") != "radon_v5_next_update_packet_v1"
                 or packet.get("test_access") is not False
+                or packet.get("requested_gpus") != 1 or packet.get("submit_timeout_seconds") != 20
                 or not isinstance(command, list) or not command
-                or not all(isinstance(x, str) and x for x in command)):
+                or not all(isinstance(x, str) and x for x in command)
+                or command[0] != "sbatch" or "--parsable" not in command
+                or not any(x == "--gres=gpu:a100:1" for x in command)):
             raise ValueError("Invalid qualification packet")
         entry = {"lease_id": lease["lease_id"], "packet_sha256": lease["packet_sha256"],
                  "state": "intent", "requested_gpus": 1, "time": now}
         journal["requests"].append(entry); write(journal_path, journal)
-        job_id = str(submit(command))
+        job_id = str(submit(command, timeout=20))
         if not job_id.isdigit():
             entry.update(state="identity_drift", observed_job_id=job_id)
         else:
@@ -137,3 +152,11 @@ def terminal_transition(entry, *, slurm_state, exit_code):
     else:
         raise ValueError("Slurm state is not terminal")
     return entry
+
+
+def submit_sbatch(command, *, timeout):
+    """Bound the scheduler RPC while the account lock protects admission."""
+    result = subprocess.run(command, text=True, capture_output=True, timeout=timeout)
+    if result.returncode:
+        raise RuntimeError("sbatch failed: " + result.stderr.strip())
+    return result.stdout.strip().split(";", 1)[0]
