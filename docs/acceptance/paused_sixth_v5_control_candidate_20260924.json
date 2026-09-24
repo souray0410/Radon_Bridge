@@ -1,6 +1,12 @@
 {
   "schema": "radon_paused_sixth_v5_control_candidate_v1",
-  "state": "candidate_zero_gpu_validated",
+  "state": "superseded_no_go_after_independent_review",
+  "independent_review": {
+    "receipt": "PHD/operations/mhd_v5_20260922/acceptance/radon_paused_sixth_grant_runner_review_20260924.json",
+    "decision": "NO-GO for production reservation or GPU submission",
+    "reviewed_candidate_commit": "0bb1d103b947871461e52536ac89d0f6c9a74393",
+    "replacement_candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83"
+  },
   "base_commit": "d0ceeb18b6d8a3dfc7d3d655a4dcbec25b5ea647",
   "scope": {
     "project": "Radon_Bridge",

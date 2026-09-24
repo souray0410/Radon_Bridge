@@ -1,0 +1,116 @@
+{
+  "schema": "radon_paused_sixth_v5_control_candidate_v2",
+  "observed_at_utc": "2026-09-24T10:28:04Z",
+  "state": "candidate_zero_gpu_validated_production_no_go",
+  "candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83",
+  "parent_candidate_commit": "0bb1d103b947871461e52536ac89d0f6c9a74393",
+  "formal_framework_v5_commit": "1287681c08846e11364c81653048435482e772a7",
+  "scope": {
+    "project": "Radon_Bridge",
+    "run_id": "2026_09_12_11_23_31_715620",
+    "test_access": false,
+    "gpu_requested_by_validation": false,
+    "production_claim_mutated": false,
+    "production_role_policy_mutated": false,
+    "production_worker_mutated": false
+  },
+  "implementation": {
+    "entrypoint": "src/radon_bridge/runtime/paused_sixth_v5_control.py",
+    "entrypoint_sha256": "e787964c7877f902912b725e3a07709650f52663d3bbbb60a173f34edfe5e062",
+    "transaction": "src/radon_bridge/runtime/paused_sixth_v5_control_v2.py",
+    "transaction_sha256": "0aa77a0be03ad81ac7aeae55b7ea7962727b970354f9f6c4dfac754e46dc28a7",
+    "tests": "tests/unit/runtime/test_paused_sixth_v5_control.py",
+    "tests_sha256": "0d746e7a653ffb4e829fa4b94165a9e0da18fd1f1bd330f1c33ac0e1abb65b21"
+  },
+  "independent_review_findings_closed_in_candidate": [
+    {
+      "finding": "submission preceded durable journal/finalizer and acknowledgement loss could wedge",
+      "candidate_behavior": "A preparing transaction is fsync-and-rename persisted under the shared lock before a held sbatch. Allocation and finalizer acknowledgements recover by unique comment from squeue plus sacct; unproven absence does not resubmit, and the held GPU job is released only after the zero-GPU afterany finalizer is durable."
+    },
+    {
+      "finding": "worker echoed its own command identity",
+      "candidate_behavior": "The allocation parent retains an in-memory owner contract with fixed argv and a 256-bit nonce, rejects any disk rewrite, and independently binds Slurm job and step to proc cmdline, executable, cgroup and environment before changing the claim."
+    },
+    {
+      "finding": "runtime pins omitted wrappers, dynamic modules, environment and formal V5",
+      "candidate_behavior": "The binding requires pinned allocation/finalizer wrappers, Python executable, all R&B/MHD_Models/MHD Framework modules, exact environment, Torch version, formal Framework V5 API and commit."
+    },
+    {
+      "finding": "one 48-hour lease had no safe same-run continuation",
+      "candidate_behavior": "Paused or failed optimizer-boundary_v2 output may create a bounded next attempt for the same source run and execution directory only after checkpoint, spec, progress and terminal claim validation; every attempt remains 48 hours."
+    },
+    {
+      "finding": "new R&B journal would invalidate the LOOK policy monitor",
+      "candidate_behavior": "Production binding validation requires a separately accepted policy proposal and an accepted LOOK stage-two receipt bound to the accepted role-policy SHA. No policy is modified by this candidate."
+    }
+  ],
+  "additional_finalizer_check": "Even for an already-terminal journal row, the finalizer first verifies its own SLURM_JOB_ID, pi-mengy account, zero GPUs, unique comment and exact afterany dependency.",
+  "capacity_contract": "Both account-wide and Radon_Bridge running-plus-pending totals include unresolved intents; one new attempt must fit the 24-GPU account ceiling and accepted R&B role allowance.",
+  "validation": {
+    "local": {
+      "command": "PYTHONPATH=src:<MHD_Models>/src:<MHD_Framework>/src <python> -m pytest -q",
+      "result": "311 passed, 2 warnings in 5.98s"
+    },
+    "ibex_zero_gpu_crash_shadow": {
+      "job_id": "52459418",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "requested_tres": "billing=2,cpu=2,mem=8G,node=1",
+      "result": "5 passed, 6 deselected in 2.08s",
+      "receipt": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/crash_shadow_receipt.json",
+      "receipt_sha256": "b2bec387a53732ebf64be27ce3eb436f655adc01e2b4033550d8bd0b1d080581",
+      "log": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/crash-52459418.out",
+      "log_sha256": "2f23ba9d40f47247ea9a4766a91c660364f5541662ead18685c25ca7ec85b405"
+    },
+    "ibex_full_cpu": {
+      "job_id": "52459719",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "requested_tres": "billing=4,cpu=4,mem=16G,node=1",
+      "result": "311 passed, 14 warnings in 10.89s",
+      "framework_submodule_commit": "1287681c08846e11364c81653048435482e772a7",
+      "runtime_framework_api": "V5",
+      "log": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/full-52459719.out",
+      "log_sha256": "2829192b36173aa85ed4bcdf6c8afe735f7f9ff338b5ef53d102eb23011bd77f"
+    },
+    "source_archive_sha256": "12895833ee325e8b75e8a40f639dda29fa929d4bb3ea0e522ad0832e143f20b4",
+    "failed_harness_attempts_preserved": [
+      {
+        "job_id": "52459417",
+        "result": "308 passed, 3 failed",
+        "cause": "macOS ._* archive metadata violated package-layout checks",
+        "log_sha256": "29680cf12ae186af8e407f41643624b1693fd7df9ed4d007bfd43fedf9bf73a4"
+      },
+      {
+        "job_id": "52459567",
+        "result": "309 passed, 2 failed",
+        "cause": "cleaned archive lacked the framework submodule git metadata required by repository-contract tests",
+        "log_sha256": "cc9ee2100bee62a567d1e1da7da203a57dd6227df2b191039c570754a10f3cae"
+      }
+    ]
+  },
+  "fresh_production_observation": {
+    "claim_state": "failed",
+    "claim_generation": 110,
+    "claim_owner": "radon-workflow-52347024",
+    "claim_migration_phase_present": false,
+    "source_status": "paused",
+    "source_updates": 26904,
+    "source_status_sha256": "ce6fe3d10edebb5433b53aa5475284d76a2e377fc6c063d29a3184cb126ae348",
+    "source_checkpoint_sha256": "792748f7a1c0c4896ca84617b1f9b9712a18392d279dc70dd42b8b76a2c1c0f5",
+    "source_spec_sha256": "6c62039f7cf82a49d060c527a771b684ee49cd8e3d72906ef38fb2e2f1322be5",
+    "old_job": "52347024 COMPLETED 0:0",
+    "current_owner_present": false
+  },
+  "remaining_production_gates": [
+    "independent review of candidate commit 89cedc1abab1e035dab67b7b5508f49945d07c83",
+    "complete the accepted LOOK v22 stage-two control-plane handover and the Uncertainty_Lab retry transaction before changing the shared role policy",
+    "accept a separate R&B role-policy proposal and publish an immutable deployment gate bound to both receipts and the resulting exact policy SHA",
+    "create the source_reserved claim and immutable production binding only after rechecking the paused source and accepted V5 asset identities",
+    "let the sole existing control plane publish the finite held-first transaction under the inherited account lock",
+    "observe the real A100 allocation, parent-bound worker step, checkpoint continuation and final receipt before calling the sixth run migrated"
+  ],
+  "production_cutover": false,
+  "automatic_takeover_proven": false,
+  "decision": "NO-GO until every remaining production gate is independently accepted"
+}
