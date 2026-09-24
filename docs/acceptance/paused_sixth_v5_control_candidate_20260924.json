@@ -1,0 +1,76 @@
+{
+  "schema": "radon_paused_sixth_v5_control_candidate_v1",
+  "state": "candidate_zero_gpu_validated",
+  "base_commit": "d0ceeb18b6d8a3dfc7d3d655a4dcbec25b5ea647",
+  "scope": {
+    "project": "Radon_Bridge",
+    "run_id": "2026_09_12_11_23_31_715620",
+    "framework_api": "V5",
+    "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+    "test_access": false,
+    "gpu_requested_by_validation": false,
+    "production_claim_mutated": false,
+    "production_role_policy_mutated": false,
+    "production_worker_mutated": false
+  },
+  "implementation": {
+    "source": "src/radon_bridge/runtime/paused_sixth_v5_control.py",
+    "source_sha256": "607f56ec3dda4922dba80e389831e8cfbcb7055898ef36896f38be60852decea",
+    "tests": "tests/unit/runtime/test_paused_sixth_v5_control.py",
+    "tests_sha256": "3bea1449ecd804203f9a4c1e3d122bd29f17c1b6a8928e6673b442c140775014",
+    "properties": [
+      "one finite request writer under the existing shared account lock",
+      "fresh account and Radon_Bridge role capacity reconciliation before submission",
+      "explicit submitted-to-granted transition from a scheduler-observed one-A100 allocation",
+      "runtime source pins plus immutable V5 asset, spec, checkpoint, command and actual Slurm step binding",
+      "separate V5 execution revision without overwriting the historical V4 run",
+      "afterany finalizer which preserves the migration reservation when no V5 step claimed it"
+    ]
+  },
+  "ibex_validation": {
+    "host_alias": "ibex-vscode",
+    "full_unit_job_id": "52454320",
+    "full_unit_state": "COMPLETED",
+    "full_unit_exit_code": "0:0",
+    "full_unit_result": "307 passed, 14 warnings in 16.47s",
+    "full_unit_log": "/ibex/user/mengh/radon_v5_grant_runner_candidate_v10_20260924/allsubmod-52454320.out",
+    "full_unit_log_sha256": "b0e3f3b8ac5234df44f0496dc0cb672f8c0c5cf6c00b3bc9e7c250ba439d40b3",
+    "runtime": {
+      "framework_overlay": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/runtime_overlay_mhd_framework_5_c022b4f4",
+      "observed_framework_api": "V5",
+      "framework_submodule_commit": "1287681c08846e11364c81653048435482e772a7",
+      "mhd_models_source": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/source_mhd_models_5d59d93"
+    },
+    "real_chain_shadow_job_id": "52454037",
+    "real_chain_shadow_state": "COMPLETED",
+    "real_chain_shadow_exit_code": "0:0",
+    "real_chain_shadow_receipt": "/ibex/user/mengh/radon_v5_grant_runner_candidate_v7_20260924/real_chain_shadow.json",
+    "real_chain_shadow_sha256": "b98a03c5c2b3807f0c3eef52d63e9ea9150683133224b65ca0cb510e177dc59e",
+    "real_chain_result": {
+      "source_update": 26904,
+      "accepted_v5_update": 26905,
+      "checkpoint_sha256": "bb5438f72b17a3ee4189106d04f22d50bcacb3fb1b11114a47fe8a56233b1dac",
+      "spec_sha256": "36e941c0629023cef8e6571207849b94c53a9649816deec1efc8aa94dd8c53dc"
+    }
+  },
+  "superseded_validation_failures_preserved": [
+    {
+      "job_ids": ["52453711", "52453814"],
+      "diagnosis": "incomplete validation archive and incomplete Python module setup failed during collection"
+    },
+    {
+      "job_ids": ["52453930", "52454218", "52454254", "52454308"],
+      "diagnosis": "validation packaging contained macOS metadata or omitted the pinned framework submodule; the final clean package and exact V5 runtime closed these harness defects"
+    }
+  ],
+  "remaining_production_gates": [
+    "merge or independently accept this candidate in the Radon_Bridge repository",
+    "create an immutable binding from that accepted commit and the then-current role policy, ownership overlay, migration reservation and production asset",
+    "register exactly one dedicated request journal through the existing sole policy publisher",
+    "submit only after a fresh under-lock 24-GPU and Radon_Bridge role-capacity decision",
+    "observe the real A100 allocation and worker step before replacing the migration reservation with the V5 running claim",
+    "verify the resumed V5 run and terminal receipt before declaring production cutover complete"
+  ],
+  "production_cutover": false,
+  "automatic_takeover_proven": false
+}
