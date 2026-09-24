@@ -1,0 +1,90 @@
+{
+  "schema": "radon_paused_sixth_v5_control_candidate_v3",
+  "candidate": {
+    "implementation_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
+    "branch": "codex/rb-v5-grant-runner",
+    "control_sha256": "d7ca158a47c242caa940b39fc4e0384fba0835127ec4284cac6a5fa813037686",
+    "test_sha256": "b9a467b780f158de4b7fb6ffa2cdd698aea9fa126c92531bfcc0669bf0ebad25",
+    "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+    "scope": "isolated paused-sixth V5 grant writer and asset runner candidate"
+  },
+  "closed_review_findings": {
+    "held_first_finalizer_transaction": "the exact PENDING afterany dependency, finalizer job, account, zero-GPU request and comment are persisted before predecessor release and revalidated from immutable proof after Slurm clears Dependency",
+    "allocation_ack_loss": "unique-comment allocation recovery runs under the account lock before live_snapshot and persists the numeric owner before capacity reconciliation",
+    "runtime_contract": "mhd_models.scheduling.quota_guard is a required pinned module and runtime role",
+    "deployment_order": "LOOK v22 stage2 evidence requires an exact schema, successor monitor job and accepted role-policy SHA",
+    "durability": "atomic JSON replacement fsyncs the containing directory",
+    "continuation": "the pre-existing same-run bounded retry contract remains covered"
+  },
+  "local_validation": {
+    "command": "PYTHONPATH=$PWD/src:$PWD/../mhd_v5_rollout_20260922/MHD_Models/src:$PWD/third_party/MHD_Framework /Users/mengh/Documents/ChatGPT/KAUST/mhd_v5_rollout_20260922/.venv28/bin/python -m pytest -q",
+    "result": "317 passed, 2 warnings",
+    "targeted_result": "17 passed"
+  },
+  "ibex_validation": {
+    "source_root": "/ibex/user/mengh/radon_v5_grant_runner_44ba496_20260924",
+    "clean_source_root": "/ibex/user/mengh/radon_v5_grant_runner_44ba496_full_20260924",
+    "full_cpu": {
+      "job_id": "52462737",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 84,
+      "requested_tres": "billing=4,cpu=4,mem=16G,node=1",
+      "result": "317 passed, 14 warnings",
+      "log": "/ibex/user/mengh/radon_v5_grant_runner_44ba496_full_20260924/full-52462737.out",
+      "log_sha256": "a38038646c68850f664df675cb083bb5ef98d3fc5da81c7299f65de18817038d"
+    },
+    "real_zero_gpu_afterany": {
+      "predecessor_job_id": "52462327",
+      "predecessor_state": "COMPLETED",
+      "predecessor_exit_code": "0:0",
+      "predecessor_requested_tres": "billing=1,cpu=1,mem=1G,node=1",
+      "finalizer_job_id": "52462328",
+      "finalizer_state": "COMPLETED",
+      "finalizer_exit_code": "0:0",
+      "finalizer_requested_tres": "billing=1,cpu=1,mem=2G,node=1",
+      "pending_dependency_proof": "afterany:52462327(unfulfilled)",
+      "live_finalizer_dependency": "(null)",
+      "manifest": "/ibex/user/mengh/radon_v5_grant_runner_44ba496_20260924/zero_gpu_afterany_integration/manifest.json",
+      "manifest_sha256": "723a6f8b10d5b92058fb1e1a77f447d7ce05b83be88373b07b1e23fdc5055d70",
+      "proof_sha256": "e2df76f2f054ca676e2b57f118abc123dc42bf453fa11a27075ba682d7b356fc",
+      "receipt": "/ibex/user/mengh/radon_v5_grant_runner_44ba496_20260924/zero_gpu_afterany_integration/finalizer_receipt.json",
+      "receipt_sha256": "3c66b80ca6c97de6a0b69d748f801016053a92a1f058d402ed69c65703c48a30",
+      "log_sha256": "e27ecb045b0819df9f8941aabe142c297cc0162376563e94f9c1658967313c8d",
+      "production_mutated": false
+    },
+    "preserved_failed_attempts": [
+      {
+        "job_id": "52462326",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "reason": "archive lacked the MHD Framework submodule git metadata required by repository-contract tests",
+        "result": "315 passed, 2 failed",
+        "log_sha256": "887b56e0b2306e6b151592a477f8a716446afe322fef85c5070e978b8038c532"
+      },
+      {
+        "job_id": "52462558",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "reason": "the zero-GPU evidence directory was placed at repository root and intentionally failed the exact root-layout contract",
+        "result": "315 passed, 2 failed",
+        "log_sha256": "b4a2244abb782a79919f9513b365a35f5d6a984806d83fc4f49c01007eb6d9fe"
+      }
+    ]
+  },
+  "production": {
+    "verdict": "NO_GO",
+    "policy_mutated": false,
+    "claim_mutated": false,
+    "owner_mutated": false,
+    "gpu_requested": false,
+    "deployment_performed": false,
+    "residual_gates": [
+      "independent review of implementation commit 44ba496fd9d2aad065e141d8485649a0dba3eec0 and this evidence",
+      "LOOK v22 stage2 successor monitor and exact shared role-policy transition must be independently accepted",
+      "the concurrent Uncertainty_Lab retry safety transaction must complete without conflicting shared-policy mutation",
+      "a production binding must pin the exact accepted LOOK receipt, successor monitor, shared policy, complete runtime and V5 asset before any source claim or Slurm allocation is changed"
+    ]
+  },
+  "test_access": false
+}
