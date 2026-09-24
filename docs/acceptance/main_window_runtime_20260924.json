@@ -23,5 +23,8 @@
   ],
   "test_access": false,
   "hosted_ci": "not_run_actions_quota_exhausted",
-  "evidence_type": "runtime_snapshot_not_new_scientific_acceptance"
+  "evidence_type": "runtime_snapshot_not_new_scientific_acceptance",
+  "followup_verified_at": "2026-09-24T20:15:45.812428+00:00",
+  "followup": "WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。",
+  "remaining": "WS02全量缓存后工程资格及新进程恢复已部署；正式父模型和六臂研究仍待接通。"
 }
