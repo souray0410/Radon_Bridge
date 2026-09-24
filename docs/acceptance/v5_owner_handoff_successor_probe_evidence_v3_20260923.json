@@ -1,0 +1,34 @@
+{
+  "schema": "radon_v5_owner_handoff_successor_probe_evidence_v3",
+  "state": "secondary_owner_reclaim_gate_confirmed_not_deployed",
+  "predecessor": "docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json",
+  "finding": {
+    "primary_dispatch_guard_is_insufficient": true,
+    "reason": "Each already-running finite_owner_chain allocation ultimately launches the frozen legacy fallback command as an independent gpu_owner process. That process performs its own repeated admissible_work and claims.acquire cycle. Guarding only finite_dispatch.submit_with_admission therefore cannot prevent an existing allocation from reacquiring a run after that run is frozen for V5 handoff.",
+    "rejected_claim": "A guarded finite_dispatch daemon alone establishes exclusive V5 handoff safety."
+  },
+  "additional_required_gate": {
+    "before_arm": [
+      "prove that the target run is excluded by the future-acquisition path of every still-live legacy gpu_owner allocation using an existing protocol-visible hold or exclusion",
+      "or wait for every allocation capable of reacquiring the target run to exit naturally, then verify its Slurm terminal state, process absence, claim release and journal state",
+      "only then arm the registry entry, freeze an immutable optimizer-boundary checkpoint and transfer the claim"
+    ],
+    "must_not_rely_on": [
+      "fast polling",
+      "daemon-only admission filtering",
+      "an assumed gap between legacy claim releases and reacquisition"
+    ]
+  },
+  "ownership_boundary": {
+    "required_change_location": "MHD_Models finite_dispatch/finite_owner_chain control plane or the established legacy owner hold protocol",
+    "radon_only_source_change_sufficient": false,
+    "next_owner": "control-plane integration workstream"
+  },
+  "safety": {
+    "owners_modified": false,
+    "claims_modified": false,
+    "jobs_submitted": 0,
+    "armed": false,
+    "test_access": false
+  }
+}

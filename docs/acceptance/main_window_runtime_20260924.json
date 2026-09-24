@@ -1,0 +1,27 @@
+{
+  "schema": "project_main_window_runtime_snapshot_v1",
+  "project": "Radon_Bridge",
+  "verified_at": "2026-09-24T19:59:01.232249+00:00",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "source_commit": "faf499be688544a3b03ee23600775c45f41eacf0",
+  "summary": "Ibex 正式 V5 续训 52473855 排队，原唯一 successor 负责终结与受控接续，健康旧 V4 作业保留。WS02 独立目标缓存直接复用/复制 Ibex 已处理的完整 macular 队列，38k 左右的逐数组摘要已核验；原缓存写入者及原目录未改。全量 70,885 人/212,655 数组验收后，已部署 GPU0 自动单更新资格入口；新进程恢复验收仍待接通。",
+  "details": {
+    "ibex_gpu_job": 52473855,
+    "ibex_finalizer": 52473867,
+    "ws02_cache_people": 70885,
+    "ws02_cache_arrays": 212655,
+    "ws02_copy_observed_completed": 37888,
+    "ws02_copy_pid": 1301822,
+    "ws02_gpu_followup_pid": 1302527,
+    "ws02_formal_v5_optimizer_updates": 0
+  },
+  "next_acceptance": "完成完整缓存复制与逐数组 SHA；自动运行 GPU0 资格，核验真实恢复与下一更新，然后接通正式父模型及六臂研究；Ibex 获卡后续训原 run。",
+  "limitations": [
+    "Ibex 52473855 待批；WS02 完整缓存尚未复制验收完。",
+    "WS02 自动后继目前只覆盖 native DenseNet3D 工程资格，不是 R&B 桥接科学训练或正式全流程，后续部署仍由主窗口负责。",
+    "原内存事故须待完整生命周期和真实下游接受，不能据新健康进程关闭。"
+  ],
+  "test_access": false,
+  "hosted_ci": "not_run_actions_quota_exhausted",
+  "evidence_type": "runtime_snapshot_not_new_scientific_acceptance"
+}

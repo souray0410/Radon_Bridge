@@ -2,19 +2,19 @@
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
-  "phase": "eye_stage_one",
-  "next_acceptance": "完成A100连续更新、完整UKB流程及生产owner交接验收；六项Ibex资源恢复和LOOK永久管理交接仍开放。原科研结果与截止时间保留。",
+  "phase": "formal_v5_ibex_resume_queued_ws02_full_exact_cache_copy_running",
+  "next_acceptance": "完成完整缓存复制与逐数组 SHA；自动运行 GPU0 资格，核验真实恢复与下一更新，然后接通正式父模型及六臂研究；Ibex 获卡后续训原 run。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
-  "evidence_cutoff": "2026-09-23T17:13:00+00:00",
-  "verified_at": "2026-09-23T20:13:00+03:00",
+  "source_commit": "faf499be688544a3b03ee23600775c45f41eacf0",
+  "evidence_cutoff": "2026-09-24T19:59:01.232249+00:00",
+  "verified_at": "2026-09-24T19:59:01.232249+00:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
-    "implemented": "partial",
+    "implemented": "verified",
     "deployed": "partial",
     "running": "partial",
     "accepted": "partial"
@@ -52,6 +52,7 @@
     }
   ],
   "limitations": [
+    "2026-09-24：本次刷新仅更新运行与交接证据；下方原科研结果仍以各自报告日期和协议为准。当前状态以本文件 phase/next_acceptance/blockers 和本次 acceptance 为准，旧候选说明仅属历史。",
     "309是逻辑位置而不是已完成训练",
     "三维父模型及逐臂执行等门槛尚未全部关闭",
     "Live check covered controller bindings, parent readiness and workflow status; isolated route tests do not establish full GPU project acceptance.",
@@ -67,10 +68,9 @@
     "The original A100 qualification finalizer remains failed and was not rewritten; acceptance of the completed one-update equivalence comes from an append-only independent CPU recheck. This does not authorize production dispatch, full train/development replay, or owner cutover."
   ],
   "blockers": [
-    "Five of six contained V4 parent runs are training again, but three live steps report MaxRSS effectively at the 106 GiB request and one run remains held; terminal full-lifecycle resource acceptance is incomplete",
-    "Active parent controller lacks accepted project runtime binding",
-    "A100 single-update equivalence has an append-only independent recheck; complete train/development replay, formal V5 production claim and production owner integration remain required",
-    "Generation5 OCT3D V2 has only a one-participant accepted prefix; complete cache and independent acceptance remain required"
+    "Ibex 52473855 待批；WS02 完整缓存尚未复制验收完。",
+    "WS02 自动后继目前只覆盖 native DenseNet3D 工程资格，不是 R&B 桥接科学训练或正式全流程，后续部署仍由主窗口负责。",
+    "原内存事故须待完整生命周期和真实下游接受，不能据新健康进程关闭。"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -118,7 +118,9 @@
     "2026-09-23 append-only correction: the prior five-owner readiness receipt labelled a Riyadh wall-clock hour as UTC. The original file remains immutable; embedded owner timestamps and commit time bound the actual sample between 19:09:55Z and 19:11:46Z, but the exact sampling instant was not preserved. Evidence docs/acceptance/v5_live_owner_transition_readiness_time_correction_20260923.json.",
     "2026-09-23 formal-V5 owner handoff guard candidate blocks an armed run in normal admission and rechecks immediately before claim acquisition. Arming requires the existing account lock, exact live claim and an active deployment receipt proving the dispatcher consumes the guard. At 19:41:19Z job52332277 remained RUNNING and no guarded dispatcher process was present, so nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_guard_candidate_20260923.json.",
     "2026-09-23 successor probe corrected the control-plane assumption: the unique live dispatcher is MHD_Models finite_dispatch, which owns the original lock and loads the frozen legacy Radon executor. Replacing that executor with direct-V5 Radon was rejected in isolated validation because historical V4 config is intentionally unsupported. No process, owner, claim, job or guard changed. The management wrapper must consume the registry before an active deployment receipt can legally arm 1ce. Evidence docs/acceptance/v5_owner_handoff_successor_probe_20260923.json.",
-    "2026-09-23 successor evidence V2 binds the live finite_dispatch PID, original lock inode/device, live binding, management wrapper and frozen Radon source SHA. It records the expected isolated rejection and the minimum MHD_Models wrapper interface required before any guard can be armed. No deployment occurred. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json."
+    "2026-09-23 successor evidence V2 binds the live finite_dispatch PID, original lock inode/device, live binding, management wrapper and frozen Radon source SHA. It records the expected isolated rejection and the minimum MHD_Models wrapper interface required before any guard can be armed. No deployment occurred. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json.",
+    "2026-09-23 successor evidence V3 records a second acquisition path: already-running finite_owner_chain allocations launch independent frozen legacy gpu_owner processes which repeat admissible_work and claims.acquire. A daemon-only guard cannot prevent those allocations from reacquiring a frozen run. Before arm, the control plane must either exclude the target in every live legacy owner path through an existing protocol-visible hold, or wait for all capable allocations to exit naturally and verify Slurm/process/claim/journal release. Nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v3_20260923.json.",
+    "2026-09-24 主窗口现场核验：Ibex 正式 V5 续训 52473855 排队，原唯一 successor 负责终结与受控接续，健康旧 V4 作业保留。WS02 独立目标缓存直接复用/复制 Ibex 已处理的完整 macular 队列，38k 左右的逐数组摘要已核验；原缓存写入者及原目录未改。全量 70,885 人/212,655 数组验收后，已部署 GPU0 自动单更新资格入口；新进程恢复验收仍待接通。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -262,6 +264,14 @@
     {
       "label": "Exact live finite-dispatch identity and minimum wrapper guard interface",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json"
+    },
+    {
+      "label": "Secondary legacy gpu-owner reacquisition gate for V5 handoff",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/v5_owner_handoff_successor_probe_evidence_v3_20260923.json"
+    },
+    {
+      "label": "2026-09-24 主窗口实际部署与运行范围",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/main_window_runtime_20260924.json"
     }
   ]
 }
