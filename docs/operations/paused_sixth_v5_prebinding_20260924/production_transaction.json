@@ -1,0 +1,130 @@
+{
+  "asset_publication": {
+    "account_lock": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/gpu_account_submission.lock",
+    "asset_dir": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/production_asset",
+    "attempt_checkpoint": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/a100_next_update/attempt_52387276/v5/last.pt",
+    "attempt_checkpoint_sha256": "bb5438f72b17a3ee4189106d04f22d50bcacb3fb1b11114a47fe8a56233b1dac",
+    "attempt_spec": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/a100_next_update/attempt_52387276/v5/spec.json",
+    "attempt_spec_sha256": "36e941c0629023cef8e6571207849b94c53a9649816deec1efc8aa94dd8c53dc",
+    "claim_path": "/ibex/project/c2377/souray/data/mengh/models/queues/transformer_companion_claims/d9f8d34ff8a8c14891666cddaac482f33654b1a7c96c5d487c3e6c889b974b28.json",
+    "claims_root": "/ibex/project/c2377/souray/data/mengh/models/queues/transformer_companion_claims",
+    "conversion_receipt": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/converted_resume/conversion.json",
+    "converted_checkpoint": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/converted_resume/checkpoint.pt",
+    "converted_checkpoint_sha256": "6773ecdb2db522a86289dfbe70cd15a450839fb8d604b2dc94019b4760ff020b",
+    "expected_reserved_claim": {
+      "generation": 111,
+      "job_id": "migration-cpu",
+      "migration_phase": "source_reserved",
+      "owner": "radon-v5-paused-sixth-migration",
+      "state": "claimed",
+      "step": null
+    },
+    "independent_recheck": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/source_tree/source/docs/acceptance/v5_a100_next_update_recheck_20260923.json",
+    "module": "radon_bridge.runtime.paused_sixth_v5_handoff",
+    "old_job_required": {
+      "exit_code": "0:0",
+      "job_id": "52347024",
+      "state": "COMPLETED"
+    },
+    "packet": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/a100_next_update/packet.json",
+    "packet_sha256": "9ed543018902173d582e8203077f7c7d180b6526a6dc6fe47c6d640947a17670",
+    "publish_function": "publish_production_asset",
+    "reservation_receipt": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/reservation.json",
+    "reserve_function": "reserve_actual_failed_claim",
+    "run": "/ibex/project/c2377/souray/data/mengh/models/runs/2026_09_12_11_23_31_715620",
+    "source_checkpoint": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/snapshot/last.pt",
+    "source_checkpoint_sha256": "792748f7a1c0c4896ca84617b1f9b9712a18392d279dc70dd42b8b76a2c1c0f5",
+    "source_spec": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/snapshot/spec.json",
+    "source_spec_sha256": "6c62039f7cf82a49d060c527a771b684ee49cd8e3d72906ef38fb2e2f1322be5"
+  },
+  "final_runtime": {
+    "allocation_wrapper": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/allocation.sbatch",
+    "binding": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/binding.json",
+    "deployment_gate": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/deployment_gate.json",
+    "execution_dir": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/execution",
+    "finalizer_wrapper": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/finalizer.sbatch",
+    "framework_root": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/runtime_overlay_mhd_framework_5_c022b4f4",
+    "intent": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/intent.json",
+    "journal": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/requests.json",
+    "mhd_models_root": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/source_mhd_models_7513dac/src",
+    "ownership_overlay": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/ownership_overlay.json",
+    "python": "/ibex/project/c2377/souray/home/mengh/environments/radon_bridge_2026_09_09_10_30_34/bin/python",
+    "requested": {
+      "cpus": 16,
+      "gpus": "a100:1",
+      "memory_gib": 160,
+      "walltime": "48:00:00"
+    },
+    "source_root": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/source_tree/source/src",
+    "worker_memory_gib": 160
+  },
+  "forbidden": [
+    "test access",
+    "unsafe V4 scancel",
+    "second scheduler",
+    "second active R&B V5 request",
+    "policy replacement without LOOK stage2"
+  ],
+  "future_values_that_must_be_resolved_and_hashed_after_predecessors": [
+    "independent review receipt path and SHA",
+    "LOOK v23 successor job id and stage2 receipt SHA",
+    "installed policy proof",
+    "reservation receipt and production asset SHA",
+    "fresh ownership overlay over then-live jobs",
+    "wrapper/runtime/deployment-gate/final-binding SHAs"
+  ],
+  "gpu_requested": false,
+  "initial_policy": {
+    "path": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/research_gpu_roles.json",
+    "sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289"
+  },
+  "phase_order": [
+    "independent_review_accepts_commit_and_exact_prebinding",
+    "look_v23_held_successor_publishes_stage2_accepting_temporary_policy_sha",
+    "sole_policy_publisher_installs_exact_temporary_policy_under_account_lock",
+    "reserve_exact_failed_source_claim_under_account lock",
+    "publish_immutable_update26905_v5_asset",
+    "generate_and_validate_runtime_ownership_deployment_gate_and_binding",
+    "publisher_creates_one_durable_held_first_request_and_zero_gpu_afterany_finalizer_then_releases_hold",
+    "allocation_owner_attests_fixed_argv_nonce_process_and_claims_exact_reserved_source",
+    "v5_worker_trains_and_publishes_terminal_or_retryable_boundary",
+    "after_v5_attempt_finalizer_and_one_v4_natural_terminal_prepare_steady_policy_monitor_handoff",
+    "look_successor_accepts_steady_policy_sha_then_sole_publisher_restores_cap9"
+  ],
+  "production_mutated": false,
+  "rollback_preconditions": [
+    "the active V5 attempt and its finalizer are terminal; policy must not change beneath a live binding",
+    "at least one pre-existing R&B V4 allocation has naturally reached proved terminal state or total R&B live count is otherwise <=9",
+    "a LOOK successor monitor has accepted exact steady-policy SHA ff390318 and predecessor release is proved",
+    "steady policy is installed under the shared account lock; no job is cancelled by rollback"
+  ],
+  "schema": "radon_paused_sixth_v5_production_transaction_v1",
+  "state": "prepared_fail_closed_awaiting_independent_review_and_look_v23_stage2",
+  "steady_policy": {
+    "path": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.rollback.json",
+    "radon_reserved_gpus": 9,
+    "sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa"
+  },
+  "temporary_policy": {
+    "path": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.proposed.json",
+    "radon_reserved_gpus": 10,
+    "sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62"
+  },
+  "test_access": false,
+  "unique_request_contract": {
+    "ack_loss_recovery_by_unique_comment": true,
+    "afterany_zero_gpu_finalizer": true,
+    "comment_prefix": "rbv5-715620-28fe66b4",
+    "held_first": true,
+    "intent_initial_sha256": "1c1e06503f4a845837c3caae7c3e5cf9ead593638bb73915e6c6c9141a6a5e02",
+    "journal_initial_sha256": "9c1d9093ae17efd03ef8726c5279212969b51deb0346d864d52138312d59c81d",
+    "lease_id": "rb-paused-sixth-v5-20260924",
+    "max_attempts": 3,
+    "requested_gpus": 1,
+    "retryable_states": [
+      "paused",
+      "failed"
+    ],
+    "walltime": "48:00:00"
+  }
+}
