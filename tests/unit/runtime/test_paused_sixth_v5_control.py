@@ -81,6 +81,10 @@ class Scheduler:
     def release(self, job_id):
         matches = [row for row in self.jobs.values() if row["job_id"] == job_id]
         assert len(matches) == 1 and matches[0]["held"] is True
+        transaction = c.read(self.journal)["requests"][-1]
+        proof = Path(transaction["finalizer_pending_proof_path"])
+        assert proof.is_file()
+        assert digest(proof) == transaction["finalizer_pending_proof_sha256"]
         matches[0]["held"] = False
         self.events.append(("release", job_id))
 
@@ -117,14 +121,22 @@ def fixture(tmp_path):
                   "projects": {"Radon_Bridge": {"reserved_gpus": 14,
                   "request_journals": [str(journal)]}}})
     stage2 = tmp_path / "look_stage2.json"
-    dump(stage2, {"status": "accepted"})
+    successor_monitor_job_id = "52345678"
+    dump(stage2, {
+        "schema": "look_v5_monitor_stage2_acceptance_v1", "status": "accepted",
+        "successor_monitor_job_id": successor_monitor_job_id,
+        "accepted_role_policy_sha256": digest(policy),
+        "successor_monitor_identity_verified": True,
+        "predecessor_release_verified": True, "test_access": False,
+    })
     proposal = tmp_path / "policy_proposal.json"
     dump(proposal, {"schema": "radon_paused_sixth_v5_policy_proposal_v1",
                     "state": "accepted", "role_policy_sha256": digest(policy)})
     gate = tmp_path / "deployment_gate.json"
     dump(gate, {"schema": "radon_paused_sixth_v5_deployment_gate_v1",
-                "look_v21_stage2": "accepted", "look_v21_receipt": str(stage2),
-                "look_v21_receipt_sha256": digest(stage2),
+                "look_v22_stage2": "accepted", "look_v22_receipt": str(stage2),
+                "look_v22_receipt_sha256": digest(stage2),
+                "look_successor_monitor_job_id": successor_monitor_job_id,
                 "policy_proposal_review": "accepted", "policy_proposal": str(proposal),
                 "policy_proposal_sha256": digest(proposal),
                 "accepted_role_policy_sha256": digest(policy),
@@ -226,6 +238,28 @@ def test_allocation_ack_loss_recovers_accepted_job_without_duplicate(tmp_path):
         ("submit", "rb-v5-test-a001")]
 
 
+def test_allocation_ack_loss_recovers_before_real_live_snapshot(tmp_path, monkeypatch):
+    """The recovered numeric owner must be journaled before capacity reconciliation."""
+    binding, value = fixture(tmp_path)
+    scheduler = Scheduler(value["journal"])
+    scheduler.crash = "allocation"
+    assert publish(binding, scheduler)["state"] == "allocation_ack_unknown"
+
+    from mhd_models.scheduling import quota_guard
+    monkeypatch.setattr(quota_guard, "snapshot", lambda: {
+        "jobs": {"700": {"gpus": 1}}, "total_gpus": 1, "limit": 24,
+    })
+    result = c.publish_once(
+        binding, snapshot=lambda: c.live_snapshot(value), submit=scheduler.submit,
+        lookup=scheduler.lookup, release=scheduler.release,
+        runtime_verify=lambda binding: {}, now=11)
+    assert result["state"] == "submitted"
+    row = c.read(value["journal"])["requests"][0]
+    assert row["job_id"] == "700" and row["recovered_before_live_snapshot"] is True
+    assert [event for event in scheduler.events if event[1] == "rb-v5-test-a001"] == [
+        ("submit", "rb-v5-test-a001")]
+
+
 def test_ack_unknown_waits_for_grace_and_proven_absence_before_resubmit(tmp_path):
     binding, value = fixture(tmp_path)
     scheduler = Scheduler(value["journal"])
@@ -253,6 +287,9 @@ def test_finalizer_ack_loss_recovers_before_releasing_gpu(tmp_path):
 def test_binding_requires_complete_runtime_and_accepted_deployment_order(tmp_path):
     binding, value = fixture(tmp_path)
     c.validate_binding(binding, now=1)
+    assert "mhd_models.scheduling.quota_guard" in {
+        row["name"] for row in value["runtime_contract"]["modules"]}
+    assert value["runtime_contract"]["roles"]["quota_guard"]
     broken = c.read(binding)
     broken["runtime_contract"]["modules"] = broken["runtime_contract"]["modules"][:-1]
     dump(binding, broken)
@@ -260,11 +297,25 @@ def test_binding_requires_complete_runtime_and_accepted_deployment_order(tmp_pat
         c.validate_binding(binding, now=1)
     dump(binding, value)
     gate = c.read(value["deployment_gate"])
-    gate["look_v21_stage2"] = "pending"
+    gate["look_v22_stage2"] = "pending"
     dump(value["deployment_gate"], gate)
     value["deployment_gate_sha256"] = digest(value["deployment_gate"])
     dump(binding, value)
-    with pytest.raises(ValueError, match="LOOK v21 stage2"):
+    with pytest.raises(ValueError, match="LOOK v22 stage2"):
+        c.validate_binding(binding, now=1)
+
+
+def test_deployment_gate_binds_exact_successor_monitor_and_policy(tmp_path):
+    binding, value = fixture(tmp_path)
+    gate = c.read(value["deployment_gate"])
+    receipt = c.read(gate["look_v22_receipt"])
+    receipt["successor_monitor_job_id"] = "99999999"
+    dump(gate["look_v22_receipt"], receipt)
+    gate["look_v22_receipt_sha256"] = digest(gate["look_v22_receipt"])
+    dump(value["deployment_gate"], gate)
+    value["deployment_gate_sha256"] = digest(value["deployment_gate"])
+    dump(binding, value)
+    with pytest.raises(ValueError, match="deployment evidence"):
         c.validate_binding(binding, now=1)
 
 
@@ -409,6 +460,40 @@ def test_finalizer_rejects_wrong_account_gpu_or_dependency(tmp_path, monkeypatch
                 "dependency": "afterany:999"}, claims_factory=lambda root: Claims(
                     value["expected_claim"], value["claims_root"]),
             runtime_verify=lambda binding: {}, now=20)
+
+
+def test_finalizer_accepts_cleared_live_dependency_with_immutable_pending_proof(tmp_path):
+    binding, value = fixture(tmp_path)
+    scheduler = Scheduler(value["journal"])
+    publish(binding, scheduler)
+    journal = c.read(value["journal"])
+    row = journal["requests"][0]
+    proof = c.read(row["finalizer_pending_proof_path"])
+    assert proof["state"] == "PENDING" and proof["dependency"] == "afterany:700"
+    row["state"] = "paused"
+    dump(value["journal"], journal)
+
+    observed = {**scheduler.jobs["rb-v5-test-a001-finalizer"],
+                "state": "RUNNING", "dependency": "(null)"}
+    result = c.finalize_afterany(
+        binding, gpu_job_id="700", finalizer_job_id="701",
+        observe_terminal=lambda job: (_ for _ in ()).throw(AssertionError()),
+        observe_finalizer=lambda job: {**observed, "job_id": job},
+        runtime_verify=lambda binding: {}, now=20)
+    assert result["state"] == "paused"
+
+
+def test_atomic_replace_fsyncs_file_and_parent_directory(tmp_path, monkeypatch):
+    calls = []
+    original = c.os.fsync
+
+    def record(descriptor):
+        calls.append(descriptor)
+        return original(descriptor)
+
+    monkeypatch.setattr(c.os, "fsync", record)
+    c.write(tmp_path / "durable.json", {"state": "accepted"})
+    assert len(calls) >= 2
 
 
 def test_capacity_wait_does_not_mutate_journal(tmp_path):

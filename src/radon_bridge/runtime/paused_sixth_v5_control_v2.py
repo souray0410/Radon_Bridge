@@ -42,6 +42,7 @@ MODULE_NAMES = {
     "radon_bridge.runtime.paused_sixth_v5_handoff",
     "mhd_models.workflows.native",
     "mhd_models.scheduling.policy",
+    "mhd_models.scheduling.quota_guard",
     "mhd_models.scheduling.slurm_liveness",
     "mhd_models.runtime.training_state",
     "mhd_framework",
@@ -49,7 +50,7 @@ MODULE_NAMES = {
     "mhd_framework.utils",
 }
 RUNTIME_ROLES = {
-    "entrypoint", "implementation", "handoff", "native", "policy", "liveness",
+    "entrypoint", "implementation", "handoff", "native", "policy", "quota_guard", "liveness",
     "training_state", "framework_init", "framework_core", "framework_utils",
     "allocation_wrapper", "finalizer_wrapper", "python_executable",
 }
@@ -59,6 +60,7 @@ ROLE_MODULES = {
     "handoff": "radon_bridge.runtime.paused_sixth_v5_handoff",
     "native": "mhd_models.workflows.native",
     "policy": "mhd_models.scheduling.policy",
+    "quota_guard": "mhd_models.scheduling.quota_guard",
     "liveness": "mhd_models.scheduling.slurm_liveness",
     "training_state": "mhd_models.runtime.training_state",
     "framework_init": "mhd_framework",
@@ -92,9 +94,35 @@ def write(path, value):
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
+
+
+def write_once(path, value):
+    """Create an immutable evidence file and durably publish its directory entry."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
+                         0o600)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+    except BaseException:
+        raise
+    directory = os.open(path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
 
 
 def locked_existing(path, *, nonblocking=False):
@@ -171,26 +199,34 @@ def validate_binding(path, *, now=None, allow_expired=False):
     _exact(binding["deployment_gate"], binding["deployment_gate_sha256"], "deployment gate")
     gate = read(binding["deployment_gate"])
     gate_keys = {
-        "schema", "look_v21_stage2", "look_v21_receipt", "look_v21_receipt_sha256",
+        "schema", "look_v22_stage2", "look_v22_receipt", "look_v22_receipt_sha256",
+        "look_successor_monitor_job_id",
         "policy_proposal_review", "policy_proposal", "policy_proposal_sha256",
         "accepted_role_policy_sha256", "production_dispatch_authorized", "test_access",
     }
     if (set(gate) != gate_keys
             or gate.get("schema") != "radon_paused_sixth_v5_deployment_gate_v1"
-            or gate.get("look_v21_stage2") != "accepted"
+            or gate.get("look_v22_stage2") != "accepted"
             or gate.get("policy_proposal_review") != "accepted"
             or gate.get("accepted_role_policy_sha256") != binding["role_policy_sha256"]
             or gate.get("production_dispatch_authorized") is not True
-            or gate.get("test_access") is not False):
-        raise ValueError("LOOK v21 stage2 and policy proposal must precede R&B production dispatch")
-    for label in ("look_v21_receipt_sha256", "policy_proposal_sha256"):
+            or gate.get("test_access") is not False
+            or not str(gate.get("look_successor_monitor_job_id", "")).isdigit()):
+        raise ValueError("LOOK v22 stage2 and policy proposal must precede R&B production dispatch")
+    for label in ("look_v22_receipt_sha256", "policy_proposal_sha256"):
         if not _hex(gate.get(label), 64):
             raise ValueError("deployment gate has an invalid digest")
-    _exact(gate["look_v21_receipt"], gate["look_v21_receipt_sha256"], "LOOK stage2 receipt")
+    _exact(gate["look_v22_receipt"], gate["look_v22_receipt_sha256"], "LOOK stage2 receipt")
     _exact(gate["policy_proposal"], gate["policy_proposal_sha256"], "policy proposal")
-    stage2 = read(gate["look_v21_receipt"])
+    stage2 = read(gate["look_v22_receipt"])
     proposal = read(gate["policy_proposal"])
-    if ((stage2.get("accepted") is not True and stage2.get("status") != "accepted")
+    if (stage2.get("schema") != "look_v5_monitor_stage2_acceptance_v1"
+            or stage2.get("status") != "accepted"
+            or stage2.get("successor_monitor_job_id") != gate["look_successor_monitor_job_id"]
+            or stage2.get("accepted_role_policy_sha256") != binding["role_policy_sha256"]
+            or stage2.get("successor_monitor_identity_verified") is not True
+            or stage2.get("predecessor_release_verified") is not True
+            or stage2.get("test_access") is not False
             or proposal.get("schema") != "radon_paused_sixth_v5_policy_proposal_v1"
             or proposal.get("state") != "accepted"
             or proposal.get("role_policy_sha256") != binding["role_policy_sha256"]):
@@ -499,6 +535,69 @@ def _dependency_matches(value, job_id):
     return value == "afterany:" + str(job_id)
 
 
+def _finalizer_proof_path(binding, row):
+    identity = hashlib.sha256(row["attempt_id"].encode()).hexdigest()
+    return Path(binding["intent"]).parent / "finalizer_proofs" / (identity + ".json")
+
+
+def _load_finalizer_proof(binding, row):
+    path = row.get("finalizer_pending_proof_path")
+    digest = row.get("finalizer_pending_proof_sha256")
+    if (path != str(_finalizer_proof_path(binding, row)) or not _hex(digest, 64)
+            or not Path(path).is_file() or sha256(path) != digest):
+        raise RuntimeError("immutable pending-finalizer proof is missing or changed")
+    proof = read(path)
+    if (proof.get("schema") != "radon_paused_sixth_v5_pending_finalizer_proof_v1"
+            or proof.get("binding_sha256") != binding["binding_sha256"]
+            or proof.get("attempt_id") != row["attempt_id"]
+            or proof.get("allocation_job_id") != row["job_id"]
+            or proof.get("finalizer_job_id") != row["finalizer_job_id"]
+            or proof.get("account") != "pi-mengy" or proof.get("gpus") != 0
+            or proof.get("comment") != row["finalizer_comment"]
+            or proof.get("state") != "PENDING"
+            or not _dependency_matches(proof.get("dependency"), row["job_id"])):
+        raise RuntimeError("immutable pending-finalizer proof identity changed")
+    return proof
+
+
+def _persist_finalizer_proof(binding, row, finalizer, now):
+    if (finalizer.get("state") != "PENDING" or finalizer.get("account") != "pi-mengy"
+            or finalizer.get("gpus") != 0 or finalizer.get("comment") != row["finalizer_comment"]
+            or not _dependency_matches(finalizer.get("dependency"), row["job_id"])):
+        raise RuntimeError("pending afterany finalizer identity is unproven")
+    path = _finalizer_proof_path(binding, row)
+    proof = {"schema": "radon_paused_sixth_v5_pending_finalizer_proof_v1",
+             "binding_sha256": binding["binding_sha256"], "attempt_id": row["attempt_id"],
+             "allocation_job_id": row["job_id"], "finalizer_job_id": finalizer["job_id"],
+             "account": finalizer["account"], "gpus": finalizer["gpus"],
+             "comment": finalizer["comment"], "state": finalizer["state"],
+             "dependency": finalizer["dependency"], "observed_at": now}
+    try:
+        write_once(path, proof)
+    except FileExistsError:
+        # The proof is intentionally immutable.  Recovery may observe the same
+        # transaction at a later wall-clock time, so validate the existing
+        # identity instead of comparing a newly generated ``observed_at``.
+        row["finalizer_pending_proof_path"] = str(path)
+        row["finalizer_pending_proof_sha256"] = sha256(path)
+        return _load_finalizer_proof(binding, row)
+    row["finalizer_pending_proof_path"] = str(path)
+    row["finalizer_pending_proof_sha256"] = sha256(path)
+    return _load_finalizer_proof(binding, row)
+
+
+def _validate_finalizer_runtime_identity(row, proof, observed, actual_finalizer, gpu_job_id):
+    live_dependency = observed.get("dependency")
+    dependency_cleared = live_dependency in {None, "", "(null)"}
+    if (proof.get("finalizer_job_id") != actual_finalizer
+            or proof.get("allocation_job_id") != str(gpu_job_id)
+            or observed.get("job_id") != actual_finalizer or observed.get("state") != "RUNNING"
+            or observed.get("account") != "pi-mengy" or observed.get("gpus") != 0
+            or observed.get("comment") != row["finalizer_comment"]
+            or (not dependency_cleared and not _dependency_matches(live_dependency, gpu_job_id))):
+        raise ValueError("zero-GPU afterany finalizer identity is unproven")
+
+
 def publish_once(binding_path, *, snapshot, submit, lookup, release,
                  runtime_verify=verify_runtime, now=None):
     """Recover or advance one held-first transaction without duplicate submission."""
@@ -521,6 +620,23 @@ def publish_once(binding_path, *, snapshot, submit, lookup, release,
         if not journal["requests"]:
             _exact(binding["journal"], binding["journal_initial_sha256"], "initial request journal")
             _exact(binding["intent"], binding["intent_initial_sha256"], "initial transaction intent")
+        active = [row for row in journal["requests"] if row.get("state") in ACTIVE]
+        if len(active) > 1:
+            raise RuntimeError("multiple active attempts")
+        if active and active[0].get("state") in {
+                "preparing", "allocation_ack_unknown", "allocation_ack_pending"}:
+            recovered, _ = _unique_job(lookup, active[0]["attempt_comment"], kind="allocation")
+            if recovered is not None:
+                row = active[0]
+                if (row.get("allocation_job_id") not in (None, recovered["job_id"])
+                        or recovered.get("state") not in {"PENDING", "RUNNING"}
+                        or recovered.get("held") is not True):
+                    raise RuntimeError("pre-snapshot allocation recovery identity changed")
+                row.update(state="held", allocation_job_id=recovered["job_id"],
+                           job_id=recovered["job_id"], held_observed_at=now,
+                           recovered_before_live_snapshot=True)
+                _persist(binding, journal, intent, row)
+                journal = read(binding["journal"])
         current = snapshot()
         for key in ("account_limit", "account_running_pending", "radon_running_pending",
                     "unresolved_gpu_intents", "radon_unresolved_gpu_intents"):
@@ -642,14 +758,19 @@ def publish_once(binding_path, *, snapshot, submit, lookup, release,
             if finalizer is None:
                 return {"action": "none", "state": "finalizer_ack_pending",
                         "job_id": row["job_id"], "finalizer_job_id": returned}
-        if (row.get("finalizer_job_id") not in (None, finalizer["job_id"])
-                or finalizer.get("state") not in {"PENDING", "RUNNING"}
-                or not _dependency_matches(finalizer.get("dependency"), row["job_id"])):
+        if row.get("finalizer_job_id") not in (None, finalizer["job_id"]):
             raise RuntimeError("finalizer acknowledgement/dependency identity changed")
         if row["state"] in {"held", "finalizer_ack_unknown", "finalizer_ack_pending"}:
+            row["finalizer_job_id"] = finalizer["job_id"]
+            _persist_finalizer_proof(binding, row, finalizer, now)
             row.update(state="ready_release", finalizer_job_id=finalizer["job_id"],
                        release_ready_at=now)
             _persist(binding, journal, intent, row)
+
+        # Reconciliation may resume after ``ready_release``.  Refuse to
+        # release unless the immutable PENDING proof created before the
+        # predecessor release is still exact.
+        _load_finalizer_proof(binding, row)
 
         allocation, _ = _unique_job(lookup, row["attempt_comment"], kind="allocation")
         if allocation is None:
@@ -1004,6 +1125,7 @@ def finalize_afterany(binding_path, *, gpu_job_id, observe_terminal, observe_fin
     now = time.time() if now is None else now
     binding = validate_binding(binding_path, now=now, allow_expired=True)
     runtime_verify(binding)
+    binding["binding_sha256"] = sha256(binding_path)
     actual_finalizer = os.environ.get("SLURM_JOB_ID", "") if finalizer_job_id is None else str(finalizer_job_id)
     if not actual_finalizer.isdigit():
         raise ValueError("finalizer lacks its own Slurm job identity")
@@ -1013,12 +1135,10 @@ def finalize_afterany(binding_path, *, gpu_job_id, observe_terminal, observe_fin
         if len(rows) != 1 or rows[0].get("finalizer_job_id") != actual_finalizer:
             raise ValueError("finalizer journal identity changed")
         row = rows[0]
+        proof = _load_finalizer_proof(binding, row)
         finalizer = observe_finalizer(actual_finalizer)
-        if (finalizer.get("job_id") != actual_finalizer or finalizer.get("state") != "RUNNING"
-                or finalizer.get("account") != "pi-mengy" or finalizer.get("gpus") != 0
-                or finalizer.get("comment") != row["finalizer_comment"]
-                or not _dependency_matches(finalizer.get("dependency"), gpu_job_id)):
-            raise ValueError("zero-GPU afterany finalizer identity is unproven")
+        _validate_finalizer_runtime_identity(
+            row, proof, finalizer, actual_finalizer, str(gpu_job_id))
         if row.get("state") in TERMINAL:
             return row
         terminal = observe_terminal(str(gpu_job_id))
