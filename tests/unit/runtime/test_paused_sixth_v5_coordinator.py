@@ -1,5 +1,8 @@
 import json
+import importlib
+import os
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -28,11 +31,30 @@ def contract(tmp_path):
     # proposal below must bind the same digest.
     dump(proposal, {"schema": "radon_paused_sixth_v5_policy_proposal_v1",
                     "state": "accepted", "role_policy_sha256": c._sha(proposed)})
+    coordinator_sha = c._sha(c.__file__)
+    modules = []
+    for name in sorted(c.control.MODULE_NAMES):
+        module_path = str(Path(importlib.import_module(name).__file__).resolve())
+        modules.append({"name": name, "path": module_path, "sha256": c._sha(module_path)})
+    runtime_environment = {key: os.environ.get(key, "") for key in c.control.ENV_KEYS}
+    review_values = {
+      "coordinator_code": {"schema": c.REVIEW_KINDS["coordinator_code"],
+          "candidate": {"implementation_commit": "1" * 40,
+                        "coordinator_sha256": coordinator_sha,
+                        "pre_mutation_modules_sha256": c._json_sha(modules),
+                        "python_sha256": c._sha(sys.executable),
+                        "runtime_environment_sha256": c._json_sha(runtime_environment)},
+          "verdict": {"code": "GO"}, "test_access": False},
+    }
     reviews = []
-    for index in range(4):
-        receipt = root / f"review{index}.json"; dump(receipt, {"accepted": True, "n": index})
-        reviews.append({"path": str(receipt), "sha256": c._sha(receipt),
-                        "verdict_path": "accepted", "accepted_value": True})
+    fixtures = Path(__file__).resolve().parents[2] / "fixtures/runtime/paused_sixth_v5_reviews"
+    for kind in c.REVIEW_KINDS:
+        receipt = root / c.REVIEW_FILENAMES[kind]
+        if kind == "coordinator_code":
+            dump(receipt, review_values[kind])
+        else:
+            receipt.write_bytes((fixtures / c.REVIEW_FILENAMES[kind]).read_bytes())
+        reviews.append({"kind": kind, "path": str(receipt), "sha256": c._sha(receipt)})
     lock = tmp_path / "account.lock"; lock.write_text("")
     values = {"schema": c.SCHEMA, "root": str(root), "state": str(root / "state.json"),
       "account_lock": str(lock), "role_policy": str(policy),
@@ -53,15 +75,22 @@ def contract(tmp_path):
       "converted_checkpoint": str(tmp_path / "converted.pt"), "packet": str(tmp_path / "packet.json"),
       "independent_recheck": str(tmp_path / "recheck.json"),
       "attempt_checkpoint": str(tmp_path / "attempt.pt"), "attempt_spec": str(tmp_path / "attempt.json"),
-      "source_root": str(tmp_path / "source_root"), "mhd_models_root": str(tmp_path / "models"),
-      "framework_root": str(tmp_path / "framework"), "python": "/usr/bin/python3",
+      "source_root": str(Path(c.__file__).resolve().parents[2]),
+      "mhd_models_root": str(Path(importlib.import_module("mhd_models").__file__).resolve().parents[1]),
+      "framework_root": str(Path(importlib.import_module("mhd_framework").__file__).resolve().parents[1]),
+      "python": str(Path(sys.executable).resolve()),
       "ownership_overlay": str(root / "overlay.json"),
       "allocation_wrapper": str(root / "allocation.sbatch"),
       "finalizer_wrapper": str(root / "finalizer.sbatch"),
-      "deployment_gate": str(root / "deployment_gate.json"), "binding": str(root / "binding.json"),
+      "deployment_gate": str(root / "deployment_gate.json"),
+      "binding_intent": str(root / "binding_intent.json"), "binding": str(root / "binding.json"),
       "execution_dir": str(root / "execution"), "native_sources": {},
-      "runtime_environment": {key: "" for key in c.control.ENV_KEYS},
+      "runtime_environment": runtime_environment,
       "worker_cpus": 16, "worker_memory_gib": 160, "source_commit": "1" * 40,
+      "coordinator_source": str(Path(c.__file__).resolve()),
+      "coordinator_source_sha256": coordinator_sha,
+      "python_sha256": c._sha(sys.executable),
+      "pre_mutation_modules": modules,
       "expires_at": 99999999999, "test_access": False}
     # Correct the circular stage2/proposal fixture by binding both to target policy.
     stage = json.loads(stage2.read_text()); stage["accepted_role_policy_sha256"] = values["temporary_policy_sha256"]
@@ -152,9 +181,123 @@ def test_policy_replace_crash_recovers_receipt_without_second_replace(tmp_path):
 
 
 def test_contract_rejects_future_look_receipt_without_exact_successor(tmp_path):
-    path, value = contract(tmp_path)
+    second = tmp_path / "second"; second.mkdir()
+    path, value = contract(second)
     stage2 = json.loads(Path(value["look_stage2"]).read_text())
     stage2["successor_monitor_job_id"] = "801"; dump(value["look_stage2"], stage2)
     value["look_stage2_sha256"] = c._sha(value["look_stage2"]); dump(path, value)
     with pytest.raises(ValueError, match="real LOOK successor"):
         c.validate_contract(path)
+
+
+def test_contract_rejects_duplicate_or_contract_selected_review_receipts(tmp_path):
+    second = tmp_path / "second"; second.mkdir()
+    path, value = contract(second)
+    first = value["review_receipts"][0]
+    value["review_receipts"] = [dict(first, kind=kind) for kind in c.REVIEW_KINDS]
+    dump(path, value)
+    with pytest.raises(ValueError, match="exact and distinct"):
+        c.validate_contract(path)
+
+    path, value = contract(tmp_path)
+    row = value["review_receipts"][0]
+    row["verdict_path"] = "accepted"
+    row["accepted_value"] = True
+    dump(path, value)
+    with pytest.raises(ValueError, match="all independent review receipts"):
+        c.validate_contract(path)
+
+
+def test_contract_rejects_wrong_review_schema_commit_and_no_go(tmp_path):
+    for mutation in ("schema", "commit", "verdict"):
+        case = tmp_path / mutation; case.mkdir()
+        path, value = contract(case)
+        row = next(item for item in value["review_receipts"]
+                   if item["kind"] == "coordinator_code")
+        receipt = json.loads(Path(row["path"]).read_text())
+        if mutation == "schema":
+            receipt["schema"] = "arbitrary_acceptance_v1"
+        elif mutation == "commit":
+            receipt["candidate"]["implementation_commit"] = "2" * 40
+        else:
+            receipt["verdict"]["code"] = "NO_GO"
+        dump(row["path"], receipt); row["sha256"] = c._sha(row["path"]); dump(path, value)
+        with pytest.raises(ValueError, match="verdict is not accepted"):
+            c.validate_contract(path)
+
+
+def test_contract_rejects_non_whitelisted_review_path(tmp_path):
+    path, value = contract(tmp_path)
+    row = next(item for item in value["review_receipts"] if item["kind"] == "coordinator_code")
+    renamed = Path(row["path"]).with_name("arbitrary-go.json")
+    renamed.write_bytes(Path(row["path"]).read_bytes())
+    row["path"] = str(renamed); dump(path, value)
+    with pytest.raises(ValueError, match="path is not whitelisted"):
+        c.validate_contract(path)
+
+
+def test_contract_rejects_unreviewed_or_changed_pre_mutation_runtime(tmp_path):
+    path, value = contract(tmp_path)
+    row = next(item for item in value["pre_mutation_modules"]
+               if item["name"] == "radon_bridge.runtime.paused_sixth_v5_coordinator")
+    row["sha256"] = "0" * 64
+    # Even a rewritten receipt cannot bless bytes that differ from the running module.
+    review = next(item for item in value["review_receipts"]
+                  if item["kind"] == "coordinator_code")
+    receipt = json.loads(Path(review["path"]).read_text())
+    receipt["candidate"]["pre_mutation_modules_sha256"] = c._json_sha(value["pre_mutation_modules"])
+    dump(review["path"], receipt); review["sha256"] = c._sha(review["path"]); dump(path, value)
+    with pytest.raises(ValueError, match="pre-mutation module is not pinned"):
+        c.validate_contract(path)
+
+
+def test_control_runtime_contract_requires_coordinator_role():
+    assert "radon_bridge.runtime.paused_sixth_v5_coordinator" in c.control.MODULE_NAMES
+    assert c.control.ROLE_MODULES["coordinator"] == "radon_bridge.runtime.paused_sixth_v5_coordinator"
+
+
+@pytest.mark.parametrize("point", ["after_binding_intent", "after_ownership_overlay",
+                                    "after_deployment_gate", "after_allocation_wrapper",
+                                    "after_finalizer_wrapper", "after_binding_write"])
+def test_binding_internal_crash_recovers_same_immutable_bytes(tmp_path, monkeypatch, point):
+    _, value = contract(tmp_path)
+    Path(value["role_policy"]).write_bytes(Path(value["temporary_policy"]).read_bytes())
+    dump(value["reservation_receipt"], {"claim": {"generation": 111}})
+    asset = Path(value["asset_dir"]); asset.mkdir()
+    dump(asset / "asset.json", {"checkpoint_sha256": "a" * 64, "spec_sha256": "b" * 64})
+    dump(Path(value["root"]) / "requests.json", {"requests": []})
+    dump(Path(value["root"]) / "intent.json", {"attempts": []})
+    Path(value["allocation_wrapper"]).parent.mkdir(parents=True, exist_ok=True)
+
+    snapshot = {"account_running_pending": 22, "radon_running_pending": 9,
+                "unresolved_gpu_intents": 0, "radon_unresolved_gpu_intents": 0,
+                "all_live_owned_once": True}
+    def ownership(_, make_overlay=False, now=None):
+        result = dict(snapshot)
+        if make_overlay:
+            result["overlay"] = {"schema": "legacy_native_ownership_overlay_v2",
+                                 "checked_at": now, "entries": [], "test": False}
+        return result
+    runtime = {"schema": "radon_v5_runtime_contract_v1", "python": value["python"],
+               "python_sha256": value["python_sha256"], "python_realpath": value["python"],
+               "python_version": "test", "torch_version": "test", "framework_api": "V5",
+               "framework_commit": c.handoff.FORMAL_V5_COMMIT,
+               "environment": value["runtime_environment"], "modules": [],
+               "roles": {"allocation_wrapper": value["allocation_wrapper"],
+                         "finalizer_wrapper": value["finalizer_wrapper"],
+                         "python_executable": value["python"]}}
+    monkeypatch.setattr(c, "_ownership", ownership)
+    monkeypatch.setattr(c, "_module_contract", lambda _: runtime)
+    monkeypatch.setattr(c, "_require_binding", lambda contract: json.loads(Path(contract["binding"]).read_text()))
+    fired = {"value": False}
+    def fault(name):
+        if name == point and not fired["value"]:
+            fired["value"] = True
+            raise RuntimeError("internal binding crash")
+    with pytest.raises(RuntimeError, match="internal binding crash"):
+        c._build_binding(value, 100, fault=fault)
+    intent = json.loads(Path(value["binding_intent"]).read_text())
+    result = c._build_binding(value, 200)
+    assert intent["created_at"] == 100
+    assert json.loads(Path(value["binding_intent"]).read_text()) == intent
+    assert result["source_commit"] == value["source_commit"]

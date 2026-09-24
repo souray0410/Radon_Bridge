@@ -1,0 +1,80 @@
+{
+  "schema": "radon_paused_sixth_v5_v3_independent_code_review_v1",
+  "observed_at_utc": "2026-09-24T11:09:38Z",
+  "review_scope": "bounded read-only review of the isolated paused-sixth V5 grant writer candidate",
+  "candidate": {
+    "repository": "/Users/mengh/Documents/ChatGPT/KAUST/radon_v5_grant_runner",
+    "implementation_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
+    "receipt_commit": "700745df1a342902574c0a847f3c6bc9bff01662",
+    "control_path": "src/radon_bridge/runtime/paused_sixth_v5_control_v2.py",
+    "control_sha256": "d7ca158a47c242caa940b39fc4e0384fba0835127ec4284cac6a5fa813037686",
+    "test_path": "tests/unit/runtime/test_paused_sixth_v5_control.py",
+    "test_sha256": "b9a467b780f158de4b7fb6ffa2cdd698aea9fa126c92531bfcc0669bf0ebad25",
+    "candidate_receipt_path": "docs/acceptance/paused_sixth_v5_control_v3_candidate_20260924.json",
+    "candidate_receipt_sha256": "d636ee64433f0544047858a4e0f5c2ec56c154118ac9c3ebd1d2ef0e833f9957",
+    "formal_framework_v5_commit": "1287681c08846e11364c81653048435482e772a7"
+  },
+  "independent_validation": {
+    "candidate_files_match_implementation_commit": true,
+    "targeted_command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=$PWD/src:$PWD/../mhd_v5_rollout_20260922/MHD_Models/src:$PWD/third_party/MHD_Framework /Users/mengh/Documents/ChatGPT/KAUST/mhd_v5_rollout_20260922/.venv28/bin/python -m pytest -q -p no:cacheprovider tests/unit/runtime/test_paused_sixth_v5_control.py --basetemp=/tmp/radon_v5_v3_independent_review_pytest",
+    "targeted_result": "17 passed in 1.07s",
+    "candidate_full_validation_record": "local 317 passed and Ibex CPU job 52462737 COMPLETED 0:0 with 317 passed",
+    "ibex_zero_gpu_afterany": {
+      "predecessor_job_id": "52462327",
+      "predecessor_state": "COMPLETED",
+      "predecessor_exit_code": "0:0",
+      "finalizer_job_id": "52462328",
+      "finalizer_state": "COMPLETED",
+      "finalizer_exit_code": "0:0",
+      "pending_dependency": "afterany:52462327(unfulfilled)",
+      "running_dependency": "(null)",
+      "manifest_sha256_verified": "723a6f8b10d5b92058fb1e1a77f447d7ce05b83be88373b07b1e23fdc5055d70",
+      "finalizer_receipt_sha256_verified": "3c66b80ca6c97de6a0b69d748f801016053a92a1f058d402ed69c65703c48a30",
+      "requested_gpu_count": 0,
+      "production_mutated": false
+    }
+  },
+  "review_findings": [
+    {
+      "finding": "finalizer afterany identity after Slurm clears a satisfied dependency",
+      "status": "closed",
+      "evidence": "An immutable PENDING proof binds the finalizer job, allocation job, account, zero-GPU request, comment and exact afterany dependency before release; runtime validation accepts a cleared live dependency only with that proof. The real zero-GPU Ibex pair verifies the PENDING-to-RUNNING behavior."
+    },
+    {
+      "finding": "allocation acknowledgement-loss recovery ordering",
+      "status": "closed",
+      "evidence": "Unique-comment allocation recovery now runs under the account lock before live_snapshot and persists the recovered numeric owner before account and project capacity reconciliation; the targeted test exercises this path through live_snapshot."
+    },
+    {
+      "finding": "quota_guard runtime pin",
+      "status": "closed",
+      "evidence": "mhd_models.scheduling.quota_guard is required in both the runtime module set and role mapping and is checked by the existing path and SHA contract."
+    },
+    {
+      "finding": "LOOK deployment evidence schema and role-policy SHA",
+      "status": "closed_in_code",
+      "evidence": "Binding validation requires the exact LOOK stage-two schema, successor monitor job, receipt digest, successor identity and predecessor release flags, and the accepted role-policy SHA shared by the LOOK receipt, R&B proposal, deployment gate and binding."
+    },
+    {
+      "finding": "directory-entry durability",
+      "status": "closed",
+      "evidence": "Atomic JSON replacement and immutable finalizer proof creation fsync the file and containing directory before the transaction advances."
+    }
+  ],
+  "code_verdict": "GO",
+  "production_verdict": "NO_GO",
+  "residual_production_gates": [
+    "LOOK job 52462712 and its current v22 handover do not accept a future R&B role-policy SHA; after all preceding policy changes, a further held-first LOOK successor receipt must bind the exact final shared policy that registers the dedicated R&B journal.",
+    "Uncertainty_Lab retry jobs 52463114 and 52463127 are pending and have zero accepted optimizer updates; their safe ownership, update and resume receipts must complete without a conflicting shared-policy mutation.",
+    "A separately accepted R&B role-policy proposal and immutable deployment gate must bind the resulting policy SHA, exact LOOK receipt and exact successor monitor identity.",
+    "The paused source, accepted V5 asset, complete runtime contract and current claim must be revalidated before creating the source_reserved claim and production binding.",
+    "Only the inherited sole control plane may publish the finite held-first transaction under the shared account lock after capacity and R&B role allowance are rechecked.",
+    "The real R&B A100 allocation, parent-attested worker step, V5 checkpoint continuation and terminal finalizer receipt remain required before reporting migration complete."
+  ],
+  "non_blocking_note": "An interrupted first write of an immutable proof fails closed and may require reviewed cleanup; it cannot authorize predecessor release without a valid proof digest.",
+  "production_policy_mutated": false,
+  "production_claim_mutated": false,
+  "production_owner_mutated": false,
+  "gpu_requested_by_review": false,
+  "test_access": false
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "radon_paused_sixth_v5_cap10_bundle_independent_review_v1",
+  "reviewed_at_utc": "2026-09-24T11:21:18Z",
+  "review_mode": "independent_read_only_bounded",
+  "scope": "immutable cap10 transition bundle at commit eb11632 only",
+  "reviewed_bundle": {
+    "local_repository": "/Users/mengh/Documents/ChatGPT/KAUST/radon_v5_grant_runner",
+    "bundle_commit": "eb11632f24c5e58cb8ca08570b25bf6e255b2302",
+    "runner_source_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
+    "remote_root": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924",
+    "policy_proposal_sha256": "1cd603fbcf2f0573585d9bc99d770d6c00439739a0d3b7d385893aa262f59cb3",
+    "slot_transition_contract_sha256": "a965c481d1af9ccb89d1be6a2d4673b366220790fc803f4c52f73e95bdcaf77d",
+    "prebinding_sha256": "2f2fcc03975e191dd62ae0e89805a4a23c8cf05badfebd5fd0e53c447ddd3678",
+    "manifest_sha256": "286e6974aa2c9571bc3f8e62fc815296eb21fd9ed18225c204bb3ca700f1d9a6",
+    "source_archive_sha256": "34d5a387477dac1625f745c6d079c6d0b10bd0a498f0ba87f3ef754c43d550aa",
+    "journal_initial_sha256": "9c1d9093ae17efd03ef8726c5279212969b51deb0346d864d52138312d59c81d",
+    "intent_initial_sha256": "1c1e06503f4a845837c3caae7c3e5cf9ead593638bb73915e6c6c9141a6a5e02",
+    "live_capacity_snapshot_sha256": "0b33e6fe3a9fd83e776314b9c4dfdc32701f020ffbc9645943b46623adcc359d"
+  },
+  "code_review_dependency": {
+    "receipt": "operations/mhd_v5_20260922/acceptance/radon_paused_sixth_v5_v3_independent_code_review_20260924.json",
+    "receipt_sha256": "fd4bd999fd9a1062a6e5efd947021dba74497d21dd5d2954d9019ced29302acf",
+    "verdict": "CODE_GO_PRODUCTION_NO_GO"
+  },
+  "policy_review": {
+    "live_current_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+    "temporary_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62",
+    "steady_rollback_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
+    "current_to_temporary_exact_differences": [
+      "Radon_Bridge.reserved_gpus changes from 9 to 10",
+      "one dedicated R&B journal is appended: /ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/requests.json"
+    ],
+    "temporary_to_rollback_exact_differences": [
+      "Radon_Bridge.reserved_gpus changes from 10 to 9"
+    ],
+    "rollback_retains_dedicated_journal": true,
+    "look_or_uncertainty_lab_content_changed": false,
+    "account_ceiling_changed": false
+  },
+  "live_read_only_checks": {
+    "account_running_pending_gpu_jobs": 22,
+    "radon_running_pending_gpu_jobs": 9,
+    "look_running_pending_gpu_jobs": 7,
+    "uncertainty_lab_running_pending_gpu_jobs": 2,
+    "legacy_native_running_pending_gpu_jobs": 4,
+    "one_request_upper_bound": 23,
+    "account_ceiling": 24,
+    "unresolved_registered_look_intents": 0,
+    "unresolved_registered_radon_intents": 0,
+    "unresolved_registered_uncertainty_lab_intents": 0,
+    "production_mutated": false,
+    "gpu_requested": false,
+    "test_access": false
+  },
+  "source_and_owner_evidence": {
+    "run_id": "2026_09_12_11_23_31_715620",
+    "v4_status_sha256": "ce6fe3d10edebb5433b53aa5475284d76a2e377fc6c063d29a3184cb126ae348",
+    "v4_checkpoint_sha256": "792748f7a1c0c4896ca84617b1f9b9712a18392d279dc70dd42b8b76a2c1c0f5",
+    "v4_spec_sha256": "6c62039f7cf82a49d060c527a771b684ee49cd8e3d72906ef38fb2e2f1322be5",
+    "claim_sha256": "bbabe60c58ca2cfabda41ebf61d8f9c7bc946673bfe3ccc196f24235a32a9d58",
+    "claim_state": "failed",
+    "claim_owner": "radon-workflow-52347024",
+    "claim_job_id": "52347024",
+    "claim_step": 1,
+    "claim_generation": 110,
+    "claim_job_terminal_evidence": "52347024|COMPLETED|0:0|2026-09-23T13:22:46|2026-09-23T13:23:45",
+    "qualified_v5_checkpoint_sha256": "bb5438f72b17a3ee4189106d04f22d50bcacb3fb1b11114a47fe8a56233b1dac",
+    "qualified_v5_spec_sha256": "36e941c0629023cef8e6571207849b94c53a9649816deec1efc8aa94dd8c53dc",
+    "production_v5_asset_published": false
+  },
+  "look_policy_compatibility": {
+    "v23_prebinding_allowed_policy_sha256s": [
+      "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+      "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62"
+    ],
+    "v23_accepts_rollback_policy": false,
+    "rollback_structure_verified": true,
+    "rollback_requires_new_held_first_look_successor_stage2": true
+  },
+  "verdict": {
+    "look_v23_prebinding": "GO",
+    "production_policy_install": "NO_GO",
+    "source_claim_reservation": "NO_GO",
+    "radon_gpu_submission": "NO_GO",
+    "rollback_policy_install": "NO_GO"
+  },
+  "residual_production_gates": [
+    "LOOK v23 held-first successor stage2 must accept exact temporary policy 28fe66b4 and the predecessor release must be verified",
+    "the sole shared-policy publisher must revalidate current policy, every live owner, capacity and unresolved intents under the account lock before installing exact temporary bytes",
+    "source claim reservation and immutable production V5 asset publication must complete before final binding",
+    "the final wrappers, runtime contract, deployment gate and production binding must validate exactly before one held-first R&B request",
+    "rollback ff390318 remains blocked until a later held-first LOOK successor stage2 accepts it and no live-binding policy change is possible"
+  ],
+  "scope_exclusions": [
+    "This receipt is not permission to install either policy, reserve a claim, submit a GPU job or cancel an existing job.",
+    "The later production transaction introduced after eb11632, including local commit 5ba82e5ea7f44237aafac158ac2b7ec0e1e9de06, is outside this review and requires a separate independent verdict."
+  ],
+  "conclusion": "GO_FOR_LOOK_V23_PREBINDING_ONLY_PRODUCTION_NO_GO"
+}

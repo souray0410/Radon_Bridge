@@ -1,0 +1,119 @@
+{
+  "schema": "radon_paused_sixth_v5_production_transaction_independent_review_v1",
+  "reviewed_at_utc": "2026-09-24T11:25:16Z",
+  "review_mode": "independent_read_only_bounded",
+  "candidate": {
+    "local_repository": "/Users/mengh/Documents/ChatGPT/KAUST/radon_v5_grant_runner",
+    "transaction_commit": "5ba82e5ea7f44237aafac158ac2b7ec0e1e9de06",
+    "runner_source_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
+    "remote_root": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924",
+    "production_transaction_sha256": "491675054f5f831fd3c0effa62067136bc8e74bf13dd6ba7816891423ced5383",
+    "manifest_sha256": "67e25eb587dc6c8a05be252422d4a6d24cb5c6cdb028490c8d7459fa189e2ab7",
+    "policy_proposal_sha256": "1cd603fbcf2f0573585d9bc99d770d6c00439739a0d3b7d385893aa262f59cb3",
+    "slot_transition_contract_sha256": "a965c481d1af9ccb89d1be6a2d4673b366220790fc803f4c52f73e95bdcaf77d",
+    "prebinding_sha256": "2f2fcc03975e191dd62ae0e89805a4a23c8cf05badfebd5fd0e53c447ddd3678",
+    "temporary_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62",
+    "steady_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
+    "journal_initial_sha256": "9c1d9093ae17efd03ef8726c5279212969b51deb0346d864d52138312d59c81d",
+    "intent_initial_sha256": "1c1e06503f4a845837c3caae7c3e5cf9ead593638bb73915e6c6c9141a6a5e02",
+    "source_archive_sha256": "34d5a387477dac1625f745c6d079c6d0b10bd0a498f0ba87f3ef754c43d550aa"
+  },
+  "dependencies": {
+    "code_review_receipt_sha256": "fd4bd999fd9a1062a6e5efd947021dba74497d21dd5d2954d9019ced29302acf",
+    "bundle_review_receipt_sha256": "af9b0319ce2fef6ea309b7e22a13aa7a91183062b7b0b46b2213e46a85ae6f40",
+    "bundle_review_persisted_commit": "89e087aab5467915f01c5a1d33eec9b90e1dcda8"
+  },
+  "ordering_review": {
+    "verdict": "GO",
+    "accepted_sequence": [
+      "independent review and exact LOOK v23 prebinding",
+      "real held-first LOOK v23 successor stage2 accepts temporary policy 28fe66b4 and proves predecessor release",
+      "sole shared-policy publisher installs exact temporary policy under the account lock after a fresh live recheck",
+      "reserve the exact failed source claim under the same account lock",
+      "publish the immutable update-26905 V5 asset",
+      "build and validate ownership overlay, wrappers, runtime contract, deployment gate and final binding",
+      "create one durable held-first GPU request and its zero-GPU afterany finalizer before release",
+      "allocation owner proves the numeric allocation, unique running srun step and parent-fixed process before claiming the source",
+      "worker publishes a completed or exact retryable V5 boundary",
+      "after the V5 attempt and finalizer are terminal and R&B live use permits cap 9, a later held-first LOOK successor accepts ff390318 before rollback installation"
+    ],
+    "fail_closed_intermediate_states": [
+      "temporary cap10 installed but source not yet reserved",
+      "source reserved but production asset not yet published",
+      "asset published but binding or request not yet created",
+      "held allocation exists but finalizer identity is not durable",
+      "worker allocation exists but exact Slurm step and process attestation are not accepted"
+    ]
+  },
+  "unique_owner_review": {
+    "verdict": "GO",
+    "sole_policy_publisher_required": true,
+    "account_lock_required_for_policy_reservation_submission_and_claim_transitions": true,
+    "one_active_request_only": true,
+    "held_first": true,
+    "unique_comment_ack_recovery": "rbv5-715620-28fe66b4-aNNN",
+    "zero_gpu_afterany_finalizer_before_release": true,
+    "numeric_allocation_and_unique_running_step_required_before_claim": true,
+    "parent_fixed_argv_nonce_and_process_attestation_required": true,
+    "second_scheduler_forbidden": true
+  },
+  "rollback_review": {
+    "structure_verdict": "GO",
+    "installation_verdict": "NO_GO",
+    "steady_policy_only_changes_radon_cap_10_to_9_and_retains_new_journal": true,
+    "requires_v5_attempt_and_finalizer_terminal": true,
+    "requires_radon_live_count_at_most_9_or_a_proved_natural_v4_terminal": true,
+    "requires_later_held_first_look_successor_stage2_for_ff390318": true,
+    "job_cancellation_authorized": false,
+    "reason_installation_is_blocked": "LOOK v23 accepts only 0c90a161 and 28fe66b4; it does not accept ff390318. A later successor gate is required before rollback."
+  },
+  "look_stage2_contract": {
+    "required_schema": "look_v5_monitor_stage2_acceptance_v1",
+    "required_status": "accepted",
+    "required_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62",
+    "successor_monitor_job_id_must_be_real_numeric_v23_job": true,
+    "successor_monitor_identity_verified": true,
+    "predecessor_release_verified": true,
+    "test_access": false,
+    "legacy_field_name_note": "The runner deployment gate still names its fields look_v22_stage2/look_v22_receipt/look_v22_receipt_sha256. This is accepted only as legacy naming: those fields must bind the real v23 receipt above, its SHA and successor job, not a v22 artifact."
+  },
+  "validation": {
+    "local_manifest_entries_exact": 9,
+    "remote_transaction_and_manifest_json_parsed": true,
+    "remote_hashes_match_candidate": true,
+    "targeted_command": "PYTHONPATH=$PWD/src:$PWD/../mhd_v5_rollout_20260922/MHD_Models/src:$PWD/third_party/MHD_Framework /Users/mengh/Documents/ChatGPT/KAUST/mhd_v5_rollout_20260922/.venv28/bin/python -m pytest -q tests/unit/runtime/test_paused_sixth_v5_control.py tests/unit/runtime/test_paused_sixth_v5_handoff.py",
+    "targeted_result": "24 passed in 1.05s",
+    "production_mutated": false,
+    "gpu_requested": false,
+    "test_access": false
+  },
+  "live_observation": {
+    "current_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+    "production_asset_present": false,
+    "reservation_receipt_present": false,
+    "binding_present": false,
+    "deployment_gate_present": false,
+    "ownership_overlay_present": false,
+    "allocation_wrapper_present": false,
+    "finalizer_wrapper_present": false,
+    "execution_dir_present": false
+  },
+  "verdict": {
+    "production_transaction_design": "GO",
+    "look_v23_prebinding_may_bind_this_review": "GO",
+    "temporary_policy_install_now": "NO_GO",
+    "source_claim_reservation_now": "NO_GO",
+    "production_asset_publication_now": "NO_GO",
+    "radon_gpu_submission_now": "NO_GO",
+    "steady_policy_rollback_now": "NO_GO"
+  },
+  "residual_gates": [
+    "LOOK v23 candidate must independently pass and a real held-first successor must publish the exact stage2 receipt before 28fe66b4 installation.",
+    "The sole policy publisher must install 28fe66b4 under the shared account lock only after fresh policy, ownership, capacity and unresolved-intent checks.",
+    "The exact source claim must then be reserved and the production asset published; neither exists at review time.",
+    "A fresh ownership overlay, pinned wrappers, runtime contract, deployment gate and final binding must be generated and independently validated.",
+    "Only after those gates may one held-first GPU request be created and released after its zero-GPU afterany finalizer is durably identified.",
+    "Rollback ff390318 remains a separate later transaction requiring a new LOOK successor stage2."
+  ],
+  "conclusion": "TRANSACTION_DESIGN_GO_PRODUCTION_EXECUTION_NO_GO"
+}

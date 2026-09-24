@@ -39,6 +39,7 @@ ENV_KEYS = {
 MODULE_NAMES = {
     "radon_bridge.runtime.paused_sixth_v5_control",
     "radon_bridge.runtime.paused_sixth_v5_control_v2",
+    "radon_bridge.runtime.paused_sixth_v5_coordinator",
     "radon_bridge.runtime.paused_sixth_v5_handoff",
     "mhd_models.workflows.native",
     "mhd_models.scheduling.policy",
@@ -50,13 +51,14 @@ MODULE_NAMES = {
     "mhd_framework.utils",
 }
 RUNTIME_ROLES = {
-    "entrypoint", "implementation", "handoff", "native", "policy", "quota_guard", "liveness",
+    "entrypoint", "implementation", "coordinator", "handoff", "native", "policy", "quota_guard", "liveness",
     "training_state", "framework_init", "framework_core", "framework_utils",
     "allocation_wrapper", "finalizer_wrapper", "python_executable",
 }
 ROLE_MODULES = {
     "entrypoint": "radon_bridge.runtime.paused_sixth_v5_control",
     "implementation": "radon_bridge.runtime.paused_sixth_v5_control_v2",
+    "coordinator": "radon_bridge.runtime.paused_sixth_v5_coordinator",
     "handoff": "radon_bridge.runtime.paused_sixth_v5_handoff",
     "native": "mhd_models.workflows.native",
     "policy": "mhd_models.scheduling.policy",

@@ -32,6 +32,27 @@ STATE_SCHEMA = "radon_paused_sixth_v5_coordinator_state_v1"
 PHASES = ("prepared", "policy_installed", "claim_reserved", "asset_published",
           "binding_ready", "publisher_invoked")
 HEX64 = set("0123456789abcdef")
+RUNNER_COMMIT = "44ba496fd9d2aad065e141d8485649a0dba3eec0"
+TRANSACTION_COMMIT = "5ba82e5ea7f44237aafac158ac2b7ec0e1e9de06"
+TEMPORARY_POLICY_SHA256 = "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62"
+STEADY_POLICY_SHA256 = "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa"
+REVIEW_KINDS = {
+    "runner_code": "radon_paused_sixth_v5_v3_independent_code_review_v1",
+    "cap10_bundle": "radon_paused_sixth_v5_cap10_bundle_independent_review_v1",
+    "production_transaction": "radon_paused_sixth_v5_production_transaction_independent_review_v1",
+    "coordinator_code": "radon_paused_sixth_v5_coordinator_independent_review_v1",
+}
+REVIEW_FILENAMES = {
+    "runner_code": "radon_paused_sixth_v5_v3_independent_code_review_20260924.json",
+    "cap10_bundle": "radon_paused_sixth_v5_cap10_bundle_independent_review_20260924.json",
+    "production_transaction": "radon_paused_sixth_v5_production_transaction_independent_review_20260924.json",
+    "coordinator_code": "radon_paused_sixth_v5_coordinator_independent_review_20260924.json",
+}
+FIXED_REVIEW_SHA256 = {
+    "runner_code": "fd4bd999fd9a1062a6e5efd947021dba74497d21dd5d2954d9019ced29302acf",
+    "cap10_bundle": "af9b0319ce2fef6ea309b7e22a13aa7a91183062b7b0b46b2213e46a85ae6f40",
+    "production_transaction": "f0238cdcbec47a6ed5629eed5bdaf6a6ae8c8345aeb246071d2ddf58dab84ac9",
+}
 
 
 def _sha(path):
@@ -40,6 +61,11 @@ def _sha(path):
         for block in iter(lambda: stream.read(8 * 1024**2), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _json_sha(value):
+    return hashlib.sha256(json.dumps(
+        value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
 def _read(path):
@@ -56,6 +82,74 @@ def _json_path(value, path):
             raise ValueError("review verdict path is missing: " + path)
         value = value[item]
     return value
+
+
+def _review_is_accepted(kind, receipt, contract):
+    if receipt.get("schema") != REVIEW_KINDS[kind]:
+        return False
+    if kind == "runner_code":
+        return (receipt.get("candidate", {}).get("implementation_commit") == RUNNER_COMMIT
+                and receipt.get("code_verdict") == "GO"
+                and receipt.get("test_access") is False)
+    if kind == "cap10_bundle":
+        return (receipt.get("reviewed_bundle", {}).get("runner_source_commit") == RUNNER_COMMIT
+                and receipt.get("policy_review", {}).get("temporary_policy_sha256")
+                == TEMPORARY_POLICY_SHA256
+                and receipt.get("policy_review", {}).get("steady_rollback_policy_sha256")
+                == STEADY_POLICY_SHA256
+                and receipt.get("verdict", {}).get("look_v23_prebinding") == "GO"
+                and receipt.get("live_read_only_checks", {}).get("test_access") is False)
+    if kind == "production_transaction":
+        candidate = receipt.get("candidate", {})
+        return (candidate.get("transaction_commit") == TRANSACTION_COMMIT
+                and candidate.get("runner_source_commit") == RUNNER_COMMIT
+                and candidate.get("temporary_policy_sha256") == TEMPORARY_POLICY_SHA256
+                and candidate.get("steady_policy_sha256") == STEADY_POLICY_SHA256
+                and receipt.get("verdict", {}).get("production_transaction_design") == "GO"
+                and receipt.get("validation", {}).get("test_access") is False)
+    candidate, verdict = receipt.get("candidate", {}), receipt.get("verdict", {})
+    return (candidate.get("implementation_commit") == contract["source_commit"]
+            and candidate.get("coordinator_sha256") == contract["coordinator_source_sha256"]
+            and candidate.get("pre_mutation_modules_sha256")
+            == _json_sha(contract["pre_mutation_modules"])
+            and candidate.get("python_sha256") == contract["python_sha256"]
+            and candidate.get("runtime_environment_sha256")
+            == _json_sha(contract["runtime_environment"])
+            and verdict.get("code") == "GO" and receipt.get("test_access") is False)
+
+
+def _validate_pre_mutation_runtime(contract):
+    source = Path(contract["coordinator_source"]).resolve()
+    actual = Path(__file__).resolve()
+    if source != actual or _sha(source) != contract["coordinator_source_sha256"]:
+        raise ValueError("running coordinator source is not the reviewed source")
+    python = Path(contract["python"]).resolve()
+    if (Path(os.sys.executable).resolve() != python
+            or _sha(python) != contract["python_sha256"]):
+        raise ValueError("running Python is not the reviewed runtime")
+    if any(os.environ.get(key, "") != value
+           for key, value in contract["runtime_environment"].items()):
+        raise ValueError("running environment is not the reviewed runtime")
+    rows = contract["pre_mutation_modules"]
+    if (not isinstance(rows, list)
+            or any(not isinstance(row, dict) or set(row) != {"name", "path", "sha256"}
+                   for row in rows)
+            or len({row["name"] for row in rows}) != len(rows)
+            or {row["name"] for row in rows} != control.MODULE_NAMES):
+        raise ValueError("pre-mutation runtime manifest is incomplete")
+    expected = {row["name"]: row for row in rows}
+    for name in sorted(control.MODULE_NAMES):
+        module = importlib.import_module(name)
+        path = Path(module.__file__).resolve()
+        expected_root = (contract["source_root"] if name.startswith("radon_bridge.")
+                         else contract["mhd_models_root"] if name.startswith("mhd_models.")
+                         else contract["framework_root"])
+        if Path(expected_root).resolve() not in path.parents:
+            raise ValueError("pre-mutation module escaped its pinned root: " + name)
+        if (str(path) != expected[name]["path"]
+                or not _hex64(expected[name]["sha256"])
+                or _sha(path) != expected[name]["sha256"]):
+            raise ValueError("pre-mutation module is not pinned: " + name)
 
 
 def _fsync_dir(path):
@@ -134,9 +228,11 @@ def validate_contract(path):
         "asset_dir", "conversion_receipt", "converted_checkpoint", "packet",
         "independent_recheck", "attempt_checkpoint", "attempt_spec", "source_root",
         "mhd_models_root", "framework_root", "python", "ownership_overlay",
-        "allocation_wrapper", "finalizer_wrapper", "deployment_gate", "binding",
+        "allocation_wrapper", "finalizer_wrapper", "deployment_gate", "binding_intent", "binding",
         "execution_dir", "native_sources", "runtime_environment", "worker_cpus",
-        "worker_memory_gib", "source_commit", "expires_at", "test_access"
+        "worker_memory_gib", "source_commit", "coordinator_source",
+        "coordinator_source_sha256", "python_sha256", "pre_mutation_modules",
+        "expires_at", "test_access"
     }
     if set(value) != required or value.get("schema") != SCHEMA:
         raise ValueError("unknown coordinator contract")
@@ -147,15 +243,25 @@ def validate_contract(path):
         if not _hex64(value[key]):
             raise ValueError("invalid digest: " + key)
     reviews = value["review_receipts"]
-    if not isinstance(reviews, list) or len(reviews) < 4:
+    if (not isinstance(reviews, list) or len(reviews) != len(REVIEW_KINDS)
+            or any(not isinstance(row, dict) or set(row) != {"kind", "path", "sha256"}
+                   for row in reviews)):
         raise ValueError("all independent review receipts, including the coordinator, are required")
+    if ({row["kind"] for row in reviews} != set(REVIEW_KINDS)
+            or len({row["path"] for row in reviews}) != len(reviews)
+            or len({row["sha256"] for row in reviews}) != len(reviews)):
+        raise ValueError("independent review receipts must be exact and distinct")
     for row in reviews:
-        if (set(row) != {"path", "sha256", "verdict_path", "accepted_value"}
-                or not _hex64(row["sha256"]) or not isinstance(row["verdict_path"], str)):
+        if row["kind"] not in REVIEW_KINDS or not _hex64(row["sha256"]):
             raise ValueError("invalid review receipt")
+        if Path(row["path"]).name != REVIEW_FILENAMES[row["kind"]]:
+            raise ValueError("review receipt path is not whitelisted")
+        if (row["kind"] in FIXED_REVIEW_SHA256
+                and row["sha256"] != FIXED_REVIEW_SHA256[row["kind"]]):
+            raise ValueError("review receipt identity changed")
         if _sha(row["path"]) != row["sha256"]:
             raise ValueError("review receipt changed")
-        if _json_path(_read(row["path"]), row["verdict_path"]) != row["accepted_value"]:
+        if not _review_is_accepted(row["kind"], _read(row["path"]), value):
             raise ValueError("independent review verdict is not accepted")
     for key in ("temporary_policy", "steady_policy", "look_stage2", "policy_proposal"):
         digest_key = key + "_sha256"
@@ -185,7 +291,9 @@ def validate_contract(path):
             or type(value["worker_cpus"]) is not int or value["worker_cpus"] < 1
             or type(value["worker_memory_gib"]) is not int or value["worker_memory_gib"] < 1
             or not isinstance(value["source_commit"], str) or len(value["source_commit"]) != 40
-            or set(value["source_commit"]) > HEX64):
+            or set(value["source_commit"]) > HEX64
+            or not _hex64(value["coordinator_source_sha256"])
+            or not _hex64(value["python_sha256"])):
         raise ValueError("invalid immutable runtime inputs")
     if (not isinstance(value["native_sources"], dict)
             or any(not str(job).isdigit() or not isinstance(source, str)
@@ -194,10 +302,11 @@ def validate_contract(path):
     root = Path(value["root"]).resolve()
     for key in ("state", "policy_intent", "policy_transition_receipt",
                 "reservation_receipt", "asset_dir", "ownership_overlay",
-                "allocation_wrapper", "finalizer_wrapper", "deployment_gate",
+                "allocation_wrapper", "finalizer_wrapper", "deployment_gate", "binding_intent",
                 "binding", "execution_dir"):
         if root not in Path(value[key]).resolve().parents:
             raise ValueError(key + " escapes coordinator root")
+    _validate_pre_mutation_runtime(value)
     return value
 
 
@@ -533,7 +642,8 @@ def _module_contract(contract):
             "modules": [observed[name] for name in sorted(observed)], "roles": roles}
 
 
-def _build_binding(contract, now):
+def _build_binding(contract, now, fault=None):
+    fault = (lambda phase: None) if fault is None else fault
     if Path(contract["binding"]).exists():
         return _require_binding(contract)
     reservation = _read(contract["reservation_receipt"])
@@ -541,14 +651,42 @@ def _build_binding(contract, now):
     with _locked(contract["account_lock"]):
         if _sha(contract["role_policy"]) != contract["temporary_policy_sha256"]:
             raise RuntimeError("temporary policy is not installed")
-        owned = _ownership(contract, make_overlay=True, now=now)
+        intent_path = Path(contract["binding_intent"])
+        previous_intent = _read(intent_path) if intent_path.exists() else None
+        created_at = previous_intent.get("created_at") if previous_intent else now
+        owned_with_overlay = _ownership(contract, make_overlay=True, now=created_at)
+        owned = {key: value for key, value in owned_with_overlay.items() if key != "overlay"}
         if (owned["account_running_pending"] > 23
                 or owned["radon_running_pending"] > 9
                 or owned["unresolved_gpu_intents"] != 0
                 or owned["radon_unresolved_gpu_intents"] != 0
                 or owned["all_live_owned_once"] is not True):
             raise RuntimeError("capacity or ownership changed before binding construction")
-        _immutable_json(contract["ownership_overlay"], owned["overlay"])
+        intent_base = {
+            "schema": "radon_paused_sixth_v5_binding_build_intent_v1",
+            "role_policy_sha256": contract["temporary_policy_sha256"],
+            "reservation_receipt_sha256": _sha(contract["reservation_receipt"]),
+            "asset_sha256": _sha(Path(contract["asset_dir"]) / "asset.json"),
+            "look_stage2_sha256": contract["look_stage2_sha256"],
+            "policy_proposal_sha256": contract["policy_proposal_sha256"],
+            "coordinator_source_sha256": contract["coordinator_source_sha256"],
+            "ownership_snapshot": owned,
+            "ownership_overlay": owned_with_overlay["overlay"],
+            "test_access": False,
+        }
+        if previous_intent is not None:
+            intent = previous_intent
+            for key, expected in intent_base.items():
+                if intent.get(key) != expected:
+                    raise RuntimeError("binding-build intent conflicts: " + key)
+            if set(intent) != {*intent_base, "created_at"} or not isinstance(intent["created_at"], (int, float)):
+                raise RuntimeError("binding-build intent is malformed")
+        else:
+            intent = {**intent_base, "created_at": now}
+            _immutable_json(intent_path, intent)
+        fault("after_binding_intent")
+        _immutable_json(contract["ownership_overlay"], intent["ownership_overlay"])
+        fault("after_ownership_overlay")
         stage2 = _read(contract["look_stage2"])
         gate = {"schema": "radon_paused_sixth_v5_deployment_gate_v1",
                 "look_v22_stage2": "accepted", "look_v22_receipt": contract["look_stage2"],
@@ -562,6 +700,7 @@ def _build_binding(contract, now):
         if stage2["successor_monitor_job_id"] != gate["look_successor_monitor_job_id"]:
             raise RuntimeError("LOOK stage2 identity changed")
         _immutable_json(contract["deployment_gate"], gate)
+        fault("after_deployment_gate")
         exports = "\n".join("export %s=%s" % (key, shlex.quote(value))
                             for key, value in sorted(contract["runtime_environment"].items()))
         python = shlex.quote(str(Path(contract["python"]).resolve()))
@@ -574,7 +713,9 @@ def _build_binding(contract, now):
                      + " -m radon_bridge.runtime.paused_sixth_v5_control --binding "
                      + binding + " --finalize --gpu-job-id \"$1\"\n")
         _immutable_text(contract["allocation_wrapper"], allocation)
+        fault("after_allocation_wrapper")
         _immutable_text(contract["finalizer_wrapper"], finalizer)
+        fault("after_finalizer_wrapper")
         runtime = _module_contract(contract)
         pin_paths = {row["path"]: row["sha256"] for row in runtime["modules"]}
         for path in (contract["allocation_wrapper"], contract["finalizer_wrapper"],
@@ -620,6 +761,7 @@ def _build_binding(contract, now):
                  "deployment_gate_sha256": _sha(contract["deployment_gate"]),
                  "test_access": False, "dispatch_authorized": True}
         _immutable_json(contract["binding"], value)
+        fault("after_binding_write")
     return _require_binding(contract)
 
 
@@ -645,7 +787,8 @@ class ProductionOperations:
         return _install_policy(contract, self.snapshot, now, fault=self.fault)
     def reserve(self, contract, now): return _reserve(contract, now)
     def publish_asset(self, contract): return _asset(contract)
-    def require_binding(self, contract): return _build_binding(contract, time.time())
+    def require_binding(self, contract):
+        return _build_binding(contract, time.time(), fault=self.fault)
     def publisher(self, contract):
         return control.publish_once(
             contract["binding"], snapshot=lambda: control.live_snapshot(_read(contract["binding"])),
