@@ -1,75 +1,56 @@
 {
-  "schema": "radon_paused_sixth_v5_coordinator_candidate_v1",
-  "state": "candidate_awaiting_independent_review",
-  "implementation_commit": "009ca00f65e5521462d9bad88dd0ac3beeb8c9b5",
-  "files": {
-    "src/radon_bridge/runtime/paused_sixth_v5_coordinator.py": "b392920b74bbb1e4591ec9b88f8001b29de8614cb46aca40764b1ce3558b7024",
-    "src/radon_bridge/runtime/paused_sixth_v5_handoff.py": "ec8b985a94cf0308794a00f492513bc12697ef4ca1027ead887e88c28a7e027c",
-    "tests/unit/runtime/test_paused_sixth_v5_coordinator.py": "17c5f346e26accdb0ccc576f781b6f2e953afeb5a0b5f73a6cc628d1ecf8458b",
-    "tests/unit/runtime/test_paused_sixth_v5_handoff.py": "e2a78617c83f7115fe9b3b53d3a15c16d3fd99f2d2d1b8e021aff57bfc661f60"
-  },
   "closed_findings": {
-    "executable_phases_1_to_4": "A source-pinned coordinator validates one immutable contract, installs the exact policy, reserves the exact claim, publishes the exact asset, constructs and validates runtime artifacts, then invokes the existing held-first publisher.",
-    "lock_lifecycle": "The coordinator releases the policy lock before the reservation helper reacquires it. The helper now runs an injected exact policy, ownership, capacity and unresolved-intent precondition inside its own lock before mutating the claim. Binding construction and publisher each reacquire and revalidate independently.",
-    "crash_recovery": "The phase journal durably records pending before every mutation and completed only after its postcondition. Policy replacement has a pre-replace intent and recovers a missing receipt; claim reservation, asset publication, binding construction and publisher invocation are idempotent and revalidated on every resume.",
-    "real_look_v23_identity": "The execution contract schema requires the exact stage2 path, SHA256 and numeric successor job; contract validation rejects any mismatch before the phase journal is created."
+    "binding_internal_recovery": "One immutable binding-build intent persists the timestamp, ownership snapshot and exact overlay before the first derived artifact. Retries reuse those bytes; injected crashes after intent, overlay, gate, each wrapper and final binding all recover without conflicts.",
+    "fixed_distinct_reviews": "Exactly four named review kinds are required. Their basenames, schemas, GO predicates and three already-persisted prerequisite SHA256 identities are fixed in code; duplicate paths or digests, contract-selected predicates, wrong commits and NO_GO verdicts are rejected.",
+    "pre_mutation_runtime_identity": "Before the state file or any policy/claim mutation, validation binds the running coordinator path/SHA, implementation commit through its independent receipt, exact Python SHA/environment, and every imported runtime module path/SHA. The coordinator is also a required formal runtime role."
   },
-  "look_stage2": {
-    "local_receipt": "/Users/mengh/Documents/ChatGPT/KAUST/mhd_v5_rollout_20260922/PHD/operations/mhd_v5_20260922/acceptance/look_v23_radon_stage2_acceptance_20260924.json",
-    "ibex_receipt": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/look_v23_radon_stage2_acceptance_20260924.json",
-    "sha256": "ee049a7079a1e770541dc9dd795c3d3c95fc3f37dbf83af7ea67efb42e63a27b",
-    "successor_monitor_job_id": "52467433",
-    "accepted_future_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62"
+  "files": {
+    "src/radon_bridge/runtime/paused_sixth_v5_control_v2.py": "0849415e2d05d3dc720fd19930e15d3fc0f2ae0f6294e351b07d3c4c416d439a",
+    "src/radon_bridge/runtime/paused_sixth_v5_coordinator.py": "76e64c896c47caecc354406d1b454f2046ad743da02d35a07cbc226e7b4aa071",
+    "tests/fixtures/runtime/paused_sixth_v5_reviews/radon_paused_sixth_v5_cap10_bundle_independent_review_20260924.json": "af9b0319ce2fef6ea309b7e22a13aa7a91183062b7b0b46b2213e46a85ae6f40",
+    "tests/fixtures/runtime/paused_sixth_v5_reviews/radon_paused_sixth_v5_production_transaction_independent_review_20260924.json": "f0238cdcbec47a6ed5629eed5bdaf6a6ae8c8345aeb246071d2ddf58dab84ac9",
+    "tests/fixtures/runtime/paused_sixth_v5_reviews/radon_paused_sixth_v5_v3_independent_code_review_20260924.json": "fd4bd999fd9a1062a6e5efd947021dba74497d21dd5d2954d9019ced29302acf",
+    "tests/unit/runtime/test_paused_sixth_v5_coordinator.py": "d6a86087eebfb44421b7c877a374a0f611d9e8d12f14ab83d50f51376fb687d4"
   },
-  "rollback": {
-    "steady_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
-    "future_look_stage2_required": true,
-    "job_cancellation_authorized": false
-  },
-  "validation": {
-    "local_full": "325 passed in 5.76s",
-    "local_targeted": "32 passed in 1.01s",
-    "ibex_source_archive_sha256": "b36e9575008fa95f32320c7723c12477a69088cdb4c20ada6dd8dc718cb74a2d",
-    "ibex_framework_commit": "1287681c08846e11364c81653048435482e772a7",
-    "ibex_test_script_sha256": "fa7118fbcde91af3c8594dbdfb571922df6d768d4067830a00b8d6c47490e36e",
-    "ibex_full_job": {
-      "job_id": "52468115",
-      "state": "COMPLETED",
-      "exit_code": "0:0",
-      "elapsed_raw": 14,
-      "requested_gpu_count": 0,
-      "result": "325 passed in 12.03s"
-    },
-    "preserved_failed_attempts": [
-      {
-        "job_id": "52467666",
-        "state": "FAILED",
-        "exit_code": "127:0",
-        "cause": "module environment was not loaded before the pinned Python executable"
-      },
-      {
-        "job_id": "52467695",
-        "state": "FAILED",
-        "exit_code": "1:0",
-        "result": "323 passed, 2 failed",
-        "cause": "git archive omitted the pinned framework submodule checkout required by repository-contract tests"
-      }
-    ],
-    "fault_injection": [
-      "crash after policy replacement before transition receipt",
-      "crash after claim mutation before reservation receipt",
-      "crash after each of the five coordinator mutations before phase completion",
-      "resume without duplicate policy, claim, asset, binding or request mutation"
-    ]
-  },
+  "implementation_commit": "cd76a996474c78fba320ba69332baa88a4f97063",
   "production": {
-    "role_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
-    "policy_mutated": false,
     "claim_mutated": false,
-    "gpu_requested": false,
     "execution_contract_created": false,
-    "reason": "The final immutable execution contract must include the independent coordinator review receipt."
+    "gpu_requested": false,
+    "look_v23_stage2_sha256": "ee049a7079a1e770541dc9dd795c3d3c95fc3f37dbf83af7ea67efb42e63a27b",
+    "policy_mutated": false,
+    "reason": "The final execution contract must bind a new independent GO receipt for this exact implementation commit and module manifest.",
+    "role_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289"
+  },
+  "schema": "radon_paused_sixth_v5_coordinator_candidate_v2",
+  "state": "candidate_awaiting_independent_review",
+  "supersedes": {
+    "implementation_commit": "009ca00f65e5521462d9bad88dd0ac3beeb8c9b5",
+    "independent_no_go_receipt_sha256": "58a541e81d8779499abd99b7b24b6ab7d3855b92c948f403be63342bf34adaf5"
   },
   "test_access": false,
+  "validation": {
+    "adversarial_cases": [
+      "four copies of one arbitrary acceptance cannot satisfy the review gate",
+      "contract-selected verdict_path/accepted_value fields are rejected",
+      "wrong schema, commit, NO_GO and non-whitelisted receipt basename are rejected",
+      "changed pre-mutation module SHA is rejected even if a forged coordinator receipt is rewritten to match",
+      "all six internal binding-write crash points resume with the original immutable timestamp and bytes"
+    ],
+    "ibex_full_job": {
+      "elapsed_raw": 16,
+      "exit_code": "0:0",
+      "job_id": "52469990",
+      "log_sha256": "66aa418e2be51dfac62c902f809638d7050639fa24d6c881ca680dd335e7b8dc",
+      "requested_gpu_count": 0,
+      "result": "336 passed in 13.89s",
+      "state": "COMPLETED"
+    },
+    "ibex_source_archive_sha256": "700088339c8dbcccc9d9ec1e601fa33f9ad7c422de2fa75e1170cdbbafe099d0",
+    "ibex_test_script_sha256": "061c3601d94200d00568e5b0251f61d8b3f7f6beefeaf9092f8328429b357d01",
+    "local_full": "336 passed in 6.48s",
+    "local_targeted": "43 passed in 1.58s",
+    "repository_check": "passed; canonical imports and Framework V5 pin 1287681c08846e11364c81653048435482e772a7 verified locally"
+  },
   "verdict": "CODE_CANDIDATE_READY_FOR_INDEPENDENT_REVIEW_PRODUCTION_NO_GO"
 }
