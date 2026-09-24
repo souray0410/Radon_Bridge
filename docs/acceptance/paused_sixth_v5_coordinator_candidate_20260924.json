@@ -1,0 +1,75 @@
+{
+  "schema": "radon_paused_sixth_v5_coordinator_candidate_v1",
+  "state": "candidate_awaiting_independent_review",
+  "implementation_commit": "d825e04493a95e34e3e3980d6608f57bee7a9214",
+  "files": {
+    "src/radon_bridge/runtime/paused_sixth_v5_coordinator.py": "604e2c3f7d63d546602499b5256680e8598402252260e9093d9bcfb32b583020",
+    "src/radon_bridge/runtime/paused_sixth_v5_handoff.py": "ec8b985a94cf0308794a00f492513bc12697ef4ca1027ead887e88c28a7e027c",
+    "tests/unit/runtime/test_paused_sixth_v5_coordinator.py": "51126310a8e2717136e6da3417479e97b7c99b21a9661dcdff09024c5d7ff245",
+    "tests/unit/runtime/test_paused_sixth_v5_handoff.py": "e2a78617c83f7115fe9b3b53d3a15c16d3fd99f2d2d1b8e021aff57bfc661f60"
+  },
+  "closed_findings": {
+    "executable_phases_1_to_4": "A source-pinned coordinator validates one immutable contract, installs the exact policy, reserves the exact claim, publishes the exact asset, constructs and validates runtime artifacts, then invokes the existing held-first publisher.",
+    "lock_lifecycle": "The coordinator releases the policy lock before the reservation helper reacquires it. The helper now runs an injected exact policy, ownership, capacity and unresolved-intent precondition inside its own lock before mutating the claim. Binding construction and publisher each reacquire and revalidate independently.",
+    "crash_recovery": "The phase journal durably records pending before every mutation and completed only after its postcondition. Policy replacement has a pre-replace intent and recovers a missing receipt; claim reservation, asset publication, binding construction and publisher invocation are idempotent and revalidated on every resume.",
+    "real_look_v23_identity": "The execution contract schema requires the exact stage2 path, SHA256 and numeric successor job; contract validation rejects any mismatch before the phase journal is created."
+  },
+  "look_stage2": {
+    "local_receipt": "/Users/mengh/Documents/ChatGPT/KAUST/mhd_v5_rollout_20260922/PHD/operations/mhd_v5_20260922/acceptance/look_v23_radon_stage2_acceptance_20260924.json",
+    "ibex_receipt": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/look_v23_radon_stage2_acceptance_20260924.json",
+    "sha256": "ee049a7079a1e770541dc9dd795c3d3c95fc3f37dbf83af7ea67efb42e63a27b",
+    "successor_monitor_job_id": "52467433",
+    "accepted_future_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62"
+  },
+  "rollback": {
+    "steady_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
+    "future_look_stage2_required": true,
+    "job_cancellation_authorized": false
+  },
+  "validation": {
+    "local_full": "325 passed in 5.83s",
+    "local_targeted": "32 passed in 1.02s",
+    "ibex_source_archive_sha256": "af685fc6ea9e26fdb046fb353767712a9d37e51336356e69c2834b9d12db8f7a",
+    "ibex_framework_commit": "1287681c08846e11364c81653048435482e772a7",
+    "ibex_test_script_sha256": "276b6527670358623c7bf1b1a4b24e47e2c0839d5fa9f97c6c11bfc1441e8235",
+    "ibex_full_job": {
+      "job_id": "52467765",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_raw": 26,
+      "requested_gpu_count": 0,
+      "result": "325 passed in 20.80s"
+    },
+    "preserved_failed_attempts": [
+      {
+        "job_id": "52467666",
+        "state": "FAILED",
+        "exit_code": "127:0",
+        "cause": "module environment was not loaded before the pinned Python executable"
+      },
+      {
+        "job_id": "52467695",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "result": "323 passed, 2 failed",
+        "cause": "git archive omitted the pinned framework submodule checkout required by repository-contract tests"
+      }
+    ],
+    "fault_injection": [
+      "crash after policy replacement before transition receipt",
+      "crash after claim mutation before reservation receipt",
+      "crash after each of the five coordinator mutations before phase completion",
+      "resume without duplicate policy, claim, asset, binding or request mutation"
+    ]
+  },
+  "production": {
+    "role_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+    "policy_mutated": false,
+    "claim_mutated": false,
+    "gpu_requested": false,
+    "execution_contract_created": false,
+    "reason": "The final immutable execution contract must include the independent coordinator review receipt."
+  },
+  "test_access": false,
+  "verdict": "CODE_CANDIDATE_READY_FOR_INDEPENDENT_REVIEW_PRODUCTION_NO_GO"
+}
