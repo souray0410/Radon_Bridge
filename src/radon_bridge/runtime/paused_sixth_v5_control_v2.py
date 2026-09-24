@@ -1071,7 +1071,7 @@ def lookup_slurm_jobs(comment):
         text=True, timeout=20)
     accounting_output = subprocess.check_output(
         ["sacct", "-S", "now-2hours", "-nPX", "-u", os.environ["USER"], "-o",
-         "JobIDRaw,State,Account,ReqTRES,Comment,Dependency"], text=True, timeout=20)
+         "JobIDRaw,State,Account,ReqTRES,Comment"], text=True, timeout=20)
     rows = {}
     for line in queue_output.splitlines():
         fields = line.split("|", 5)
@@ -1087,17 +1087,14 @@ def lookup_slurm_jobs(comment):
                            "held": fields[5] == "JobHeldUser",
                            "dependency": detail.get("Dependency", "")}
     for line in accounting_output.splitlines():
-        fields = line.split("|", 5)
-        if len(fields) != 6 or fields[4] != comment or not fields[0].isdigit():
+        fields = line.split("|", 4)
+        if len(fields) != 5 or fields[4] != comment or not fields[0].isdigit():
             continue
         match = re.search(r"gres/gpu(?::[^=,]+)?=([0-9]+)", fields[3])
         recovered = {"job_id": fields[0], "state": fields[1].split()[0],
                      "account": fields[2], "gpus": int(match.group(1)) if match else 0,
-                     "comment": fields[4], "held": False, "dependency": fields[5]}
-        if fields[0] in rows:
-            if not rows[fields[0]]["dependency"]:
-                rows[fields[0]]["dependency"] = fields[5]
-        else:
+                     "comment": fields[4], "held": False, "dependency": ""}
+        if fields[0] not in rows:
             rows[fields[0]] = recovered
     return {"jobs": [rows[key] for key in sorted(rows)], "absence_proven": True}
 
@@ -1117,15 +1114,10 @@ def observe_terminal(job_id):
 def observe_finalizer(job_id):
     fields = _fields(subprocess.check_output(
         ["scontrol", "show", "job", str(job_id), "-o"], text=True, timeout=20))
-    accounting = subprocess.check_output(
-        ["sacct", "-nPX", "-j", str(job_id), "-o", "JobIDRaw,Dependency"],
-        text=True, timeout=20)
-    matches = [line.split("|", 1) for line in accounting.splitlines()
-               if line.split("|", 1)[0] == str(job_id)]
     return {"job_id": str(fields.get("JobId", "")), "state": fields.get("JobState"),
             "account": fields.get("Account"), "gpus": _gpu_count(fields),
             "comment": fields.get("Comment"),
-            "dependency": matches[0][1] if len(matches) == 1 else ""}
+            "dependency": fields.get("Dependency", "")}
 
 
 def submit_sbatch(command, *, timeout):

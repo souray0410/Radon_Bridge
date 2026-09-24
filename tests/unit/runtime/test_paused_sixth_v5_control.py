@@ -430,3 +430,26 @@ def test_capacity_wait_does_not_mutate_journal(tmp_path):
                             runtime_verify=lambda binding: {}, now=11)
     assert result["state"] == "waiting_radon_role_capacity"
     assert c.read(value["journal"])["requests"] == []
+
+
+def test_ibex_recovery_does_not_request_unsupported_sacct_dependency(monkeypatch):
+    commands = []
+
+    def output(command, **kwargs):
+        commands.append(command)
+        return ""
+
+    monkeypatch.setattr(c.subprocess, "check_output", output)
+    monkeypatch.setenv("USER", "mengh")
+    assert c.lookup_slurm_jobs("absent") == {"jobs": [], "absence_proven": True}
+    sacct = next(command for command in commands if command[0] == "sacct")
+    assert "Dependency" not in sacct[-1]
+
+
+def test_finalizer_dependency_is_read_from_live_scontrol(monkeypatch):
+    monkeypatch.setattr(c.subprocess, "check_output", lambda command, **kwargs:
+        "JobId=701 JobState=RUNNING Account=pi-mengy ReqTRES=cpu=1,mem=2G "
+        "Comment=rb-finalizer Dependency=afterany:700")
+    assert c.observe_finalizer("701") == {
+        "job_id": "701", "state": "RUNNING", "account": "pi-mengy", "gpus": 0,
+        "comment": "rb-finalizer", "dependency": "afterany:700"}
