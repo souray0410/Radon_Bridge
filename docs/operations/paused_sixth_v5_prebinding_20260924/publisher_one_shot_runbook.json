@@ -1,0 +1,87 @@
+{
+  "schema": "radon_paused_sixth_v5_publisher_one_shot_runbook_v1",
+  "state": "prepared_inert_until_real_look_v23_stage2",
+  "scope": "exactly one paused-sixth V5 production request; no dispatcher or refiller",
+  "production_mutated": false,
+  "test_access": false,
+  "immutable_inputs": {
+    "runner_source_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
+    "runner_archive": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/radon_bridge_44ba496fd9d2aad065e141d8485649a0dba3eec0.tar.gz",
+    "runner_archive_sha256": "34d5a387477dac1625f745c6d079c6d0b10bd0a498f0ba87f3ef754c43d550aa",
+    "initial_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+    "temporary_policy": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.proposed.json",
+    "temporary_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62",
+    "steady_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
+    "journal": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/requests.json",
+    "journal_initial_sha256": "9c1d9093ae17efd03ef8726c5279212969b51deb0346d864d52138312d59c81d",
+    "intent": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/intent.json",
+    "intent_initial_sha256": "1c1e06503f4a845837c3caae7c3e5cf9ead593638bb73915e6c6c9141a6a5e02",
+    "production_transaction_sha256": "491675054f5f831fd3c0effa62067136bc8e74bf13dd6ba7816891423ced5383",
+    "independent_code_review_sha256": "fd4bd999fd9a1062a6e5efd947021dba74497d21dd5d2954d9019ced29302acf",
+    "independent_bundle_review_sha256": "af9b0319ce2fef6ea309b7e22a13aa7a91183062b7b0b46b2213e46a85ae6f40",
+    "independent_transaction_review_sha256": "f0238cdcbec47a6ed5629eed5bdaf6a6ae8c8345aeb246071d2ddf58dab84ac9"
+  },
+  "hard_entry_gates": [
+    "the real held-first LOOK v23 successor is RUNNING or PENDING with a verified numeric Slurm identity",
+    "a look_v5_monitor_stage2_acceptance_v1 receipt has status accepted, binds exact policy 28fe66b4, verifies successor identity and predecessor release, and has a recorded SHA256",
+    "the sole shared-policy publisher holds gpu_account_submission.lock",
+    "inside that lock the live policy is still 0c90a161, account running plus pending is at most 23, Radon_Bridge is at most 9, and every live GPU job has one owner",
+    "all registered journals have zero unresolved intents and the dedicated R&B journal and intent still have their initial hashes",
+    "the exact failed source claim, paused status, source checkpoint, source spec and old terminal allocation remain unchanged"
+  ],
+  "ordered_transaction": [
+    {
+      "phase": 1,
+      "owner": "sole_shared_policy_publisher",
+      "action": "atomically install the exact temporary policy bytes under gpu_account_submission.lock and fsync the file and parent directory",
+      "postcondition": "live research_gpu_roles.json SHA256 is exactly 28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62; a transition receipt binds the old and new SHA values and fresh capacity snapshot"
+    },
+    {
+      "phase": 2,
+      "owner": "sole_shared_policy_publisher",
+      "action": "call reserve_actual_failed_claim for run 2026_09_12_11_23_31_715620 using the production Claims store and real sacct observation",
+      "postcondition": "claim generation 111 is source_reserved by radon-v5-paused-sixth-migration and reservation.json is durable; no GPU dispatch is yet allowed"
+    },
+    {
+      "phase": 3,
+      "owner": "sole_shared_policy_publisher",
+      "action": "call publish_production_asset once for the independently accepted update-26905 chain",
+      "postcondition": "production_asset is immutable and its asset.json, last.pt and spec.json hashes are recorded"
+    },
+    {
+      "phase": 4,
+      "owner": "sole_shared_policy_publisher",
+      "action": "generate a fresh legacy ownership overlay bound to policy 28fe66b4 plus allocation/finalizer wrappers, runtime contract, deployment gate and binding; validate binding with the pinned formal V5 runtime",
+      "postcondition": "binding.json and every referenced artifact have fixed paths and SHA256 values; the deployment gate binds the real LOOK v23 stage2 receipt and numeric successor job"
+    },
+    {
+      "phase": 5,
+      "owner": "sole_shared_policy_publisher",
+      "action": "run the exact publisher command once; recovery uses the same command and binding",
+      "command": "PYTHONPATH=/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/source_tree/source/src:/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/source_mhd_models_7513dac/src:/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/runtime_overlay_mhd_framework_5_c022b4f4 /ibex/project/c2377/souray/home/mengh/environments/radon_bridge_2026_09_09_10_30_34/bin/python -m radon_bridge.runtime.paused_sixth_v5_control --binding /ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/binding.json --publisher",
+      "postcondition": "one allocation is submitted held, its zero-GPU afterany finalizer and immutable pending proof are durable, then the same allocation is released; no second request exists"
+    }
+  ],
+  "recovery": {
+    "rule": "repeat only the same publisher command after inspecting the durable journal and unique Slurm comment; never submit an ad-hoc replacement",
+    "unique_comment_prefix": "rbv5-715620-28fe66b4-aNNN",
+    "max_attempts": 3,
+    "retryable_worker_states": [
+      "paused",
+      "failed"
+    ],
+    "each_attempt_walltime": "48:00:00",
+    "ack_loss": "recover the unique comment under the account lock before a capacity decision",
+    "ambiguous_or_duplicate_job": "fail closed as identity_drift and do not release or resubmit"
+  },
+  "forbidden": [
+    "running any mutation before the real LOOK v23 stage2 receipt",
+    "installing the temporary policy outside the shared account lock",
+    "creating a request before reservation, asset, overlay, wrappers, deployment gate and binding validate",
+    "submitting a second scheduler or a second active request",
+    "cancelling a healthy V4 allocation to manufacture capacity",
+    "opening test data",
+    "installing steady policy ff390318 while a V5 attempt or finalizer is active"
+  ],
+  "later_steady_state": "Only after the V5 attempt and finalizer are terminal, Radon_Bridge live count is at most 9, and a later held-first LOOK successor stage2 accepts ff390318 may the sole publisher restore cap 9 under the same lock."
+}
