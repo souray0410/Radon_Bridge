@@ -1,16 +1,46 @@
 import gzip
 import hashlib
+import io
 import json
 from pathlib import Path
 import sqlite3
 import sys
+import zipfile
 
 import pytest
 
 from radon_bridge.runtime.oct3d_cache_extension import (
-    load_contract, load_rows, proposal_digest, run, validate_adoption,
+    load_contract, load_rows, materialize, proposal_digest, run, validate_adoption,
     validate_root_audit, validate_runner, validate_runtime,
 )
+
+
+def test_materialize_uses_frozen_eye_selection_when_extra_oct_is_valid(tmp_path):
+    import numpy as np
+    from PIL import Image
+
+    raw = tmp_path / "raw"; raw.mkdir()
+    right_planes = []
+    for side in ("left", "right"):
+        with zipfile.ZipFile(raw / f"{side}.zip", "w") as archive:
+            for index in range(128):
+                pixels = np.array([[0, 10 + index], [20, 30]], dtype=np.uint8)
+                payload = io.BytesIO(); Image.fromarray(pixels).save(payload, format="PNG")
+                archive.writestr(f"slice_{index}.png", payload.getvalue())
+                if side == "right":
+                    right_planes.append(np.asarray(Image.fromarray(pixels).resize(
+                        (224, 224), Image.Resampling.BILINEAR)))
+    expected = np.stack([np.stack(right_planes)[None]])
+    encoded = io.BytesIO(); np.save(encoded, expected, allow_pickle=False)
+    row = {"id": "a", "split": "train", "output_path": "arrays/a",
+           "expected_eyes": ["right"], "oct3d_sha256": hashlib.sha256(encoded.getvalue()).hexdigest(),
+           "eyes": [{"eye": side, "oct": {"archive": f"{side}.zip"}} for side in ("left", "right")]}
+
+    receipt = materialize(row, raw, tmp_path / "output", {"version": "frozen"})
+    assert receipt["valid_eyes"] == ["right"]
+    assert receipt["rejections"] == [{"eye": "left", "reason": "excluded_by_frozen_reference",
+                                      "type": "FrozenReferenceExclusion"}]
+    assert digest(tmp_path / "output/arrays/a/oct_volume_3d.npy") == row["oct3d_sha256"]
 
 
 def digest(path: Path) -> str:

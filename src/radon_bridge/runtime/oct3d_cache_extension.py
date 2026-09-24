@@ -250,7 +250,17 @@ def materialize(row: dict, raw_root: Path, output_root: Path, recipe: dict) -> d
             return receipt
         raise ValueError("committed OCT3D extension changed")
     volumes, valid, rejections = [], [], []
+    expected = row["expected_eyes"]
+    raw_eyes = {eye["eye"]: eye for eye in row["eyes"]}
+    if (len(expected) != len(set(expected)) or len(raw_eyes) != len(row["eyes"])
+            or not set(expected) <= set(raw_eyes)):
+        raise ValueError("frozen eye selection is not present in raw bundle")
     for eye in row["eyes"]:
+        if eye["eye"] not in expected:
+            rejections.append({"eye": eye["eye"], "reason": "excluded_by_frozen_reference",
+                               "type": "FrozenReferenceExclusion"})
+    for eye_name in expected:
+        eye = raw_eyes[eye_name]
         try:
             archive = raw_root / safe_relative(eye["oct"]["archive"])
             with zipfile.ZipFile(archive) as source:
@@ -275,7 +285,7 @@ def materialize(row: dict, raw_root: Path, output_root: Path, recipe: dict) -> d
             valid.append(eye["eye"])
         except (ValueError, zipfile.BadZipFile, UnidentifiedImageError) as error:
             rejections.append({"eye": eye["eye"], "reason": str(error), "type": type(error).__name__})
-    if valid != row["expected_eyes"]:
+    if valid != expected:
         raise ValueError("valid-eye QC differs from frozen reference")
     destination.mkdir(parents=True, exist_ok=True)
     volume_path = destination / "oct_volume_3d.npy"
