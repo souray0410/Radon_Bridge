@@ -1,0 +1,55 @@
+{
+  "account_ceiling": 24,
+  "native_max_gpus": 0,
+  "projects": {
+    "LOOK": {
+      "request_journals": [
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_mechanisms_20260913_v1/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_mechanisms_20260913_v2/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_execution_20260914/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_admission_20260914/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_spatial_20260914/control/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_terminal_20260915/control/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_terminal_20260915/borrow_51898877/borrowed_requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_suffix_20260916/control/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_suffix_20260916/borrow_51898670/borrowed_requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_suffix_20260916/borrow_51896678/borrowed_requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_affine_20260916/control/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_forward_20260916/control/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/look_forward_20260916/lease_recovery_20260917/dispatcher/requests.json",
+        "/ibex/user/mengh/LOOK/look_v5_monitor_policy_candidate_06117d9_b89feee_20260924/look_v5_requests.json"
+      ],
+      "reserved_gpus": 7
+    },
+    "Radon_Bridge": {
+      "request_journals": [
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/radon_bridge_multimodel_20260913_v2/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/radon_bridge_priority_20260913_v3/dispatcher/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/radon_execution_20260914/dispatcher/requests.json",
+        "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/requests.json"
+      ],
+      "reserved_gpus": 10
+    },
+    "Uncertainty_Lab": {
+      "request_journals": [
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/lane1/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/lane2/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry1/lane1/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry1/lane2/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry2/lane1/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry2/lane2/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry3/lane1/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry3/lane2/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry4/lane1/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/rotation_20260923/retry4/lane2/requests.json",
+        "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_held_v5_candidate_20260923/2026_09_12_11_23_31_715620/a100_next_update/qualification_requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/full_glaucoma_v5_99ae6be/production_requests_v1/full-glaucoma-even-arms/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/full_glaucoma_v5_99ae6be/production_requests_v1/full-glaucoma-odd-arms/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/ul_gpu_claim_fix_069e1e4/production_requests_v2/full-glaucoma-even-arms/requests.json",
+        "/ibex/user/mengh/Uncertainty_Lab/ul_gpu_claim_fix_069e1e4/production_requests_v2/full-glaucoma-odd-arms/requests.json"
+      ],
+      "reserved_gpus": 2
+    }
+  },
+  "schema": "research_gpu_roles_v1"
+}

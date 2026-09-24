@@ -1,0 +1,65 @@
+{
+  "capacity_at_snapshot": {
+    "account_ceiling": 24,
+    "account_running_pending": 22,
+    "post_request_upper_bound": 23,
+    "radon_initial_cap": 9,
+    "radon_proposed_cap": 10,
+    "radon_running_pending": 9,
+    "remaining_account_slots": 1
+  },
+  "existing_natural_cutover_waiter": {
+    "job_id": "52430765",
+    "not_reusable_for_paused_sixth": true,
+    "target_job_id": "52332277"
+  },
+  "gpu_requested": false,
+  "initial_role_policy": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/research_gpu_roles.json",
+  "initial_role_policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+  "legacy_dispatcher": {
+    "armed_sha256": "07aa3c7c2e5309c1b7be41417ec3fe6b7a0f96c44fdaf648b5d61bb4503128ee",
+    "binding": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/v5_rollout_20260922/radon_resource_106_v2/binding.json",
+    "binding_sha256": "cb468f93d1a4849d25d7b98166938889b97e9fd1f6bd3a0e1e9224225b659013",
+    "host": "vsc509-03-l",
+    "must_remain_unchanged_until_coupled_handover": true,
+    "pid": 3555102,
+    "ready_sha256": "597d69475c14370d8aef9046da858d45b91c5ea40d4a66b0a220fa66969cb6f7"
+  },
+  "legacy_native_jobs_preserved": 4,
+  "live_capacity_snapshot": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/live_capacity_snapshot.json",
+  "live_capacity_snapshot_sha256": "0b33e6fe3a9fd83e776314b9c4dfdc32701f020ffbc9645943b46623adcc359d",
+  "other_project_caps_unchanged": {
+    "LOOK": 7,
+    "Uncertainty_Lab": 2
+  },
+  "production_mutated": false,
+  "proposed_role_policy": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.proposed.json",
+  "proposed_role_policy_sha256": "28fe66b4c3bb29530dc8be22eb32b35e0d9b728b83f80a4c1165a834e20c4f62",
+  "rollback_role_policy": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.rollback.json",
+  "rollback_role_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
+  "rollback_rules": [
+    "after the first existing R&B V4 allocation naturally reaches a proved terminal state, install the exact rollback policy under the same shared lock",
+    "rollback only after the V5 request has a durable numeric Slurm job identity and there is no unresolved acknowledgement state",
+    "if V5 submission is never made, rollback may occur after its empty journal and intent are revalidated",
+    "rollback never cancels a running or pending job; it only restores future R&B admission cap to 9"
+  ],
+  "schema": "radon_paused_sixth_v5_slot_transition_contract_v1",
+  "state": "prepared_read_only_no_production_mutation",
+  "submission_rules": [
+    "install policy only through the sole shared-policy publisher and accepted LOOK successor transaction",
+    "fresh under-lock live_snapshot must still report account occupied <=23 and R&B occupied <=9 before creating the one request",
+    "create at most one held-first R&B V5 attempt using the exact dedicated journal",
+    "do not stop, signal or reassign any V4 allocation to make capacity",
+    "do not submit a second R&B V5 request while this temporary request is active or unresolved"
+  ],
+  "test_access": false,
+  "transition": "temporary_radon_role_9_to_10_for_one_formal_v5_request",
+  "v4_preemption": {
+    "authorized_by_this_contract": false,
+    "earliest_natural_slot": {
+      "end_time": "2026-09-25T12:15:16+03:00",
+      "job_id": "52331982"
+    },
+    "reason": "job 52331982 owner has no reviewed no-next-task quiesce; pause alone can immediately reacquire work"
+  }
+}

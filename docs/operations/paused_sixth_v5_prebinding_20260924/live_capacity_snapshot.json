@@ -1,0 +1,178 @@
+{
+  "account_ceiling": 24,
+  "account_running_pending": 22,
+  "jobs": {
+    "52288428": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ukb_cap128_01_48h",
+      "state": "RUNNING"
+    },
+    "52288974": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790078314613561488",
+      "state": "RUNNING"
+    },
+    "52292334": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ukb_cap128_01_48h",
+      "state": "RUNNING"
+    },
+    "52331982": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790112131947567527",
+      "state": "RUNNING"
+    },
+    "52332032": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790112279678459875",
+      "state": "RUNNING"
+    },
+    "52332277": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790113404738771273",
+      "state": "RUNNING"
+    },
+    "52333813": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790116031627549355",
+      "state": "RUNNING"
+    },
+    "52336187": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790121463034108571",
+      "state": "RUNNING"
+    },
+    "52346748": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790144800348782193",
+      "state": "RUNNING"
+    },
+    "52347745": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790145973242844320",
+      "state": "RUNNING"
+    },
+    "52362425": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ukb_cap128_01_48h",
+      "state": "RUNNING"
+    },
+    "52362656": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ukb_cap128_01_48h",
+      "state": "RUNNING"
+    },
+    "52393255": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790196531330724115",
+      "state": "RUNNING"
+    },
+    "52393389": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "radon_bridge_auto_1790196620173034835",
+      "state": "RUNNING"
+    },
+    "52421563": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790227594836623495",
+      "state": "RUNNING"
+    },
+    "52422169": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790227889544525891",
+      "state": "PENDING"
+    },
+    "52422361": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790227992058049505",
+      "state": "PENDING"
+    },
+    "52422738": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790228188519877661",
+      "state": "PENDING"
+    },
+    "52429877": {
+      "comment": "***No Comment***",
+      "gpus": 1,
+      "name": "look_v5_mid_sharded",
+      "state": "PENDING"
+    },
+    "52429947": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "look_auto_1790231619531204109",
+      "state": "PENDING"
+    },
+    "52463114": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ulv5_de460f9a6fb04506_a0",
+      "state": "PENDING"
+    },
+    "52463127": {
+      "comment": "(null)",
+      "gpus": 1,
+      "name": "ulv5_4bb562b210ff8c6b_a0",
+      "state": "PENDING"
+    }
+  },
+  "observed_at": 1790248347.05169,
+  "owners": {
+    "52288428": "legacy_native_unregistered",
+    "52288974": "LOOK",
+    "52292334": "legacy_native_unregistered",
+    "52331982": "Radon_Bridge",
+    "52332032": "Radon_Bridge",
+    "52332277": "Radon_Bridge",
+    "52333813": "Radon_Bridge",
+    "52336187": "Radon_Bridge",
+    "52346748": "Radon_Bridge",
+    "52347745": "Radon_Bridge",
+    "52362425": "legacy_native_unregistered",
+    "52362656": "legacy_native_unregistered",
+    "52393255": "Radon_Bridge",
+    "52393389": "Radon_Bridge",
+    "52421563": "LOOK",
+    "52422169": "LOOK",
+    "52422361": "LOOK",
+    "52422738": "LOOK",
+    "52429877": "LOOK",
+    "52429947": "LOOK",
+    "52463114": "Uncertainty_Lab",
+    "52463127": "Uncertainty_Lab"
+  },
+  "policy_path": "/ibex/project/c2377/souray/home/mengh/operations/2026_09_10_11_11_31/research_gpu_roles.json",
+  "policy_sha256": "0c90a1619bd165eb32fb753678b185793daf8ffc1c4da70632833cb7da4d1289",
+  "role_live_gpus": {
+    "LOOK": 7,
+    "Radon_Bridge": 9,
+    "Uncertainty_Lab": 2,
+    "legacy_native_unregistered": 4
+  },
+  "schema": "radon_v5_live_capacity_snapshot_v1",
+  "test_access": false,
+  "unresolved_gpu_intents": {
+    "LOOK": 0,
+    "Radon_Bridge": 0,
+    "Uncertainty_Lab": 0
+  }
+}
