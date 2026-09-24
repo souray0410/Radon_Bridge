@@ -31,7 +31,8 @@ def contract(tmp_path):
     reviews = []
     for index in range(4):
         receipt = root / f"review{index}.json"; dump(receipt, {"accepted": True, "n": index})
-        reviews.append({"path": str(receipt), "sha256": c._sha(receipt)})
+        reviews.append({"path": str(receipt), "sha256": c._sha(receipt),
+                        "verdict_path": "accepted", "accepted_value": True})
     lock = tmp_path / "account.lock"; lock.write_text("")
     values = {"schema": c.SCHEMA, "root": str(root), "state": str(root / "state.json"),
       "account_lock": str(lock), "role_policy": str(policy),

@@ -50,6 +50,14 @@ def _hex64(value):
     return isinstance(value, str) and len(value) == 64 and set(value) <= HEX64
 
 
+def _json_path(value, path):
+    for item in path.split("."):
+        if not isinstance(value, dict) or item not in value:
+            raise ValueError("review verdict path is missing: " + path)
+        value = value[item]
+    return value
+
+
 def _fsync_dir(path):
     descriptor = os.open(Path(path), os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
     try:
@@ -142,10 +150,13 @@ def validate_contract(path):
     if not isinstance(reviews, list) or len(reviews) < 4:
         raise ValueError("all independent review receipts, including the coordinator, are required")
     for row in reviews:
-        if set(row) != {"path", "sha256"} or not _hex64(row["sha256"]):
+        if (set(row) != {"path", "sha256", "verdict_path", "accepted_value"}
+                or not _hex64(row["sha256"]) or not isinstance(row["verdict_path"], str)):
             raise ValueError("invalid review receipt")
         if _sha(row["path"]) != row["sha256"]:
             raise ValueError("review receipt changed")
+        if _json_path(_read(row["path"]), row["verdict_path"]) != row["accepted_value"]:
+            raise ValueError("independent review verdict is not accepted")
     for key in ("temporary_policy", "steady_policy", "look_stage2", "policy_proposal"):
         digest_key = key + "_sha256"
         if _sha(value[key]) != value[digest_key]:
@@ -173,7 +184,8 @@ def validate_contract(path):
             or any(not isinstance(item, str) for item in value["runtime_environment"].values())
             or type(value["worker_cpus"]) is not int or value["worker_cpus"] < 1
             or type(value["worker_memory_gib"]) is not int or value["worker_memory_gib"] < 1
-            or not isinstance(value["source_commit"], str) or len(value["source_commit"]) != 40):
+            or not isinstance(value["source_commit"], str) or len(value["source_commit"]) != 40
+            or set(value["source_commit"]) > HEX64):
         raise ValueError("invalid immutable runtime inputs")
     if (not isinstance(value["native_sources"], dict)
             or any(not str(job).isdigit() or not isinstance(source, str)
