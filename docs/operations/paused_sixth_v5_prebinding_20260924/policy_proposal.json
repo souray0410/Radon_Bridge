@@ -18,7 +18,7 @@
   "runner_commit": "44ba496fd9d2aad065e141d8485649a0dba3eec0",
   "schema": "radon_paused_sixth_v5_policy_proposal_v1",
   "slot_transition_contract": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/slot_transition_contract.json",
-  "slot_transition_contract_sha256": "9a5975a18eb875083706c634f911d19dad247fc4b4ade6d4b75cfff175781ba0",
+  "slot_transition_contract_sha256": "a965c481d1af9ccb89d1be6a2d4673b366220790fc803f4c52f73e95bdcaf77d",
   "state": "accepted",
   "steady_state_reserved_gpus": 9,
   "temporary_reserved_gpus": 10,

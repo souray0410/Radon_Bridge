@@ -38,7 +38,8 @@
   "rollback_role_policy": "/ibex/user/mengh/Radon_Bridge/paused_sixth_v5_44ba496_20260924/research_gpu_roles.rollback.json",
   "rollback_role_policy_sha256": "ff3903185847cfcdffb7abcf6b5804228431184a5c338d686c35f0f23124e0fa",
   "rollback_rules": [
-    "after the first existing R&B V4 allocation naturally reaches a proved terminal state, install the exact rollback policy under the same shared lock",
+    "after the first existing R&B V4 allocation naturally reaches a proved terminal state, prepare the exact rollback policy under the same shared lock",
+    "install rollback only after the current LOOK successor accepts the rollback SHA or a new held-first LOOK monitor publishes matching stage2 acceptance",
     "rollback only after the V5 request has a durable numeric Slurm job identity and there is no unresolved acknowledgement state",
     "if V5 submission is never made, rollback may occur after its empty journal and intent are revalidated",
     "rollback never cancels a running or pending job; it only restores future R&B admission cap to 9"
