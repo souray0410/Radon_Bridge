@@ -80,6 +80,34 @@ def sha256(path):
     return digest.hexdigest()
 
 
+def python_launcher_identity(path):
+    """Return the exact logical launcher chain without resolving it away."""
+    current = Path(os.path.abspath(path))
+    rows, seen = [], set()
+    for _ in range(16):
+        key = str(current)
+        if key in seen:
+            raise ValueError("Python launcher symlink loop")
+        seen.add(key)
+        if current.is_symlink():
+            target = os.readlink(current)
+            rows.append({"path": key, "kind": "symlink", "target": target})
+            current = Path(target) if os.path.isabs(target) else current.parent / target
+            current = Path(os.path.abspath(current))
+            continue
+        if not current.is_file():
+            raise ValueError("Python launcher chain is incomplete")
+        rows.append({"path": key, "kind": "file", "sha256": sha256(current)})
+        return rows
+    raise ValueError("Python launcher chain is too deep")
+
+
+def python_launcher_sha256(path):
+    return hashlib.sha256(json.dumps(
+        python_launcher_identity(path), sort_keys=True, separators=(",", ":"),
+        allow_nan=False).encode()).hexdigest()
+
+
 def read(path):
     return json.loads(Path(path).read_text())
 
@@ -253,7 +281,8 @@ def validate_binding(path, *, now=None, allow_expired=False):
         _exact(pinned, digest, "runtime source")
 
     runtime = binding["runtime_contract"]
-    if (set(runtime) != {"schema", "python", "python_sha256", "python_realpath",
+    if (set(runtime) != {"schema", "python", "python_launcher_sha256",
+                         "python_sha256", "python_realpath",
                          "python_version", "torch_version", "framework_api",
                          "framework_commit", "environment", "modules", "roles"}
             or runtime["schema"] != "radon_v5_runtime_contract_v1"
@@ -263,8 +292,10 @@ def validate_binding(path, *, now=None, allow_expired=False):
             or set(runtime["roles"]) != RUNTIME_ROLES
             or {row.get("name") for row in runtime["modules"]} != MODULE_NAMES):
         raise ValueError("formal V5 runtime contract is incomplete")
-    if (runtime["python"] != str(Path(runtime["python"]).resolve())
+    if (not Path(runtime["python"]).is_absolute()
+            or runtime["python"] != os.path.abspath(runtime["python"])
             or runtime["python_realpath"] != str(Path(runtime["python"]).resolve(strict=True))
+            or python_launcher_sha256(runtime["python"]) != runtime["python_launcher_sha256"]
             or pin_map.get(runtime["python"]) != runtime["python_sha256"]):
         raise ValueError("Python executable is not pinned")
     for role, pinned in runtime["roles"].items():
@@ -321,8 +352,9 @@ def validate_binding(path, *, now=None, allow_expired=False):
 def verify_runtime(binding):
     """Verify the running interpreter, environment and every imported runtime module."""
     runtime = binding["runtime_contract"]
-    if (str(Path(sys.executable).resolve()) != runtime["python"]
+    if (os.path.abspath(sys.executable) != runtime["python"]
             or str(Path(sys.executable).resolve(strict=True)) != runtime["python_realpath"]
+            or python_launcher_sha256(sys.executable) != runtime["python_launcher_sha256"]
             or sha256(runtime["python"]) != runtime["python_sha256"]
             or platform.python_version() != runtime["python_version"]):
         raise RuntimeError("running Python differs from the immutable runtime")
@@ -1259,6 +1291,7 @@ def main():
     parser.add_argument("--binding", required=True)
     parser.add_argument("--worker", action="store_true")
     parser.add_argument("--publisher", action="store_true")
+    parser.add_argument("--runtime-preflight", action="store_true")
     parser.add_argument("--allocation-owner", action="store_true")
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument("--gpu-job-id")
@@ -1267,6 +1300,13 @@ def main():
     parser.add_argument("--owner-contract")
     parser.add_argument("--nonce")
     args = parser.parse_args()
+    if sum((args.worker, args.publisher, args.runtime_preflight,
+            args.allocation_owner, args.finalize)) != 1:
+        parser.error("choose exactly one execution mode")
+    if args.runtime_preflight:
+        binding = validate_binding(args.binding)
+        print(json.dumps(verify_runtime(binding), sort_keys=True))
+        return
     if args.worker:
         if not all((args.step_record, args.gate, args.owner_contract, args.nonce)):
             parser.error("worker requires step, gate, owner contract and nonce")
@@ -1289,7 +1329,7 @@ def main():
                                    observe_finalizer=observe_finalizer)
         print(json.dumps(result, sort_keys=True))
         return
-    parser.error("choose publisher, allocation owner, finalizer or worker")
+    parser.error("choose publisher, runtime preflight, allocation owner, finalizer or worker")
 
 
 if __name__ == "__main__":

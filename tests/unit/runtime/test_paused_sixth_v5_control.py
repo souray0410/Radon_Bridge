@@ -150,7 +150,8 @@ def fixture(tmp_path):
     finalizer_wrapper = tmp_path / "finalizer.sbatch"
     allocation_wrapper.write_text("allocation")
     finalizer_wrapper.write_text("finalizer")
-    python = str(Path(sys.executable).resolve())
+    python = os.path.abspath(sys.executable)
+    python_realpath = str(Path(sys.executable).resolve(strict=True))
     pins = ([{"path": path, "sha256": digest(path)} for path in sources.values()]
             + [{"path": str(allocation_wrapper.resolve()), "sha256": digest(allocation_wrapper)},
                {"path": str(finalizer_wrapper.resolve()), "sha256": digest(finalizer_wrapper)},
@@ -162,7 +163,8 @@ def fixture(tmp_path):
                   "finalizer_wrapper": str(finalizer_wrapper.resolve()),
                   "python_executable": python})
     runtime = {"schema": "radon_v5_runtime_contract_v1", "python": python,
-               "python_sha256": digest(python), "python_realpath": python,
+               "python_launcher_sha256": c.python_launcher_sha256(python),
+               "python_sha256": digest(python), "python_realpath": python_realpath,
                "python_version": platform.python_version(), "torch_version": "test",
                "framework_api": "V5", "framework_commit": c.FORMAL_V5_COMMIT,
                "environment": {key: os.environ.get(key, "") for key in c.ENV_KEYS},
@@ -199,6 +201,21 @@ def fixture(tmp_path):
     }
     dump(binding, value)
     return binding, value
+
+
+def test_python_launcher_identity_binds_logical_symlink_chain(tmp_path):
+    first = tmp_path / "python-a"
+    second = tmp_path / "python-b"
+    first.write_bytes(b"same binary bytes")
+    second.write_bytes(b"same binary bytes")
+    launcher = tmp_path / "python"
+    launcher.symlink_to(first.name)
+    before = c.python_launcher_sha256(launcher)
+    launcher.unlink()
+    launcher.symlink_to(second.name)
+    after = c.python_launcher_sha256(launcher)
+    assert before != after
+    assert digest(first) == digest(second)
 
 
 def capacity():

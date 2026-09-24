@@ -112,6 +112,9 @@ def _review_is_accepted(kind, receipt, contract):
             and candidate.get("coordinator_sha256") == contract["coordinator_source_sha256"]
             and candidate.get("pre_mutation_modules_sha256")
             == _json_sha(contract["pre_mutation_modules"])
+            and candidate.get("python") == contract["python"]
+            and candidate.get("python_realpath") == contract["python_realpath"]
+            and candidate.get("python_launcher_sha256") == contract["python_launcher_sha256"]
             and candidate.get("python_sha256") == contract["python_sha256"]
             and candidate.get("runtime_environment_sha256")
             == _json_sha(contract["runtime_environment"])
@@ -123,8 +126,11 @@ def _validate_pre_mutation_runtime(contract):
     actual = Path(__file__).resolve()
     if source != actual or _sha(source) != contract["coordinator_source_sha256"]:
         raise ValueError("running coordinator source is not the reviewed source")
-    python = Path(contract["python"]).resolve()
-    if (Path(os.sys.executable).resolve() != python
+    python = os.path.abspath(os.sys.executable)
+    if (not Path(contract["python"]).is_absolute()
+            or python != contract["python"]
+            or str(Path(python).resolve(strict=True)) != contract["python_realpath"]
+            or control.python_launcher_sha256(python) != contract["python_launcher_sha256"]
             or _sha(python) != contract["python_sha256"]):
         raise ValueError("running Python is not the reviewed runtime")
     if any(os.environ.get(key, "") != value
@@ -227,11 +233,12 @@ def validate_contract(path):
         "claim_path", "source_checkpoint", "source_spec", "reservation_receipt",
         "asset_dir", "conversion_receipt", "converted_checkpoint", "packet",
         "independent_recheck", "attempt_checkpoint", "attempt_spec", "source_root",
-        "mhd_models_root", "framework_root", "python", "ownership_overlay",
+        "mhd_models_root", "framework_root", "python", "python_realpath", "ownership_overlay",
         "allocation_wrapper", "finalizer_wrapper", "deployment_gate", "binding_intent", "binding",
         "execution_dir", "native_sources", "runtime_environment", "worker_cpus",
         "worker_memory_gib", "source_commit", "coordinator_source",
-        "coordinator_source_sha256", "python_sha256", "pre_mutation_modules",
+        "coordinator_source_sha256", "python_launcher_sha256", "python_sha256",
+        "pre_mutation_modules",
         "expires_at", "test_access"
     }
     if set(value) != required or value.get("schema") != SCHEMA:
@@ -293,6 +300,7 @@ def validate_contract(path):
             or not isinstance(value["source_commit"], str) or len(value["source_commit"]) != 40
             or set(value["source_commit"]) > HEX64
             or not _hex64(value["coordinator_source_sha256"])
+            or not _hex64(value["python_launcher_sha256"])
             or not _hex64(value["python_sha256"])):
         raise ValueError("invalid immutable runtime inputs")
     if (not isinstance(value["native_sources"], dict)
@@ -615,7 +623,9 @@ def _immutable_text(path, value, mode=0o700):
 
 
 def _module_contract(contract):
-    if str(Path(os.sys.executable).resolve()) != str(Path(contract["python"]).resolve()):
+    actual_python = os.path.abspath(os.sys.executable)
+    if (actual_python != contract["python"]
+            or str(Path(actual_python).resolve(strict=True)) != contract["python_realpath"]):
         raise RuntimeError("coordinator must use the pinned production Python")
     observed = {}
     for name in sorted(control.MODULE_NAMES):
@@ -630,11 +640,12 @@ def _module_contract(contract):
     roles = {role: observed[module]["path"] for role, module in control.ROLE_MODULES.items()}
     roles.update({"allocation_wrapper": contract["allocation_wrapper"],
                   "finalizer_wrapper": contract["finalizer_wrapper"],
-                  "python_executable": str(Path(contract["python"]).resolve())})
+                  "python_executable": contract["python"]})
     return {"schema": "radon_v5_runtime_contract_v1",
-            "python": str(Path(contract["python"]).resolve()),
+            "python": contract["python"],
+            "python_launcher_sha256": contract["python_launcher_sha256"],
             "python_sha256": _sha(contract["python"]),
-            "python_realpath": str(Path(contract["python"]).resolve(strict=True)),
+            "python_realpath": contract["python_realpath"],
             "python_version": platform.python_version(),
             "torch_version": importlib.import_module("torch").__version__,
             "framework_api": "V5", "framework_commit": handoff.FORMAL_V5_COMMIT,
@@ -703,9 +714,15 @@ def _build_binding(contract, now, fault=None):
         fault("after_deployment_gate")
         exports = "\n".join("export %s=%s" % (key, shlex.quote(value))
                             for key, value in sorted(contract["runtime_environment"].items()))
-        python = shlex.quote(str(Path(contract["python"]).resolve()))
+        # Preserve the reviewed virtual-environment launcher.  Resolving this
+        # symlink would bypass its site-packages and launch the bare cluster
+        # interpreter instead.
+        python = shlex.quote(contract["python"])
         binding = shlex.quote(str(Path(contract["binding"]).resolve()))
-        allocation = ("#!/bin/bash\nset -euo pipefail\n" + exports + "\nexec " + python
+        allocation = ("#!/bin/bash\nset -euo pipefail\n" + exports
+                      + "\nif [[ ${1:-} == --runtime-preflight && $# -eq 1 ]]; then\n  exec "
+                      + python + " -m radon_bridge.runtime.paused_sixth_v5_control --binding "
+                      + binding + " --runtime-preflight\nfi\n[[ $# -eq 0 ]]\nexec " + python
                       + " -m radon_bridge.runtime.paused_sixth_v5_control --binding "
                       + binding + " --allocation-owner\n")
         finalizer = ("#!/bin/bash\nset -euo pipefail\n" + exports

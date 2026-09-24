@@ -37,11 +37,16 @@ def contract(tmp_path):
         module_path = str(Path(importlib.import_module(name).__file__).resolve())
         modules.append({"name": name, "path": module_path, "sha256": c._sha(module_path)})
     runtime_environment = {key: os.environ.get(key, "") for key in c.control.ENV_KEYS}
+    python = os.path.abspath(sys.executable)
+    python_realpath = str(Path(sys.executable).resolve(strict=True))
     review_values = {
       "coordinator_code": {"schema": c.REVIEW_KINDS["coordinator_code"],
           "candidate": {"implementation_commit": "1" * 40,
                         "coordinator_sha256": coordinator_sha,
                         "pre_mutation_modules_sha256": c._json_sha(modules),
+                        "python": python,
+                        "python_realpath": python_realpath,
+                        "python_launcher_sha256": c.control.python_launcher_sha256(python),
                         "python_sha256": c._sha(sys.executable),
                         "runtime_environment_sha256": c._json_sha(runtime_environment)},
           "verdict": {"code": "GO"}, "test_access": False},
@@ -78,7 +83,8 @@ def contract(tmp_path):
       "source_root": str(Path(c.__file__).resolve().parents[2]),
       "mhd_models_root": str(Path(importlib.import_module("mhd_models").__file__).resolve().parents[1]),
       "framework_root": str(Path(importlib.import_module("mhd_framework").__file__).resolve().parents[1]),
-      "python": str(Path(sys.executable).resolve()),
+      "python": python, "python_realpath": python_realpath,
+      "python_launcher_sha256": c.control.python_launcher_sha256(python),
       "ownership_overlay": str(root / "overlay.json"),
       "allocation_wrapper": str(root / "allocation.sbatch"),
       "finalizer_wrapper": str(root / "finalizer.sbatch"),
@@ -279,7 +285,9 @@ def test_binding_internal_crash_recovers_same_immutable_bytes(tmp_path, monkeypa
                                  "checked_at": now, "entries": [], "test": False}
         return result
     runtime = {"schema": "radon_v5_runtime_contract_v1", "python": value["python"],
-               "python_sha256": value["python_sha256"], "python_realpath": value["python"],
+               "python_launcher_sha256": value["python_launcher_sha256"],
+               "python_sha256": value["python_sha256"],
+               "python_realpath": value["python_realpath"],
                "python_version": "test", "torch_version": "test", "framework_api": "V5",
                "framework_commit": c.handoff.FORMAL_V5_COMMIT,
                "environment": value["runtime_environment"], "modules": [],
@@ -301,3 +309,46 @@ def test_binding_internal_crash_recovers_same_immutable_bytes(tmp_path, monkeypa
     assert intent["created_at"] == 100
     assert json.loads(Path(value["binding_intent"]).read_text()) == intent
     assert result["source_commit"] == value["source_commit"]
+
+
+def test_binding_wrappers_preserve_reviewed_virtualenv_launcher(tmp_path, monkeypatch):
+    _, value = contract(tmp_path)
+    launcher = tmp_path / "venv" / "bin" / "python"
+    launcher.parent.mkdir(parents=True)
+    launcher.symlink_to(sys.executable)
+    value["python"] = str(launcher.absolute())
+    value["python_realpath"] = str(Path(sys.executable).resolve(strict=True))
+    value["python_launcher_sha256"] = c.control.python_launcher_sha256(launcher)
+    value["python_sha256"] = c._sha(launcher)
+    Path(value["role_policy"]).write_bytes(Path(value["temporary_policy"]).read_bytes())
+    dump(value["reservation_receipt"], {"claim": {"generation": 111}})
+    asset = Path(value["asset_dir"]); asset.mkdir()
+    dump(asset / "asset.json", {"checkpoint_sha256": "a" * 64, "spec_sha256": "b" * 64})
+    dump(Path(value["root"]) / "requests.json", {"requests": []})
+    dump(Path(value["root"]) / "intent.json", {"attempts": []})
+    snapshot = {"account_running_pending": 22, "radon_running_pending": 9,
+                "unresolved_gpu_intents": 0, "radon_unresolved_gpu_intents": 0,
+                "all_live_owned_once": True,
+                "overlay": {"schema": "legacy_native_ownership_overlay_v2",
+                            "checked_at": 10, "entries": [], "test": False}}
+    monkeypatch.setattr(c, "_ownership", lambda *_, **__: dict(snapshot))
+    monkeypatch.setattr(c, "_module_contract", lambda _: {
+        "schema": "radon_v5_runtime_contract_v1", "python": value["python"],
+        "python_launcher_sha256": value["python_launcher_sha256"],
+        "python_sha256": value["python_sha256"], "python_realpath": value["python_realpath"],
+        "python_version": "test", "torch_version": "test", "framework_api": "V5",
+        "framework_commit": c.handoff.FORMAL_V5_COMMIT,
+        "environment": value["runtime_environment"], "modules": [],
+        "roles": {"allocation_wrapper": value["allocation_wrapper"],
+                  "finalizer_wrapper": value["finalizer_wrapper"],
+                  "python_executable": value["python"]}})
+    monkeypatch.setattr(c, "_require_binding",
+                        lambda contract: json.loads(Path(contract["binding"]).read_text()))
+    c._build_binding(value, 10)
+    allocation = Path(value["allocation_wrapper"]).read_text()
+    finalizer = Path(value["finalizer_wrapper"]).read_text()
+    assert value["python"] in allocation and value["python"] in finalizer
+    assert "--runtime-preflight" in allocation
+    if value["python"] != value["python_realpath"]:
+        assert value["python_realpath"] not in allocation
+        assert value["python_realpath"] not in finalizer
