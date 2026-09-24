@@ -57,7 +57,7 @@ def _exact_file(path, digest, label):
 
 def reserve_actual_failed_claim(*, run, claims, claim_path, source_checkpoint,
                                 source_spec, account_lock, observe_job,
-                                reservation_receipt, now):
+                                reservation_receipt, now, locked_precondition=None):
     """Reserve only the reviewed failed sixth claim before producing assets."""
     run = Path(run).resolve()
     expected = {
@@ -77,6 +77,8 @@ def reserve_actual_failed_claim(*, run, claims, claim_path, source_checkpoint,
             or terminal.get("exit_code") != "0:0"):
         raise ValueError("old allocation terminal identity is unproven")
     with _locked_existing(account_lock):
+        if locked_precondition is not None:
+            locked_precondition()
         exact_claim = _read(claim_path)
         if (_read(run / "status.json") != status
                 or file_sha256(source_checkpoint) != SOURCE_CHECKPOINT_SHA256):

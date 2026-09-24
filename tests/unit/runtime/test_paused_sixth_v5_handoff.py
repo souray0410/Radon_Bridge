@@ -101,6 +101,35 @@ class Claims:
     def mutate(self, run, fn): self.value=fn(dict(self.value)); return self.value
 
 
+def test_reservation_recovers_if_receipt_write_crashes_after_claim_mutation(tmp_path, monkeypatch):
+    run=tmp_path/'run'; run.mkdir(); source=run/'last.pt'; spec=run/'spec.json'
+    source.write_bytes(b'v4'); spec.write_text('{}')
+    write(run/'status.json',{'state':'paused','test_used':False,'updates':26904})
+    monkeypatch.setattr(h,'SOURCE_CHECKPOINT_SHA256',sha(source))
+    monkeypatch.setattr(h,'SOURCE_SPEC_SHA256',sha(spec))
+    monkeypatch.setattr(h,'PAUSED_STATUS_SHA256',sha(run/'status.json'))
+    claim={'run_dir':str(run.resolve()),'spec_sha256':sha(spec),'owner':h.OLD_OWNER,
+      'job_id':h.OLD_JOB_ID,'generation':h.OLD_GENERATION,'state':'failed','step':'1'}
+    claim_path=tmp_path/'claim.json'; write(claim_path,claim)
+    monkeypatch.setattr(h,'OLD_CLAIM_SHA256',sha(claim_path))
+    lock=tmp_path/'account.lock'; lock.write_text('')
+    class FileClaims:
+        def mutate(self, run, fn):
+            value=fn(json.loads(claim_path.read_text())); write(claim_path,value); return value
+    original=h.atomic_write_json
+    monkeypatch.setattr(h,'atomic_write_json',lambda *args,**kwargs: (_ for _ in ()).throw(RuntimeError('crash')))
+    kwargs=dict(run=run,claims=FileClaims(),claim_path=claim_path,source_checkpoint=source,
+      source_spec=spec,account_lock=lock,now=2,reservation_receipt=tmp_path/'reservation.json',
+      observe_job=lambda job:{'job_id':job,'state':'COMPLETED','exit_code':'0:0'},
+      locked_precondition=lambda: None)
+    with pytest.raises(RuntimeError,match='crash'): h.reserve_actual_failed_claim(**kwargs)
+    assert json.loads(claim_path.read_text())['migration_phase']=='source_reserved'
+    monkeypatch.setattr(h,'atomic_write_json',original)
+    recovered=h.reserve_actual_failed_claim(**kwargs)
+    assert recovered['claim']['generation']==111
+    assert (tmp_path/'reservation.json').is_file()
+
+
 def test_claim_derives_step_from_scheduler_and_binds_grant(tmp_path):
     run=tmp_path/'run'; run.mkdir(); asset=tmp_path/'asset'; asset.mkdir()
     (asset/'last.pt').write_bytes(b'checkpoint'); (asset/'spec.json').write_text('{}')
