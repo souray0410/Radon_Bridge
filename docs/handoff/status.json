@@ -3,14 +3,14 @@
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
   "phase": "eye_stage_one",
-  "next_acceptance": "完成A100连续更新、完整UKB流程及生产owner交接验收；六项Ibex资源恢复和LOOK永久管理交接仍开放。原科研结果与截止时间保留。",
+  "next_acceptance": "等待 paused-sixth 唯一 V5 A100 allocation 52473855 获卡；核验 live owner/claim、首个真实更新、断点和 finalizer。其余六项资源事件及完整 UKB 流程继续按各自 owner。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "27aafca11796e3969bb263ab950e93dc49d58f23",
-  "evidence_cutoff": "2026-09-23T17:13:00+00:00",
-  "verified_at": "2026-09-23T20:13:00+03:00",
+  "source_commit": "3bb4215101105e88141fd8e05fd23c5eafdb63c8",
+  "evidence_cutoff": "2026-09-24T12:57:37+00:00",
+  "verified_at": "2026-09-24T15:57:37+03:00",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -70,7 +70,8 @@
     "Five of six contained V4 parent runs are training again, but three live steps report MaxRSS effectively at the 106 GiB request and one run remains held; terminal full-lifecycle resource acceptance is incomplete",
     "Active parent controller lacks accepted project runtime binding",
     "A100 single-update equivalence has an append-only independent recheck; complete train/development replay, formal V5 production claim and production owner integration remain required",
-    "Generation5 OCT3D V2 has only a one-participant accepted prefix; complete cache and independent acceptance remain required"
+    "Generation5 OCT3D V2 has only a one-participant accepted prefix; complete cache and independent acceptance remain required",
+    "Paused-sixth formal V5 job 52473855 is uniquely submitted but still PENDING with zero optimizer updates; live owner/claim handoff, first update, checkpoint and finalizer evidence remain open"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -118,7 +119,8 @@
     "2026-09-23 append-only correction: the prior five-owner readiness receipt labelled a Riyadh wall-clock hour as UTC. The original file remains immutable; embedded owner timestamps and commit time bound the actual sample between 19:09:55Z and 19:11:46Z, but the exact sampling instant was not preserved. Evidence docs/acceptance/v5_live_owner_transition_readiness_time_correction_20260923.json.",
     "2026-09-23 formal-V5 owner handoff guard candidate blocks an armed run in normal admission and rechecks immediately before claim acquisition. Arming requires the existing account lock, exact live claim and an active deployment receipt proving the dispatcher consumes the guard. At 19:41:19Z job52332277 remained RUNNING and no guarded dispatcher process was present, so nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_guard_candidate_20260923.json.",
     "2026-09-23 successor probe corrected the control-plane assumption: the unique live dispatcher is MHD_Models finite_dispatch, which owns the original lock and loads the frozen legacy Radon executor. Replacing that executor with direct-V5 Radon was rejected in isolated validation because historical V4 config is intentionally unsupported. No process, owner, claim, job or guard changed. The management wrapper must consume the registry before an active deployment receipt can legally arm 1ce. Evidence docs/acceptance/v5_owner_handoff_successor_probe_20260923.json.",
-    "2026-09-23 successor evidence V2 binds the live finite_dispatch PID, original lock inode/device, live binding, management wrapper and frozen Radon source SHA. It records the expected isolated rejection and the minimum MHD_Models wrapper interface required before any guard can be armed. No deployment occurred. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json."
+    "2026-09-23 successor evidence V2 binds the live finite_dispatch PID, original lock inode/device, live binding, management wrapper and frozen Radon source SHA. It records the expected isolated rejection and the minimum MHD_Models wrapper interface required before any guard can be armed. No deployment occurred. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json.",
+    "2026-09-24 paused-sixth正式V5提交事务已恢复：runtime 3bb4215、Framework V5 1287681c、asset 09a0bf02；唯一A100 job52473855已unheld并恢复精确Comment，唯一0GPU finalizer52473867仍afterany。journal/intent均submitted，零GPU恢复job52476376成功且duplicate GPU=0。12:57UTC仍PENDING Priority、V5 optimizer update=0；禁止重跑原coordinator，cap9回退仍未授权。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
