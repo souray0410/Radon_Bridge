@@ -1,0 +1,84 @@
+{
+  "schema": "radon_ws02_cache_resume_acceptance_v1",
+  "verified_at": "2026-09-24T21:36:25.845Z",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "cache": {
+    "participants": 70885,
+    "arrays": 212655,
+    "bytes": 930895984512,
+    "exact_array_sha_accepted": true,
+    "manifests": {
+      "development": "1958f4472933cccc5c3cb4b9d3d42315118e0703673eff086505b3949a1a863e",
+      "train": "d15ddfcba1ea210ab5d4d85e952c876fc05d288fc687bf104da65ef14682871e"
+    },
+    "accepted_sha256": "9bd190e0f28467d2471a66c4581e23e24c9f208a6aa15ba01c65bae7e54e7f48"
+  },
+  "actual_updates": 2,
+  "checkpoint_after_update1": "1056d331155a7e5af6c39dd133e25e5096c436710079e507d4c80e5039967d41",
+  "fresh_process_resume": {
+    "comparison": "exact model/optimizer/scheduler/RNG/cursor equality after two independent fresh-process restores",
+    "excluded_fields": [
+      "progress.seconds"
+    ],
+    "first_checkpoint_sha256": "1056d331155a7e5af6c39dd133e25e5096c436710079e507d4c80e5039967d41",
+    "formal_pipeline_started": false,
+    "gpu_uuid": "GPU-127282cd-e989-5453-7f24-2e6cdc195d9c",
+    "output_checkpoint_sha256": [
+      "17a153d009767d8f90d1895b19270fe8642c1ffef3e0534ba1f13bccaadcf917",
+      "08a66ab31455517f4190cea8573cdfb351adf8124556f394b8b81fe9bf11f511"
+    ],
+    "pid": 1312417,
+    "progress": {
+      "epoch": 1,
+      "epoch_loss": 12.497122749686241,
+      "epoch_seen": 32,
+      "history": [],
+      "offset": 32,
+      "updates": 2
+    },
+    "schema": "radon_ws02_v5_fresh_resume_repeatability_v1",
+    "scientific_training_completed": false,
+    "state": "accepted",
+    "test_access": false,
+    "updated_at": 1790285603.912951,
+    "updates": 2
+  },
+  "uninterrupted_reference": {
+    "accepted_at": 1790285753.7803314,
+    "compared": [
+      "resume_a",
+      "resume_b"
+    ],
+    "comparison": "exact complete checkpoint equality: uninterrupted two updates versus update1/save/fresh-process update2",
+    "excluded_fields": [
+      "progress.seconds"
+    ],
+    "formal_pipeline_started": false,
+    "gpu_uuid": "GPU-127282cd-e989-5453-7f24-2e6cdc195d9c",
+    "reference_sha256": "ebeb1c79b303b4926a6892abcef955e5b7ec797ea816137c886f9d7bf7de0ae5",
+    "resume_receipt_sha256": "97f0e00507d510ad661c2c920c5cf593b10a2cdc5c90fb094ce2ba7d63c14b73",
+    "schema": "radon_ws02_v5_uninterrupted_resume_equivalence_v1",
+    "scientific_training_completed": false,
+    "script_sha256": "f87c371542f603923e6cbe70dc7bdd84731cf69896511e01740a034676925a6a",
+    "state": "accepted",
+    "test_access": false,
+    "updates": 2
+  },
+  "repaired": [
+    "Correct the formal framework src import path",
+    "Install fixed MONAI 1.5.1 in an isolated dependency directory",
+    "Read paused epoch/cursor from the checkpoint instead of assuming optional status fields"
+  ],
+  "failed_attempts_preserved": true,
+  "temporary_transfer_key_removed": true,
+  "healthy_look_worker_unchanged": true,
+  "formal_pipeline_started": false,
+  "scientific_training_completed": false,
+  "test_access": false,
+  "ci": "not_run_account_actions_minutes_exhausted",
+  "remaining": [
+    "WS02 formal parent/complete six-arm scientific continuation not deployed",
+    "Ibex queued V5 jobs still require actual allocation and updates",
+    "Second Models formal role slot not yet installed"
+  ]
+}

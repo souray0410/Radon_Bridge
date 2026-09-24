@@ -2,8 +2,8 @@
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
-  "phase": "formal_v5_ibex_resume_queued_ws02_full_exact_cache_copy_running",
-  "next_acceptance": "完成完整缓存复制与逐数组 SHA；自动运行 GPU0 资格，核验真实恢复与下一更新，然后接通正式父模型及六臂研究；Ibex 获卡后续训原 run。",
+  "phase": "formal_v5_ibex_queued_ws02_full_cache_and_exact_resume_accepted",
+  "next_acceptance": "WS02完整缓存和真实V5更新/精确恢复已接受；接通正式父模型与完整六臂科学流程，保持与Ibex的互斥run分工；Ibex已排队V5作业获卡后实际更新。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
@@ -122,7 +122,8 @@
     "2026-09-23 successor evidence V3 records a second acquisition path: already-running finite_owner_chain allocations launch independent frozen legacy gpu_owner processes which repeat admissible_work and claims.acquire. A daemon-only guard cannot prevent those allocations from reacquiring a frozen run. Before arm, the control plane must either exclude the target in every live legacy owner path through an existing protocol-visible hold, or wait for all capable allocations to exit naturally and verify Slurm/process/claim/journal release. Nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v3_20260923.json.",
     "2026-09-24 主窗口现场核验：Ibex 正式 V5 续训 52473855 排队，原唯一 successor 负责终结与受控接续，健康旧 V4 作业保留。WS02 独立目标缓存直接复用/复制 Ibex 已处理的完整 macular 队列，38k 左右的逐数组摘要已核验；原缓存写入者及原目录未改。全量 70,885 人/212,655 数组验收后，已部署 GPU0 自动单更新资格入口；新进程恢复验收仍待接通。",
     "2026-09-24 20:15UTC：WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。",
-    "2026-09-24 20:50UTC：已复现并修复 Ibex R&B 排队入口的旧角色策略摘要；52473855/52473867保留，绑定更新为b850063d，runtime-preflight/终结证明/实际16卡预算检查通过。没有新增GPU申请或V5训练更新，旧控制版本已归档。"
+    "2026-09-24 20:50UTC：已复现并修复 Ibex R&B 排队入口的旧角色策略摘要；52473855/52473867保留，绑定更新为b850063d，runtime-preflight/终结证明/实际16卡预算检查通过。没有新增GPU申请或V5训练更新，旧控制版本已归档。",
+    "2026-09-24 21:36UTC：WS02 70,885人/212,655数组逐一SHA接受。修复框架src导入路径和独立MONAI1.5.1依赖后，GPU0真实update1及两次新进程update2完成；另跑不中断两步，完整模型/优化器/scheduler/RNG/游标严格相等，仅排除墙钟seconds。失败记录保留、临时传输键清除。只接受工程路径，正式父模型/六臂尚未接通。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -278,6 +279,10 @@
     {
       "label": "Ibex pending runtime policy mismatch repaired and rechecked",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/radon_pending_policy_binding_repaired_20260924.json"
+    },
+    {
+      "label": "Full WS02 cache and real V5 uninterrupted-versus-resumed update equivalence",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/ws02_full_cache_resume_accepted_20260924.json"
     }
   ]
 }
