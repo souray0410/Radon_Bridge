@@ -121,7 +121,8 @@
     "2026-09-23 successor evidence V2 binds the live finite_dispatch PID, original lock inode/device, live binding, management wrapper and frozen Radon source SHA. It records the expected isolated rejection and the minimum MHD_Models wrapper interface required before any guard can be armed. No deployment occurred. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v2_20260923.json.",
     "2026-09-23 successor evidence V3 records a second acquisition path: already-running finite_owner_chain allocations launch independent frozen legacy gpu_owner processes which repeat admissible_work and claims.acquire. A daemon-only guard cannot prevent those allocations from reacquiring a frozen run. Before arm, the control plane must either exclude the target in every live legacy owner path through an existing protocol-visible hold, or wait for all capable allocations to exit naturally and verify Slurm/process/claim/journal release. Nothing was armed or deployed. Evidence docs/acceptance/v5_owner_handoff_successor_probe_evidence_v3_20260923.json.",
     "2026-09-24 主窗口现场核验：Ibex 正式 V5 续训 52473855 排队，原唯一 successor 负责终结与受控接续，健康旧 V4 作业保留。WS02 独立目标缓存直接复用/复制 Ibex 已处理的完整 macular 队列，38k 左右的逐数组摘要已核验；原缓存写入者及原目录未改。全量 70,885 人/212,655 数组验收后，已部署 GPU0 自动单更新资格入口；新进程恢复验收仍待接通。",
-    "2026-09-24 20:15UTC：WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。"
+    "2026-09-24 20:15UTC：WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。",
+    "2026-09-24 20:50UTC：已复现并修复 Ibex R&B 排队入口的旧角色策略摘要；52473855/52473867保留，绑定更新为b850063d，runtime-preflight/终结证明/实际16卡预算检查通过。没有新增GPU申请或V5训练更新，旧控制版本已归档。"
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -273,6 +274,10 @@
     {
       "label": "2026-09-24 主窗口实际部署与运行范围",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/main_window_runtime_20260924.json"
+    },
+    {
+      "label": "Ibex pending runtime policy mismatch repaired and rechecked",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/radon_pending_policy_binding_repaired_20260924.json"
     }
   ]
 }

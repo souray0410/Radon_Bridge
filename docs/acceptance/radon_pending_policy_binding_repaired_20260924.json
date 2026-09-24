@@ -1,0 +1,39 @@
+{
+  "actual_gpu_updates": 0,
+  "binding_sha256": "b850063ddad7debacc34b5a5c89140d5759970ca999cf20cade0df5022adfd82",
+  "claim_unchanged": true,
+  "finalizer_job_id": "52473867",
+  "job_id": "52473855",
+  "observed_at": 1790282953.0000713,
+  "prior_binding_sha256": "0879d84d0f8fbdcf905ef3be925159a052ff05c304b35c46722fd2642527e7e1",
+  "request_count_unchanged": true,
+  "role_policy_sha256": "8582dcc6ee0fb6e897b6843b351a1e0700d34526a54451999fd7983db3d6f180",
+  "schema": "radon_pending_control_revision_v1",
+  "scientific_assets_unchanged": true,
+  "state": "accepted",
+  "test_access": false,
+  "cause": "Changing the shared role policy for Models left the pending R&B allocation bound to the previous SHA. Original runtime-preflight reproduced ValueError: role policy changed.",
+  "validation": {
+    "runtime": "accepted",
+    "finalizer_proof": "accepted",
+    "binding_sha256": "b850063ddad7debacc34b5a5c89140d5759970ca999cf20cade0df5022adfd82",
+    "budget": {
+      "account_limit": 24,
+      "account_running_pending": 16,
+      "radon_running_pending": 8,
+      "unresolved_gpu_intents": 0,
+      "radon_unresolved_gpu_intents": 0
+    }
+  },
+  "slurm_comment_restored": true,
+  "job_id_preserved": true,
+  "submission_time_preserved": true,
+  "eligibility_time_reset_by_hold_release": true,
+  "repair_scope": "Explicit versioned pending control-configuration migration only; no model, optimizer, scientific spec, claim, shared policy or GPU worker change.",
+  "new_gpu_submissions": 0,
+  "known_remaining": [
+    "GPU execution waits for Slurm grant",
+    "Other historical V4 workers remain unmigrated",
+    "WS02 formal parent and six-arm chain still open"
+  ]
+}

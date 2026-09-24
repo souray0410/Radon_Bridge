@@ -1,3 +1,9 @@
+## 2026-09-24 20:50 UTC：修复 Ibex 排队入口的策略摘要失配
+
+共享角色策略调整后，R&B 原排队绑定仍固定旧 SHA，真实启动预检复现 `role policy changed`。主窗口以独立控制版本保存旧绑定、journal、intent 与终结回执，在共享锁内短暂 hold 原待批作业，原位更新控制引用后 release；作业号52473855/52473867、科学资产与原 claim 均保留，没有新 GPU 申请。Slurm release 清除的原 comment 已恢复并实查。新运行环境、终结回执、账户16/24及R&B8项预算复核通过；hold/release 重置 eligible time，不能声称队列优先级未受影响。
+
+这只关闭确定的启动前配置错误；仍无该作业 V5 GPU 更新。完整阶段未完成，见 [修复回执](../acceptance/radon_pending_policy_binding_repaired_20260924.json)。
+
 当前接续更新（2026-09-24 20:15UTC）：WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。
 
 # 当前执行交接（2026-09-24T19:59:01.232249+00:00）
