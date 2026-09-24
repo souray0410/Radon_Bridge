@@ -1,9 +1,9 @@
 {
   "schema": "radon_paused_sixth_v5_control_candidate_v2",
-  "observed_at_utc": "2026-09-24T10:28:04Z",
+  "observed_at_utc": "2026-09-24T10:34:00Z",
   "state": "candidate_zero_gpu_validated_production_no_go",
-  "candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83",
-  "parent_candidate_commit": "0bb1d103b947871461e52536ac89d0f6c9a74393",
+  "candidate_commit": "deed044050ed73d0bdf050f63bf6585af9336035",
+  "parent_candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83",
   "formal_framework_v5_commit": "1287681c08846e11364c81653048435482e772a7",
   "scope": {
     "project": "Radon_Bridge",
@@ -18,9 +18,9 @@
     "entrypoint": "src/radon_bridge/runtime/paused_sixth_v5_control.py",
     "entrypoint_sha256": "e787964c7877f902912b725e3a07709650f52663d3bbbb60a173f34edfe5e062",
     "transaction": "src/radon_bridge/runtime/paused_sixth_v5_control_v2.py",
-    "transaction_sha256": "0aa77a0be03ad81ac7aeae55b7ea7962727b970354f9f6c4dfac754e46dc28a7",
+    "transaction_sha256": "a665ff8e4c7ef8d9ddbd7db8a9d191d1367b255521cde12d956e44440743c8a1",
     "tests": "tests/unit/runtime/test_paused_sixth_v5_control.py",
-    "tests_sha256": "0d746e7a653ffb4e829fa4b94165a9e0da18fd1f1bd330f1c33ac0e1abb65b21"
+    "tests_sha256": "381adfacbbc38b8c8192846c4a682104c8013d78d33b3afa33eda012e81bd07a"
   },
   "independent_review_findings_closed_in_candidate": [
     {
@@ -49,31 +49,32 @@
   "validation": {
     "local": {
       "command": "PYTHONPATH=src:<MHD_Models>/src:<MHD_Framework>/src <python> -m pytest -q",
-      "result": "311 passed, 2 warnings in 5.98s"
+      "result": "313 passed, 2 warnings in 5.87s"
     },
     "ibex_zero_gpu_crash_shadow": {
-      "job_id": "52459418",
+      "job_id": "52460246",
       "state": "COMPLETED",
       "exit_code": "0:0",
       "requested_tres": "billing=2,cpu=2,mem=8G,node=1",
-      "result": "5 passed, 6 deselected in 2.08s",
-      "receipt": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/crash_shadow_receipt.json",
-      "receipt_sha256": "b2bec387a53732ebf64be27ce3eb436f655adc01e2b4033550d8bd0b1d080581",
-      "log": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/crash-52459418.out",
-      "log_sha256": "2f23ba9d40f47247ea9a4766a91c660364f5541662ead18685c25ca7ec85b405"
+      "result": "7 passed, 6 deselected in 1.35s",
+      "receipt": "/ibex/user/mengh/radon_v5_grant_runner_deed044_20260924/crash_shadow_receipt.json",
+      "receipt_sha256": "c3eecb38207fb2b342c021e0cb8bb5190ffa4bf7e1291a581d670cc5168446c3",
+      "log": "/ibex/user/mengh/radon_v5_grant_runner_deed044_20260924/crash-52460246.out",
+      "log_sha256": "2d3aedc1438af15a685956c5beef7a72dcb89bed08a7d972cd21e3887dae7cf8",
+      "ibex_slurm_api_probe": "lookup_slurm_jobs returned exact empty authoritative observation using the live Ibex squeue+sacct field set"
     },
     "ibex_full_cpu": {
-      "job_id": "52459719",
+      "job_id": "52460245",
       "state": "COMPLETED",
       "exit_code": "0:0",
       "requested_tres": "billing=4,cpu=4,mem=16G,node=1",
-      "result": "311 passed, 14 warnings in 10.89s",
+      "result": "313 passed, 14 warnings in 15.52s",
       "framework_submodule_commit": "1287681c08846e11364c81653048435482e772a7",
       "runtime_framework_api": "V5",
-      "log": "/ibex/user/mengh/radon_v5_grant_runner_89cedc1_20260924/full-52459719.out",
-      "log_sha256": "2829192b36173aa85ed4bcdf6c8afe735f7f9ff338b5ef53d102eb23011bd77f"
+      "log": "/ibex/user/mengh/radon_v5_grant_runner_deed044_20260924/full-52460245.out",
+      "log_sha256": "546276399bef7ced6e0f5d6e6c3686d779e657aab55994b794961fdc9e4dc681"
     },
-    "source_archive_sha256": "12895833ee325e8b75e8a40f639dda29fa929d4bb3ea0e522ad0832e143f20b4",
+    "source_archive_sha256": "7b81c9e0f5d00c48fbae5fa32d179f3678a59b45f9223a34542a24edbfbebc43",
     "failed_harness_attempts_preserved": [
       {
         "job_id": "52459417",
@@ -87,7 +88,12 @@
         "cause": "cleaned archive lacked the framework submodule git metadata required by repository-contract tests",
         "log_sha256": "cc9ee2100bee62a567d1e1da7da203a57dd6227df2b191039c570754a10f3cae"
       }
-    ]
+    ],
+    "superseded_candidate_validation": {
+      "candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83",
+      "full_cpu_job": "52459719 COMPLETED 0:0; 311 passed",
+      "superseded_reason": "A live read-only Ibex probe found that this cluster does not expose Dependency as a sacct field. Candidate deed044 moves live finalizer dependency attestation to scontrol and keeps sacct only for existence recovery."
+    }
   },
   "fresh_production_observation": {
     "claim_state": "failed",
@@ -103,7 +109,7 @@
     "current_owner_present": false
   },
   "remaining_production_gates": [
-    "independent review of candidate commit 89cedc1abab1e035dab67b7b5508f49945d07c83",
+    "independent review of candidate commit deed044050ed73d0bdf050f63bf6585af9336035",
     "complete the accepted LOOK v22 stage-two control-plane handover and the Uncertainty_Lab retry transaction before changing the shared role policy",
     "accept a separate R&B role-policy proposal and publish an immutable deployment gate bound to both receipts and the resulting exact policy SHA",
     "create the source_reserved claim and immutable production binding only after rechecking the paused source and accepted V5 asset identities",

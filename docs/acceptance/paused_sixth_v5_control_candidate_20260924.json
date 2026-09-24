@@ -5,7 +5,7 @@
     "receipt": "PHD/operations/mhd_v5_20260922/acceptance/radon_paused_sixth_grant_runner_review_20260924.json",
     "decision": "NO-GO for production reservation or GPU submission",
     "reviewed_candidate_commit": "0bb1d103b947871461e52536ac89d0f6c9a74393",
-    "replacement_candidate_commit": "89cedc1abab1e035dab67b7b5508f49945d07c83"
+    "replacement_candidate_commit": "deed044050ed73d0bdf050f63bf6585af9336035"
   },
   "base_commit": "d0ceeb18b6d8a3dfc7d3d655a4dcbec25b5ea647",
   "scope": {
@@ -61,11 +61,19 @@
   },
   "superseded_validation_failures_preserved": [
     {
-      "job_ids": ["52453711", "52453814"],
+      "job_ids": [
+        "52453711",
+        "52453814"
+      ],
       "diagnosis": "incomplete validation archive and incomplete Python module setup failed during collection"
     },
     {
-      "job_ids": ["52453930", "52454218", "52454254", "52454308"],
+      "job_ids": [
+        "52453930",
+        "52454218",
+        "52454254",
+        "52454308"
+      ],
       "diagnosis": "validation packaging contained macOS metadata or omitted the pinned framework submodule; the final clean package and exact V5 runtime closed these harness defects"
     }
   ],
