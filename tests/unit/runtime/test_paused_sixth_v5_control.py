@@ -565,3 +565,19 @@ def test_running_allocation_recovers_release_ack_race(tmp_path, state):
     scheduler.jobs['rb-v5-test-a001'].update(state='RUNNING',held=False)
     row=c.grant_allocation(binding,job_id='700',observe_allocation=lambda job:{**scheduler.jobs['rb-v5-test-a001'],'job_id':job},runtime_verify=lambda _: {},now=11)
     assert row['state']=='granted'
+
+
+def test_ibex_release_restores_submission_comment(monkeypatch):
+    calls = []
+    monkeypatch.setattr(c.subprocess, 'check_output', lambda *a, **k: 'JobId=700 Comment=rb-v5-test-a001')
+    monkeypatch.setattr(c.subprocess, 'run', lambda command, **k: calls.append(command))
+    c.release_job('700')
+    assert calls == [['scontrol', 'release', '700'],
+                     ['scontrol', 'update', 'JobId=700', 'Comment=rb-v5-test-a001']]
+
+
+def test_release_rejects_missing_submission_identity(monkeypatch):
+    monkeypatch.setattr(c.subprocess, 'check_output', lambda *a, **k: 'JobId=700 Comment=(null)')
+    monkeypatch.setattr(c.subprocess, 'run', lambda *a, **k: pytest.fail('Must not release'))
+    with pytest.raises(ValueError, match='submission identity'):
+        c.release_job('700')

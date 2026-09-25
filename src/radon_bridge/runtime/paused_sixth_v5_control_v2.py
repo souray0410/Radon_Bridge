@@ -1284,8 +1284,17 @@ def submit_sbatch(command, *, timeout):
 
 
 def release_job(job_id):
+    # Ibex clears Comment on release. The publisher retains the account lock
+    # until restoration, preventing the allocation grant from racing it.
+    fields = _fields(subprocess.check_output(
+        ["scontrol", "show", "job", str(job_id), "-o"], text=True, timeout=20))
+    comment = fields.get("Comment", "")
+    if not comment or comment.startswith("***") or comment == "(null)":
+        raise ValueError("Cannot release a job without its submission identity")
     subprocess.run(["scontrol", "release", str(job_id)], check=True,
                    text=True, capture_output=True, timeout=20)
+    subprocess.run(["scontrol", "update", "JobId=" + str(job_id), "Comment=" + comment],
+                   check=True, capture_output=True, text=True, timeout=20)
 
 
 def main():
