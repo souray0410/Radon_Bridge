@@ -2,15 +2,15 @@
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
-  "phase": "formal_v5_ibex_queued_ws02_full_cache_and_exact_resume_accepted",
-  "next_acceptance": "WS02完整缓存和真实V5更新/精确恢复已接受；接通正式父模型与完整六臂科学流程，保持与Ibex的互斥run分工；Ibex已排队V5作业获卡后实际更新。",
+  "phase": "formal_v5_ws02_original_parent_running_ibex_queued",
+  "next_acceptance": "保持WS02原DenseNet3D父模型正式V5完整训练，核开发集、最终选优及安全周期恢复；随后接通六臂。Ibex V5任务获卡后核真实更新，避免重复run。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
   "source_commit": "faf499be688544a3b03ee23600775c45f41eacf0",
-  "evidence_cutoff": "2026-09-24T21:36:25.845Z",
-  "verified_at": "2026-09-24T21:36:25.845Z",
+  "evidence_cutoff": "2026-09-25T02:12:35.975Z",
+  "verified_at": "2026-09-25T02:12:35.975Z",
   "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
@@ -68,9 +68,9 @@
     "The original A100 qualification finalizer remains failed and was not rewritten; acceptance of the completed one-update equivalence comes from an append-only independent CPU recheck. This does not authorize production dispatch, full train/development replay, or owner cutover."
   ],
   "blockers": [
-    "Ibex 52473855 待批；WS02 完整缓存尚未复制验收完。",
-    "WS02全量缓存后工程资格及新进程恢复已部署；正式父模型和六臂研究仍待接通。",
-    "原内存事故须待完整生命周期和真实下游接受，不能据新健康进程关闭。"
+    "Ibex 52473855仍待批；当前获卡前不能算真实V5训练。",
+    "WS02原父模型已正式续训但未完成；最终父模型选优/六臂下游尚未接通。",
+    "旧内存事故等其他原路径仍须各自完整生命周期与真实下游接受。"
   ],
   "actions": [
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
@@ -123,7 +123,8 @@
     "2026-09-24 主窗口现场核验：Ibex 正式 V5 续训 52473855 排队，原唯一 successor 负责终结与受控接续，健康旧 V4 作业保留。WS02 独立目标缓存直接复用/复制 Ibex 已处理的完整 macular 队列，38k 左右的逐数组摘要已核验；原缓存写入者及原目录未改。全量 70,885 人/212,655 数组验收后，已部署 GPU0 自动单更新资格入口；新进程恢复验收仍待接通。",
     "2026-09-24 20:15UTC：WS02逐数组SHA缓存复制已达46592/70885人、139776数组。原CPU等待器在无GPU工作时安全退出，新PID1304457先设置CUBLAS确定性环境，完整缓存后自动运行原GPU0 update1，并两次在新进程恢复到update2、严格比较模型/优化器/scheduler/RNG/游标，排除仅墙钟seconds。尚无本次GPU更新或正式科学结果。",
     "2026-09-24 20:50UTC：已复现并修复 Ibex R&B 排队入口的旧角色策略摘要；52473855/52473867保留，绑定更新为b850063d，runtime-preflight/终结证明/实际16卡预算检查通过。没有新增GPU申请或V5训练更新，旧控制版本已归档。",
-    "2026-09-24 21:36UTC：WS02 70,885人/212,655数组逐一SHA接受。修复框架src导入路径和独立MONAI1.5.1依赖后，GPU0真实update1及两次新进程update2完成；另跑不中断两步，完整模型/优化器/scheduler/RNG/游标严格相等，仅排除墙钟seconds。失败记录保留、临时传输键清除。只接受工程路径，正式父模型/六臂尚未接通。"
+    "2026-09-24 21:36UTC：WS02 70,885人/212,655数组逐一SHA接受。修复框架src导入路径和独立MONAI1.5.1依赖后，GPU0真实update1及两次新进程update2完成；另跑不中断两步，完整模型/优化器/scheduler/RNG/游标严格相等，仅排除墙钟seconds。失败记录保留、临时传输键清除。只接受工程路径，正式父模型/六臂尚未接通。",
+    "2026-09-25 02:12UTC: original macular DenseNet3D checkpoint migrated with unchanged science, explicit dead-owner release and cross-host claim, exact GPU fresh-resume versus uninterrupted updates; actual WS02 V5 production advanced 26284 to26286. No new Slurm requests; historical source retained."
   ],
   "decisions": [
     "结果反馈：不因单3416与默认适配配方否定MMTM/注意力；不继续堆近似骨干。优先回答同一A与A+桥的附加性，先核对适配和匹配训练身份；已有6臂与原父模型严格复用。正式锁定种子/大队列不按当前优势删减。",
@@ -283,6 +284,10 @@
     {
       "label": "Full WS02 cache and real V5 uninterrupted-versus-resumed update equivalence",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/ws02_full_cache_resume_accepted_20260924.json"
+    },
+    {
+      "label": "Original parent formal V5 training on WS02",
+      "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/v5-rollout/docs/acceptance/ws02_actual_parent_running_20260925.json"
     }
   ]
 }

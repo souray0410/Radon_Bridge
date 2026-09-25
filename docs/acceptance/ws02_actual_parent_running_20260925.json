@@ -1,0 +1,36 @@
+{
+  "observed_at": "2026-09-25T02:12:35.975Z",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "models_runtime_commit": "07afb366dff39090fd6cc1db39247c32fca488df",
+  "limitations": [
+    "Actual six-hour supervisor lease cycle not yet elapsed; restart branch deployed, not claimed verified.",
+    "Parent still training; selected parent acceptance and six-arm downstream not yet complete.",
+    "V4 source fields preserved exactly; Ada uninterrupted versus fresh-process resume exact excluding wall time. No new A100-to-Ada next-update numerical comparison performed this round.",
+    "Liu method qualification, Ibex V5 consumers still pending; Models second formal role not yet implemented."
+  ],
+  "schema": "radon_v5_actual_parent_runtime_v1",
+  "state": "formal_parent_training",
+  "original_run_id": "2026_09_12_11_23_31_801126",
+  "original_updates": 26284,
+  "observed_updates": 26286,
+  "epoch": 8,
+  "source_checkpoint_sha256": "832a726ba78f2ecd80df78e692bbf4811edb675a8813589dc6568cac5bfecb5b",
+  "spec_sha256": "4ac9fc4e4f2f371d10add767218853e71aab69ff96f0ed88098f0672397f7aec",
+  "full_state_preserved": [
+    "model",
+    "optimizer",
+    "scheduler",
+    "RNG",
+    "data cursor",
+    "history",
+    "selected best state"
+  ],
+  "gpu_restore_exact_excluding": [
+    "progress.seconds"
+  ],
+  "scientific_configuration_unchanged": true,
+  "original_training_framework": "V4",
+  "current_execution_framework": "V5",
+  "hosted_ci": "not run: quota exhausted",
+  "six_arm_complete": false
+}
