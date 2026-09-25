@@ -1,0 +1,20 @@
+{
+  "schema": "phd_project_morning_execution_evidence_v1",
+  "project": "Radon_Bridge",
+  "observed_at": "2026-09-25T07:04:23.404062+00:00",
+  "framework_commit": "1287681c08846e11364c81653048435482e772a7",
+  "implementation_commit": "a8f416b0f8e6598e8635e96bd56beee8e5417598",
+  "summary": "WS02原父模型GPU0继续V5训练，已核29153更新。Ibex修复MONAI1.5.1、放行确认竞态及Slurm清空comment；历史选优权重遗漏在实际评估前安全暂停，26905更新与选优状态未改变。epoch7原best已逐Tensor精确转换、严格加载并发布，history保留；52558755在同一run正式V5续训到26936，原104GiB与完整六臂事件不因此全部关闭。",
+  "validation": [
+    "52558444: grant/release lifecycle22 passed",
+    "52558672: source selected weights strict load and exact tensors",
+    "original WS02 uninterrupted/fresh-process resume equality remains accepted",
+    "52558755: actual production26905 to26936 updates after selected-state repair"
+  ],
+  "open_items": [
+    "完整父模型验收、六臂和旧消费者全面V5切换未完成；未来干净租期追加仍需主窗口按现有锁办理，不自动重试未知失败。"
+  ],
+  "test_access": false,
+  "hosted_ci": "not_run_quota_exhausted",
+  "all_consumers_migrated": false
+}
