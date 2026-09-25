@@ -555,3 +555,13 @@ def test_finalizer_dependency_is_read_from_live_scontrol(monkeypatch):
     assert c.observe_finalizer("701") == {
         "job_id": "701", "state": "RUNNING", "account": "pi-mengy", "gpus": 0,
         "comment": "rb-finalizer", "dependency": "afterany:700"}
+
+
+@pytest.mark.parametrize('state', ['release_ack_pending', 'release_ack_unknown'])
+def test_running_allocation_recovers_release_ack_race(tmp_path, state):
+    binding, value = fixture(tmp_path)
+    scheduler = Scheduler(value['journal']); publish(binding, scheduler)
+    journal=c.read(value['journal']);journal['requests'][0]['state']=state;dump(value['journal'],journal)
+    scheduler.jobs['rb-v5-test-a001'].update(state='RUNNING',held=False)
+    row=c.grant_allocation(binding,job_id='700',observe_allocation=lambda job:{**scheduler.jobs['rb-v5-test-a001'],'job_id':job},runtime_verify=lambda _: {},now=11)
+    assert row['state']=='granted'

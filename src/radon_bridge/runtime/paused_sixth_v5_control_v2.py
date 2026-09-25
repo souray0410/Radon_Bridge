@@ -831,21 +831,23 @@ def grant_allocation(binding_path, *, job_id, observe_allocation,
                      runtime_verify=verify_runtime, now=None):
     now = time.time() if now is None else now
     binding = validate_binding(binding_path, now=now)
+    binding["binding_sha256"] = sha256(binding_path)
     runtime_verify(binding)
     with locked_existing(binding["account_lock"]):
         validate_binding(binding_path, now=now)
         _, _, journal = _policy_and_journal(binding)
         rows = [row for row in journal["requests"] if row.get("job_id") == str(job_id)]
-        if len(rows) != 1 or rows[0].get("state") not in {"submitted", "granted"}:
+        if len(rows) != 1 or rows[0].get("state") not in {"submitted", "granted", "release_ack_pending", "release_ack_unknown"}:
             raise ValueError("submitted V5 request identity changed")
         row = rows[0]
+        _load_finalizer_proof(binding, row)
         observed = observe_allocation(str(job_id))
         if (observed.get("job_id") != str(job_id) or observed.get("state") != "RUNNING"
                 or observed.get("account") != "pi-mengy" or observed.get("gpus") != 1
                 or observed.get("held") is not False
                 or observed.get("comment") != row["attempt_comment"]):
             raise ValueError("Slurm allocation grant identity is unproven")
-        if row["state"] == "submitted":
+        if row["state"] != "granted":
             row.update(state="granted", granted_at=now)
             intent = read(binding["intent"])
             _persist(binding, journal, intent, row)
