@@ -58,6 +58,39 @@ class MMTMExchange(NativeExchange):
         return self.packet(features,deltas)
 
 
+class AuthorMMTMExchange(NativeExchange):
+    """Author-code sigmoid excitation, separate from the historical identity adapter.
+
+    Mechanism reference: haamoon/mmtm at 1c81cfefad5532cfb39193b8af3840ac3346e897.
+    Complete medical task composition lives in models.modern_communication.
+    """
+    def __init__(self, specs, reduction_ratio):
+        super().__init__(specs, 'mmtm_author')
+        positive_integer(reduction_ratio, 'reduction_ratio')
+        hidden = int(2 * sum(s.channels for s in specs) / reduction_ratio)
+        if hidden < 1:
+            raise ValueError('MMTM hidden dimension must be positive')
+        self.squeeze = nn.Linear(sum(s.channels for s in specs), hidden)
+        self.excite = nn.ModuleList([nn.Linear(hidden, s.channels) for s in specs])
+        self.metadata.update(reduction_ratio=reduction_ratio, hidden_dimension=hidden,
+            gate_scale=1., initialization='PyTorch Linear defaults; not identity',
+            author_commit='1c81cfefad5532cfb39193b8af3840ac3346e897',
+            adaptation='author-code MMTM mechanism; medical task and encoders are adaptations')
+        self.finish_metadata()
+
+    def forward(self, *features):
+        self.check(features)
+        pooled = torch.cat([x.flatten(2).mean(-1) for x in features], dim=1)
+        shared = torch.relu(self.squeeze(pooled))
+        outputs = []
+        for x, excite in zip(features, self.excite):
+            gate = torch.sigmoid(excite(shared)).reshape(x.shape[:2] + (1,) * (x.ndim - 2))
+            outputs.append((x * gate).flatten(1))
+        # Direct multiplication preserves the author operation, without a
+        # subtract/add residual round trip changing FP32 rounding.
+        return torch.cat(outputs, dim=1)
+
+
 class AttentionDirection(nn.Module):
     def __init__(self,source_channels,destination_channels,dimension,heads):
         super().__init__();self.heads=heads;self.dimension=dimension

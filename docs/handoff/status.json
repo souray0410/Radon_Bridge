@@ -293,5 +293,15 @@
       "label": "2026-09-25 morning real execution and remaining scope",
       "url": "https://github.com/souray0410/Radon_Bridge/blob/codex/rb-v5-grant-runner/docs/acceptance/morning_execution_20260925.json"
     }
-  ]
+  ],
+  "modern_methods_candidate": {
+    "protocol": "docs/protocols/modern_mmtm_20260926.md",
+    "state": "multi_stage_mmtm_cpu_verified_not_gpu_deployed",
+    "tests": 28,
+    "remaining": [
+      "actual_modern_pair_gpu_lifecycle",
+      "MBT",
+      "matched_Radon_linear_successors"
+    ]
+  }
 }

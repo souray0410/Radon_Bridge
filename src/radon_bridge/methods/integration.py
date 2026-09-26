@@ -8,13 +8,13 @@ def attach_communications(native,configs):
     if native.metadata.get('task_fusion') is not None and any('nested_rhos' in c for c in configs):
         raise ValueError('Task fusion protocol does not support joint-width training')
     parallel=any('parallel_to' in c for c in configs)
-    if parallel and (len(configs)!=2 or configs[1].get('parallel_to')!=0 or configs[0].get('family') not in ('mmtm','cross_attention','cmx_frm') or configs[1].get('family','radon')!='radon' or configs[0]['nodes']!=configs[1]['nodes']):
+    if parallel and (len(configs)!=2 or configs[1].get('parallel_to')!=0 or configs[0].get('family') not in ('mmtm','mmtm_author','cross_attention','cmx_frm') or configs[1].get('family','radon')!='radon' or configs[0]['nodes']!=configs[1]['nodes']):
         raise ValueError('Parallel addition requires one intact nonlinear host and one Radon-family addition on identical nodes')
     for c in configs:
         family=c.get('family','radon')
-        required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family=='mmtm' else {'nodes','family','attention_dimension','heads'} if family=='cross_attention' else {'nodes','family','alignment_tokens'}
+        required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family in ('mmtm','mmtm_author') else {'nodes','family','attention_dimension','heads'} if family=='cross_attention' else {'nodes','family','alignment_tokens'}
         optional={'family','compression','basis_files','cross_edges','nested_rhos','s_axis_permutation','kernel_size','r','h','group_count','bottleneck_rank','parallel_to'} if family=='radon' else set()
-        if family not in ('radon','mmtm','cross_attention','cmx_frm') or not required<=set(c) or set(c)-required-optional:
+        if family not in ('radon','mmtm','mmtm_author','cross_attention','cmx_frm') or not required<=set(c) or set(c)-required-optional:
             raise ValueError('Invalid communication configuration for '+str(family))
     modules=[e.edge_operations[0].function for e in builder.edges]
     training={m:m.training for module in modules for m in module.modules()}
