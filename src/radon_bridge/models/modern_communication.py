@@ -79,6 +79,7 @@ class ModernMMTMHost(NativePair):
         self.graph = self.task.graph
         self.parent_node_map = native.metadata['parent_node_map']
         self.sites = tuple(sites)
+        self.selection_output = "joint"
         self.frozen = frozen
         if frozen:
             for name, module in self.task.modules_by_name().items():

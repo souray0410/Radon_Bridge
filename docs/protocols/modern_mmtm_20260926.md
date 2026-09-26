@@ -21,3 +21,9 @@ Next: qualify actual modern 2D/3D parent shapes, memory, gradients, save and new
 ## Training-entry integration increment
 
 The multi-stage host now reuses NativePair's source-owned optimizer groups, gradient clipping and node identity interface. In frozen mode only communication parameters enter optimizer groups; in finetuning mode every trainable parent/head/communication parameter belongs to exactly one group. Parent node maps remain available for migration and downstream binding. Both regimes have targeted coverage; the related CPU suite is now30passed. These are tiny 2D/3D graph fixtures, not the full ConvNeXt/Swin volume GPU lifecycle.
+
+## 2026-09-26 pre-deployment semantic review
+
+The actual complete MMTM classifier is the **mean of branch logits**, so its development macro-F1 selects A and matched successors. The legacy two-independent-head mean-F1 remains a separately named diagnostic. Evaluation now saves the joint prediction as well as both branches; it must not substitute mean branch F1 or mean probability fusion for the registered joint classifier. This mismatch was found in the source review before any modern scientific update. FP32 prediction replay uses rtol1e-5/atol1e-6. Tiny fixture coverage checks that the different selection rules are distinguishable.
+
+Multi-site Radon/linear additions and strict selected-A transfer now have CPU output/gradient/three-update/recovery tests. They are implemented but still need actual full-size GPU qualification and the complete matched-training execution package.

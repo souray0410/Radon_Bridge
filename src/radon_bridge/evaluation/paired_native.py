@@ -12,7 +12,8 @@ def move(batch,device):
 @torch.no_grad()
 def evaluate(model,loader,device,output=None,should_pause=lambda:False):
     from mhd_models.workflows.native import metrics
-    mode=model.training;model.eval();p={'cfp':[],'oct':[]};ids=[];labels=[]
+    mode=model.training;model.eval();p={name:[] for name in model.task.output_names};ids=[];labels=[]
+    if not {'cfp','oct'}.issubset(p):raise ValueError('Paired outputs missing')
     try:
         for batch in loader:
             if should_pause():raise InterruptedError('Pause during evaluation; replay this read-only stage')
@@ -23,7 +24,7 @@ def evaluate(model,loader,device,output=None,should_pause=lambda:False):
     p={k:np.concatenate(v) for k,v in p.items()};y=np.asarray(labels)
     if len(set(ids))!=len(ids) or not len(ids):raise ValueError('Evaluation coverage invalid')
     values={k:metrics(y,v) for k,v in p.items()}
-    values['mean_macro_f1']=sum(v['macro_f1'] for v in values.values())/2
+    values['mean_macro_f1']=(values['cfp']['macro_f1']+values['oct']['macro_f1'])/2
     values['fixed_probability_fusion']=metrics(y,(p['cfp']+p['oct'])/2)
     if output:
         path=Path(output);path.parent.mkdir(parents=True,exist_ok=True)
@@ -39,5 +40,14 @@ def replay_matches(path,other):
         for k in a.files:
             exact=k in ('participant_ids','labels')
             if exact and not np.array_equal(a[k],b[k]):raise ValueError('Prediction identity/order changed')
-            if not exact and (not np.allclose(a[k],b[k],atol=1e-5,rtol=1e-4) or not np.array_equal(a[k].argmax(1),b[k].argmax(1))):
+            if not exact and (not np.allclose(a[k],b[k],atol=1e-6,rtol=1e-5) or not np.array_equal(a[k].argmax(1),b[k].argmax(1))):
                 raise ValueError('Selected prediction numerical replay failed')
+
+
+def selection_score(model,result):
+    """Complete MMTM selects its declared mean-logit classifier; legacy keeps its own target."""
+    output=getattr(model,'selection_output',None)
+    if output is None:return result['mean_macro_f1']
+    if output not in model.task.output_names or output not in result:
+        raise ValueError('Declared selection output absent')
+    return result[output]['macro_f1']

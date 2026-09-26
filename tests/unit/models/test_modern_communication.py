@@ -200,3 +200,33 @@ def test_matched_host_transfer_rejects_missing_modules_before_mutation():
     with pytest.raises(ValueError,match='Selected host modules'):
         augmented.load_matched_host(state)
     for n,t in before.items():torch.testing.assert_close(t,augmented.state_dict()[n],rtol=0,atol=0)
+
+
+def test_modern_selection_uses_joint_classifier_not_mean_branch_metric():
+    from radon_bridge.evaluation.paired_native import selection_score
+    result={'cfp':{'macro_f1':.8},'oct':{'macro_f1':.4},'joint':{'macro_f1':.7},'mean_macro_f1':.6}
+    modern=SimpleNamespace(selection_output='joint',task=SimpleNamespace(output_names=('cfp','oct','joint')))
+    assert selection_score(modern,result)==.7
+    assert selection_score(SimpleNamespace(),result)==.6
+    with pytest.raises(ValueError):selection_score(SimpleNamespace(selection_output='joint',task=SimpleNamespace(output_names=('cfp','oct'))),result)
+
+
+def test_full_joint_prediction_saved_and_branch_mean_preserved(tmp_path,monkeypatch):
+    import sys
+    import numpy as np
+    from radon_bridge.evaluation.paired_native import evaluate
+    # Isolate this evaluator from unrelated native dataset initialization.
+    monkeypatch.setitem(sys.modules,'mhd_models.workflows.native',SimpleNamespace(metrics=lambda y,p:{'macro_f1':float((p.argmax(1)==y).mean())}))
+    class Model:
+        training=True
+        task=SimpleNamespace(output_names=('cfp','oct','joint'))
+        def train(self,mode=True):self.training=mode;return self
+        def eval(self):return self.train(False)
+        def __call__(self,b):
+            a=torch.tensor([[5.,0.],[5.,0.]])
+            z=torch.tensor([[3.,0.],[0.,8.]])
+            return {'cfp':a,'oct':z,'joint':(a+z)/2},None
+    path=tmp_path/'prediction.npz'
+    value=evaluate(Model(),[{'participant_id':['one','two'],'label':torch.tensor([0,1])}],'cpu',path)
+    assert value['mean_macro_f1']==.75 and value['joint']['macro_f1']==1.
+    with np.load(path,allow_pickle=False) as data:assert set(data.files)=={'participant_ids','labels','cfp','oct','joint'}

@@ -2,16 +2,16 @@
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
-  "phase": "v5_ws02_parent_training_ibex_repaired_owner_running",
-  "next_acceptance": "继续两平台各自父模型V5训练与完整选优，随后接六臂；Ibex新finalizer52558756负责释放/续训边界证据。",
+  "phase": "modern_swin3d_parent_submitted_complete_mmtm_interfaces_cpu_verified",
+  "next_acceptance": "独立3D Swin父模型52627844获卡资格与训练；新MMTM同A三阶段匹配链仍需真实尺寸GPU资格和后继部署。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "a8f416b0f8e6598e8635e96bd56beee8e5417598",
-  "evidence_cutoff": "2026-09-25T07:04:23.404062+00:00",
-  "verified_at": "2026-09-25T07:04:23.404062+00:00",
-  "verification_scope": "runtime_and_evidence",
+  "source_commit": "af3fdca",
+  "evidence_cutoff": "2026-09-26T17:39:09.964063+00:00",
+  "verified_at": "2026-09-26T17:39:09.964239+00:00",
+  "verification_scope": "source_tests_and_exact_parent_submission",
   "layers": {
     "planned": "documented",
     "implemented": "verified",
@@ -304,5 +304,14 @@
       "matched_Radon_linear_successors"
     ],
     "training_entry": "NativePair parameter groups, clip and node identity reused; frozen and finetuned groups tested"
+  },
+  "current_execution_increment": {
+    "parent_gpu_job": "52627844",
+    "parent_finalizer": "52627845",
+    "parent_state": "pending_last_verified",
+    "implementation": "multistage_additions_and_strict_A_transfer",
+    "selection_review": "joint mean-logit classifier macro-F1; legacy branch mean retained separately",
+    "gpu_method_accepted": false,
+    "automation_complete": false
   }
 }

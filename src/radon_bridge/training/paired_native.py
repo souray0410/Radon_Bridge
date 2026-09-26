@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader,Subset
 from radon_bridge.data.observed_pair import collate_observed
-from radon_bridge.evaluation.paired_native import evaluate,move,replay_matches
+from radon_bridge.evaluation.paired_native import evaluate,move,replay_matches,selection_score
 from radon_bridge.runtime.host_checkpoint import save,load,atomic_save,cpu_tree,save_selected,read_selected
 from radon_bridge.runtime.state import atomic_write_json,file_sha256
 from radon_bridge.training.convergence import Plateau
@@ -58,7 +58,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
             if any(not torch.equal(v.cpu(),frozen[k]) for k,v in current.items()):raise ValueError('Frozen native parameters/BN changed')
     if not (out/'best.pt').exists():
         result=evaluate(model,loader(dev),device,out/'development_predictions.npz',should_pause)
-        sch.step(result['mean_macro_f1'],0)
+        sch.step(selection_score(model,result),0)
         save_selected(out/'best.pt',identity=identity,epoch=0,model=model,node_ids=nodes);checkpoint()
     launch_updates=0
     try:
@@ -79,7 +79,7 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
                 if should_pause() or (preflight_updates is not None and launch_updates>=preflight_updates):
                     checkpoint();status('paused');return {'state':'paused'}
             status('validating');result=evaluate(model,loader(dev),device,out/'candidate_predictions.npz',should_pause)
-            decision=sch.step(result['mean_macro_f1'],epoch)
+            decision=sch.step(selection_score(model,result),epoch)
             if decision['improved']:
                 save_selected(out/'best.pt',identity=identity,epoch=epoch,model=model,node_ids=nodes)
                 (out/'candidate_predictions.npz').replace(out/'development_predictions.npz')
