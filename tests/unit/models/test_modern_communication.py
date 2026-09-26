@@ -141,3 +141,62 @@ def test_standard_training_groups_and_node_identity(frozen):
     assert all(torch.isfinite(p.grad).all() for p in params)
     assert set(model.parent_node_map) == {'cfp', 'oct'}
     assert any(name == 'joint_logits' for _, name in model.node_identity())
+
+
+@pytest.mark.parametrize('mode', ['radon', 'linear_resample'])
+def test_multistage_matched_addition_native_gradients_and_restore(mode):
+    torch.manual_seed(3416)
+    parents = {'cfp': parent(2), 'oct': parent(3)}
+    shapes = {'cfp': (1, 4, 4), 'oct': (1, 3, 4, 4)}
+    host = ModernMMTMHost(parents, shapes, frozen=True)
+    additions = {site: dict(M=2, S=4, rho=1, mode=mode,
+                           compression='factorized_projected', bottleneck_rank=3)
+                 for site in ('stage2', 'stage3', 'stage4')}
+    actual = ModernMMTMHost(parents, shapes, frozen=True, additions=additions).train()
+    actual.load_matched_host(host.task.save_state())
+    reference = ModernMMTMHost(parents, shapes, frozen=True, additions=additions).train()
+    reference.load_state_dict(actual.state_dict(), strict=True)
+    original_parents = {n: copy.deepcopy(m.state_dict()) for n,m in actual.task.modules_by_name().items()
+                        if n.startswith(('cfp_', 'oct_'))}
+    opt = torch.optim.Adam(actual.groups(1e-5, 1e-4, 1e-3))
+    refopt = torch.optim.Adam(reference.groups(1e-5, 1e-4, 1e-3))
+    for step in range(3):
+        batch = dict(cfp=torch.randn(3,*shapes['cfp']), oct=torch.randn(3,*shapes['oct']),
+                     counts=[1,2], label=torch.tensor([0,1]))
+        left = {k:v.clone().requires_grad_() if k in ('cfp','oct') else v for k,v in batch.items()}
+        right = {k:v.clone().requires_grad_() if k in ('cfp','oct') else v for k,v in batch.items()}
+        opt.zero_grad(set_to_none=True); refopt.zero_grad(set_to_none=True)
+        out, loss = actual(left); expected, ref_loss = reference.native_forward(right)
+        torch.testing.assert_close(loss, ref_loss, rtol=1e-5, atol=1e-6)
+        for key in out: torch.testing.assert_close(out[key], expected[key], rtol=1e-5, atol=1e-6)
+        actual.backward(); ref_loss.backward()
+        for key in ('cfp','oct'): torch.testing.assert_close(left[key].grad, right[key].grad, rtol=1e-5, atol=1e-6)
+        for (n,a),(rn,b) in zip(actual.named_parameters(),reference.named_parameters()):
+            assert n==rn
+            if a.requires_grad:
+                assert a.grad is not None, n
+                torch.testing.assert_close(a.grad,b.grad,rtol=1e-5,atol=1e-6)
+        opt.step(); refopt.step()
+        for n,t in actual.state_dict().items():
+            torch.testing.assert_close(t, reference.state_dict()[n],rtol=1e-5,atol=1e-6)
+        if step==0:
+            restored=ModernMMTMHost(parents,shapes,frozen=True,additions=additions).train()
+            restored.load_state_dict(actual.state_dict(),strict=True)
+            fresh=torch.optim.Adam(restored.groups(1e-5,1e-4,1e-3))
+            fresh.load_state_dict(copy.deepcopy(opt.state_dict()))
+            actual,opt=restored,fresh
+    for n,buffers in original_parents.items():
+        for key,t in buffers.items():
+            torch.testing.assert_close(actual.task.modules_by_name()[n].state_dict()[key],t,rtol=0,atol=0)
+
+
+def test_matched_host_transfer_rejects_missing_modules_before_mutation():
+    parents={'cfp':parent(2),'oct':parent(3)}
+    shapes={'cfp':(1,4,4),'oct':(1,3,4,4)}
+    host=ModernMMTMHost(parents,shapes)
+    augmented=ModernMMTMHost(parents,shapes,additions={'stage3':dict(M=2,S=4,rho=1,mode='radon')})
+    state=host.task.save_state(); state.pop(next(iter(state)))
+    before=copy.deepcopy(augmented.state_dict())
+    with pytest.raises(ValueError,match='Selected host modules'):
+        augmented.load_matched_host(state)
+    for n,t in before.items():torch.testing.assert_close(t,augmented.state_dict()[n],rtol=0,atol=0)

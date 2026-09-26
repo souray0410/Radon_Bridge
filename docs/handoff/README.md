@@ -297,3 +297,5 @@ unmodified until completed-step checkpoint handover and numerical acceptance.
 factorized 历史24项及 centered 2项已完成原来源审计、52份状态的独立转换和逐项原 V4→直接 V5 真实开发集回放；输出、中间状态、输入/参数梯度、优化器、buffer、两次原批量更新及断点下一步均通过既定容差和独立复核。当前 V5 候选代码恢复了原 factorized 全局因子卷积构图，254项CPU单元测试通过。此接受仅限单卡 Ada 迁移诊断，当前依赖引用、A100、完整 UKB 协议和生产切换仍开放。[逐项边界](v5_rollout_20260922.md)与[脱敏凭证](../acceptance/v5_factorized_centered_20260923.json)。
 
 正式 MHD `V5=1287681c08846e11364c81653048435482e772a7` 发布后，本候选的 submodule、源锁和当前交接引用已统一更新，运行 companion 同步固定为 `MHD_Models=cc16e74a8cfc705d69b3d31efe2daeec9404471f`；正常运行仍无 V4 回退。正式 wheel 摘要复核及最大 factorized 配置的隔离 ws02 真实回放通过，框架与 companion 的候选/正式运行源码 tree 分别相同。此项只关闭正式依赖身份门槛；A100、完整 UKB 流程、生产 owner 切换及六项 Ibex RAM 事件仍开放。[正式发布pin凭证](../acceptance/v5_formal_release_pin_20260923.json)。
+
+2026-09-26现代MMTM匹配扩展：同一冻结骨干MMTM宿主可在stage2/3/4同时增加Radon或线性重采样delta；严格宿主模块/键/形状/精度预检后载入，新增参数单独初始化，不含V4回退。33项models/methods CPU测试通过，包括三次更新、原生/V5梯度、恢复、冻结buffer。真实尺寸GPU接口仍待验收。独立三维Swin父模型由PHD在Ibex新登记为V5、完整原科学配方训练；GPU52627844/终结52627845已提交，不能把排队当合格权重或现代比较结果。

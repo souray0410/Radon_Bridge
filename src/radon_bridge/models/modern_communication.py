@@ -28,7 +28,7 @@ class ScaledCrossEntropy(nn.Module):
 
 class ModernMMTMHost(NativePair):
     def __init__(self, parents, shapes, *, sites=('stage2', 'stage3', 'stage4'),
-                 reduction_ratio=4, frozen=False, device='cpu'):
+                 reduction_ratio=4, frozen=False, device='cpu', additions=None):
         nn.Module.__init__(self)
         if not sites or len(set(sites)) != len(sites):
             raise ValueError('Explicit distinct corresponding sites required')
@@ -62,6 +62,19 @@ class ModernMMTMHost(NativePair):
         native.native_checkpoint_modules = tuple(e.name for e in builder.edges)
         communications = [dict(family='mmtm_author', nodes=[r + '_' + site for r in ('cfp', 'oct')],
                                reduction_ratio=reduction_ratio) for site in sites]
+        additions = {} if additions is None else additions
+        if set(additions) - set(sites):
+            raise ValueError('Addition must identify a corresponding host site')
+        self.addition_prefixes = []
+        for index, site in enumerate(sites):
+            if site not in additions:
+                continue
+            config = dict(additions[site])
+            if {'nodes', 'parallel_to', 'family'} & set(config):
+                raise ValueError('Addition topology is owned by the matched host')
+            self.addition_prefixes.append(f'bridge_{len(communications)}_')
+            communications.append(dict(config, family='radon', parallel_to=index,
+                                       nodes=[r+'_'+site for r in ('cfp','oct')]))
         self.task = MHDTaskGraph(native, bridge_configs=communications, device=device)
         self.graph = self.task.graph
         self.parent_node_map = native.metadata['parent_node_map']
@@ -90,3 +103,25 @@ class ModernMMTMHost(NativePair):
 
     def backward(self):
         self.task.backward()
+
+    def load_matched_host(self, state):
+        """Strict one-time transfer from selected A; new deltas remain initialized.
+
+        This is an explicit scientific branch operation, not a checkpoint-resume
+        fallback. Complete augmented executions use normal strict state loading.
+        """
+        modules = self.task.modules_by_name()
+        expected = {name for name in modules
+                    if not any(name.startswith(prefix) for prefix in self.addition_prefixes)}
+        if set(state) != expected:
+            raise ValueError('Selected host modules differ from matched A')
+        # Validate the complete structure before any parameter is updated.
+        for name in expected:
+            current = modules[name].state_dict()
+            if set(state[name]) != set(current):
+                raise ValueError('Selected host state keys changed: '+name)
+            for key, tensor in current.items():
+                if state[name][key].shape != tensor.shape or state[name][key].dtype != tensor.dtype:
+                    raise ValueError('Selected host tensor changed: '+name+'.'+key)
+        for name in expected:
+            modules[name].load_state_dict(state[name], strict=True)

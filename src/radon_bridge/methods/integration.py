@@ -8,8 +8,18 @@ def attach_communications(native,configs):
     if native.metadata.get('task_fusion') is not None and any('nested_rhos' in c for c in configs):
         raise ValueError('Task fusion protocol does not support joint-width training')
     parallel=any('parallel_to' in c for c in configs)
-    if parallel and (len(configs)!=2 or configs[1].get('parallel_to')!=0 or configs[0].get('family') not in ('mmtm','mmtm_author','cross_attention','cmx_frm') or configs[1].get('family','radon')!='radon' or configs[0]['nodes']!=configs[1]['nodes']):
-        raise ValueError('Parallel addition requires one intact nonlinear host and one Radon-family addition on identical nodes')
+    additions = {}
+    for index, config in enumerate(configs):
+        if 'parallel_to' not in config:
+            continue
+        parent = config['parallel_to']
+        if (type(parent) is not int or not 0 <= parent < index or parent in additions
+                or 'parallel_to' in configs[parent]
+                or configs[parent].get('family') not in ('mmtm','mmtm_author','cross_attention','cmx_frm')
+                or config.get('family','radon') != 'radon'
+                or configs[parent]['nodes'] != config['nodes']):
+            raise ValueError('Parallel addition requires one intact nonlinear host and one Radon-family addition on identical nodes')
+        additions[parent] = index
     for c in configs:
         family=c.get('family','radon')
         required={'nodes','M','S','rho','mode'} if family=='radon' else {'nodes','family','reduction_ratio'} if family in ('mmtm','mmtm_author') else {'nodes','family','attention_dimension','heads'} if family=='cross_attention' else {'nodes','family','alignment_tokens'}
@@ -24,9 +34,17 @@ def attach_communications(native,configs):
         with torch.random.fork_rng(devices=[]),torch.no_grad():samples=builder.native_forward(dict(native.probe_inputs))
     finally:
         for m,value in training.items():m.training=value
-    if parallel:return attach_parallel_to_nodes(builder,configs,samples),True
     groups=[]
     for index,c in enumerate(configs):
+        if 'parallel_to' in c:
+            continue
+        if index in additions:
+            addition = additions[index]
+            groups.extend(attach_parallel_to_nodes(
+                builder, [c, configs[addition]], samples,
+                host_prefix=f'bridge_{index}_', addition_prefix=f'bridge_{addition}_',
+                merge_name='bridge_parallel_merge' if len(configs)==2 else f'bridge_{addition}_parallel_merge'))
+            continue
         _,meta=attach_to_nodes(builder,c['nodes'],prefix=f'bridge_{index}_',samples=samples,**{k:v for k,v in c.items() if k!='nodes'})
         groups.append(meta)
-    return groups,False
+    return groups,parallel

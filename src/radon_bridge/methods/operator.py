@@ -372,29 +372,30 @@ class ParallelResidualSum(nn.Module):
         return host_output + new_delta
 
 
-def attach_parallel_to_nodes(builder, configs, samples):
+def attach_parallel_to_nodes(builder, configs, samples, *, host_prefix="bridge_0_",
+                             addition_prefix="bridge_1_", merge_name="bridge_parallel_merge"):
     """Keep the host's state keys and route both exchanges from pre-write Nodes."""
     host, addition = configs
-    _, host_meta = attach_to_nodes(builder, host['nodes'], prefix='bridge_0_', samples=samples,
+    _, host_meta = attach_to_nodes(builder, host['nodes'], prefix=host_prefix, samples=samples,
                                    **{k:v for k,v in host.items() if k!='nodes'})
     host_steps = list(builder.steps)
     names = host['nodes']
     specs = [FeatureSpec(n, samples[n].shape[1], tuple(samples[n].shape[2:])) for n in names]
     inputs = {n:builder.by_name[n].id for n in names}
-    _, new_meta = attach_group(builder.node, builder.edge, specs, inputs, 'bridge_1_',
+    _, new_meta = attach_group(builder.node, builder.edge, specs, inputs, addition_prefix,
                                **{k:v for k,v in addition.items() if k not in ('nodes','parallel_to')})
     modules={e.name:e.edge_operations[0].function for e in builder.edges}
-    modules['bridge_1_exchange'].delta_only=True
+    modules[addition_prefix+'exchange'].delta_only=True
     new_steps = builder.steps[len(host_steps):]
-    packet=builder.node('bridge_parallel_output')
-    builder.edge('bridge_parallel_merge',ParallelResidualSum(),
+    packet=builder.node('bridge_parallel_output' if merge_name=='bridge_parallel_merge' else merge_name+'_output')
+    builder.edge(merge_name,ParallelResidualSum(),
                  [host_meta['communication_node'],new_meta['communication_node']],[packet])
     merge_step=builder.steps[-1]
-    exchange_id=next(e.id for e in builder.edges if e.name=='bridge_0_exchange')
+    exchange_id=next(e.id for e in builder.edges if e.name==host_prefix+'exchange')
     insertion=next(i for i,row in enumerate(host_steps) if row[0]==exchange_id)+1
     # The old return edges stay named identically and still write original Node IDs.
     reordered=host_steps[:insertion]+[new_steps[0],merge_step]+host_steps[insertion:]
-    return_ids={e.id for e in builder.edges if e.name.startswith('bridge_0_') and e.name.endswith('_return')}
+    return_ids={e.id for e in builder.edges if e.name.startswith(host_prefix) and e.name.endswith('_return')}
     builder.steps[:]=[(eid,[packet] if eid in return_ids else heads,tails) for eid,heads,tails in reordered]
     for meta in (host_meta,new_meta):
         meta.update(topology='parallel_prewrite_residual',native_node_ids=inputs,
