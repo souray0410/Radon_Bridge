@@ -1,0 +1,13 @@
+{
+  "schema": "bounded_engineering_acceptance_v1",
+  "scope": "initial_dev_and_final_selected_replay_clean_pause",
+  "before": "2 failed, 1 passed; InterruptedError escaped at both evaluation boundaries",
+  "after": "22 targeted CPU tests passed",
+  "recovery": "actual tiny MHD four optimizer updates and plateau; fresh model reload reaches accepted, no extra updates on final replay restart",
+  "last_state_preserved": true,
+  "unknown_failures_retry": false,
+  "live_gpu_workers_changed": false,
+  "modern_full_runner_deployed": false,
+  "test_access": false,
+  "hosted_ci": "not_run_budget_exhausted"
+}

@@ -57,7 +57,11 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
             current={name+':'+k:v for name,m in model.task.modules_by_name().items() if not name.startswith('bridge_') for k,v in m.state_dict().items()}
             if any(not torch.equal(v.cpu(),frozen[k]) for k,v in current.items()):raise ValueError('Frozen native parameters/BN changed')
     if not (out/'best.pt').exists():
-        result=evaluate(model,loader(dev),device,out/'development_predictions.npz',should_pause)
+        try:
+            result=evaluate(model,loader(dev),device,out/'development_predictions.npz',should_pause)
+        except InterruptedError:
+            # Preserve initialization and RNG before selection has completed.
+            checkpoint();status('paused');return {'state':'paused'}
         sch.step(selection_score(model,result),0)
         save_selected(out/'best.pt',identity=identity,epoch=0,model=model,node_ids=nodes);checkpoint()
     launch_updates=0
@@ -93,7 +97,12 @@ def train(model,train,dev,cfg,seed,out,identity,device,should_pause=lambda:False
     state=read_selected(out/'best.pt',identity=identity,node_ids=nodes)
     if state['identity']!=identity or state['node_ids']!=nodes:raise ValueError('Selected identity changed')
     model.load_state_dict(state['model'],strict=True);model.eval();check_frozen()
-    result=evaluate(model,loader(dev),device,out/'replay_predictions.npz',should_pause)
+    try:
+        result=evaluate(model,loader(dev),device,out/'replay_predictions.npz',should_pause)
+    except InterruptedError:
+        # best is loaded for read-only acceptance. Never overwrite last with
+        # these weights while its optimizer/scheduler belong to the stop state.
+        status('paused');return {'state':'paused'}
     replay_matches(out/'development_predictions.npz',out/'replay_predictions.npz')
     receipt=dict(schema='radon_branch_training_v1',state='accepted',identity=identity,test_access=False,
         plateau=True,best_epoch=sch.rule.best_epoch,stop_epoch=progress['epoch']-1,metrics=result,
