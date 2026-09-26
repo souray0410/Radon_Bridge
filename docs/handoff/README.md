@@ -1,5 +1,12 @@
 [2026-09-22 V5 候选迁移与未完成门槛](v5_rollout_20260922.md)
 
+## 2026-09-26 evening: current CFP parent accepted by R&B
+
+Explicit one-time importer source `2db7955` republishes the accepted ConvNeXt-Base CFP asset into the current R&B selected contract, without changing weights, source history or runtime loaders. Seven focused tests pass. Ibex CPU52628358 completed strict loading and fresh-process real-input replay for three participants, bitwise equal to the pinned reference. A subsequent check used the not-yet-created canonical Swin run spec path and failed; the original failure remains. A bounded read-only repair checked the already pinned prepared Swin spec instead, confirmed identical full train/dev manifest hashes, and accepted the import. No inference or training was repeated to repair the metadata check. The imported best checkpoint SHA remains `62fc6096b9baf040f7729a269c30b91115b2cfbbf60314c5fce9ca06447c193c`.
+
+The Swin parent remains queued, and actual-size modern MMTM GPU qualification plus the complete matched runner are still open. This is asset/consumer acceptance, not a modern comparison result. Existing running owners are unchanged. Hosted CI was not run.
+
+
 ## 2026-09-19 晚：cross-attention 加桥三臂已独立接受
 
 WS02 `attention_teacher_20260919_v1` 已 3/3 完成且 manager 正常退出；独立复核三臂起点精确重放同一 cross-attention A、fresh Stage3 SVD、全部资产 SHA、profiles/resume、296 人 sklearn 指标及 10k 三项配对区间。continue / Radon / 普通通信分支均值 Macro-F1 分别 69.256% / 71.114% / 70.067%；Radon−continue +1.858pp、Radon−ordinary +1.047pp，但三项同时95%区间全部跨0。详细见 [attention三臂报告](../reports/current/attention_augmentation/README.md) 与 [handoff](ws02_attention_augmentation_20260919.md)。

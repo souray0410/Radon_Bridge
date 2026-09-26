@@ -2,16 +2,16 @@
   "schema": "research_project_status_v1",
   "project": "Radon_Bridge",
   "goal": "结构化跨来源通信与可迁移专家协作",
-  "phase": "modern_swin3d_parent_submitted_complete_mmtm_interfaces_cpu_verified",
-  "next_acceptance": "独立3D Swin父模型52627844获卡资格与训练；新MMTM同A三阶段匹配链仍需真实尺寸GPU资格和后继部署。",
+  "phase": "modern_cfp_current_asset_accepted_swin_pending_matched_runner_open",
+  "next_acceptance": "Swin父模型获卡并完成；接通真实尺寸MMTM资格和同A匹配训练执行链。CFP当前资产已由R&B严格加载和真实输入独立进程验证。",
   "dependencies": [
     "三维父模型",
     "逐实验臂执行与线性补充验收"
   ],
-  "source_commit": "af3fdca",
+  "source_commit": "2db7955",
   "evidence_cutoff": "2026-09-26T17:39:09.964063+00:00",
-  "verified_at": "2026-09-26T17:39:09.964239+00:00",
-  "verification_scope": "source_tests_and_exact_parent_submission",
+  "verified_at": "2026-09-26T18:14:00.626155+00:00",
+  "verification_scope": "runtime_and_evidence",
   "layers": {
     "planned": "documented",
     "implemented": "verified",
@@ -72,6 +72,7 @@
     "完整父模型验收、六臂和旧消费者全面V5切换未完成；未来干净租期追加仍需主窗口按现有锁办理，不自动重试未知失败。"
   ],
   "actions": [
+    "2026-09-26 evening: explicit current CFP import preserves all weight bytes; fresh-process three-participant replay exactly equal. Original post-replay wrong prepared-spec path failure retained and bounded metadata check repaired. No current loader compatibility fallback.",
     "Independent review caught worker step RAM omission before activation; code65d98f6 now enforces actual step cap as well as allocation15% reserve.44 isolated Ibex CPU tests passed; production remains unchanged.",
     "Corrected modality-specific DenseNet/Swin route lookup and duplicate family counting; 16 isolated Ibex tests passed",
     "Read-only verified all 18 route group keys against live 73-candidate catalog",
