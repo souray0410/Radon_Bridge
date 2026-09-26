@@ -6,7 +6,7 @@ The historical single-site, identity-initialized MMTM remains a distinct method.
 import torch
 from torch import nn
 
-from radon_bridge.models.native_pair import definition
+from radon_bridge.models.native_pair import NativePair, definition
 from radon_bridge.models.task import MHDTaskGraph
 
 
@@ -26,10 +26,10 @@ class ScaledCrossEntropy(nn.Module):
         return nn.functional.cross_entropy(logits, labels) * self.scale
 
 
-class ModernMMTMHost(nn.Module):
+class ModernMMTMHost(NativePair):
     def __init__(self, parents, shapes, *, sites=('stage2', 'stage3', 'stage4'),
                  reduction_ratio=4, frozen=False, device='cpu'):
-        super().__init__()
+        nn.Module.__init__(self)
         if not sites or len(set(sites)) != len(sites):
             raise ValueError('Explicit distinct corresponding sites required')
         native, self.pools = definition(parents, shapes)
@@ -64,6 +64,7 @@ class ModernMMTMHost(nn.Module):
                                reduction_ratio=reduction_ratio) for site in sites]
         self.task = MHDTaskGraph(native, bridge_configs=communications, device=device)
         self.graph = self.task.graph
+        self.parent_node_map = native.metadata['parent_node_map']
         self.sites = tuple(sites)
         self.frozen = frozen
         if frozen:
@@ -71,14 +72,6 @@ class ModernMMTMHost(nn.Module):
                 if not name.startswith('bridge_'):
                     module.requires_grad_(False)
         self.train(False)
-
-    def train(self, mode=True):
-        super().train(mode)
-        if getattr(self, 'frozen', False):
-            for name, module in self.task.modules_by_name().items():
-                if not name.startswith('bridge_'):
-                    module.eval()
-        return self
 
     def _inputs(self, batch):
         counts = tuple(batch['counts'])

@@ -120,3 +120,24 @@ def test_reject_missing_corresponding_site_and_unpaired_eyes():
     with pytest.raises(ValueError, match='Paired'):
         model({'cfp': torch.zeros(2, *shapes['cfp']), 'oct': torch.zeros(1, *shapes['oct']),
                'counts': [1], 'label': torch.tensor([0])})
+
+
+@pytest.mark.parametrize('frozen', [False, True])
+def test_standard_training_groups_and_node_identity(frozen):
+    parents = {'cfp': parent(2), 'oct': parent(3)}
+    shapes = {'cfp': (1, 4, 4), 'oct': (1, 3, 4, 4)}
+    model = ModernMMTMHost(parents, shapes, frozen=frozen)
+    groups = model.groups(1e-5, 1e-4, 1e-3)
+    params = [p for group in groups for p in group['params']]
+    assert len(params) == len({id(p) for p in params})
+    assert {id(p) for p in params} == {id(p) for p in model.parameters() if p.requires_grad}
+    assert {g['source'] for g in groups} == ({'bridge'} if frozen else {'cfp', 'oct', 'bridge'})
+    for group in groups:
+        if group['source'] == 'bridge':
+            assert group['lr'] == 1e-3
+    for p in params:
+        p.grad = torch.ones_like(p)
+    model.clip(.1)
+    assert all(torch.isfinite(p.grad).all() for p in params)
+    assert set(model.parent_node_map) == {'cfp', 'oct'}
+    assert any(name == 'joint_logits' for _, name in model.node_identity())

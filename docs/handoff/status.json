@@ -297,11 +297,12 @@
   "modern_methods_candidate": {
     "protocol": "docs/protocols/modern_mmtm_20260926.md",
     "state": "multi_stage_mmtm_cpu_verified_not_gpu_deployed",
-    "tests": 28,
+    "tests": 30,
     "remaining": [
       "actual_modern_pair_gpu_lifecycle",
       "MBT",
       "matched_Radon_linear_successors"
-    ]
+    ],
+    "training_entry": "NativePair parameter groups, clip and node identity reused; frozen and finetuned groups tested"
   }
 }

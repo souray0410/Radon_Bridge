@@ -17,3 +17,7 @@ For every accepted A, compare selected A, continued A, A+Radon and A+ordinary li
 2026-09-26 CPU PyTorch 2.8: 28 method/model tests passed, including author-formula output/input/parameter gradients, native versus V5 continuous three updates, optimizer/model reload, and frozen parent parameters/BatchNorm buffers unchanged from initialization. FP32 rtol=1e-5, atol=1e-6; author float64 gradients 1e-12. This is bounded CPU engineering evidence, not actual modern-pair GPU qualification or research results.
 
 Next: qualify actual modern 2D/3D parent shapes, memory, gradients, save and new-process resume on Ibex under existing claims; then deploy full cohort training and matched successors. MBT, modern parent coverage, additional Radon/linear augmentation on this complete multi-stage host and independent scientific acceptance remain open. Do not hot-edit healthy legacy runs or deployed source snapshots.
+
+## Training-entry integration increment
+
+The multi-stage host now reuses NativePair's source-owned optimizer groups, gradient clipping and node identity interface. In frozen mode only communication parameters enter optimizer groups; in finetuning mode every trainable parent/head/communication parameter belongs to exactly one group. Parent node maps remain available for migration and downstream binding. Both regimes have targeted coverage; the related CPU suite is now30passed. These are tiny 2D/3D graph fixtures, not the full ConvNeXt/Swin volume GPU lifecycle.
