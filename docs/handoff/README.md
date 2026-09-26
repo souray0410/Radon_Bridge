@@ -2,7 +2,7 @@
 
 主窗口主动检查现代MMTM共用训练器时，复现了初始化开发集评价及最终selected重放两处InterruptedError未被捕获：正常租期退出会被误报技术失败。两项回归先失败；修复后22项训练/现代模块/selected状态测试通过。初次评价暂停保存初始化完整状态；最终重放暂停保留原last及其optimizer/scheduler，绝不把已加载best写回last。未知ValueError仍上抛、不会盲重试。tiny MHD真实训练重载后到达accepted，末次重放中断不增加训练更新。
 
-这是新源修复，不热改健康旧worker；实际Ibex CPU部署复核随后记录，真实大模型GPU租期故障尚未发生。完整现代MMTM匹配执行链仍开放，不能以此修复宣称已经部署。
+这是新源修复，不热改健康旧worker；实际Ibex CPU52635063 COMPLETED0，22项通过；源码d39d2db隔离快照已执行。真实大模型GPU租期故障尚未发生。完整现代MMTM匹配执行链仍开放，不能以此修复宣称已经部署。
 
 [2026-09-22 V5 候选迁移与未完成门槛](v5_rollout_20260922.md)
 

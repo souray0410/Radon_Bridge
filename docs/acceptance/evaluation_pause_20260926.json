@@ -9,5 +9,13 @@
   "live_gpu_workers_changed": false,
   "modern_full_runner_deployed": false,
   "test_access": false,
-  "hosted_ci": "not_run_budget_exhausted"
+  "hosted_ci": "not_run_budget_exhausted",
+  "source_commit": "d39d2dbef9265924637f68c0acbc2b8aa97849ff",
+  "ibex_cpu": {
+    "job": "52635063",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "tests_passed": 22,
+    "source_root": "/ibex/user/mengh/Radon_Bridge/evaluation_pause_d39d2db_20260926/source"
+  }
 }

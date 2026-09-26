@@ -314,5 +314,12 @@
     "selection_review": "joint mean-logit classifier macro-F1; legacy branch mean retained separately",
     "gpu_method_accepted": false,
     "automation_complete": false
+  },
+  "maintenance_increment": {
+    "source_commit": "d39d2dbef9265924637f68c0acbc2b8aa97849ff",
+    "receipt": "docs/acceptance/evaluation_pause_20260926.json",
+    "state": "ibex_cpu_evaluation_pause_resume_accepted",
+    "live_workers_rebound": false,
+    "modern_matched_runner_deployed": false
   }
 }
